@@ -11,12 +11,14 @@ import org.logicalcobwebs.logging.LogFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
 import java.util.Properties;
 
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.8 $, $Date: 2003/12/09 18:52:19 $
+ * @version $Revision: 1.9 $, $Date: 2004/03/23 21:17:23 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -56,6 +58,60 @@ public class ProxyStatementTest extends AbstractProxoolTest {
     }
 
     /**
+     * Test what interfaces are supported when getting a PreparedStatement
+     */
+    public void testPreparedStatement() throws Exception {
+
+        String testName = "preparedStatement";
+        String alias = testName;
+        Connection c = null;
+
+        // Register pool
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        c = DriverManager.getConnection(url);
+        PreparedStatement s = c.prepareStatement(TestConstants.HYPERSONIC_TEST_SQL);
+        Statement delegateStatement = ProxoolFacade.getDelegateStatement(s);
+        LOG.debug("Statement " + s.getClass() + " is delegating to " + delegateStatement.getClass());
+        assertTrue("Delegate statement isn't a Hypersonic one as expected.", delegateStatement instanceof org.hsqldb.jdbcPreparedStatement);
+
+    }
+
+    /**
+     * Test what interfaces are supported when getting a CallableStatement
+     */
+    public void testCallableStatement() throws Exception {
+
+        String testName = "callableStatement";
+        String alias = testName;
+        Connection c = null;
+
+        // Register pool
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        c = DriverManager.getConnection(url);
+        CallableStatement s = c.prepareCall(TestConstants.HYPERSONIC_TEST_SQL);
+        s = c.prepareCall(TestConstants.HYPERSONIC_TEST_SQL);
+        Statement delegateStatement = ProxoolFacade.getDelegateStatement(s);
+        LOG.debug("Statement " + s.getClass() + " is delegating to " + delegateStatement.getClass());
+        assertTrue("Delegate statement isn't a Hypersonic one as expected.", delegateStatement instanceof org.hsqldb.jdbcPreparedStatement);
+
+    }
+
+
+    /**
      * That we can get the delegate driver's Connection from the one given by Proxool
      */
     public void testDelegateConnection() throws Exception {
@@ -86,6 +142,9 @@ public class ProxyStatementTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ProxyStatementTest.java,v $
+ Revision 1.9  2004/03/23 21:17:23  billhorsman
+ added preparedStatement and callableStatement tests
+
  Revision 1.8  2003/12/09 18:52:19  billhorsman
  checkstyle
 
