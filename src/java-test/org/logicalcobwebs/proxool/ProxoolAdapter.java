@@ -18,7 +18,7 @@ import java.sql.DriverManager;
  *
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/07 18:56:59 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/09 14:45:35 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -64,7 +64,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
     }
 
     public void closeConnection(Connection connection) throws SQLException {
-        connection.close();
+        if (connection != null){
+            connection.close();
+        }
     }
 
     public void teardown() throws SQLException {
@@ -76,6 +78,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.5  2002/11/09 14:45:35  billhorsman
+ only close connection if it is open
+
  Revision 1.4  2002/11/07 18:56:59  billhorsman
  allow explicit definition of alias
 
