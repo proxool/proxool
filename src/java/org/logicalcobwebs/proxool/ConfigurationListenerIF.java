@@ -13,7 +13,7 @@ import java.util.Properties;
  * opportunity to persist any changes made to it.
  *
  * One of the tasks for a configurator is to
- * {@link ProxoolFacade#registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfiguratorIF) register}
+ * {@link ProxoolFacade#registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfigurationListenerIF) register}
  * the pool. When it does this it should pass in a reference to this configurator. This ensures two things:
  *
  * 1) Any changes to the definition will call this object's {@link #defintionUpdated} method
@@ -21,12 +21,12 @@ import java.util.Properties;
  * 2) Any on-the-fly updates to the definition (i.e. when passed in as a Properties object to
  * the driver) will result in a warning log message,
  *
- * @version $Revision: 1.3 $, $Date: 2002/12/15 19:21:42 $
+ * @version $Revision: 1.1 $, $Date: 2003/01/18 15:12:23 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
-public interface ConfiguratorIF {
+public interface ConfigurationListenerIF {
 
     /**
      * Gets called once after a pool has been updated.
@@ -41,7 +41,10 @@ public interface ConfiguratorIF {
 
 /*
  Revision history:
- $Log: ConfiguratorIF.java,v $
+ $Log: ConfigurationListenerIF.java,v $
+ Revision 1.1  2003/01/18 15:12:23  billhorsman
+ renamed ConfiguratorIF to ConfigurationListenerIF to better reflect role
+
  Revision 1.3  2002/12/15 19:21:42  chr32
  Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
 
@@ -49,6 +52,6 @@ public interface ConfiguratorIF {
  now includes properties in definitionChanged event
 
  Revision 1.1  2002/12/04 13:19:43  billhorsman
- draft ConfiguratorIF stuff for persistent configuration
+ draft ConfigurationListenerIF stuff for persistent configuration
 
 */
