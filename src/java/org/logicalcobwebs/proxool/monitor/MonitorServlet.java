@@ -42,7 +42,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/05 15:06:16 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/05 17:04:02 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -66,7 +66,7 @@ public class MonitorServlet extends HttpServlet {
     private static final String STYLE_NO_DATA = "color: #666666;";
     private static final int DATE_OFFSET = 3600000;
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("DD-MMM-yyyy HH:mm:ss");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
     private static final Color COLOR_ACTIVE = Color.red;
     private static final Color COLOR_AVAILABLE = Color.green;
@@ -489,6 +489,9 @@ public class MonitorServlet extends HttpServlet {
 /*
  Revision history:
  $Log: MonitorServlet.java,v $
+ Revision 1.6  2003/02/05 17:04:02  billhorsman
+ fixed date format
+
  Revision 1.5  2003/02/05 15:06:16  billhorsman
  removed dependency on JDK1.4 imaging.
 
