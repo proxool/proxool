@@ -16,13 +16,13 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * This is the simplest pool you can get. It isnæt thread safe. It isn't robust.
+ * This is the simplest pool you can get. It isn\ufffdt thread safe. It isn't robust.
  * But it is fast. We use it as our bench mark on how could we should strive
  * to be.
  *
  * Provides Simpool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/13 20:23:38 $
+ * @version $Revision: 1.6 $, $Date: 2003/01/27 23:32:10 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -83,6 +83,9 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: SimpoolAdapter.java,v $
+ Revision 1.6  2003/01/27 23:32:10  billhorsman
+ encoding fix (no idea how that happened)
+
  Revision 1.5  2002/11/13 20:23:38  billhorsman
  change method name, throw exceptions differently, trivial changes
 
