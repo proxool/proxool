@@ -12,7 +12,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Waits for a set of results to become true with timeout
  * functionality
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/01 16:54:20 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/01 18:17:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -63,9 +63,10 @@ public abstract class ResultMonitor {
             if (check()) {
                 result = SUCCESS;
             }
-            while (result  != SUCCESS) {
+            while (true) {
                 if (System.currentTimeMillis() - startTime > timeout) {
                     result = TIMEOUT;
+                    LOG.debug("Timeout");
                     break;
                 }
                 try {
@@ -75,6 +76,8 @@ public abstract class ResultMonitor {
                 }
                 if (check()) {
                     result = SUCCESS;
+                    LOG.debug("Success");
+                    break;
                 }
             }
             return result;
@@ -100,6 +103,9 @@ public abstract class ResultMonitor {
 /*
  Revision history:
  $Log: ResultMonitor.java,v $
+ Revision 1.5  2003/03/01 18:17:51  billhorsman
+ arrffgh. fix,
+
  Revision 1.4  2003/03/01 16:54:20  billhorsman
  fix
 

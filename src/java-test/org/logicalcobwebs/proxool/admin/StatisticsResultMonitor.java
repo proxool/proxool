@@ -8,16 +8,20 @@ package org.logicalcobwebs.proxool.admin;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ResultMonitor;
 import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 /**
  * A ResultMonitor specifically for Snapshots
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/01 16:53:07 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/01 18:17:50 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class StatisticsResultMonitor extends ResultMonitor {
+
+    private static final Log LOG = LogFactory.getLog(StatisticsResultMonitor.class);
 
     private StatisticsIF statistics;
 
@@ -49,7 +53,11 @@ public class StatisticsResultMonitor extends ResultMonitor {
         } else if (oldStatistics == null) {
             return true;
         } else {
-            return (!statistics.getStartDate().equals(oldStatistics.getStartDate()));
+            if (!statistics.getStartDate().equals(oldStatistics.getStartDate())) {
+                return true;
+            } else {
+               return false;
+            }
         }
     }
 
@@ -71,6 +79,9 @@ public class StatisticsResultMonitor extends ResultMonitor {
 /*
  Revision history:
  $Log: StatisticsResultMonitor.java,v $
+ Revision 1.5  2003/03/01 18:17:50  billhorsman
+ arrffgh. fix,
+
  Revision 1.4  2003/03/01 16:53:07  billhorsman
  fix
 
