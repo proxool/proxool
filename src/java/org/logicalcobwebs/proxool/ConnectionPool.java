@@ -20,7 +20,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:12:55 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/13 12:13:50 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -224,8 +224,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             throwSQLException("Unknown reason for not getting connection. Sorry.");
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Returning connection " + proxyConnection.getId());
+        if (log.isDebugEnabled() && getDefinition().getDebugLevel() > ConnectionPoolDefinitionIF.DEBUG_LEVEL_QUIET) {
+            log.debug("Serving connection " + proxyConnection.getId());
         }
 
         return (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(), new Class[]{Connection.class}, proxyConnection);
@@ -337,6 +337,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 // Let's make it available for someone else
                 proxyConnection.fromActiveToAvailable();
             }
+
+            if (log.isDebugEnabled() && getDefinition().getDebugLevel() > ConnectionPoolDefinitionIF.DEBUG_LEVEL_QUIET) {
+                log.debug("Returning connection " + proxyConnection.getId());
+            }
+
         } finally {
             // This is probably due to getPoolableConnection returning a null.
             calculateUpState();
@@ -360,8 +365,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     /** Get a ProxyConnection by index */
-    private Connection getConnection(int i) {
-        return (Connection) proxyConnections.elementAt(i);
+    private ProxyConnection getConnection(int i) {
+        return (ProxyConnection) proxyConnections.elementAt(i);
     }
 
     private ProxyConnection getProxyConnection(int i) {
@@ -569,8 +574,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     // matter at all).  If an element is added then it is added to the end and we
                     // will miss it on this house keeping run (but we'll get it next time).
                     for (int i = proxyConnections.size() - 1; i >= 0; i--) {
-                        connection = getConnection(i);
-                        proxyConnection = (ProxyConnection) Proxy.getInvocationHandler(connection);
+                        proxyConnection = getConnection(i);
+                        connection = proxyConnection.getConnection();
                         // First lets check whether the connection still works. We should only validate
                         // connections that are not is use!  SetOffline only succeeds if the connection
                         // is available.
@@ -1010,8 +1015,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
- Revision 1.1  2002/09/13 08:12:55  billhorsman
- Initial revision
+ Revision 1.2  2002/09/13 12:13:50  billhorsman
+ added debug and fixed ClassCastException during housekeeping
+
+ Revision 1.1.1.1  2002/09/13 08:12:55  billhorsman
+ new
 
  Revision 1.13  2002/08/24 19:57:15  billhorsman
  checkstyle changes
