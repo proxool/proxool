@@ -26,7 +26,7 @@ import java.util.Calendar;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.5 $, $Date: 2003/01/31 16:53:27 $
+ * @version $Revision: 1.6 $, $Date: 2003/09/05 17:01:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -49,7 +49,12 @@ public class ProxyPreparedStatement extends ProxyStatement implements PreparedSt
         try {
             return getPreparedStatement().executeQuery();
         } catch (SQLException e) {
-            testException(e);
+            if (testException(e)) {
+                // This is really a fatal one
+                if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
+                    throw new FatalSQLException(e);
+                }
+            }
             exception = e;
             throw e;
         } finally {
@@ -63,7 +68,12 @@ public class ProxyPreparedStatement extends ProxyStatement implements PreparedSt
         try {
             return getPreparedStatement().executeUpdate();
         } catch (SQLException e) {
-            testException(e);
+            if (testException(e)) {
+                // This is really a fatal one
+                if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
+                    throw new FatalSQLException(e);
+                }
+            }
             exception = e;
             throw e;
         } finally {
@@ -230,7 +240,12 @@ public class ProxyPreparedStatement extends ProxyStatement implements PreparedSt
         try {
             return preparedStatement.execute();
         } catch (SQLException e) {
-            testException(e);
+            if (testException(e)) {
+                // This is really a fatal one
+                if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
+                    throw new FatalSQLException(e);
+                }
+            }
             throw e;
         }
     }
@@ -316,6 +331,9 @@ public class ProxyPreparedStatement extends ProxyStatement implements PreparedSt
 /*
  Revision history:
  $Log: ProxyPreparedStatement.java,v $
+ Revision 1.6  2003/09/05 17:01:12  billhorsman
+ Trap and throw FatalSQLExceptions.
+
  Revision 1.5  2003/01/31 16:53:27  billhorsman
  checkstyle
 

@@ -19,7 +19,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.18 $, $Date: 2003/03/03 11:11:58 $
+ * @version $Revision: 1.19 $, $Date: 2003/09/05 17:01:00 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -80,13 +80,25 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
         } catch (InvocationTargetException e) {
             exception = e;
             if (e.getTargetException() instanceof SQLException) {
-                testException((SQLException) e.getTargetException());
+                final SQLException sqlException = (SQLException) e.getTargetException();
+                if (testException(sqlException)) {
+                    // This is really a fatal one
+                    if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
+                        throw new FatalSQLException(sqlException);
+                    }
+                }
             }
             throw e.getTargetException();
         } catch (Exception e) {
             exception = e;
             if (e instanceof SQLException) {
-                testException((SQLException) e);
+                final SQLException sqlException = (SQLException) e;
+                if (testException(sqlException)) {
+                    // This is really a fatal one
+                    if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
+                        throw new FatalSQLException(sqlException);
+                    }
+                }
             }
             throw e;
         } finally {
@@ -110,6 +122,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.19  2003/09/05 17:01:00  billhorsman
+ Trap and throw FatalSQLExceptions.
+
  Revision 1.18  2003/03/03 11:11:58  billhorsman
  fixed licence
 

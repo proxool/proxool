@@ -20,7 +20,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.6 $, $Date: 2003/02/06 23:48:10 $
+ * @version $Revision: 1.7 $, $Date: 2003/09/05 17:01:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -38,7 +38,12 @@ public class ProxyStatement extends AbstractProxyStatement implements Statement 
         try {
             return getStatement().executeQuery(sql);
         } catch (SQLException e) {
-            testException(e);
+            if (testException(e)) {
+                // This is really a fatal one
+                if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
+                    throw new FatalSQLException(e);
+                }
+            }
             exception = e;
             throw e;
         } finally {
@@ -52,7 +57,12 @@ public class ProxyStatement extends AbstractProxyStatement implements Statement 
         try {
             return getStatement().executeUpdate(sql);
         } catch (SQLException e) {
-            testException(e);
+            if (testException(e)) {
+                // This is really a fatal one
+                if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
+                    throw new FatalSQLException(e);
+                }
+            }
             exception = e;
             throw e;
         } finally {
@@ -66,7 +76,12 @@ public class ProxyStatement extends AbstractProxyStatement implements Statement 
         try {
             return getStatement().executeBatch();
         } catch (SQLException e) {
-            testException(e);
+            if (testException(e)) {
+                // This is really a fatal one
+                if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
+                    throw new FatalSQLException(e);
+                }
+            }
             exception = e;
             throw e;
         } finally {
@@ -122,7 +137,12 @@ public class ProxyStatement extends AbstractProxyStatement implements Statement 
         try {
             return getStatement().execute(sql);
         } catch (SQLException e) {
-            testException(e);
+            if (testException(e)) {
+                // This is really a fatal one
+                if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
+                    throw new FatalSQLException(e);
+                }
+            }
             throw e;
         }
     }
@@ -181,6 +201,9 @@ public class ProxyStatement extends AbstractProxyStatement implements Statement 
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.7  2003/09/05 17:01:12  billhorsman
+ Trap and throw FatalSQLExceptions.
+
  Revision 1.6  2003/02/06 23:48:10  billhorsman
  Use imported logging
 
