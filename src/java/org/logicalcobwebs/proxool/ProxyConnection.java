@@ -21,9 +21,9 @@ import java.sql.Statement;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.29 $, $Date: 2003/12/12 19:29:47 $
+ * @version $Revision: 1.30 $, $Date: 2004/03/14 21:52:38 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  */
 class ProxyConnection extends AbstractProxyConnection implements InvocationHandler, MethodInterceptor {
 
@@ -54,9 +54,9 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
             if (method.getName().equals(CLOSE_METHOD)) {
                 close();
             } else if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
-                result = new Boolean(equals(args[0]));
+                result = Boolean.valueOf(equals(args[0]));
             } else if (method.getName().equals(IS_CLOSED_METHOD) && argCount == 0) {
-                result = new Boolean(isClosed());
+                result = Boolean.valueOf(isClosed());
             } else if (method.getName().equals(GET_META_DATA_METHOD) && argCount == 0) {
                 result = getMetaData();
             } else if (method.getName().equals(FINALIZE_METHOD)) {
@@ -111,6 +111,9 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.30  2004/03/14 21:52:38  brenuart
+ Little improvement: don't create a new Boolean but reuse the Boolean.TRUE/FALSE static instances
+
  Revision 1.29  2003/12/12 19:29:47  billhorsman
  Now uses Cglib 2.0
 
