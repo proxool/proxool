@@ -22,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.19 $, $Date: 2003/03/06 10:37:41 $
+ * @version $Revision: 1.20 $, $Date: 2003/03/06 12:45:06 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -56,6 +56,7 @@ public class StatisticsTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s,15s");
         info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, "true");
 
         // We don't test whether anything is logged, but this line should make something appear
         info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
@@ -117,6 +118,9 @@ public class StatisticsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.20  2003/03/06 12:45:06  billhorsman
+ switch on verbose logging
+
  Revision 1.19  2003/03/06 10:37:41  billhorsman
  better timeout assertion
 
