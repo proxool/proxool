@@ -20,7 +20,7 @@ import java.sql.Statement;
  * A central place to build proxy objects ({@link org.logicalcobwebs.proxool.ProxyConnection connections}
  * and {@link org.logicalcobwebs.proxool.ProxyStatement statements}).
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/06 23:48:10 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/12 12:46:30 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -31,11 +31,12 @@ class ProxyFactory {
 
     protected static ProxyConnection buildProxyConnection(long id, ConnectionPool connectionPool) throws SQLException {
         Connection realConnection = null;
+        final String url = connectionPool.getDefinition().getUrl();
         realConnection = DriverManager.getConnection(
-                connectionPool.getDefinition().getUrl(),
+                url,
                 connectionPool.getDefinition().getProperties());
 
-        return new ProxyConnection(realConnection, id, connectionPool);
+        return new ProxyConnection(realConnection, id, url, connectionPool);
     }
 
     /**
@@ -81,6 +82,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.5  2003/02/12 12:46:30  billhorsman
+ brought up to date with recent changes in main source
+
  Revision 1.4  2003/02/06 23:48:10  billhorsman
  Use imported logging
 
