@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.2 $, $Date: 2002/10/25 15:59:32 $
+ * @version $Revision: 1.3 $, $Date: 2002/10/27 13:29:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -70,8 +70,14 @@ interface ProxoolConstants {
     /** @see ProxoolDriver#getPropertyInfo */
     public final String MAXIMUM_ACTIVE_TIME_PROPERTY = PROPERTY_PREFIX + "maximum-active-time";
 
-    /** @see ProxoolDriver#getPropertyInfo */
+    /**
+     * Deprecated - use {@linkplain #VERBOSE_PROPERTY verbose} instead.
+     * @see ProxoolDriver#getPropertyInfo
+     */
     public final String DEBUG_LEVEL_PROPERTY = PROPERTY_PREFIX + "debug-level";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String VERBOSE_PROPERTY = PROPERTY_PREFIX + "verbose";
 
     /** @see ProxoolDriver#getPropertyInfo */
     public final String FATAL_SQL_EXCEPTION_PROPERTY = PROPERTY_PREFIX + "fatal-sql-exception";
@@ -93,6 +99,9 @@ interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.3  2002/10/27 13:29:38  billhorsman
+ deprecated debug-level in favour of verbose
+
  Revision 1.2  2002/10/25 15:59:32  billhorsman
  made non-public where possible
 

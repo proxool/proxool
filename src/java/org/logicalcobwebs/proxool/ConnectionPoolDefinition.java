@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.2 $, $Date: 2002/10/17 19:46:02 $
+ * @version $Revision: 1.3 $, $Date: 2002/10/27 13:29:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -49,7 +49,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     private int maximumActiveTime = DEFAULT_MAXIMUM_ACTIVE_TIME;
 
-    private int debugLevel;
+    private boolean verbose;
 
     private Set fatalSqlExceptions = new HashSet();
 
@@ -199,11 +199,15 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     }
 
     public int getDebugLevel() {
-        return debugLevel;
+        return (verbose ? 1 : 0);
     }
 
-    public void setDebugLevel(int debugLevel) {
-        this.debugLevel = debugLevel;
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
     }
 
     public String getCompleteUrl() {
@@ -241,6 +245,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.3  2002/10/27 13:29:38  billhorsman
+ deprecated debug-level in favour of verbose
+
  Revision 1.2  2002/10/17 19:46:02  billhorsman
  removed redundant reference to logFilename (we now use Jakarta's Commons Logging component
 

@@ -14,7 +14,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.4 $, $Date: 2002/10/23 21:04:36 $
+ * @version $Revision: 1.5 $, $Date: 2002/10/27 13:29:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -130,8 +130,8 @@ public class ProxoolDriver implements Driver {
                     "If a connection is active for longer than this (milliseconds) then we assume it has stalled or something. And we kill it.");
             dpi[9].value = String.valueOf(cpd.getMaximumActiveTime());
 
-            dpi[10] = new DriverPropertyInfo(ProxoolConstants.DEBUG_LEVEL_PROPERTY,
-                    "Either 0 (quiet) or 1 (loud). Default is 0.");
+            dpi[10] = new DriverPropertyInfo(ProxoolConstants.VERBOSE_PROPERTY,
+                    "Either false (quiet) or true (loud). Default is false.");
 
             dpi[11] = new DriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY,
                     "All SQLExceptions are caught and tested for containing this text fragment. If it matches than this connection is considered useless "
@@ -178,6 +178,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.5  2002/10/27 13:29:38  billhorsman
+ deprecated debug-level in favour of verbose
+
  Revision 1.4  2002/10/23 21:04:36  billhorsman
  checkstyle fixes (reduced max line width and lenient naming convention
 

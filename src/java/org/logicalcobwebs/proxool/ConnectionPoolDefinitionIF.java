@@ -22,7 +22,7 @@ import java.util.Set;
  * {@linkplain java.sql.Driver#connect ask} for a connection or call
  * {@linkplain ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.5 $, $Date: 2002/10/27 12:09:00 $
+ * @version $Revision: 1.6 $, $Date: 2002/10/27 13:29:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -133,6 +133,9 @@ public interface ConnectionPoolDefinitionIF {
      than your slowest expected response! */
     int getMaximumActiveTime();
 
+    /**
+     * @deprecated use {@link #isVerbose} instead
+     */
     int getDebugLevel();
 
     Set getFatalSqlExceptions();
@@ -141,11 +144,23 @@ public interface ConnectionPoolDefinitionIF {
 
     String getCompleteUrl();
 
+    /**
+     * If this is true then we start logging a lot of stuff everytime we serve a
+     * connection and everytime the house keeper and prototyper run. Be
+     * prepared for a lot of debug!
+     *
+     * @return true if in verbose mode
+     */
+    boolean isVerbose();
+
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.6  2002/10/27 13:29:38  billhorsman
+ deprecated debug-level in favour of verbose
+
  Revision 1.5  2002/10/27 12:09:00  billhorsman
  default minimum connection count changed from 5 to 0
 

@@ -24,7 +24,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.7 $, $Date: 2002/10/27 13:01:23 $
+ * @version $Revision: 1.8 $, $Date: 2002/10/27 13:29:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -197,12 +197,15 @@ public class ProxoolFacade {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        cpd.setDebugLevel(valueAsInt);
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                    if (value != null && value.equals("1")) {
+                        LOG.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
+                        cpd.setVerbose(true);
+                    } else {
+                        LOG.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=0 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=false instead.");
+                        cpd.setVerbose(false);
                     }
+                } else if (key.equals(ProxoolConstants.VERBOSE_PROPERTY)) {
+                    cpd.setVerbose(Boolean.valueOf(value).booleanValue());
                 } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
                     cpd.setFatalSqlException(value);
                 } else {
@@ -410,6 +413,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.8  2002/10/27 13:29:38  billhorsman
+ deprecated debug-level in favour of verbose
+
  Revision 1.7  2002/10/27 13:01:23  billhorsman
  layout
 
