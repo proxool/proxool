@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.21 $, $Date: 2002/12/03 12:25:05 $
+ * @version $Revision: 1.22 $, $Date: 2002/12/16 11:14:51 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -91,6 +91,32 @@ public class GeneralTests extends TestCase {
             Properties info = TestHelper.buildProperties();
             adapter = new ProxoolAdapter(alias);
             adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
+        }
+
+    }
+
+    public void testDelegateStatement() {
+
+        String testName = "delegateStatement";
+        ProxoolAdapter adapter = null;
+        Connection c = null;
+        try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            c = adapter.getConnection();
+            Statement s = c.createStatement();
+            Statement delegateStatement = ProxoolFacade.getDelegateStatement(s);
+            LOG.debug("Statement " + s.getClass() + " is delegating to " + delegateStatement.getClass());
+            assertTrue("Delegate statement isn't a Hypersonic one as expected.", delegateStatement instanceof org.hsqldb.jdbcStatement);
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -443,6 +469,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.22  2002/12/16 11:14:51  billhorsman
+ new delegateStatement test
+
  Revision 1.21  2002/12/03 12:25:05  billhorsman
  new fatal sql exception test
 
