@@ -21,7 +21,7 @@ import java.text.DecimalFormat;
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.13 $, $Date: 2003/03/10 15:31:26 $
+ * @version $Revision: 1.14 $, $Date: 2003/03/10 23:49:04 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -35,8 +35,8 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
     private Thread waitingThead;
 
     private StatisticsIF statistics;
-    private static final int period = 10;
-    private static final int count = 1;
+    private static final int PERIOD = 10;
+    private static final int COUNT = 1;
 
     public PerformanceTest(String s) {
         super(s);
@@ -59,7 +59,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, String.valueOf(threadCount));
-        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, String.valueOf(period) + "s");
+        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, String.valueOf(PERIOD) + "s");
         info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_INFO);
         ProxoolFacade.registerConnectionPool(url, info);
         ProxoolFacade.addStatisticsListener(alias, this);
@@ -73,7 +73,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
             t.start();
         }
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < COUNT; i++) {
             doWait();
         }
 
@@ -82,7 +82,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
         }
 
         LOG.info("Served " + statistics.getServedCount()
-            + " at " + millisecondsFormat.format((double) (1000 * period * count) / (double) statistics.getServedCount()) + " ms per connection");
+            + " at " + millisecondsFormat.format((double) (1000 * PERIOD * COUNT) / (double) statistics.getServedCount()) + " ms per connection");
 
     }
 
@@ -116,7 +116,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, String.valueOf(threadCount));
-        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, String.valueOf(period) + "s");
+        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, String.valueOf(PERIOD) + "s");
         info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_INFO);
         ProxoolFacade.registerConnectionPool(url, info);
         ProxoolFacade.addStatisticsListener(alias, this);
@@ -132,7 +132,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 
         doWait();
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < COUNT; i++) {
             doWait();
         }
 
@@ -142,7 +142,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
         disagreeableSnapshotter.cancel();
 
         LOG.info("Served " + statistics.getServedCount()
-            + " at " + millisecondsFormat.format((double) (1000 * period * count) / (double) statistics.getServedCount()) + " ms per connection");
+            + " at " + millisecondsFormat.format((double) (1000 * PERIOD * COUNT) / (double) statistics.getServedCount()) + " ms per connection");
 
     }
 
@@ -228,6 +228,9 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.14  2003/03/10 23:49:04  billhorsman
+ new test to measure the impact of taking snapshots
+
  Revision 1.13  2003/03/10 15:31:26  billhorsman
  fixes
 
