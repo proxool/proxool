@@ -14,7 +14,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.6 $, $Date: 2002/11/09 15:55:42 $
+ * @version $Revision: 1.7 $, $Date: 2002/12/03 00:41:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -133,12 +133,13 @@ public class ProxoolDriver implements Driver {
             dpi[10] = new DriverPropertyInfo(ProxoolConstants.VERBOSE_PROPERTY,
                     "Either false (quiet) or true (loud). Default is false.");
 
-            dpi[11] = new DriverPropertyInfo(ProxoolConstants.VERBOSE_PROPERTY,
+            dpi[11] = new DriverPropertyInfo(ProxoolConstants.TRACE_PROPERTY,
                     "If true then every execution will be logged. Default is false.");
 
             dpi[12] = new DriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY,
                     "All SQLExceptions are caught and tested for containing this text fragment. If it matches than this connection is considered useless "
-                    + "and it is discarded. Regardless of what happens the exception is alway thrown again.");
+                    + "and it is discarded. Regardless of what happens the exception is always thrown again. This property behaves like a collection; "
+                    + "you can set it more than once and each value is checked.");
 
         }
 
@@ -181,6 +182,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.7  2002/12/03 00:41:56  billhorsman
+ fixed getPropertyInfo() for TRACE property and better explanation of FATAL_SQL_EXCEPTION
+
  Revision 1.6  2002/11/09 15:55:42  billhorsman
  added propertyInfo for verbose
 
