@@ -18,7 +18,7 @@ import java.util.Properties;
  * Tests whether we are wrapping up connections correctly. There disposable
  * wrappers stop the user doing nasty things to the connection after it has
  * been closed.
- * @version $Revision: 1.1 $, $Date: 2004/03/23 21:14:24 $
+ * @version $Revision: 1.2 $, $Date: 2004/03/23 21:25:54 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -260,6 +260,31 @@ public class WrapperTest extends AbstractProxoolTest {
         assertEquals("c1.getId()", 1, ProxoolFacade.getId(c1));
         c2.close();
         assertEquals("c2.getId()", 2, ProxoolFacade.getId(c2));
+
+    }
+
+    /**
+     * Check whether {@link ProxoolFacade#getAlias(java.sql.Connection)} returns
+     * sensible values
+     * @throws ProxoolException if anything goes wrong
+     * @throws SQLException if anything goes wrong
+     */
+    public void testAlias() throws ProxoolException, SQLException {
+        String testName = "alias";
+        String alias = testName;
+
+        // Register pool
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+
+        Connection c1 = DriverManager.getConnection(url, info);
+        assertEquals("c1.getAlias()", alias, ProxoolFacade.getAlias(c1));
+        c1.close();
+        assertEquals("c1.getAlias()", alias, ProxoolFacade.getAlias(c1));
 
     }
 }

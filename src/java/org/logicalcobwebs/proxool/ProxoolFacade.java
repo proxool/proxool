@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.77 $, $Date: 2004/03/23 21:19:45 $
+ * @version $Revision: 1.78 $, $Date: 2004/03/23 21:25:54 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -568,11 +568,27 @@ public class ProxoolFacade {
      * Get the connection ID for a connection
      * @param connection the connection that was served
      * @return the ID
-     * @throws ProxoolException if the connection wasn't recognised or if it's been closed.
+     * @throws ProxoolException if the connection wasn't recognised.
      */
     public static long getId(Connection connection) throws ProxoolException {
         try {
             return ProxyFactory.getWrappedConnection(connection).getId();
+        } catch (NullPointerException e) {
+            throw new ProxoolException("Connection argument is not one provided by Proxool (it's a " + connection.getClass() + ")");
+        } catch (IllegalArgumentException e) {
+            throw new ProxoolException("Connection argument is not one provided by Proxool (it's a " + connection.getClass() + ")");
+        }
+    }
+
+    /**
+     * Get the alias for the connection pool that served a connection
+     * @param connection the connection that was served
+     * @return the alias
+     * @throws ProxoolException if the connection wasn't recognised.
+     */
+    public static String getAlias(Connection connection) throws ProxoolException {
+        try {
+            return ProxyFactory.getWrappedConnection(connection).getAlias();
         } catch (NullPointerException e) {
             throw new ProxoolException("Connection argument is not one provided by Proxool (it's a " + connection.getClass() + ")");
         } catch (IllegalArgumentException e) {
@@ -770,6 +786,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.78  2004/03/23 21:25:54  billhorsman
+ Added getAlias() call.
+
  Revision 1.77  2004/03/23 21:19:45  billhorsman
  Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
 
