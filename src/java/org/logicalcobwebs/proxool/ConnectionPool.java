@@ -21,9 +21,9 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.48 $, $Date: 2003/02/18 16:49:59 $
+ * @version $Revision: 1.49 $, $Date: 2003/02/19 22:38:33 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPool implements ConnectionPoolStatisticsIF {
 
@@ -518,7 +518,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             boolean connectionClosedManually = false;
             try {
                 try {
-                    wakeThread(houseKeepingThread);
+                    wakehouseKeeper();
                 } catch (NullPointerException e) {
                     log.error("HouseKeepingThread already dead", e);
                 } catch (Exception e) {
@@ -526,7 +526,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 }
 
                 try {
-                    wakeThread(prototypingThread);
+                    wakePrototyper();
                 } catch (NullPointerException e) {
                     log.error("PrototypingThread already dead", e);
                 } catch (Exception e) {
@@ -597,6 +597,14 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 log.debug("Ignoring duplicate attempt to shutdown '" + alias + "' pool by " + finalizerName);
             }
         }
+    }
+
+    private void wakePrototyper() {
+        wakeThread(prototypingThread);
+    }
+
+    protected void wakehouseKeeper() {
+        wakeThread(houseKeepingThread);
     }
 
     private void wakeThread(Thread thread) {
@@ -1052,7 +1060,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
              */
 
             // if (this.lastCreateWasSuccessful) {
-            if (getAvailableConnectionCount() > 0 || getRecentlyStartedActiveConnectionCount() > 0) {
+            final int availableConnectionCount = getAvailableConnectionCount();
+            final int recentlyStartedActiveConnectionCount = getRecentlyStartedActiveConnectionCount();
+            if (availableConnectionCount > 0 || recentlyStartedActiveConnectionCount > 0) {
 
 /* Defintion of overloaded is that we refused a connection
                  * (because we were too busy) within the last minute.
@@ -1198,6 +1208,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.49  2003/02/19 22:38:33  billhorsman
+ fatal sql exception causes house keeper to run
+ immediately
+
  Revision 1.48  2003/02/18 16:49:59  chr32
  Added possibility to remove connection and state listeners.
 
