@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.shiftone.ooc.InitialContextFactoryImpl;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -19,7 +18,7 @@ import java.util.Hashtable;
 
 /**
  * Test for {@link org.logicalcobwebs.proxool.BasicDataSource}
- * @version $Revision: 1.3 $, $Date: 2003/08/15 10:12:20 $
+ * @version $Revision: 1.4 $, $Date: 2003/08/27 18:03:35 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -43,7 +42,9 @@ public class DataSourceTest extends AbstractProxoolTest {
         super.setUp();
 
         Hashtable jndiEnvironment = new Hashtable();
+/*
         jndiEnvironment.put(InitialContext.INITIAL_CONTEXT_FACTORY, org.shiftone.ooc.InitialContextFactoryImpl.class.getName());
+*/
         context = new InitialContext(jndiEnvironment);
         LOG.debug("Found context " + context.getClass().getName());
     }
