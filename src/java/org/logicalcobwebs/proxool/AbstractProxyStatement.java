@@ -21,7 +21,7 @@ import java.util.TreeMap;
  * statement. The subclass of this defines how we delegate to the
  * real statement.
 
- * @version $Revision: 1.1 $, $Date: 2003/01/27 18:26:35 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/28 11:47:08 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -105,7 +105,7 @@ abstract class AbstractProxyStatement {
      * @throws SQLException if it couldn't be closed
      * @see ProxyConnectionIF#registerClosedStatement
      */
-    protected void close() throws SQLException {
+    public void close() throws SQLException {
         statement.close();
         proxyConnection.registerClosedStatement(statement);
     }
@@ -185,12 +185,20 @@ abstract class AbstractProxyStatement {
 
     }
 
+    protected boolean isTrace() {
+        boolean isTrace = getConnectionPool().isConnectionListenedTo() || (getConnectionPool().getDefinition().isTrace() && getConnectionPool().getLog().isDebugEnabled());
+        return isTrace;
+    }
+
 }
 
 
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.2  2003/01/28 11:47:08  billhorsman
+ new isTrace() and made close() public
+
  Revision 1.1  2003/01/27 18:26:35  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch

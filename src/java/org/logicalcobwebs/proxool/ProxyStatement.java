@@ -19,7 +19,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.13 $, $Date: 2003/01/27 18:26:40 $
+ * @version $Revision: 1.14 $, $Date: 2003/01/28 11:47:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -47,8 +47,6 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
         long startTime = System.currentTimeMillis();
         final int argCount = args != null ? args.length : 0;
 
-        boolean isTrace = getConnectionPool().isConnectionListenedTo() || (getConnectionPool().getDefinition().isTrace() && getConnectionPool().getLog().isDebugEnabled());
-
         // We need to remember an exceptions that get thrown so that we can optionally
         // pass them to the onExecute() call below
         Exception exception = null;
@@ -62,7 +60,7 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
             }
 
             // We only dump sql calls if we are in verbose mode and debug is enabled
-            if (isTrace) {
+            if (isTrace()) {
                 try {
 
                     // What sort of method is it
@@ -109,6 +107,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.14  2003/01/28 11:47:08  billhorsman
+ new isTrace() and made close() public
+
  Revision 1.13  2003/01/27 18:26:40  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch
