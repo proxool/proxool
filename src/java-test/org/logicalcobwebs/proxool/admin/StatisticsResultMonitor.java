@@ -12,7 +12,7 @@ import org.logicalcobwebs.proxool.ProxoolException;
 /**
  * A ResultMonitor specifically for Snapshots
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/01 16:38:40 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/01 16:53:07 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -34,6 +34,7 @@ public class StatisticsResultMonitor extends ResultMonitor {
     public StatisticsResultMonitor(String alias, String token) {
         this.alias = alias;
         this.token = token;
+        setDelay(2000);
     }
 
     /**
@@ -70,6 +71,9 @@ public class StatisticsResultMonitor extends ResultMonitor {
 /*
  Revision history:
  $Log: StatisticsResultMonitor.java,v $
+ Revision 1.4  2003/03/01 16:53:07  billhorsman
+ fix
+
  Revision 1.3  2003/03/01 16:38:40  billhorsman
  fix
 

@@ -12,7 +12,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Waits for a set of results to become true with timeout
  * functionality
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/01 15:27:24 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/01 16:54:20 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -40,6 +40,8 @@ public abstract class ResultMonitor {
     private long timeout = 30000;
 
     private int result = WAITING;
+
+    private int delay = 500;
 
     /**
      * Override this with your specific check
@@ -89,12 +91,18 @@ public abstract class ResultMonitor {
         this.timeout = timeout;
     }
 
+    public void setDelay(int delay) {
+        this.delay = delay;
+    }
 }
 
 
 /*
  Revision history:
  $Log: ResultMonitor.java,v $
+ Revision 1.4  2003/03/01 16:54:20  billhorsman
+ fix
+
  Revision 1.3  2003/03/01 15:27:24  billhorsman
  checkstyle
 
