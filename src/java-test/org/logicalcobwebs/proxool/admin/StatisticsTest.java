@@ -8,23 +8,23 @@ package org.logicalcobwebs.proxool.admin;
 import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.TestConstants;
+import org.logicalcobwebs.proxool.TestHelper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.Properties;
 import java.text.DecimalFormat;
+import java.util.Properties;
 
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/28 12:36:33 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/01 15:27:25 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -172,6 +172,9 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.8  2003/03/01 15:27:25  billhorsman
+ checkstyle
+
  Revision 1.7  2003/02/28 12:36:33  billhorsman
  more robust waiting for statistics
 

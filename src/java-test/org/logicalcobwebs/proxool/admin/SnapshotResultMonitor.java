@@ -11,12 +11,12 @@ import org.logicalcobwebs.proxool.ResultMonitor;
 /**
  * A ResultMonitor specifically for Snapshots
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/01 15:22:50 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/01 15:27:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-abstract public class SnapshotResultMonitor extends ResultMonitor {
+public abstract class SnapshotResultMonitor extends ResultMonitor {
 
     private SnapshotIF snapshot;
 
@@ -45,7 +45,7 @@ abstract public class SnapshotResultMonitor extends ResultMonitor {
      * @return true if the result has happened, else false
      * @throws Exception if anything goes wrong
      */
-    abstract public boolean check(SnapshotIF snapshot) throws Exception;
+    public abstract boolean check(SnapshotIF snapshot) throws Exception;
 
     /**
      * Get the snapshot used in the most recent {@link #check(org.logicalcobwebs.proxool.admin.SnapshotIF) check}
@@ -61,6 +61,9 @@ abstract public class SnapshotResultMonitor extends ResultMonitor {
 /*
  Revision history:
  $Log: SnapshotResultMonitor.java,v $
+ Revision 1.3  2003/03/01 15:27:24  billhorsman
+ checkstyle
+
  Revision 1.2  2003/03/01 15:22:50  billhorsman
  doc
 

@@ -7,32 +7,32 @@ package org.logicalcobwebs.proxool.admin.jmx;
 
 import junit.framework.TestCase;
 import org.logicalcobwebs.proxool.GlobalTest;
-import org.logicalcobwebs.proxool.ProxoolDriver;
 import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.ProxoolDriver;
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestConstants;
+import org.logicalcobwebs.proxool.TestHelper;
 
+import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
-import javax.management.Attribute;
-import javax.management.NotificationListener;
 import javax.management.Notification;
 import javax.management.NotificationFilter;
 import javax.management.NotificationFilterSupport;
+import javax.management.NotificationListener;
 import javax.management.ObjectName;
-import javax.management.AttributeList;
-import java.util.Properties;
-import java.util.Iterator;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.Properties;
 
 
 /**
  * Test {@link ConnectionPoolMBean}.
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/28 12:53:59 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/01 15:27:25 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -244,6 +244,9 @@ public class ConnectionPoolMBeanTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionPoolMBeanTest.java,v $
+ Revision 1.3  2003/03/01 15:27:25  billhorsman
+ checkstyle
+
  Revision 1.2  2003/02/28 12:53:59  billhorsman
  move database to db directory and use constants where possible
 

@@ -6,9 +6,9 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
+import org.logicalcobwebs.dbscript.ScriptFacade;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.dbscript.ScriptFacade;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,7 +18,7 @@ import java.sql.SQLException;
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/19 15:14:23 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/01 15:27:24 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -54,6 +54,9 @@ public class PerformanceTest extends TestCase {
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.9  2003/03/01 15:27:24  billhorsman
+ checkstyle
+
  Revision 1.8  2003/02/19 15:14:23  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

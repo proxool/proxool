@@ -5,18 +5,18 @@
  */
 package org.logicalcobwebs.proxool;
 
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.extensions.TestSetup;
 
 /**
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/19 23:36:50 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/01 15:27:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -80,6 +80,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.9  2003/03/01 15:27:24  billhorsman
+ checkstyle
+
  Revision 1.8  2003/02/19 23:36:50  billhorsman
  renamed monitor package to admin
 

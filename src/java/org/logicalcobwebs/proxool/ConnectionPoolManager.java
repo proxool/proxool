@@ -8,7 +8,6 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,7 +16,7 @@ import java.util.Set;
 
 /**
  *
- * @version $Revision: 1.10 $, $Date: 2003/02/28 10:42:59 $
+ * @version $Revision: 1.11 $, $Date: 2003/03/01 15:27:24 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -115,6 +114,9 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.11  2003/03/01 15:27:24  billhorsman
+ checkstyle
+
  Revision 1.10  2003/02/28 10:42:59  billhorsman
  ConnectionPoolManager now passes ProxoolFacade an
  array of ConnectionPools rather than a Collection

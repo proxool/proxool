@@ -5,9 +5,9 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.logicalcobwebs.dbscript.ConnectionAdapterIF;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.dbscript.ConnectionAdapterIF;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,7 +21,7 @@ import java.util.Properties;
  *
  * Provides Simpool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/19 15:14:25 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/01 15:27:24 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -82,6 +82,9 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: SimpoolAdapter.java,v $
+ Revision 1.9  2003/03/01 15:27:24  billhorsman
+ checkstyle
+
  Revision 1.8  2003/02/19 15:14:25  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

@@ -6,20 +6,19 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-
-import java.util.Properties;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.DriverManager;
-
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/01 15:24:09 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/01 15:27:24 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -177,6 +176,9 @@ public class StateListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.6  2003/03/01 15:27:24  billhorsman
+ checkstyle
+
  Revision 1.5  2003/03/01 15:24:09  billhorsman
  tweaked properties
 

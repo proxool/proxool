@@ -6,22 +6,21 @@
 package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
-
-import java.sql.SQLException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
-import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.GlobalTest;
+import org.logicalcobwebs.proxool.TestHelper;
 import org.xml.sax.InputSource;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.sql.SQLException;
 
 /**
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/27 18:01:49 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/01 15:27:25 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -185,6 +184,9 @@ public class JAXPConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.9  2003/03/01 15:27:25  billhorsman
+ checkstyle
+
  Revision 1.8  2003/02/27 18:01:49  billhorsman
  completely rethought the test structure. it's now
  more obvious. no new tests yet though.

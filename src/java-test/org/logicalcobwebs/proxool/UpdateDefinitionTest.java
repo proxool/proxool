@@ -5,20 +5,17 @@
  */
 package org.logicalcobwebs.proxool;
 
+import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.util.Properties;
-import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-
-import junit.framework.TestCase;
+import java.util.Properties;
 
 /**
  * Test that we can update the definition of a pool
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/27 18:01:48 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/01 15:27:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -190,6 +187,9 @@ public class UpdateDefinitionTest extends TestCase {
 /*
  Revision history:
  $Log: UpdateDefinitionTest.java,v $
+ Revision 1.2  2003/03/01 15:27:24  billhorsman
+ checkstyle
+
  Revision 1.1  2003/02/27 18:01:48  billhorsman
  completely rethought the test structure. it's now
  more obvious. no new tests yet though.

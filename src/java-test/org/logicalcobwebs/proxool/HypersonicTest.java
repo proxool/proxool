@@ -9,13 +9,10 @@ import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 /**
  * Very basic test to see if Hypersonic test database is working
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/27 18:01:48 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/01 15:27:24 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -55,6 +52,9 @@ public class HypersonicTest extends TestCase {
 /*
  Revision history:
  $Log: HypersonicTest.java,v $
+ Revision 1.9  2003/03/01 15:27:24  billhorsman
+ checkstyle
+
  Revision 1.8  2003/02/27 18:01:48  billhorsman
  completely rethought the test structure. it's now
  more obvious. no new tests yet though.

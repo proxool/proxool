@@ -6,27 +6,26 @@
 package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
-
-import java.io.File;
-
-import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.GlobalTest;
-import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.apache.avalon.excalibur.component.DefaultRoleManager;
+import org.apache.avalon.excalibur.component.ExcaliburComponentManager;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.avalon.framework.context.DefaultContext;
-import org.apache.avalon.excalibur.component.ExcaliburComponentManager;
-import org.apache.avalon.excalibur.component.DefaultRoleManager;
 import org.apache.log.Hierarchy;
 import org.apache.log.LogTarget;
 import org.apache.log.Logger;
 import org.apache.log.Priority;
+import org.logicalcobwebs.proxool.GlobalTest;
+import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.TestHelper;
+
+import java.io.File;
 
 /**
  * Tests that the AvalonConfgiuration works.
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/27 18:01:49 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/01 15:27:25 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -178,6 +177,9 @@ public class AvalonConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: AvalonConfiguratorTest.java,v $
+ Revision 1.6  2003/03/01 15:27:25  billhorsman
+ checkstyle
+
  Revision 1.5  2003/02/27 18:01:49  billhorsman
  completely rethought the test structure. it's now
  more obvious. no new tests yet though.

@@ -5,19 +5,18 @@
  */
 package org.logicalcobwebs.proxool;
 
+import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.util.Properties;
 import java.sql.Connection;
 import java.sql.DriverManager;
-
-import junit.framework.TestCase;
+import java.util.Properties;
 
 /**
  * Test the house keeper in ConnectionPool
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/27 18:01:48 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/01 15:27:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -97,6 +96,7 @@ public class HouseKeeperTest extends TestCase {
         String alias = testName;
         try {
 
+            assertTrue("Humph", true);
             // TODO complete this test
 
         } catch (Exception e) {
@@ -112,6 +112,9 @@ public class HouseKeeperTest extends TestCase {
 /*
  Revision history:
  $Log: HouseKeeperTest.java,v $
+ Revision 1.2  2003/03/01 15:27:24  billhorsman
+ checkstyle
+
  Revision 1.1  2003/02/27 18:01:48  billhorsman
  completely rethought the test structure. it's now
  more obvious. no new tests yet though.
