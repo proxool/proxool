@@ -21,7 +21,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.9 $, $Date: 2002/10/28 19:51:34 $
+ * @version $Revision: 1.10 $, $Date: 2002/10/30 21:19:17 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -53,20 +53,7 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 
     private static final String EQUALS_METHOD = "equals";
 
-    public static Object newInstance(long id, ConnectionPoolDefinitionIF connectionPoolDefinition) throws SQLException {
-
-        ConnectionPool connectionPool = ConnectionPoolManager.getInstance().getConnectionPool(connectionPoolDefinition.getName());
-        Connection connection = null;
-
-        connection = DriverManager.getConnection(connectionPoolDefinition.getUrl(), connectionPoolDefinition.getProperties());
-
-        return java.lang.reflect.Proxy.newProxyInstance(
-                connection.getClass().getClassLoader(),
-                connection.getClass().getInterfaces(),
-                new ProxyConnection(connection, id, connectionPool));
-    }
-
-    private ProxyConnection(Connection connection, long id, ConnectionPool connectionPool) throws SQLException {
+    protected ProxyConnection(Connection connection, long id, ConnectionPool connectionPool) throws SQLException {
         this.connection = connection;
         setId(id);
         this.connectionPool = connectionPool;
@@ -360,6 +347,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.10  2002/10/30 21:19:17  billhorsman
+ make use of ProxyFactory
+
  Revision 1.9  2002/10/28 19:51:34  billhorsman
  Fixed NullPointerException when calling connection.createStatement()
 

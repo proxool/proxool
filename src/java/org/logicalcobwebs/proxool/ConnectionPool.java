@@ -19,7 +19,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.13 $, $Date: 2002/10/29 23:00:33 $
+ * @version $Revision: 1.14 $, $Date: 2002/10/30 21:19:17 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -225,7 +225,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             log.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " served");
         }
 
-        return (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(), new Class[]{Connection.class}, proxyConnection);
+        return ProxyFactory.getConnection(proxyConnection);
     }
 
     private void throwSQLException(String message) throws SQLException {
@@ -251,8 +251,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         Connection connection = null;
 
         try {
-            connection = (Connection) ProxyConnection.newInstance(getNextId(), getDefinition());
-            proxyConnection = (ProxyConnection) Proxy.getInvocationHandler(connection);
+            proxyConnection = ProxyFactory.buildProxyConnection(getNextId(), this);
+            connection = ProxyFactory.getConnection(proxyConnection);
 
             try {
                 onBirth(connection);
@@ -1043,6 +1043,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.14  2002/10/30 21:19:17  billhorsman
+ make use of ProxyFactory
+
  Revision 1.13  2002/10/29 23:00:33  billhorsman
  fixed sign error in prototyper (that meant that protoyping never happened)
 
