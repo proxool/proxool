@@ -24,7 +24,7 @@ import java.text.DecimalFormat;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.6 $, $Date: 2003/02/28 12:23:59 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/28 12:36:33 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -86,10 +86,13 @@ public class StatisticsTest extends TestCase {
             StatisticsIF statistics = waitForNextStatistics(alias, "10s", null, 20000);
 
 
-            Thread.sleep(1000);
             Connection c = DriverManager.getConnection(url);
             // Ensure that active time is non-zero (due to rounding)
-            Thread.sleep(20);
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                LOG.error("Awoken", e);
+            }
             c.close();
 
             statistics = waitForNextStatistics(alias, "10s", statistics, 20000);
@@ -150,15 +153,15 @@ public class StatisticsTest extends TestCase {
         long startWaiting = System.currentTimeMillis();
         StatisticsIF statistics = null;
         while (statistics == null || statistics == oldStatistics) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                LOG.debug("Awoken", e);
-            }
             if (System.currentTimeMillis() - startWaiting > timeout) {
                 fail("Statistics didn't arrive within expected 20 seconds");
             }
             statistics = ProxoolFacade.getStatistics(alias, token);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                LOG.debug("Awoken", e);
+            }
         }
         LOG.debug("Got stats after " + DECIMAL_FORMAT.format((double) (System.currentTimeMillis() - startWaiting) / 1000) + " seconds");
         return statistics;
@@ -169,6 +172,9 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.7  2003/02/28 12:36:33  billhorsman
+ more robust waiting for statistics
+
  Revision 1.6  2003/02/28 12:23:59  billhorsman
  more robust waiting for statistics
 
