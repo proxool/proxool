@@ -31,7 +31,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.38 $, $Date: 2003/01/31 16:53:17 $
+ * @version $Revision: 1.39 $, $Date: 2003/02/04 15:04:17 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -47,6 +47,13 @@ public class ProxoolFacade {
         TODO we only allow one configurationListener at a time. Need to rethink whole listener code
      */
     private static Map configurators = new HashMap();
+
+    /**
+     * This will register a ShutdownHook. (At least, it will with JDK > 1.2)
+     */
+    static {
+        new ShutdownHook();
+    }
 
     /**
      * Build a ConnectionPool based on this definition and then start it.
@@ -696,6 +703,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.39  2003/02/04 15:04:17  billhorsman
+ New ShutdownHook
+
  Revision 1.38  2003/01/31 16:53:17  billhorsman
  checkstyle
 
