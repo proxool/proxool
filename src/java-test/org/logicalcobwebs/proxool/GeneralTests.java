@@ -10,10 +10,12 @@ import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -21,7 +23,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:14:24 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/17 22:44:19 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -31,8 +33,23 @@ public class GeneralTests extends TestCase {
 
     private static final String PASSWORD = "";
 
+    private static final Log LOG = LogFactory.getLog(GeneralTests.class);
+
     public GeneralTests(String name) {
         super(name);
+
+        DOMConfigurator.configure("log4j.xml");
+
+    }
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        execute(prefix + "setup" + urlSuffix, "create table test (a int, b varchar)");
+    }
+
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        execute(prefix + "setup" + urlSuffix, "drop table test");
     }
 
     /**
@@ -43,13 +60,13 @@ public class GeneralTests extends TestCase {
         String alias = "alias";
 
         // Register pool
-        getDate(prefix + alias + urlSuffix);
+        execute(prefix + alias + urlSuffix, SELECT_SQL);
 
         // Get it back by url
-        getDate(prefix + alias + urlSuffix);
+        execute(prefix + alias + urlSuffix, SELECT_SQL);
 
         // Get it back by name
-        getDate(prefix + alias);
+        execute(prefix + alias, SELECT_SQL);
 
         ConnectionPoolStatisticsIF connectionPoolStatistics = ProxoolFacade.getConnectionPoolStatistics(alias);
 
@@ -65,7 +82,7 @@ public class GeneralTests extends TestCase {
 
         String alias = "update";
 
-        getDate(prefix + alias + urlSuffix);
+        execute(prefix + alias + urlSuffix, SELECT_SQL);
 
         ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
         long mcc1 = cpd.getMaximumConnectionCount();
@@ -86,7 +103,7 @@ public class GeneralTests extends TestCase {
             // Update on-the-fly using the driver
             Properties info = buildProperties();
             info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
-            getDate(prefix + alias + urlSuffix, info);
+            execute(prefix + alias + urlSuffix, info, SELECT_SQL);
             cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
             long mcc2 = cpd.getMaximumConnectionCount();
             assertTrue(mcc1 != mcc2);
@@ -104,7 +121,7 @@ public class GeneralTests extends TestCase {
 
         Properties info = buildProperties();
         ProxoolFacade.registerConnectionPool(prefix + alias + urlSuffix, info);
-        getDate(prefix + alias + urlSuffix);
+        execute(prefix + alias + urlSuffix, SELECT_SQL);
 
         // Wait for a while for some prototyping and for the log to write.
         try {
@@ -156,28 +173,63 @@ public class GeneralTests extends TestCase {
         info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
         ProxoolFacade.registerConnectionPool(prefix + alias + urlSuffix, info);
 
-        for (int i = 0; i < maxThreads; i++) {
-            Thread t = new Thread(new Load(alias));
-            t.setDaemon(true);
-            t.start();
-        }
+        final int load = 6;
+        final int count = 200;
+        int goodHits = 0;
 
-        while (threadCount > 0) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Who cares?
+        Connection[] connections = new Connection[count];
+        for (int i = 0; i < count; i++) {
+
+            if (i >= load && connections[i - load] != null) {
+                connections[i - load].close();
             }
+
+            connections[i] = null;
+            try {
+                Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
+
+                if (info == null) {
+                    info = buildProperties();
+                }
+                connections[i] = DriverManager.getConnection(prefix + alias, info);
+
+                Statement statement = null;
+                try {
+                    statement = connections[i].createStatement();
+                    statement.execute(SELECT_SQL);
+                    goodHits++;
+                } finally {
+                    if (statement != null) {
+                        try {
+                            statement.close();
+                        } catch (SQLException e) {
+                            LOG.error("Couldn't close statement", e);
+                        }
+                    }
+                }
+
+            } catch (ClassNotFoundException e) {
+                LOG.error("Problem finding driver?", e);
+            } catch (SQLException e) {
+                LOG.debug("Ignorable SQLException", e);
+            } catch (Exception e) {
+                LOG.error("Unexpected Exception", e);
+            }
+
         }
 
         ConnectionPoolStatisticsIF cps = ProxoolFacade.getConnectionPoolStatistics(alias);
-        assertEquals(maxThreads * maxLoops, cps.getConnectionsServedCount() + cps.getConnectionsRefusedCount());
+        LOG.info("Served: " + cps.getConnectionsServedCount());
+        LOG.info("Refused: " + cps.getConnectionsRefusedCount());
+        assertEquals(count, cps.getConnectionsServedCount() + cps.getConnectionsRefusedCount());
+        assertEquals(goodHits, cps.getConnectionsServedCount());
     }
 
-    private Properties buildProperties() {
+    private static Properties buildProperties() {
         Properties info = new Properties();
         info.setProperty("user", USER);
         info.setProperty("password", PASSWORD);
+        info.setProperty("proxool.debug-level", "1");
         return info;
     }
     /**
@@ -189,11 +241,11 @@ public class GeneralTests extends TestCase {
         String alias2 = "pool#2";
 
         // #1
-        getDate(prefix + alias1 + urlSuffix);
+        execute(prefix + alias1 + urlSuffix, SELECT_SQL);
 
         // #2
-        getDate(prefix + alias2 + urlSuffix);
-        getDate(prefix + alias2 + urlSuffix);
+        execute(prefix + alias2 + urlSuffix, SELECT_SQL);
+        execute(prefix + alias2 + urlSuffix, SELECT_SQL);
 
         ConnectionPoolStatisticsIF cps1 = ProxoolFacade.getConnectionPoolStatistics(alias1);
         assertEquals(1L, cps1.getConnectionsServedCount());
@@ -203,39 +255,38 @@ public class GeneralTests extends TestCase {
 
     }
 
-    private static void getDate(String urlToUse) {
-        getDate(urlToUse, null);
+    private static void execute(String urlToUse, String sql) {
+        execute(urlToUse, null, sql);
     }
 
-    private static void getDate(String urlToUse, Properties info) {
+    private static void execute(String urlToUse, Properties info, String sql) {
         Connection connection = null;
         try {
             Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
 
-            if (info != null) {
-                info.setProperty("user", USER);
-                info.setProperty("password", PASSWORD);
-                connection = DriverManager.getConnection(urlToUse, info);
-            } else {
-                connection = DriverManager.getConnection(urlToUse, USER, PASSWORD);
+            if (info == null) {
+                info = buildProperties();
             }
+            connection = DriverManager.getConnection(urlToUse, info);
 
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select CURRENT_DATE");
-            resultSet.next();
-
-            // System.out.println("date=" + resultSet.getString(1) );
-
+            Statement statement = null;
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // Who cares?
+                statement = connection.createStatement();
+                statement.execute(sql);
+            } finally {
+                if (statement != null) {
+                    try {
+                        statement.close();
+                    } catch (SQLException e) {
+                        LOG.error("Couldn't close statement", e);
+                    }
+                }
             }
 
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            LOG.error("Problem finding driver?", e);
         } catch (SQLException e) {
-            // Ignore (it could just be a "can't get connection" message)
+            LOG.debug("Ignorable SQLException", e);
         } finally {
             try {
                 if (connection != null) {
@@ -244,7 +295,7 @@ public class GeneralTests extends TestCase {
                     connection.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.error("Problem closing connection", e);
             }
         }
 
@@ -254,42 +305,18 @@ public class GeneralTests extends TestCase {
 
     private static String prefix = "proxool.";
 
-    private int threadCount;
-
-    private int maxThreads = 20;
-
-    private int maxLoops = 10;
-
-    class Load implements Runnable {
-
-        private String alias;
-
-        Load(String alias) {
-            threadCount++;
-            this.alias = alias;
-        }
-
-        public void run() {
-            for (int i = 0; i < maxLoops; i++) {
-                try {
-                    getDate(prefix + alias);
-                } catch (Exception e) {
-                    // Ignore
-                }
-                Thread.yield();
-            }
-            threadCount--;
-        }
-
-    }
+    private static String SELECT_SQL = "SELECT * FROM test";
 
 }
 
 /*
  Revision history:
  $Log: GeneralTests.java,v $
- Revision 1.1  2002/09/13 08:14:24  billhorsman
- Initial revision
+ Revision 1.2  2002/09/17 22:44:19  billhorsman
+ improved tests
+
+ Revision 1.1.1.1  2002/09/13 08:14:24  billhorsman
+ new
 
  Revision 1.5  2002/08/24 20:07:48  billhorsman
  renamed tests
