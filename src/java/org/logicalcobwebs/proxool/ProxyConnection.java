@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.18 $, $Date: 2002/12/03 12:24:00 $
+ * @version $Revision: 1.19 $, $Date: 2002/12/17 17:15:39 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -182,7 +182,7 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
         return status;
     }
 
-    public void setStatus(int status) {
+    private void setStatus(int status) {
         if (this.status != status) {
             connectionPool.changeStatus(this.status, status);
         }
@@ -274,6 +274,12 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
             }
         }
         return success;
+    }
+
+    protected void fromAnythingToNull() {
+        synchronized (this) {
+            setStatus(STATUS_NULL);
+        }
     }
 
     protected boolean fromActiveToNull() {
@@ -382,6 +388,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.19  2002/12/17 17:15:39  billhorsman
+ Better synchronization of status stuff
+
  Revision 1.18  2002/12/03 12:24:00  billhorsman
  fixed fatal sql exception
 
