@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.55 $
-    $Date: 2003/06/18 10:04:47 $
+    $Revision: 1.56 $
+    $Date: 2003/07/08 22:12:02 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -321,13 +321,12 @@
         description="Runs the JUnit tests"
         depends="clean,init,build-test,deleteTestDb"
         >
-        <!--
         <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}"/>
             <arg value="org.logicalcobwebs.proxool.GlobalTest"/>
             <jvmarg line="${jvmargs}"/>
         </java>
-        -->
+<!--
         <junit fork="true" printsummary="yes">
             <classpath refid="source"/>
             <sysproperty key="log4jPath" value="${log4jPath}"/>
@@ -337,6 +336,7 @@
                     />
             </batchtest>
         </junit>
+-->
     </target>
 
     <target
