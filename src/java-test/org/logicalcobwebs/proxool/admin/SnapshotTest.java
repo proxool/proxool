@@ -13,6 +13,7 @@ import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.ResultMonitor;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/04 10:58:44 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/06 10:11:11 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -40,10 +41,10 @@ public class SnapshotTest extends AbstractProxoolTest {
     /**
      * Test whether the statistics we get back are roughly right.
      */
-    public void testStatistics() throws Exception {
+    public void testSnapshot() throws Exception {
 
-        String testName = "statistics";
-        String alias = testName;
+        String testName = "snapshot";
+        final String alias = testName;
         String url = TestHelper.buildProxoolUrl(alias,
                 TestConstants.HYPERSONIC_DRIVER,
                 TestConstants.HYPERSONIC_TEST_URL);
@@ -59,22 +60,13 @@ public class SnapshotTest extends AbstractProxoolTest {
         // Register pool
         ProxoolFacade.registerConnectionPool(url, info);
 
-        // Wait for prototyper to build connections
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            LOG.debug("Awoken", e);
-        }
-
         {
-            Connection c = DriverManager.getConnection(url);
-            c.close();
+            DriverManager.getConnection(url).close();
 
             SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
 
             assertEquals("servedCount", 1L, snapshot.getServedCount());
             assertEquals("refusedCount", 0L, snapshot.getRefusedCount());
-            assertEquals("availableConnectionCount", 1, snapshot.getAvailableConnectionCount());
             assertEquals("activeConnectionCount", 0, snapshot.getActiveConnectionCount());
 
             ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
@@ -89,7 +81,6 @@ public class SnapshotTest extends AbstractProxoolTest {
 
             assertEquals("servedCount", 2L, snapshot.getServedCount());
             assertEquals("refusedCount", 0L, snapshot.getRefusedCount());
-            assertEquals("availableConnectionCount", 0, snapshot.getAvailableConnectionCount());
             assertEquals("activeConnectionCount", 1, snapshot.getActiveConnectionCount());
 
             ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
@@ -106,6 +97,9 @@ public class SnapshotTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: SnapshotTest.java,v $
+ Revision 1.9  2003/03/06 10:11:11  billhorsman
+ fixes
+
  Revision 1.8  2003/03/04 10:58:44  billhorsman
  checkstyle
 
