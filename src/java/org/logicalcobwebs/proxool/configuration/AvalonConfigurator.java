@@ -24,11 +24,11 @@ import org.xml.sax.helpers.AttributesImpl;
  * and have exactly the same format as is documented in that class.
  * <p>
  * This is a "faceless" Avalon component. This means that it does not present an operational interface, it
- * simply configures Proxool when Avalon calls it's <code>configure</code> method. You need to lookup this
+ * simply configures Proxool when Avalon calls its <code>configure</code> method. You need to lookup this
  * component in your bootstrap code to make this happen.
  * </p>
  *
- * @version $Revision: 1.7 $, $Date: 2002/12/23 02:58:16 $
+ * @version $Revision: 1.8 $, $Date: 2002/12/23 02:59:38 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -121,6 +121,9 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.8  2002/12/23 02:59:38  chr32
+ Tiny doc fix.
+
  Revision 1.7  2002/12/23 02:58:16  chr32
  Improved doc.
 
