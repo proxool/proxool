@@ -20,7 +20,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.36 $, $Date: 2003/02/12 00:35:08 $
+ * @version $Revision: 1.37 $, $Date: 2003/02/26 16:05:49 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -60,28 +60,26 @@ public class GeneralTests extends TestCase {
             // Register pool
             {
                 String url = TestHelper.getFullUrl(alias);
-                Connection c = TestHelper.getProxoolConnection(url);
+                Connection c = TestHelper.getProxoolConnection(url, TestHelper.buildProperties());
                 TestHelper.insertRow(c, TEST_TABLE);
             }
 
             // Get it back by url
             {
                 String url = TestHelper.getFullUrl(alias);
-                Connection c = TestHelper.getProxoolConnection(url);
+                Connection c = TestHelper.getProxoolConnection(url, null);
                 TestHelper.insertRow(c, TEST_TABLE);
             }
 
             // Get it back by name
             {
                 String url = TestHelper.getSimpleUrl(alias);
-                Connection c = TestHelper.getProxoolConnection(url);
+                Connection c = DriverManager.getConnection(url);
                 TestHelper.insertRow(c, TEST_TABLE);
             }
 
-            ConnectionPoolStatisticsIF connectionPoolStatistics = ProxoolFacade.getConnectionPoolStatistics(alias);
-
             // If the above calls all used the same pool then it should have served exactly 3 connections.s
-            assertEquals(3L, connectionPoolStatistics.getConnectionsServedCount());
+            assertEquals(3L, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -115,36 +113,34 @@ public class GeneralTests extends TestCase {
 
             // Get one connection
             {
-                Connection c = TestHelper.getProxoolConnection(urlPrefix + "1");
+                Connection c = TestHelper.getProxoolConnection(urlPrefix + "1", null);
                 c.close();
             }
 
             // If the above calls all used the same pool then it should have served exactly 3 connections.s
-            assertEquals("connectionsServedCount", 1L, ProxoolFacade.getConnectionPoolStatistics(alias).getConnectionsServedCount());
+            assertEquals("connectionsServedCount", 1L, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
             ProxoolFacade.updateConnectionPool(urlPrefix + "2", null);
-            ProxoolFacade.killAllConnections(alias);
 
             // Get another connection
             {
-                Connection c = TestHelper.getProxoolConnection(urlPrefix + "2");
+                Connection c = TestHelper.getProxoolConnection(urlPrefix + "2", null);
                 c.close();
             }
 
             // If the above calls all used the same pool then it should have served exactly 3 connections.s
-            assertEquals("connectionsServedCount", 2L, ProxoolFacade.getConnectionPoolStatistics(alias).getConnectionsServedCount());
+            assertEquals("connectionsServedCount", 2L, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
             ProxoolFacade.updateConnectionPool(urlPrefix + "1", null);
-            ProxoolFacade.killAllConnections(alias);
 
             // Get another connection
             {
-                Connection c = TestHelper.getProxoolConnection(urlPrefix + "1");
+                Connection c = TestHelper.getProxoolConnection(urlPrefix + "1", null);
                 c.close();
             }
 
             // If the above calls all used the same pool then it should have served exactly 3 connections.s
-            assertEquals("connectionsServedCount", 3L, ProxoolFacade.getConnectionPoolStatistics(alias).getConnectionsServedCount());
+            assertEquals("connectionsServedCount", 3L, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -167,7 +163,7 @@ public class GeneralTests extends TestCase {
 
             // Register
             ProxoolFacade.registerConnectionPool(url, info);
-            Connection c1 = TestHelper.getProxoolConnection(url);
+            Connection c1 = TestHelper.getProxoolConnection(url, null);
             assertNotNull("connection is null", c1);
             assertNotNull("definition is null", ProxoolFacade.getConnectionPoolDefinition(alias));
 
@@ -183,7 +179,7 @@ public class GeneralTests extends TestCase {
 
             // Re-register
             ProxoolFacade.registerConnectionPool(url, info);
-            Connection c3 = TestHelper.getProxoolConnection(url);
+            Connection c3 = TestHelper.getProxoolConnection(url, null);
             assertNotNull("connection is null", c3);
             assertNotNull("definition is null", ProxoolFacade.getConnectionPoolDefinition(alias));
 
@@ -250,18 +246,20 @@ public class GeneralTests extends TestCase {
 
             // listen to the configuration
             MyConfigurationListener mcl = new MyConfigurationListener();
-            ProxoolFacade.setConfigurationListener(alias, mcl);
+            ProxoolFacade.addConfigurationListener(alias, mcl);
 
             // Update the URL
             ProxoolFacade.updateConnectionPool(urlPrefix + "2", null);
             LOG.debug("changed: " + mcl.getChangedInfo());
             LOG.debug("complete: " + mcl.getCompleteInfo());
+            mcl.reset();
 
             // Update the URL again
             ProxoolFacade.updateConnectionPool(urlPrefix + "1", null);
             LOG.debug("changed: " + mcl.getChangedInfo());
             LOG.debug("complete: " + mcl.getCompleteInfo());
             assertEquals("completeInfo size", propertyCount, mcl.getCompleteInfo().size());
+            mcl.reset();
 
             // Update the verbose property
             info.setProperty("proxool.verbose", "false");
@@ -271,7 +269,7 @@ public class GeneralTests extends TestCase {
             assertEquals("completeInfo size", propertyCount, mcl.getCompleteInfo().size());
             assertNotNull("changedInfo", mcl.getChangedInfo());
             assertEquals("changedInfo size", 1, mcl.getChangedInfo().size());
-
+            mcl.reset();
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -322,7 +320,7 @@ public class GeneralTests extends TestCase {
 
             }
 
-            Connection c2 = adapter.getConnection();
+            c = adapter.getConnection();
             Statement s2 = c.createStatement();
             try {
                 s2.execute("drop table foo");
@@ -337,9 +335,6 @@ public class GeneralTests extends TestCase {
                 c.close();
             }
 
-            // this should trigger an automatic close of the statement
-            c.close();
-
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
             fail(e.getMessage());
@@ -350,11 +345,11 @@ public class GeneralTests extends TestCase {
     }
 
     /**
-     * Test the {@link ConfigurationListenerIF#defintionUpdated} event.
+     * Test the {@link ConfigurationListenerIF#definitionUpdated} event.
      */
-    public void testDefintionUpdated() {
+    public void testDefinitionUpdated() {
 
-        String testName = "defintionUpdated";
+        String testName = "definitionUpdated";
         ProxoolAdapter adapter = null;
         try {
             String alias = testName;
@@ -366,9 +361,9 @@ public class GeneralTests extends TestCase {
             newInfo.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "3");
             adapter.update(newInfo);
             assertEquals("Wrong number of properties updated", adapter.getChangedInfo().size(), 1);
-            final String newUrl = "proxool.defintionUpdated:org.hsqldb.jdbcDriver:jdbc:hsqldb:db/different";
+            final String newUrl = "proxool.definitionUpdated:org.hsqldb.jdbcDriver:jdbc:hsqldb:db/different";
             adapter.update(newUrl);
-            assertTrue("Mp properties should have been updated", adapter.getChangedInfo() == null);
+            assertTrue("No properties should have been updated", adapter.getChangedInfo() == null || adapter.getChangedInfo().size() == 0);
             final ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
             assertTrue("URL has not been updated", (cpd.getCompleteUrl().equals(newUrl)));
 
@@ -476,13 +471,13 @@ public class GeneralTests extends TestCase {
             assertEquals(alias, checkAlias);
 
             LOG.debug("setConfigurationListener");
-            ProxoolFacade.setConfigurationListener(alias, new ConfigurationListenerIF() {
-                public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
+            ProxoolFacade.addConfigurationListener(alias, new ConfigurationListenerIF() {
+                public void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
                 }
             });
 
             LOG.debug("setStateListener");
-            ProxoolFacade.setStateListener(alias, new StateListenerIF() {
+            ProxoolFacade.addStateListener(alias, new StateListenerIF() {
                 public void upStateChanged(int upState) {
                 }
             });
@@ -511,11 +506,11 @@ public class GeneralTests extends TestCase {
             adapter = new ProxoolAdapter(alias);
             adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
 
-            assertEquals("Shuoldn't be any active connections yet", ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount(), 0);
+            assertEquals("Shouldn't be any active connections yet", 0, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
             Connection connection = adapter.getConnection();
 
-            assertEquals("We just opened 1 connection", ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount(), 1);
+            assertEquals("We just opened 1 connection", 1, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
             long start = System.currentTimeMillis();
             try {
@@ -527,7 +522,7 @@ public class GeneralTests extends TestCase {
             long elapsed = System.currentTimeMillis() - start;
             assertTrue("Connection has not been closed after " + elapsed + " milliseconds as expected", connection.isClosed());
 
-            assertEquals("Expected the connection to be inactive", ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount(), 0);
+            assertEquals("Expected the connection to be inactive", 0, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -550,7 +545,7 @@ public class GeneralTests extends TestCase {
             adapter = new ProxoolAdapter(alias);
             adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
 
-            ProxoolFacade.setConnectionListener(alias, new ConnectionListenerIF() {
+            ProxoolFacade.addConnectionListener(alias, new ConnectionListenerIF() {
 
                 public void onBirth(Connection connection) throws SQLException {
                     LOG.debug("onBirth");
@@ -610,7 +605,7 @@ public class GeneralTests extends TestCase {
                 // Good. We expected to not get the third
             }
 
-            assertEquals("activeConnectionCount", 2, ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount());
+            assertEquals("activeConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -637,10 +632,10 @@ public class GeneralTests extends TestCase {
             info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "0");
             adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
 
-            Connection c1 = adapter.getConnection();
+            adapter.getConnection();
             assertEquals("connectionInfo count", 1, ProxoolFacade.getConnectionInfos(alias).size());
 
-            Connection c2 = adapter.getConnection();
+            adapter.getConnection();
             assertEquals("connectionInfo count", 2, ProxoolFacade.getConnectionInfos(alias).size());
 
             Connection c3 = adapter.getConnection();
@@ -683,28 +678,24 @@ public class GeneralTests extends TestCase {
             adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
 
             Connection[] connections = new Connection[6];
-            ConnectionPoolStatisticsIF cps;
 
             Thread.sleep(10000);
-            cps = ProxoolFacade.getConnectionPoolStatistics(alias);
-            assertEquals("activeConnectionCount", 0, cps.getActiveConnectionCount());
-            assertEquals("availableConnectionCount", 2, cps.getAvailableConnectionCount());
+            assertEquals("activeConnectionCount", 0, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
+            assertEquals("availableConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
 
             connections[0] = adapter.getConnection();
 
             Thread.sleep(10000);
-            cps = ProxoolFacade.getConnectionPoolStatistics(alias);
-            assertEquals("activeConnectionCount", 1, cps.getActiveConnectionCount());
-            assertEquals("availableConnectionCount", 2, cps.getAvailableConnectionCount());
+            assertEquals("activeConnectionCount", 1, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
+            assertEquals("availableConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
 
             connections[1] = adapter.getConnection();
             connections[2] = adapter.getConnection();
             connections[3] = adapter.getConnection();
 
             Thread.sleep(10000);
-            cps = ProxoolFacade.getConnectionPoolStatistics(alias);
-            assertEquals("activeConnectionCount", 4, cps.getActiveConnectionCount());
-            assertEquals("availableConnectionCount", 1, cps.getAvailableConnectionCount());
+            assertEquals("activeConnectionCount", 4, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
+            assertEquals("availableConnectionCount", 1, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
 
             Thread.sleep(10000);
 
@@ -749,8 +740,8 @@ public class GeneralTests extends TestCase {
             // Open 1 connection on #2
             adapter2.getConnection().close();
 
-            assertEquals("connectionsServedCount #1", 2L, ProxoolFacade.getConnectionPoolStatistics(alias1).getConnectionsServedCount());
-            assertEquals("connectionsServedCount #2", 1L, ProxoolFacade.getConnectionPoolStatistics(alias2).getConnectionsServedCount());
+            assertEquals("connectionsServedCount #1", 2L, ProxoolFacade.getSnapshot(alias1, false).getServedCount());
+            assertEquals("connectionsServedCount #2", 1L, ProxoolFacade.getSnapshot(alias2, false).getServedCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -783,7 +774,7 @@ public class GeneralTests extends TestCase {
 
             c.close();
 
-            assertEquals("availableConnectionCount", 0L, ProxoolFacade.getConnectionPoolStatistics(alias).getAvailableConnectionCount());
+            assertEquals("availableConnectionCount", 0L, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -803,7 +794,7 @@ public class GeneralTests extends TestCase {
 
         private ConnectionPoolDefinitionIF connectionPoolDefinition;
 
-        public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
+        public void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
             this.connectionPoolDefinition = connectionPoolDefinition;
             this.completeInfo = completeInfo;
             this.changedInfo = changedInfo;
@@ -821,12 +812,21 @@ public class GeneralTests extends TestCase {
             return connectionPoolDefinition;
         }
 
+        public void reset() {
+            completeInfo.clear();
+            changedInfo.clear();
+        }
+
     }
 }
 
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.37  2003/02/26 16:05:49  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.36  2003/02/12 00:35:08  billhorsman
  new update test
 

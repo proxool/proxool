@@ -14,7 +14,7 @@ import java.sql.Statement;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
 
- * @version $Revision: 1.1 $, $Date: 2003/01/27 18:26:39 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:53 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -88,9 +88,10 @@ public interface ProxyConnectionIF extends ConnectionInfoIF {
     /**
      * Mark this connection for expiry (destruction) as soon as it stops
      * being active.
+     * @param reason why we are marking this connection
      * @see #isMarkedForExpiry
      */
-    void markForExpiry();
+    void markForExpiry(String reason);
 
     /**
      * Whether this connection is due for expiry
@@ -98,6 +99,13 @@ public interface ProxyConnectionIF extends ConnectionInfoIF {
      * @see #markForExpiry
      */
     boolean isMarkedForExpiry();
+
+    /**
+     * Why this connection is marked (for instance, if a thread has
+     * marked it for expiry then it's nice to know why)
+     * @return reasonForMark
+     */
+    String getReasonForMark();
 
     /**
      * The real, delegate connection that we are using
@@ -164,6 +172,10 @@ public interface ProxyConnectionIF extends ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnectionIF.java,v $
+ Revision 1.2  2003/02/26 16:05:53  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.1  2003/01/27 18:26:39  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch

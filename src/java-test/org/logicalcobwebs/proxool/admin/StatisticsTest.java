@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/20 00:33:15 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:51 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -76,7 +76,7 @@ public class StatisticsTest extends TestCase {
             StatisticsIF statistics = waitForNextStatistics(alias, "10s", null, 20000);
 
 
-            Connection c = TestHelper.getProxoolConnection(url);
+            Connection c = TestHelper.getProxoolConnection(url, null);
             c.close();
 
             statistics = waitForNextStatistics(alias, "10s", statistics, 20000);
@@ -128,6 +128,10 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.2  2003/02/26 16:05:51  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.1  2003/02/20 00:33:15  billhorsman
  renamed monitor package -> admin
 

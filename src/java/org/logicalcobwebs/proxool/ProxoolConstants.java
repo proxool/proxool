@@ -8,9 +8,9 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.12 $, $Date: 2003/02/24 18:02:24 $
+ * @version $Revision: 1.13 $, $Date: 2003/02/26 16:05:52 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ProxoolConstants {
 
@@ -37,14 +37,17 @@ public interface ProxoolConstants {
     /** Used to build up URL */
     public final String ALIAS_PROPERTY = PROPERTY_PREFIX + "alias";
 
-    /** Define URL directly */
-    public final String URL_PROPERTY = PROPERTY_PREFIX + "url";
+    /** Instead of defining the driver in the url you can also use this property */
+    public final String DELEGATE_DRIVER = "driver";
 
-    /** Used to build up URL */
-    public final String DELEGATE_CLASS_PROPERTY = PROPERTY_PREFIX + "class";
+    /** @see ProxoolDriver#getPropertyInfo */
+     public final String DELEGATE_DRIVER_PROPERTY = PROPERTY_PREFIX + DELEGATE_DRIVER;
 
-    /** Used to build up URL */
-    public final String DELEGATE_URL_PROPERTY = PROPERTY_PREFIX + "url";
+    /** @see #HOUSE_KEEPING_SLEEP_TIME_PROPERTY */
+    public final String DELEGATE_URL = "url";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+     public final String DELEGATE_URL_PROPERTY = PROPERTY_PREFIX + DELEGATE_URL;
 
     /** @see #HOUSE_KEEPING_SLEEP_TIME_PROPERTY */
     public final String HOUSE_KEEPING_SLEEP_TIME = "house-keeping-sleep-time";
@@ -200,6 +203,10 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.13  2003/02/26 16:05:52  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.12  2003/02/24 18:02:24  chr32
  Added JMX related constants.
 

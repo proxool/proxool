@@ -136,10 +136,6 @@ public class TestHelper {
         ProxoolFacade.registerConnectionPool(getFullOracleUrl(alias), info);
     }
 
-    public static Connection getProxoolConnection(String url) throws ClassNotFoundException, SQLException {
-        return getProxoolConnection(url, buildProperties());
-    }
-
     public static Connection getProxoolConnection(String url, Properties info) throws ClassNotFoundException, SQLException {
         Connection connection = null;
         Class.forName(PROXOOL_DRIVER);

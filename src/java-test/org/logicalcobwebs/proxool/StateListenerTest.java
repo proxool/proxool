@@ -18,7 +18,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/19 23:07:57 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:50 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -53,17 +53,24 @@ public class StateListenerTest extends TestCase {
             info.setProperty(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY, "5000");
             ProxoolFacade.registerConnectionPool(url, info);
 
+            assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+
             StateListenerIF stateListener = new TestStateListener();
             ProxoolFacade.addStateListener(alias, stateListener);
 
-            Connection c1 = TestHelper.getProxoolConnection(url);
+            assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+
+            Connection c1 = TestHelper.getProxoolConnection(url, null);
 
             // Test BUSY
             Thread.sleep(6000);
             assertEquals("upState", StateListenerIF.STATE_BUSY, upState);
 
+            assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+            LOG.debug("maximumConnectionCount=" + ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+
             try {
-                Connection c2 = TestHelper.getProxoolConnection(url);
+                Connection c2 = TestHelper.getProxoolConnection(url, null);
                 fail("Didn't expect second connection since maximumConnectionCount is 1");
             } catch (SQLException e) {
                 // We expect a refusal here
@@ -130,6 +137,10 @@ public class StateListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.2  2003/02/26 16:05:50  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.1  2003/02/19 23:07:57  billhorsman
  new test
 

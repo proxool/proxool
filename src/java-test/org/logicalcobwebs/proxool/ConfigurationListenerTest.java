@@ -14,9 +14,9 @@ import java.util.Properties;
  * Test that registering a {@link org.logicalcobwebs.proxool.ConfigurationListenerIF} with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/24 18:04:07 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/26 16:05:49 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class ConfigurationListenerTest extends TestCase {
@@ -123,7 +123,7 @@ public class ConfigurationListenerTest extends TestCase {
     }
 
     class TestConfigurationListener implements ConfigurationListenerIF {
-        public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition,
+        public void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition,
             Properties completeInfo, Properties changedInfo) {
             if (properties1 == null) {
                 properties1 = completeInfo;
@@ -139,6 +139,10 @@ public class ConfigurationListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.5  2003/02/26 16:05:49  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.4  2003/02/24 18:04:07  chr32
  Fixde some eroneous property names.
 

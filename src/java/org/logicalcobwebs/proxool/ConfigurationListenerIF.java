@@ -17,7 +17,7 @@ import java.util.Properties;
  * ProxoolFacade.{@link ProxoolFacade#addConfigurationListener addConfigurationListener}(alias, myConfigurationListener);
  * </pre>
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/08 00:35:30 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/26 16:05:52 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -31,13 +31,17 @@ public interface ConfigurationListenerIF {
      * @param changedInfo only the properties that have changed since the pool was
      * registered, or this method was las called.
      */
-    void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo);
+    void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo);
 
 }
 
 /*
  Revision history:
  $Log: ConfigurationListenerIF.java,v $
+ Revision 1.4  2003/02/26 16:05:52  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.3  2003/02/08 00:35:30  billhorsman
  doc
 

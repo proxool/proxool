@@ -19,7 +19,7 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.2 $, $Date: 2003/02/07 17:20:17 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/26 16:05:52 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -28,9 +28,9 @@ public class CompositeConfigurationListener extends AbstractListenerContainer im
     static final Log LOG = LogFactory.getLog(CompositeConfigurationListener.class);
 
     /**
-     * @see ConfigurationListenerIF#defintionUpdated(ConnectionPoolDefinitionIF, Properties, Properties)
+     * @see ConfigurationListenerIF#definitionUpdated(ConnectionPoolDefinitionIF, Properties, Properties)
      */
-    public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition,
+    public void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition,
                                  Properties completeInfo, Properties changedInfo) {
         Iterator listenerIterator = null;
         try {
@@ -39,7 +39,7 @@ public class CompositeConfigurationListener extends AbstractListenerContainer im
                 ConfigurationListenerIF configurationListener = null;
                 while (listenerIterator.hasNext()) {
                     configurationListener = (ConfigurationListenerIF) listenerIterator.next();
-                    configurationListener.defintionUpdated(connectionPoolDefinition, completeInfo, changedInfo);
+                    configurationListener.definitionUpdated(connectionPoolDefinition, (Properties) completeInfo.clone(), (Properties) changedInfo.clone());
                 }
             }
         } catch (InterruptedException e) {
@@ -54,6 +54,10 @@ public class CompositeConfigurationListener extends AbstractListenerContainer im
 /*
  Revision history:
  $Log: CompositeConfigurationListener.java,v $
+ Revision 1.3  2003/02/26 16:05:52  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.2  2003/02/07 17:20:17  billhorsman
  checkstyle
 

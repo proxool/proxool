@@ -19,9 +19,9 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.1 $, $Date: 2003/02/24 01:15:05 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:52 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class CompositeProxoolListener extends AbstractListenerContainer implements ProxoolListenerIF {
@@ -39,7 +39,7 @@ public class CompositeProxoolListener extends AbstractListenerContainer implemen
                 ProxoolListenerIF proxoolListener = null;
                 while (listenerIterator.hasNext()) {
                     proxoolListener = (ProxoolListenerIF) listenerIterator.next();
-                    proxoolListener.onRegistration(connectionPoolDefinition, completeInfo);
+                    proxoolListener.onRegistration(connectionPoolDefinition, (Properties) completeInfo.clone());
                 }
             }
         } catch (InterruptedException e) {
@@ -76,6 +76,10 @@ public class CompositeProxoolListener extends AbstractListenerContainer implemen
 /*
  Revision history:
  $Log: CompositeProxoolListener.java,v $
+ Revision 1.2  2003/02/26 16:05:52  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.1  2003/02/24 01:15:05  chr32
  Init rev.
 

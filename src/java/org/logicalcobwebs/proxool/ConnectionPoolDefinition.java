@@ -5,37 +5,50 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
+
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.8 $, $Date: 2003/02/06 15:41:17 $
+ * @version $Revision: 1.9 $, $Date: 2003/02/26 16:05:52 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
-    private int maximumConnectionLifetime = DEFAULT_MAXIMUM_CONNECTION_LIFETIME;
+    // TODO  add synch to avoid definition being read during update
 
-    private int prototypeCount = DEFAULT_PROTOTYPE_COUNT;
+    private static final Log LOG = LogFactory.getLog(ConnectionPoolDefinition.class);
 
-    private int minimumConnectionCount = DEFAULT_MINIMUM_CONNECTION_COUNT;
-
-    private int maximumConnectionCount = DEFAULT_MAXIMUM_CONNECTION_COUNT;
-
-    private int houseKeepingSleepTime = DEFAULT_HOUSE_KEEPING_SLEEP_TIME;
-
-    private int maximumNewConnections = DEFAULT_MAXIMUM_NEW_CONNECTIONS;
+    /**
+     * This log has a category based on the alias
+     */
+    private Log poolLog = LOG;;
 
     private String alias;
 
-    private Properties properties = new Properties();
+    private Properties delegateProperties = new Properties();
+
+    private Properties completeInfo = new Properties();
+
+    private Properties changedInfo = new Properties();
+
+    /**
+     * Whether any of the properties that effect an individual
+     * connection have changed. If they have, we need to kill
+     * all the existing connections.
+     */
+    private boolean connectionPropertiesChanged;
 
     private String url;
 
@@ -43,11 +56,23 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     private String driver;
 
-    private int recentlyStartedThreshold = DEFAULT_RECENTLY_STARTED_THRESHOLD;
+    private int maximumConnectionLifetime;;
 
-    private int overloadWithoutRefusalLifetime = DEFAULT_OVERLOAD_WITHOUT_REFUSAL_THRESHOLD;
+    private int prototypeCount;
 
-    private int maximumActiveTime = DEFAULT_MAXIMUM_ACTIVE_TIME;
+    private int minimumConnectionCount;
+
+    private int maximumConnectionCount;
+
+    private int houseKeepingSleepTime;
+
+    private int maximumNewConnections;
+
+    private int recentlyStartedThreshold;
+
+    private int overloadWithoutRefusalLifetime;
+
+    private int maximumActiveTime;
 
     private boolean verbose;
 
@@ -59,35 +84,342 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     private Set fatalSqlExceptions = new HashSet();
 
-    /** Holds value of property houseKeepingTestSql. */
+    /**
+     * A String of all the fatalSqlExceptions delimited by
+     * {@link ConnectionPoolDefinitionIF#FATAL_SQL_EXCEPTIONS_DELIMITER}
+     */
+    private String fatalSqlExceptionsAsString;
+
     private String houseKeepingTestSql;
+
+    /**
+     * Construct a new definition
+     * @param url the url that defines this pool
+     * @param info additional properties (for Proxool and the delegate
+     * driver)
+     * @throws ProxoolException if anything goes wrong
+     */
+    protected ConnectionPoolDefinition(String url, Properties info) throws ProxoolException {
+        this.alias = ProxoolFacade.getAlias(url);
+        poolLog = LogFactory.getLog("org.logicalcobwebs.proxool." + alias);
+        poolLog.info("Proxool " + Version.getVersion());
+        reset();
+        doChange(url, info);
+    }
+
+    /**
+     * Redefine the definition. All existing properties are reset to their
+     * default values
+     * @param url the url that defines this pool
+     * @param info additional properties (for Proxool and the delegate
+     * driver)
+     * @throws ProxoolException if anything goes wrong
+     */
+    protected void update(String url, Properties info) throws ProxoolException {
+        changedInfo.clear();
+        connectionPropertiesChanged = false;
+        poolLog.debug("Updating definition");
+        doChange(url, info);
+        if (connectionPropertiesChanged) {
+            poolLog.info("Mercifully killing all current connections because of definition changes");
+            ProxoolFacade.killAllConnections(alias, "of definition changes", true);
+        }
+    }
+
+    /**
+     * Update the definition. All existing properties are retained
+     * and only overwritten if included in the info parameter
+     * @param url the url that defines this pool
+     * @param info additional properties (for Proxool and the delegate
+     * driver)
+     * @throws ProxoolException if anything goes wrong
+     */
+    protected void redefine(String url, Properties info) throws ProxoolException {
+        reset();
+        changedInfo.clear();
+        connectionPropertiesChanged = false;
+        poolLog.debug("Redefining definition");
+        doChange(url, info);
+
+        // Check for minimum information
+        if (getUrl() == null || getDriver() == null) {
+            throw new ProxoolException("The URL is not defined properly: " + getCompleteUrl());
+        }
+
+        if (connectionPropertiesChanged) {
+            LOG.info("Mercifully killing all current connections because of definition changes");
+            ProxoolFacade.killAllConnections(alias, true);
+        }
+    }
+
+    private void doChange(String url, Properties info) throws ProxoolException {
+
+        try {
+            int endOfPrefix = url.indexOf(':');
+            int endOfDriver = url.indexOf(':', endOfPrefix + 1);
+
+            if (endOfPrefix > -1 && endOfDriver > -1) {
+                final String driver = url.substring(endOfPrefix + 1, endOfDriver);
+                if (isChanged(getDriver(), driver)) {
+                    logChange(true, ProxoolConstants.DELEGATE_DRIVER_PROPERTY, driver);
+                    setDriver(driver);
+                }
+
+                final String delegateUrl = url.substring(endOfDriver + 1);
+                if (isChanged(getUrl(), delegateUrl)) {
+                    logChange(true, ProxoolConstants.DELEGATE_URL_PROPERTY, delegateUrl);
+                    setUrl(delegateUrl);
+                }
+            } else {
+                // Using alias. Nothing to do
+            }
+        } catch (IndexOutOfBoundsException e) {
+            LOG.error("Invalid URL: '" + url + "'", e);
+            throw new ProxoolException("Invalid URL: '" + url + "'");
+        }
+
+        setCompleteUrl(url);
+
+        if (info != null) {
+            Iterator i = info.keySet().iterator();
+            while (i.hasNext()) {
+                String key = (String) i.next();
+                String value = info.getProperty(key);
+                setAnyProperty(key, value);
+                completeInfo.setProperty(key, value);
+            }
+        }
+
+        ProxoolFacade.definitionUpdated(getAlias(), this, completeInfo, changedInfo);
+
+    }
+
+    private void logChange(boolean proxoolProperty, String key, String value) {
+        if (poolLog.isDebugEnabled()) {
+            String displayValue = value;
+            if (key.toLowerCase().indexOf("password") > -1) {
+                displayValue = "********";
+            }
+            poolLog.debug((proxoolProperty ? "Recognised proxool property: " : "Delegating property to driver: ") + key + "=" + displayValue);
+        }
+    }
+
+    private void setAnyProperty(String key, String value) throws ProxoolException {
+
+        boolean proxoolProperty = true;
+        boolean changed = false;
+        if (key.equals(ProxoolConstants.USER_PROPERTY)) {
+            proxoolProperty = false;
+            if (isChanged(getUser(), value)) {
+                changed = true;
+                setUser(value);
+            }
+        } else if (key.equals(ProxoolConstants.PASSWORD_PROPERTY)) {
+            proxoolProperty = false;
+            if (isChanged(getPassword(), value)) {
+                changed = true;
+                setPassword(value);
+            }
+        } else if (key.equals(ProxoolConstants.DELEGATE_DRIVER_PROPERTY)) {
+            if (isChanged(getDriver(), value)) {
+                changed = true;
+                setDriver(value);
+            }
+        } else if (key.equals(ProxoolConstants.DELEGATE_URL_PROPERTY)) {
+            if (isChanged(getUrl(), value)) {
+                changed = true;
+                setUrl(value);
+            }
+        } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
+            if (getHouseKeepingSleepTime() != getInt(key, value)) {
+                changed = true;
+                setHouseKeepingSleepTime(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
+            if (isChanged(getHouseKeepingTestSql(), value)) {
+                changed = true;
+                setHouseKeepingTestSql(value);
+            }
+        } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY)) {
+            if (getMaximumConnectionCount() != getInt(key, value)) {
+                changed = true;
+                setMaximumConnectionCount(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY)) {
+            if (getMaximumConnectionLifetime() != getInt(key, value)) {
+                changed = true;
+                setMaximumConnectionLifetime(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY)) {
+            if (getMaximumNewConnections() != getInt(key, value)) {
+                changed = true;
+                setMaximumNewConnections(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY)) {
+            if (getMinimumConnectionCount() != getInt(key, value)) {
+                changed = true;
+                setMinimumConnectionCount(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY)) {
+            if (getPrototypeCount() != getInt(key, value)) {
+                changed = true;
+                setPrototypeCount(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY)) {
+            if (getRecentlyStartedThreshold() != getInt(key, value)) {
+                changed = true;
+                setRecentlyStartedThreshold(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY)) {
+            if (getOverloadWithoutRefusalLifetime() != getInt(key, value)) {
+                changed = true;
+                setOverloadWithoutRefusalLifetime(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY)) {
+            if (getMaximumActiveTime() != getInt(key, value)) {
+                changed = true;
+                setMaximumActiveTime(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
+            if (value != null && value.equals("1")) {
+                poolLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
+                if (!isVerbose()) {
+                    changed = true;
+                    setVerbose(true);
+                }
+            } else {
+                poolLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=0 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=false instead.");
+                if (isVerbose()) {
+                    changed = true;
+                    setVerbose(false);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.VERBOSE_PROPERTY)) {
+            final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
+            if (isVerbose() != valueAsBoolean) {
+                changed = true;
+                setVerbose(valueAsBoolean);
+            }
+        } else if (key.equals(ProxoolConstants.TRACE_PROPERTY)) {
+            final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
+            if (isTrace() != valueAsBoolean) {
+                changed = true;
+                setTrace(valueAsBoolean);
+            }
+        } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
+            if (isChanged(fatalSqlExceptionsAsString, value)) {
+                changed = true;
+                setFatalSqlExceptionsAsString(value);
+            }
+        } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
+            if (isChanged(getStatistics(), value)) {
+                changed = true;
+                setStatistics(value);
+            }
+        } else if (key.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY)) {
+            if (isChanged(getStatisticsLogLevel(), value)) {
+                changed = true;
+                setStatisticsLogLevel(value);
+            }
+        } else {
+            if (isChanged(getDelegateProperty(key), value)) {
+                changed = true;
+                setDelegateProperty(key, value);
+            }
+            proxoolProperty = false;
+        }
+
+        if (changed) {
+            logChange(proxoolProperty, key, value);
+            changedInfo.setProperty(key, value);
+        }
+
+    }
+
+    private int getInt(String key, String value) throws ProxoolException {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+        }
+    }
+
+    private static boolean isChanged(String oldValue, String newValue) {
+        boolean changed = false;
+        if (oldValue == null) {
+            if (newValue != null) {
+                changed = true;
+            }
+        } else if (newValue == null) {
+            changed = true;
+        } else if (!oldValue.equals(newValue)) {
+            changed = true;
+        }
+        return changed;
+    }
+
+    /**
+     * Reset all properties to their default values
+     */
+    private void reset() {
+        completeUrl = null;
+        delegateProperties.clear();
+        completeInfo.clear();
+        changedInfo.clear();
+
+        url = null;
+        driver = null;
+        maximumConnectionLifetime = DEFAULT_MAXIMUM_CONNECTION_LIFETIME;
+        prototypeCount = DEFAULT_PROTOTYPE_COUNT;
+        minimumConnectionCount = DEFAULT_MINIMUM_CONNECTION_COUNT;
+        maximumConnectionCount = DEFAULT_MAXIMUM_CONNECTION_COUNT;
+        houseKeepingSleepTime = DEFAULT_HOUSE_KEEPING_SLEEP_TIME;
+        houseKeepingTestSql = null;
+        maximumNewConnections = DEFAULT_MAXIMUM_NEW_CONNECTIONS;
+        recentlyStartedThreshold = DEFAULT_RECENTLY_STARTED_THRESHOLD;
+        overloadWithoutRefusalLifetime = DEFAULT_OVERLOAD_WITHOUT_REFUSAL_THRESHOLD;
+        maximumActiveTime = DEFAULT_MAXIMUM_ACTIVE_TIME;
+        verbose = false;
+        trace = false;
+        statistics = null;
+        statisticsLogLevel = null;
+        fatalSqlExceptions.clear();
+    }
+
+    /**
+     * Get all the properties used to define this pool
+     * @return
+     */
+    protected Properties getCompleteInfo() {
+        return completeInfo;
+    }
 
     /**
      * @see ConnectionPoolDefinitionIF#getUser
      */
     public String getUser() {
-        return getProperty(USER_PROPERTY);
+        return getDelegateProperty(USER_PROPERTY);
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getUser
      */
     public void setUser(String user) {
-        setProperty(USER_PROPERTY, user);
+        setDelegateProperty(USER_PROPERTY, user);
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getPassword
      */
     public String getPassword() {
-        return getProperty(PASSWORD_PROPERTY);
+        return getDelegateProperty(PASSWORD_PROPERTY);
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getPassword
      */
     public void setPassword(String password) {
-        setProperty(PASSWORD_PROPERTY, password);
+        setDelegateProperty(PASSWORD_PROPERTY, password);
     }
 
     /**
@@ -221,19 +553,26 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     /**
      * @see ConnectionPoolDefinitionIF#getProperties
+     * @deprecated use less ambiguous {@link #getDelegateProperties} instead
      */
     public Properties getProperties() {
-        return properties;
+        return delegateProperties;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getDelegateProperties
+     */
+    public Properties getDelegateProperties() {
+        return delegateProperties;
     }
 
     /**
      * Get a property
      * @param name the name of the property
      * @return the value of the property
-     * @see ConnectionPoolDefinitionIF#getProperties
      */
-    public String getProperty(String name) {
-        return getProperties().getProperty(name);
+    public String getDelegateProperty(String name) {
+        return getDelegateProperties().getProperty(name);
     }
 
     /**
@@ -242,9 +581,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      * @param value the value of the property
      * @see ConnectionPoolDefinitionIF#getProperties
      */
-    public void setProperty(String name, String value) {
-        getProperties().setProperty(name, value);
-
+    public void setDelegateProperty(String name, String value) {
+        connectionPropertiesChanged = true;
+        getDelegateProperties().setProperty(name, value);
     }
 
     /**
@@ -259,6 +598,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      */
     public void setUrl(String url) {
         this.url = url;
+        connectionPropertiesChanged = true;
     }
 
     /**
@@ -273,6 +613,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      */
     public void setDriver(String driver) {
         this.driver = driver;
+        connectionPropertiesChanged = true;
     }
 
     /**
@@ -370,8 +711,13 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     /**
      * @see ConnectionPoolDefinitionIF#getFatalSqlExceptions
      */
-    public void setFatalSqlException(String messageFragment) {
-        fatalSqlExceptions.add(messageFragment);
+    public void setFatalSqlExceptionsAsString(String fatalSqlExceptionsAsString) {
+        this.fatalSqlExceptionsAsString = fatalSqlExceptionsAsString;
+        fatalSqlExceptions.clear();
+        StringTokenizer st = new StringTokenizer(fatalSqlExceptionsAsString, FATAL_SQL_EXCEPTIONS_DELIMITER);
+        while (st.hasMoreTokens()) {
+            fatalSqlExceptions.add(st.nextToken());
+        }
     }
 
     /**
@@ -428,6 +774,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.9  2003/02/26 16:05:52  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.8  2003/02/06 15:41:17  billhorsman
  add statistics-log-level
 

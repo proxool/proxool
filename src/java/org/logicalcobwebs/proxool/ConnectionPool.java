@@ -17,11 +17,14 @@ import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.52 $, $Date: 2003/02/26 12:57:30 $
+ * @version $Revision: 1.53 $, $Date: 2003/02/26 16:05:52 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -217,7 +220,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     try {
                         // No!  Let's see if we can create one
                         proxyConnection = createPoolableConnection(ProxyConnection.STATUS_ACTIVE, "on demand");
-                        addPoolableConnection(proxyConnection);
                     } catch (Exception e) {
                         log.error("Couldn't get connection", e);
                         throwSQLException(e.toString());
@@ -317,6 +319,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         + STATUS_DESCRIPTIONS[state]);
 
             } else {
+
+                addPoolableConnection(proxyConnection);
+
                 if (log.isDebugEnabled()) {
                     StringBuffer out = new StringBuffer(displayStatistics());
                     out.append(" - Connection #");
@@ -335,7 +340,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         out.append(getDefinition().getUrl());
                         out.append(" (");
                         out.append(Integer.toHexString(proxyConnection.getConnection().hashCode()));
-                        out.append(")");
+                        out.append(") by thread ");
+                        out.append(Thread.currentThread().getName());
                     }
                     log.debug(out);
                 }
@@ -394,34 +400,30 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * Unless it's due for expiry, in which case it will... expire
      */
     protected void putConnection(ProxyConnectionIF proxyConnection) {
-        try {
 
-            if (admin != null) {
-                admin.connectionReturned(System.currentTimeMillis() - proxyConnection.getTimeLastStartActive());
-            }
-
-            // It's possible that this connection is due for expiry
-            if (proxyConnection.isMarkedForExpiry()) {
-                if (proxyConnection.fromActiveToNull()) {
-                    expireProxyConnection(proxyConnection, REQUEST_EXPIRY);
-                }
-            } else {
-                // Let's make it available for someone else
-                proxyConnection.fromActiveToAvailable();
-            }
-
-            if (log.isDebugEnabled() && getDefinition().isVerbose()) {
-                log.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " returned");
-            }
-
-        } finally {
-            // This is probably due to getPoolableConnection returning a null.
+        if (admin != null) {
+            admin.connectionReturned(System.currentTimeMillis() - proxyConnection.getTimeLastStartActive());
         }
+
+        // It's possible that this connection is due for expiry
+        if (proxyConnection.isMarkedForExpiry()) {
+            if (proxyConnection.fromActiveToNull()) {
+                expireProxyConnection(proxyConnection, proxyConnection.getReasonForMark(), REQUEST_EXPIRY);
+            }
+        } else {
+            // Let's make it available for someone else
+            proxyConnection.fromActiveToAvailable();
+        }
+
+        if (log.isDebugEnabled() && getDefinition().isVerbose()) {
+            log.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " returned");
+        }
+
     }
 
     /** This means that there's something wrong the connection and it's probably best if no one uses it again. */
-    protected void throwConnection(ProxyConnectionIF proxyConnection) {
-        expireConnectionAsSoonAsPossible(proxyConnection, true);
+    protected void throwConnection(ProxyConnectionIF proxyConnection, String reason) {
+        expireConnectionAsSoonAsPossible(proxyConnection, reason, true);
     }
 
     /** Get a ProxyConnection by index */
@@ -456,9 +458,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 log.error(e);
             }
 
-            int size = proxyConnections.size();
             proxyConnections.remove(proxyConnection);
-            log.debug("proxyConnections.size() changed from " + size + " to " + proxyConnections.size());
 
             if (log.isDebugEnabled()) {
                 log.debug(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId())
@@ -471,8 +471,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         }
     }
 
-    private void expireProxyConnection(ProxyConnectionIF proxyConnection, boolean forceExpiry) {
-        removeProxyConnection(proxyConnection, "age is " + proxyConnection.getAge() + "ms", forceExpiry);
+    private void expireProxyConnection(ProxyConnectionIF proxyConnection, String reason, boolean forceExpiry) {
+        removeProxyConnection(proxyConnection, reason, forceExpiry);
     }
 
     /**
@@ -554,7 +554,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     long id = getProxyConnection(i).getId();
                     try {
                         connectionClosedManually = true;
-                        getProxyConnection(i).reallyClose();;
+                        getProxyConnection(i).reallyClose();
+                        ;
                         if (log.isDebugEnabled()) {
                             log.debug("Connection #" + id + " closed");
                         }
@@ -571,7 +572,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             } finally {
 
                 ConnectionPoolManager.getInstance().removeConnectionPool(alias);
-                ProxoolFacade.forgetAlias(alias);
 
                 if (log.isDebugEnabled()) {
                     log.debug("'" + alias + "' pool has been closed down by " + finalizerName
@@ -723,17 +723,18 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         } // END if (poolableConnection.setOffline())
                         // Now to check whether the connection is due for expiry
                         if (proxyConnection.getAge() > getDefinition().getMaximumConnectionLifetime()) {
+                            final String reason = "age is " + proxyConnection.getAge() + "ms";
                             // Check whether we can make it offline
                             if (proxyConnection.fromAvailableToOffline()) {
                                 if (proxyConnection.fromOfflineToNull()) {
                                     // It is.  Expire it now .
-                                    expireProxyConnection(proxyConnection, REQUEST_EXPIRY);
+                                    expireProxyConnection(proxyConnection, reason, REQUEST_EXPIRY);
                                 }
                             } else {
                                 // Oh no, it's in use.  Never mind, we'll mark it for expiry
                                 // next time it is available.  This will happen in the
                                 // putConnection() method.
-                                proxyConnection.markForExpiry();
+                                proxyConnection.markForExpiry(reason);
                                 if (log.isDebugEnabled()) {
                                     log.debug(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId())
                                             + " marked for expiry.");
@@ -811,11 +812,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 }
 
                 int total = connectionCountByState[ProxyConnection.STATUS_ACTIVE]
-                    + connectionCountByState[ProxyConnection.STATUS_AVAILABLE]
-                    + connectionCountByState[ProxyConnection.STATUS_OFFLINE];
+                        + connectionCountByState[ProxyConnection.STATUS_AVAILABLE]
+                        + connectionCountByState[ProxyConnection.STATUS_OFFLINE];
                 int verifiedTotal = verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE]
-                    + verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE]
-                    + verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE];
+                        + verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE]
+                        + verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE];
                 if (total != verifiedTotal) {
                     log.warn("Warning: TOTAL connections = " + verifiedTotal + ". not " + total + " as expected.");
                 }
@@ -854,8 +855,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     }
 
                     try {
-                        ProxyConnectionIF poolableConnection = createPoolableConnection(ProxyConnection.STATUS_AVAILABLE, reason);
-                        addPoolableConnection(poolableConnection);
+                        createPoolableConnection(ProxyConnection.STATUS_AVAILABLE, reason);
                         somethingDone = true;
                     } catch (Exception e) {
                         log.error("Prototype", e);
@@ -890,17 +890,27 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         }
     }
 
-    protected void expireAllConnections(boolean merciful) {
+    protected void expireAllConnections(String reason, boolean merciful) {
+
+        // Do this in two stages because expiring a connection will trigger
+        // the prototyper to make more. And that might mean we end up
+        // killing a newly made connection;
+        Set pcs = new HashSet();
         for (int i = proxyConnections.size() - 1; i >= 0; i--) {
-            expireConnectionAsSoonAsPossible((ProxyConnectionIF) proxyConnections.get(i), merciful);
+            pcs.add(proxyConnections.get(i));}
+
+        Iterator i = pcs.iterator();
+        while (i.hasNext()) {
+            ProxyConnectionIF pc = (ProxyConnectionIF) i.next();
+            expireConnectionAsSoonAsPossible(pc, reason, merciful);
         }
     }
 
-    protected void expireConnectionAsSoonAsPossible(ProxyConnectionIF proxyConnection, boolean merciful) {
+    protected void expireConnectionAsSoonAsPossible(ProxyConnectionIF proxyConnection, String reason, boolean merciful) {
         if (proxyConnection.fromAvailableToOffline()) {
             if (proxyConnection.fromOfflineToNull()) {
                 // It is.  Expire it now .
-                expireProxyConnection(proxyConnection, REQUEST_EXPIRY);
+                expireProxyConnection(proxyConnection, reason, REQUEST_EXPIRY);
             }
         } else {
             // Oh no, it's in use.
@@ -909,7 +919,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 //Never mind, we'll mark it for expiry
                 // next time it is available.  This will happen in the
                 // putConnection() method.
-                proxyConnection.markForExpiry();
+                proxyConnection.markForExpiry(reason);
                 if (log.isDebugEnabled()) {
                     log.debug(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId()) + " marked for expiry.");
                 }
@@ -917,7 +927,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 // So? Kill, kill, kill
 
                 // We have to make sure it's null first.
-                expireProxyConnection(proxyConnection, FORCE_EXPIRY);
+                expireProxyConnection(proxyConnection, reason, FORCE_EXPIRY);
             }
 
         } // END if (proxyConnection.setOffline())
@@ -1186,6 +1196,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.53  2003/02/26 16:05:52  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.52  2003/02/26 12:57:30  billhorsman
  added TODO
 

@@ -14,7 +14,6 @@ import org.logicalcobwebs.proxool.admin.StatisticsListenerIF;
 
 import java.sql.Statement;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,17 +33,13 @@ import java.lang.reflect.Method;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.59 $, $Date: 2003/02/24 18:03:24 $
+ * @version $Revision: 1.60 $, $Date: 2003/02/26 16:05:53 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public class ProxoolFacade {
 
     private static final Log LOG = LogFactory.getLog(ProxoolFacade.class);
-
-    private static Map infos = new HashMap();
-
-    private static Map completeInfos = new HashMap();
 
     private static Map configurators = new HashMap();
 
@@ -67,22 +62,12 @@ public class ProxoolFacade {
         }
 
         if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
-            ConnectionPoolDefinition cpd = new ConnectionPoolDefinition();
-            cpd.setAlias(alias);
-            definePool(url, cpd, info);
-
-            // Check for minimum information
-            if (cpd.getUrl() == null || cpd.getDriver() == null) {
-                throw new ProxoolException("The URL is not defined properly.");
-            }
-
+            ConnectionPoolDefinition cpd = new ConnectionPoolDefinition(url, info);
             ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
             connectionPool.start();
-
-            final Properties poolProperties = (Properties) completeInfos.get(alias);
-            compositeProxoolListener.onRegistration(cpd, poolProperties);
-            if (isConfiguredForJMX(poolProperties)) {
-                registerForJmx(alias, poolProperties);
+            compositeProxoolListener.onRegistration(cpd, cpd.getCompleteInfo());
+            if (isConfiguredForJMX(cpd.getCompleteInfo())) {
+                registerForJmx(alias, cpd.getCompleteInfo());
             }
         } else {
             throw new ProxoolException("Attempt to register duplicate pool called '" + alias + "'");
@@ -134,287 +119,6 @@ public class ProxoolFacade {
     }
 
     /**
-     *  Translates from properties to definition
-     *
-     * @param url the connection we are defining
-     * @param cpd The defintion to populate (can have existing settings)
-     * @param info the properties object to read from
-     * @return the alias
-     * @throws ProxoolException if there were any validation errors.
-     */
-    protected static String definePool(String url, ConnectionPoolDefinition cpd,
-                                       Properties info) throws ProxoolException {
-
-        Properties rememberedInfo = null;
-        Properties changedProperties = null;
-        final String alias = getAlias(url);
-        rememberedInfo = (Properties) infos.get(alias);
-
-        Properties completeInfo = (Properties) completeInfos.get(alias);
-        if (completeInfo == null) {
-            completeInfo = new Properties();
-            completeInfos.put(alias, completeInfo);
-        }
-
-        cpd.setCompleteUrl(url);
-
-        Log earlyLog = LogFactory.getLog("org.logicalcobwebs.proxool." + alias);
-
-        if (cpd.getDriver() == null) {
-            earlyLog.info("Proxool " + Version.getVersion());
-        }
-
-        try {
-            int endOfPrefix = url.indexOf(':');
-            int endOfDriver = url.indexOf(':', endOfPrefix + 1);
-
-            if (endOfPrefix > -1 && endOfDriver > -1) {
-                final String driver = url.substring(endOfPrefix + 1, endOfDriver);
-                if (cpd.getDriver() == null) {
-                    cpd.setDriver(driver);
-                    earlyLog.debug("Setting driver for " + alias + " pool to " + driver);
-                } else if (cpd.getDriver() != null && !cpd.getDriver().equals(driver)) {
-                    cpd.setDriver(driver);
-                    earlyLog.debug("Updating driver for " + alias + " pool to " + driver);
-                }
-                final String delegateUrl = url.substring(endOfDriver + 1);
-                if (cpd.getUrl() == null) {
-                    cpd.setUrl(delegateUrl);
-                    earlyLog.debug("Setting url for " + alias + " pool to " + delegateUrl);
-                } else if (cpd.getUrl() != null && !cpd.getUrl().equals(delegateUrl)) {
-                    cpd.setUrl(delegateUrl);
-                    earlyLog.debug("Updating url for " + alias + " pool to " + delegateUrl);
-                }
-            } else {
-                // Using alias. Nothing to do
-            }
-        } catch (IndexOutOfBoundsException e) {
-            LOG.error("Invalid URL " + url, e);
-            throw new ProxoolException("Invalid URL format.");
-        }
-
-        if (info != null && (rememberedInfo == null || !info.equals(rememberedInfo))) {
-
-            if (earlyLog.isDebugEnabled()) {
-                if (rememberedInfo == null) {
-                    earlyLog.debug("Setting properties on " + url);
-                } else {
-                    earlyLog.debug("Updating properties on " + url);
-                }
-            }
-
-            changedProperties = new Properties();
-
-            Iterator i = info.keySet().iterator();
-            while (i.hasNext()) {
-                String key = (String) i.next();
-                String value = info.getProperty(key);
-
-                completeInfo.setProperty(key, value);
-
-                boolean isProxoolProperty = setProperty(key, cpd, value, changedProperties, earlyLog);
-
-                if (earlyLog.isDebugEnabled()) {
-                    if (isProxoolProperty) {
-                        earlyLog.debug("Recognised proxool property: " + key + "=" + value);
-                    } else {
-                        if (key.toLowerCase().indexOf("password") > -1) {
-                            earlyLog.debug("Delgating property to Driver: " + key + "=" + "*******");
-                        } else {
-                            earlyLog.debug("Delegating property to Driver: " + key + "=" + value);
-                        }
-                    }
-                }
-
-            }
-
-            // Clone the property. Otherwise we won't detect changes if the
-            // same properties object is passed back in (but with different
-            // content)
-            Properties clone = new Properties();
-            Enumeration e = info.propertyNames();
-            while (e.hasMoreElements()) {
-                String key = (String) e.nextElement();
-                String value = info.getProperty(key);
-                clone.setProperty(key, value);
-            }
-
-            infos.put(alias, clone);
-        }
-
-        ConfigurationListenerIF configurationListener = (ConfigurationListenerIF) configurators.get(alias);
-        if (configurationListener != null) {
-            configurationListener.defintionUpdated(cpd, completeInfo, changedProperties);
-        }
-
-        return cpd.getAlias();
-    }
-
-    private static boolean setProperty(String key, ConnectionPoolDefinition cpd, String value, Properties changedProperties, Log earlyLog) throws ProxoolException {
-        boolean isProxoolProperty = true;
-        if (key.equals(ProxoolConstants.USER_PROPERTY)) {
-            isProxoolProperty = false;
-            if (isChanged(cpd.getUser(), value)) {
-                changedProperties.setProperty(key, value);
-                cpd.setUser(value);
-            }
-        } else if (key.equals(ProxoolConstants.PASSWORD_PROPERTY)) {
-            isProxoolProperty = false;
-            if (isChanged(cpd.getPassword(), value)) {
-                changedProperties.setProperty(key, value);
-                cpd.setPassword(value);
-            }
-        } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
-            try {
-                int valueAsInt = Integer.parseInt(value);
-                if (cpd.getHouseKeepingSleepTime() != valueAsInt) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setHouseKeepingSleepTime(valueAsInt);
-                }
-            } catch (NumberFormatException e) {
-                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-            }
-        } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
-            if (isChanged(cpd.getHouseKeepingTestSql(), value)) {
-                changedProperties.setProperty(key, value);
-                cpd.setHouseKeepingTestSql(value);
-            }
-        } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY)) {
-            try {
-                int valueAsInt = Integer.parseInt(value);
-                if (cpd.getMaximumConnectionCount() != valueAsInt) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setMaximumConnectionCount(valueAsInt);
-                }
-            } catch (NumberFormatException e) {
-                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-            }
-        } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY)) {
-            try {
-                int valueAsInt = Integer.parseInt(value);
-                if (cpd.getMaximumConnectionLifetime() != valueAsInt) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setMaximumConnectionLifetime(valueAsInt);
-                }
-            } catch (NumberFormatException e) {
-                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-            }
-        } else if (key.equals(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY)) {
-            try {
-                int valueAsInt = Integer.parseInt(value);
-                if (cpd.getMaximumNewConnections() != valueAsInt) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setMaximumNewConnections(valueAsInt);
-                }
-            } catch (NumberFormatException e) {
-                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-            }
-        } else if (key.equals(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY)) {
-            try {
-                int valueAsInt = Integer.parseInt(value);
-                if (cpd.getMinimumConnectionCount() != valueAsInt) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setMinimumConnectionCount(valueAsInt);
-                }
-            } catch (NumberFormatException e) {
-                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-            }
-        } else if (key.equals(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY)) {
-            try {
-                int valueAsInt = Integer.parseInt(value);
-                if (cpd.getPrototypeCount() != valueAsInt) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setPrototypeCount(valueAsInt);
-                }
-            } catch (NumberFormatException e) {
-                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-            }
-        } else if (key.equals(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY)) {
-            try {
-                int valueAsInt = Integer.parseInt(value);
-                if (cpd.getRecentlyStartedThreshold() != valueAsInt) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setRecentlyStartedThreshold(valueAsInt);
-                }
-            } catch (NumberFormatException e) {
-                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-            }
-        } else if (key.equals(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY)) {
-            try {
-                int valueAsInt = Integer.parseInt(value);
-                if (cpd.getOverloadWithoutRefusalLifetime() != valueAsInt) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setOverloadWithoutRefusalLifetime(valueAsInt);
-                }
-            } catch (NumberFormatException e) {
-                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-            }
-        } else if (key.equals(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY)) {
-            try {
-                int valueAsInt = Integer.parseInt(value);
-                if (cpd.getMaximumActiveTime() != valueAsInt) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setMaximumActiveTime(valueAsInt);
-                }
-            } catch (NumberFormatException e) {
-                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-            }
-        } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
-            if (value != null && value.equals("1")) {
-                earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
-                if (!cpd.isVerbose()) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setVerbose(true);
-                }
-            } else {
-                earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=0 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=false instead.");
-                if (cpd.isVerbose()) {
-                    changedProperties.setProperty(key, value);
-                    cpd.setVerbose(false);
-                }
-            }
-        } else if (key.equals(ProxoolConstants.VERBOSE_PROPERTY)) {
-            final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
-            if (cpd.isVerbose() != valueAsBoolean) {
-                changedProperties.setProperty(key, value);
-                cpd.setVerbose(valueAsBoolean);
-            }
-        } else if (key.equals(ProxoolConstants.TRACE_PROPERTY)) {
-            cpd.setTrace(Boolean.valueOf(value).booleanValue());
-        } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
-            cpd.setFatalSqlException(value);
-        } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
-            if (isChanged(cpd.getStatistics(), value)) {
-                changedProperties.setProperty(key, value);
-                cpd.setStatistics(value);
-            }
-        } else if (key.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY)) {
-            if (isChanged(cpd.getStatisticsLogLevel(), value)) {
-                changedProperties.setProperty(key, value);
-                cpd.setStatisticsLogLevel(value);
-            }
-        } else {
-            cpd.setProperty(key, value);
-            isProxoolProperty = false;
-        }
-        return isProxoolProperty;
-    }
-
-    private static boolean isChanged(String oldValue, String newValue) {
-        boolean changed = false;
-        if (oldValue == null) {
-            if (newValue != null) {
-                changed = true;
-            }
-        } else if (newValue == null) {
-            changed = true;
-        } else if (!oldValue.equals(newValue)) {
-            changed = true;
-        }
-        return changed;
-    }
-
-    /**
      * Remove a connection pool. Kills all the connections. Resets everything.
      * @param finalizer the name of the thread requesting shutdown (for logging)
      * @param connectionPool the pool to remove
@@ -431,16 +135,6 @@ public class ProxoolFacade {
             }
         }
         connectionPool = null;
-    }
-
-    /**
-     * When a connection pool is removed then we need to forget the cached information
-     * we hold for that alias: namely, the properties that get reused for each connection.
-     * @param alias to identify the pool we are removing
-     */
-    protected static void forgetAlias(String alias) {
-        infos.remove(alias);
-        completeInfos.remove(alias);
     }
 
     /**
@@ -544,18 +238,44 @@ public class ProxoolFacade {
      * @param alias the pool containing the connection
      * @param merciful if true will only kill connections that aren't active
      * @throws ProxoolException if we couldn't find the pool
+     * @deprecated use {@link #killAllConnections(java.lang.String, java.lang.String, boolean) alternative}
+     * to provide better auditing in log
      */
     public static void killAllConnections(String alias, boolean merciful) throws ProxoolException {
-        ConnectionPoolManager.getInstance().getConnectionPool(alias).expireAllConnections(merciful);
+        killAllConnections(alias, "of thread " + Thread.currentThread().getName(), merciful);
+    }
+
+    /**
+     * Kill all connections in a pool. The pool continues to work however, and new connections will be
+     * made as required.
+     * @param alias the pool containing the connection
+     * @param reason provides audit in log of why connections were killed
+     * @param merciful if true will only kill connections that aren't active
+     * @throws ProxoolException if we couldn't find the pool
+     */
+    public static void killAllConnections(String alias, String reason, boolean merciful) throws ProxoolException {
+        ConnectionPoolManager.getInstance().getConnectionPool(alias).expireAllConnections(reason, merciful);
     }
 
     /**
      * Like {@link #killAllConnections} but defaults to merciful.
      * @param alias to identify the pool
      * @throws ProxoolException if we couldn't find the pool
+     * @deprecated use {@link #killAllConnections(java.lang.String, java.lang.String) alternative}
+     * to provide better auditing in log
      */
     public static void killAllConnections(String alias) throws ProxoolException {
-        killAllConnections(alias, MERCIFUL);
+        killAllConnections(alias, "of thread " + Thread.currentThread().getName(), MERCIFUL);
+    }
+
+    /**
+     * Like {@link #killAllConnections} but defaults to merciful.
+     * @param alias to identify the pool
+     * @param reason provides audit in log of why connections were killed
+     * @throws ProxoolException if we couldn't find the pool
+     */
+    public static void killAllConnections(String alias, String reason) throws ProxoolException {
+        killAllConnections(alias, reason, MERCIFUL);
     }
 
     /**
@@ -675,6 +395,22 @@ public class ProxoolFacade {
     }
 
     /**
+     * Broadcast a configuration change
+     * @param alias identifies the pool
+     * @param connectionPoolDefinition the definition
+     * @param completeInfo all properties
+     * @param changedInfo only changed properties (since the last
+     * time this method was called)
+     */
+    protected static void definitionUpdated(String alias, ConnectionPoolDefinitionIF connectionPoolDefinition,
+                                 Properties completeInfo, Properties changedInfo) {
+        CompositeConfigurationListener ccl = (CompositeConfigurationListener) configurators.get(alias);
+        if (ccl != null) {
+            ccl.definitionUpdated(connectionPoolDefinition, completeInfo, changedInfo);
+        }
+    }
+
+    /**
      * Remove a listener that gets called everytime the configuration changes.
      * @param alias identifies the pool.
      * @param configurationListener the listener to be removed.
@@ -702,27 +438,40 @@ public class ProxoolFacade {
     private static final boolean MERCIFUL = true;
 
     /**
+     * Redfine the behaviour of the pool. All existing properties (for Proxool
+     * and the delegate driver are reset to their default) and reapplied
+     * based on the parameters sent here.
+     *
+     * @param url the url that defines the pool (or the abbreviated ""proxool.alias")
+     * @param info the new properties
+     * @see #updateConnectionPool
+     */
+    public static void redefineConnectionPool(String url, Properties info) throws ProxoolException {
+        String alias = getAlias(url);
+        ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
+        ConnectionPoolDefinition cpd = cp.getDefinition();
+        cpd.update(url, info);
+    }
+
+
+    /**
      * Update the behaviour of the pool. Only properties that are defined here are overwritten. That is, properties
      * that were defined before but are not mentioned here are retained.
      *
      * @param url the url that defines the pool (or the abbreviated ""proxool.alias")
      * @param info the new properties
+     * @see #redefineConnectionPool
      */
     public static void updateConnectionPool(String url, Properties info) throws ProxoolException {
         String alias = getAlias(url);
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
         ConnectionPoolDefinition cpd = cp.getDefinition();
-        definePool(url, cpd, info);
-
+        cpd.update(url, info);
     }
 
     protected void finalize() throws Throwable {
         super.finalize();
         LOG.debug("Finalising");
-    }
-
-    protected static void updatePoolByDriver(String url, ConnectionPoolDefinition cpd, Properties info) throws ProxoolException {
-        definePool(url, cpd, info);
     }
 
     /**
@@ -874,6 +623,10 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.60  2003/02/26 16:05:53  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.59  2003/02/24 18:03:24  chr32
  Added JMX operations.
 

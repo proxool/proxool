@@ -23,7 +23,7 @@ import java.util.Date;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.11 $, $Date: 2003/02/13 17:01:27 $
+ * @version $Revision: 1.12 $, $Date: 2003/02/26 16:05:52 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -37,6 +37,8 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
     private String delegateUrl;
 
     private int mark;
+
+    private String reasonForMark;
 
     private int status;
 
@@ -214,10 +216,6 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 
     public int getMark() {
         return mark;
-    }
-
-    public void setMark(int mark) {
-        this.mark = mark;
     }
 
     public int getStatus() {
@@ -456,8 +454,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
     /**
      * @see ProxyConnectionIF#markForExpiry
      */
-    public void markForExpiry() {
-        setMark(MARK_FOR_EXPIRY);
+    public void markForExpiry(String reason) {
+        mark = MARK_FOR_EXPIRY;
+        reasonForMark = reason;
     }
 
     /**
@@ -465,6 +464,13 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
      */
     public boolean isMarkedForExpiry() {
         return getMark() == MARK_FOR_EXPIRY;
+    }
+
+    /**
+     * @see ProxyConnectionIF#getReasonForMark
+     */
+    public String getReasonForMark() {
+        return reasonForMark;
     }
 
     /**
@@ -511,6 +517,10 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.12  2003/02/26 16:05:52  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.11  2003/02/13 17:01:27  billhorsman
  use hex for statement hashcode
 

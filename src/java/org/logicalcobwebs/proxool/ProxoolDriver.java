@@ -7,6 +7,7 @@ package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.resources.ResourceNamesIF;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -14,10 +15,11 @@ import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.16 $, $Date: 2003/02/07 10:12:59 $
+ * @version $Revision: 1.17 $, $Date: 2003/02/26 16:05:52 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -31,6 +33,17 @@ public class ProxoolDriver implements Driver {
         } catch (SQLException e) {
             System.out.println(e.toString());
         }
+    }
+
+    private static final ResourceBundle ATTRIBUTE_DESCRIPTIONS_RESOURCE = createAttributeDescriptionsResource ();
+
+    private static ResourceBundle createAttributeDescriptionsResource () {
+        try {
+            return ResourceBundle.getBundle (ResourceNamesIF.ATTRIBUTE_DESCRIPTIONS);
+        } catch (Exception e) {
+            LOG.error ("Could not find resource " + ResourceNamesIF.ATTRIBUTE_DESCRIPTIONS, e);
+        }
+        return null;
     }
 
     /**
@@ -52,7 +65,6 @@ public class ProxoolDriver implements Driver {
      */
     public Connection connect(String url, Properties info)
             throws SQLException {
-        Connection connection = null;
 
         if (!url.startsWith("proxool")) {
             return null;
@@ -65,19 +77,21 @@ public class ProxoolDriver implements Driver {
             if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
                 ProxoolFacade.registerConnectionPool(url, info);
                 cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
-            } else if (info != null) {
-                // Perhaps we should be updating the definition?
+            } else if (info != null && info.size() > 0) {
+                // Perhaps we should be redefining the definition?
                 cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
                 ConnectionPoolDefinition cpd = cp.getDefinition();
-                ProxoolFacade.updatePoolByDriver(url, cpd, info);
+                cpd.redefine(url, info);
+            } else {
+                cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
             }
+            return cp.getConnection();
+
         } catch (ProxoolException e) {
             LOG.error("Problem", e);
             throw new SQLException(e.toString());
         }
 
-        connection = cp.getConnection();
-        return connection;
     }
 
     /**
@@ -93,7 +107,7 @@ public class ProxoolDriver implements Driver {
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
             throws SQLException {
 
-        DriverPropertyInfo[] dpi = new DriverPropertyInfo[15];
+        DriverPropertyInfo[] dpi = new DriverPropertyInfo[17];
         ConnectionPool cp = null;
         try {
             cp = ConnectionPoolManager.getInstance().getConnectionPool(url);
@@ -103,70 +117,66 @@ public class ProxoolDriver implements Driver {
 
         ConnectionPoolDefinitionIF cpd = cp.getDefinition();
 
-        dpi[0] = new DriverPropertyInfo(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY,
-                "How long the house keeping thread sleeps for (milliseconds). Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_HOUSE_KEEPING_SLEEP_TIME + ".");
-        dpi[0].value = String.valueOf(cpd.getHouseKeepingSleepTime());
+        dpi[0] = buildDriverPropertyInfo(ProxoolConstants.DELEGATE_DRIVER_PROPERTY,
+                String.valueOf(cpd.getDriver()));
 
-        dpi[1] = new DriverPropertyInfo(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY,
-                "If the house keeping thread finds and idle connections it will test them with this SQL statement. "
-                + "It should be _very_ quick to execute. Something like checking the current date or something. If not defined then this test is omitted.");
-        dpi[1].value = cpd.getHouseKeepingTestSql();
+        dpi[1] = buildDriverPropertyInfo(ProxoolConstants.DELEGATE_URL_PROPERTY,
+                String.valueOf(cpd.getUrl()));
 
-        dpi[2] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY,
-                "The maximum amount of connections to the database. Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_CONNECTION_COUNT + ".");
-        dpi[2].value = String.valueOf(cpd.getMaximumConnectionCount());
+        dpi[2] = buildDriverPropertyInfo(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY,
+                String.valueOf(cpd.getMinimumConnectionCount()));
 
-        dpi[3] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY,
-                "Any idle connections older than this will be removed by the housekeeper (milliseconds). Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_CONNECTION_LIFETIME + ".");
-        dpi[3].value = String.valueOf(cpd.getMaximumConnectionLifetime());
+        dpi[3] = buildDriverPropertyInfo(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY,
+                String.valueOf(cpd.getMaximumConnectionCount()));
 
-        dpi[4] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY,
-                "This is the maximum number of connections we can be building at any one time. That is, the number of new connections that have been requested but aren't "
-                + "yet available for use. Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_NEW_CONNECTIONS + ".");
-        dpi[4].value = String.valueOf(cpd.getMaximumNewConnections());
+        dpi[4] = buildDriverPropertyInfo(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY,
+                String.valueOf(cpd.getMaximumConnectionLifetime()));
 
-        dpi[5] = new DriverPropertyInfo(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY,
-                "If the connection cound it less than this then the housekeeper will build some more.");
-        dpi[5].value = String.valueOf(cpd.getMinimumConnectionCount());
+        dpi[5] = buildDriverPropertyInfo(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY,
+                String.valueOf(cpd.getMaximumNewConnections()));
 
-        dpi[6] = new DriverPropertyInfo(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY,
-                "If there are fewer than this number of connections available then we will build some more (assuming the maximum-connection-count is not exceeded).");
-        dpi[6].value = String.valueOf(cpd.getPrototypeCount());
+        dpi[6] = buildDriverPropertyInfo(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY,
+                String.valueOf(cpd.getPrototypeCount()));
 
-        dpi[7] = new DriverPropertyInfo(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY,
-                "This helps us determine whether the pool status. As long as at least one connection was started within this threshold (milliseconds) or there "
-                + " are some spare connections available then we assume the pool is up. Defaults to 60 seconds.");
-        dpi[7].value = String.valueOf(cpd.getRecentlyStartedThreshold());
+        dpi[7] = buildDriverPropertyInfo(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY,
+                String.valueOf(cpd.getHouseKeepingSleepTime()));
 
-        dpi[8] = new DriverPropertyInfo(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY,
-                "This helps us determine the pool status. If we have refused a connection within this threshold (milliseconds) then we are overloaded. Defaults to 60 seconds.");
-        dpi[8].value = String.valueOf(cpd.getOverloadWithoutRefusalLifetime());
+        dpi[8] = buildDriverPropertyInfo(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY,
+                cpd.getHouseKeepingTestSql());
 
-        dpi[9] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY,
-                "If a connection is active for longer than this (milliseconds) then we assume it has stalled or something. And we kill it.");
-        dpi[9].value = String.valueOf(cpd.getMaximumActiveTime());
+        dpi[9] = buildDriverPropertyInfo(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY,
+                String.valueOf(cpd.getRecentlyStartedThreshold()));
 
-        dpi[10] = new DriverPropertyInfo(ProxoolConstants.VERBOSE_PROPERTY,
-                "Either false (quiet) or true (loud). Default is false.");
+        dpi[10] = buildDriverPropertyInfo(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY,
+                String.valueOf(cpd.getOverloadWithoutRefusalLifetime()));
 
-        dpi[11] = new DriverPropertyInfo(ProxoolConstants.TRACE_PROPERTY,
-                "If true then every execution will be logged. Default is false.");
+        dpi[11] = buildDriverPropertyInfo(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY,
+                String.valueOf(cpd.getMaximumActiveTime()));
 
-        dpi[12] = new DriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY,
-                "All SQLExceptions are caught and tested for containing this text fragment. If it matches than this connection is considered useless "
-                + "and it is discarded. Regardless of what happens the exception is always thrown again. This property behaves like a collection; "
-                + "you can set it more than once and each value is checked.");
+        dpi[12] = buildDriverPropertyInfo(ProxoolConstants.VERBOSE_PROPERTY,
+                String.valueOf(cpd.isVerbose()));
 
-        dpi[13] = new DriverPropertyInfo(ProxoolConstants.STATISTICS_PROPERTY,
-                "The sample length when taking statistical information, comma-delimited. "
-                + "For example: '10s,15m' would mean take samples every 10 seconds and "
-                + "every 15 minutes. Valid units are s(econds), m(inutes), h(ours) and d(ays). "
-                + "Default is null (no statistics).");
+        dpi[13] = buildDriverPropertyInfo(ProxoolConstants.TRACE_PROPERTY,
+                String.valueOf(cpd.isTrace()));
 
-        dpi[14] = new DriverPropertyInfo(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY,
-                "Whether statistics are logged as they are produced. Range: DEBUG, INFO, WARN, ERROR, FATAL."
-                + "Default is null (no logging).");
+        dpi[14] = buildDriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY,
+                String.valueOf(cpd.getFatalSqlExceptions()));
 
+        dpi[15] = buildDriverPropertyInfo(ProxoolConstants.STATISTICS_PROPERTY,
+                String.valueOf(cpd.getStatistics()));
+
+        dpi[16] = buildDriverPropertyInfo(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY,
+                String.valueOf(cpd.getStatisticsLogLevel()));
+
+        return dpi;
+    }
+
+    private DriverPropertyInfo buildDriverPropertyInfo(String propertyName, String value) {
+        DriverPropertyInfo dpi = new DriverPropertyInfo(propertyName,
+                ATTRIBUTE_DESCRIPTIONS_RESOURCE.getString (propertyName));
+        if (value != null) {
+            dpi.value = value;
+        }
         return dpi;
     }
 
@@ -206,6 +216,10 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.17  2003/02/26 16:05:52  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.16  2003/02/07 10:12:59  billhorsman
  changed updatePoolByDriver sig.
 

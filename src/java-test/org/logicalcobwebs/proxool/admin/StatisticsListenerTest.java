@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/20 00:33:15 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:51 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -74,7 +74,14 @@ public class StatisticsListenerTest extends TestCase {
             TestListener tl = new TestListener();
             ProxoolFacade.addStatisticsListener(alias, tl);
 
-            Connection c = TestHelper.getProxoolConnection(url);
+            // Wait for prototyper to build connections
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                LOG.debug("Awoken", e);
+            }
+
+            Connection c = TestHelper.getProxoolConnection(url, null);
             c.close();
 
             long startWaiting = System.currentTimeMillis();
@@ -117,6 +124,10 @@ public class StatisticsListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.2  2003/02/26 16:05:51  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.1  2003/02/20 00:33:15  billhorsman
  renamed monitor package -> admin
 

@@ -17,7 +17,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.17 $, $Date: 2003/02/19 15:14:24 $
+ * @version $Revision: 1.18 $, $Date: 2003/02/26 16:05:49 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -48,7 +48,7 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
     public ProxoolAdapter() {
     }
 
-    public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
+    public void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
         setCompleteInfo(completeInfo);
         setChangedInfo(changedInfo);
         LOG.debug("Definition updated " + connectionPoolDefinition.getCompleteUrl());
@@ -129,6 +129,10 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.18  2003/02/26 16:05:49  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.17  2003/02/19 15:14:24  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.13 $, $Date: 2003/02/06 15:41:17 $
+ * @version $Revision: 1.14 $, $Date: 2003/02/26 16:05:52 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -62,6 +62,11 @@ public interface ConnectionPoolDefinitionIF {
     public static final String USER_PROPERTY = "user";
 
     public static final String PASSWORD_PROPERTY = "password";
+
+    /**
+     * @see #getFatalSqlExceptions
+     */
+    public static final String FATAL_SQL_EXCEPTIONS_DELIMITER = ",";
 
     /** This is the time the house keeping thread sleeps for between checks. (milliseconds) */
     int getHouseKeepingSleepTime();
@@ -111,7 +116,8 @@ public interface ConnectionPoolDefinitionIF {
 
     /**
      * Get all of the properties that are defined on the delegated driver.
-     * @return
+     * @return the delegate properties
+     * @deprecated use less ambiguous {@link #getDelegateProperties} instead
      */
     Properties getProperties();
 
@@ -149,6 +155,7 @@ public interface ConnectionPoolDefinitionIF {
      * and it is discarded. Regardless of what happens the exception
      * is always thrown back to the user.
      * @return the list of exception fragments (String)
+     * @see #FATAL_SQL_EXCEPTIONS_DELIMITER 
      */
     Set getFatalSqlExceptions();
 
@@ -200,11 +207,23 @@ public interface ConnectionPoolDefinitionIF {
      */
     String getStatisticsLogLevel();
 
+    /**
+     * Get all of the properties that are defined on the delegated driver.
+     * @return the delegate properties
+     */
+    Properties getDelegateProperties();
+
+    String getDelegateProperty(String name);
+
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.14  2003/02/26 16:05:52  billhorsman
+ widespread changes caused by refactoring the way we
+ update and redefine pool definitions.
+
  Revision 1.13  2003/02/06 15:41:17  billhorsman
  add statistics-log-level
 
