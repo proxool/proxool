@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.41 $
-    $Date: 2003/03/03 01:50:06 $
+    $Revision: 1.42 $
+    $Date: 2003/03/03 12:41:03 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -325,7 +325,7 @@
         <replace
             file="${build-dir}/reports/${junit-report-name}"
             token="Unit Test Results"
-            value="${junit-report-description} - ${TODAY_FULL}"
+            value='&lt;div style="font-size: 110%;"&gt;&lt;div style="float: right; font-weight: bold;"&gt;${TODAY_FULL}&lt;/div&gt;&lt;a href="../index.html">Proxool&lt;/a&gt; - ${junit-report-description}&lt;/div&gt;'
             />
 
     </target>
