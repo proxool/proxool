@@ -22,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.10 $, $Date: 2003/03/06 11:31:17 $
+ * @version $Revision: 1.11 $, $Date: 2003/03/06 14:25:53 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -71,7 +71,7 @@ public class SnapshotTest extends AbstractProxoolTest {
 
             ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
             assertTrue("connectionInfos.length != 0",  connectionInfos.length != 0);
-            assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_AVAILABLE, connectionInfos[0].getStatus());
+            assertEquals("connectionInfos activeCount", 0, getCount(connectionInfos, ConnectionInfoIF.STATUS_ACTIVE));
         }
 
         {
@@ -85,11 +85,21 @@ public class SnapshotTest extends AbstractProxoolTest {
 
             ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
             assertTrue("connectionInfos.length != 0",  connectionInfos.length != 0);
-            assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_ACTIVE, connectionInfos[0].getStatus());
+            assertEquals("connectionInfos activeCount", 1, getCount(connectionInfos, ConnectionInfoIF.STATUS_ACTIVE));
 
             c.close();
         }
 
+    }
+
+    private int getCount(ConnectionInfoIF[] connectionInfos, int status) {
+        int count = 0;
+        for (int i = 0; i < connectionInfos.length; i++) {
+            if (connectionInfos[i].getStatus() == status) {
+                count++;
+            }
+        }
+        return count;
     }
 
 }
@@ -97,6 +107,9 @@ public class SnapshotTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: SnapshotTest.java,v $
+ Revision 1.11  2003/03/06 14:25:53  billhorsman
+ fix for threading
+
  Revision 1.10  2003/03/06 11:31:17  billhorsman
  fix for unlikely prototyper situation
 
