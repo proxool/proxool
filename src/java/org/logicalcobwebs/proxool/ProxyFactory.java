@@ -8,8 +8,8 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
+import net.sf.cglib.InvocationHandler;
+import net.sf.cglib.Proxy;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -23,9 +23,9 @@ import java.util.Properties;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.22 $, $Date: 2003/09/07 22:11:31 $
+ * @version $Revision: 1.23 $, $Date: 2003/09/10 22:21:04 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
  */
 class ProxyFactory {
@@ -125,6 +125,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.23  2003/09/10 22:21:04  chr32
+ Removing > jdk 1.2 dependencies.
+
  Revision 1.22  2003/09/07 22:11:31  billhorsman
  Remove very persistent debug message
 

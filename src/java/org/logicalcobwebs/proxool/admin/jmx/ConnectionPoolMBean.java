@@ -83,7 +83,7 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.9 $, $Date: 2003/05/06 23:15:55 $
+ * @version $Revision: 1.10 $, $Date: 2003/09/10 22:21:04 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.8
@@ -193,13 +193,13 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                         this.poolDefinition.getUrl ()));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.FATAL_SQL_EXCEPTION)) {
                     resultList.add (new Attribute (attributeNames[i],
-                        this.poolProperties.getProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)));
+                        getValueOrEmpty(this.poolProperties.getProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY))));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME)) {
                     resultList.add (new Attribute (attributeNames[i],
                         new Integer (this.poolDefinition.getHouseKeepingSleepTime ())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.HOUSE_KEEPING_TEST_SQL)) {
                     resultList.add (new Attribute (attributeNames[i],
-                        this.poolDefinition.getHouseKeepingTestSql ()));
+                        getValueOrEmpty(poolDefinition.getHouseKeepingTestSql ())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_ACTIVE_TIME)) {
                     resultList.add (new Attribute (attributeNames[i],
                         new Integer (this.poolDefinition.getMaximumActiveTime ())));
@@ -524,6 +524,10 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
         return integer != null && integer.intValue() > 0;
     }
 
+    private String getValueOrEmpty(String property) {
+        return property == null ? "" : property;
+    }
+
     private void setIntegerAttribute(String attributeName, String propertyName, Object value, int defaultValue, Properties properties,
         AttributeList resultList) throws InvalidAttributeValueException {
         checkAssignable (attributeName, Integer.class, value.getClass ());
@@ -639,6 +643,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.10  2003/09/10 22:21:04  chr32
+ Removing > jdk 1.2 dependencies.
+
  Revision 1.9  2003/05/06 23:15:55  chr32
  Moving JMX classes back in from sandbox.
 

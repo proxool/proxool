@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.lang.reflect.InvocationHandler;
+import net.sf.cglib.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -18,9 +18,9 @@ import java.sql.Statement;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.26 $, $Date: 2003/03/11 14:51:54 $
+ * @version $Revision: 1.27 $, $Date: 2003/09/10 22:21:04 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 class ProxyConnection extends AbstractProxyConnection implements InvocationHandler {
 
@@ -33,6 +33,8 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
     private static final String EQUALS_METHOD = "equals";
 
     private static final String GET_META_DATA_METHOD = "getMetaData";
+
+    private static final String FINALIZE_METHOD = "finalize";
 
     public ProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool, int status) throws SQLException {
         super(connection, id, delegateUrl, connectionPool, status);
@@ -51,11 +53,13 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
                 result = new Boolean(isClosed());
             } else if (m.getName().equals(GET_META_DATA_METHOD) && argCount == 0) {
                 result = getMetaData();
+            } else if (m.getName().equals(FINALIZE_METHOD)) {
+                super.finalize();
             } else {
                 if (m.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
                     setNeedToReset(true);
                 }
-                result = m.invoke(getConnection(), args);
+                    result = m.invoke(getConnection(), args);
             }
 
             // If we have just made some sort of Statement then we should rather return
@@ -94,6 +98,9 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.27  2003/09/10 22:21:04  chr32
+ Removing > jdk 1.2 dependencies.
+
  Revision 1.26  2003/03/11 14:51:54  billhorsman
  more concurrency fixes relating to snapshots
 

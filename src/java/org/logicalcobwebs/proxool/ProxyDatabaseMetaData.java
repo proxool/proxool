@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.lang.reflect.InvocationHandler;
+import net.sf.cglib.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -17,9 +17,9 @@ import java.sql.SQLException;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.4 $, $Date: 2003/03/03 11:11:58 $
+ * @version $Revision: 1.5 $, $Date: 2003/09/10 22:21:04 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements InvocationHandler {
 
@@ -28,6 +28,8 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements Invocati
     private static final String GET_CONNECTION_METHOD = "getConnection";
 
     private static final String EQUALS_METHOD = "equals";
+
+    private static final String FINALIZE_METHOD = "finalize";
 
     public ProxyDatabaseMetaData(Connection connection, ProxyConnectionIF proxyConnection) throws SQLException {
         super(connection,  proxyConnection);
@@ -42,6 +44,8 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements Invocati
                 result = getConnection();
             } else if (m.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = new Boolean(equals(args[0]));
+            } else if (m.getName().equals(FINALIZE_METHOD)) {
+                super.finalize();
             } else {
                 result = m.invoke(getDatabaseMetaData(), args);
             }
@@ -61,6 +65,9 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements Invocati
 /*
  Revision history:
  $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.5  2003/09/10 22:21:04  chr32
+ Removing > jdk 1.2 dependencies.
+
  Revision 1.4  2003/03/03 11:11:58  billhorsman
  fixed licence
 

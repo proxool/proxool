@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.3 2003/03/11 00:02:07 billhorsman Exp $
- * $Revision: 1.3 $
- * $Date: 2003/03/11 00:02:07 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.4 2003/09/10 22:21:04 chr32 Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/09/10 22:21:04 $
  *
  * ====================================================================
  *
@@ -61,10 +61,9 @@
 
 package org.logicalcobwebs.logging.impl;
 
-import org.logicalcobwebs.logging.Log;
+import java.lang.reflect.Method;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.logicalcobwebs.logging.Log;
 
 /**
  * <p>Implementation of the <code>org.logicalcobwebs.logging.Log</code>
@@ -74,7 +73,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author <a href="mailto:bloritsch@apache.org">Berin Loritsch</a>
  * @author <a href="mailto:donaldp@apache.org">Peter Donald</a>
- * @version $Revision: 1.3 $ $Date: 2003/03/11 00:02:07 $
+ * @version $Revision: 1.4 $ $Date: 2003/09/10 22:21:04 $
  */
 
 public final class Jdk14Logger implements Log {
@@ -88,9 +87,25 @@ public final class Jdk14Logger implements Log {
      * @param name Name of the logger to be constructed
      */
     public Jdk14Logger (String name) {
-
-        logger = Logger.getLogger (name);
-
+        try {
+            final Class loggerClass = Class.forName("java.util.logging.Logger");
+            final Method getLoggerMethod = loggerClass.getMethod("getLogger", new Class [] {String.class});
+            logger = getLoggerMethod.invoke(null, new Object[]{name});
+            logpMethod = logger.getClass().getMethod("logp", new Class[] {Class.forName("java.util.logging.Logger"),
+                String.class, String.class, String.class});
+            logpExMethod = logger.getClass().getMethod("logp", new Class[] {Class.forName("java.util.logging.Logger"),
+                String.class, String.class, String.class, Throwable.class});
+            final Class levelClass = Class.forName("java.util.logging.Level");
+            isLoggableMethod = loggerClass.getMethod("isLoggable", new Class[] {levelClass});
+            levelFINEST = levelClass.getField("FINEST").get(null);
+            levelFINE = levelClass.getField("FINE").get(null);
+            levelINFO = levelClass.getField("INFO").get(null);
+            levelWARNING = levelClass.getField("WARNING").get(null);
+            levelSEVERE = levelClass.getField("SEVERE").get(null);
+        } catch (Exception e) {
+            System.err.println("Could not create Jdk14Logger.");
+            e.printStackTrace();
+        }
     }
 
 
@@ -100,12 +115,27 @@ public final class Jdk14Logger implements Log {
     /**
      * The underlying Logger implementation we are using.
      */
-    private Logger logger = null;
+    private Object logger = null;
+
+    private Method logpMethod = null;
+    private Method logpExMethod = null;
+    private Method isLoggableMethod = null;
+
+    private Object levelFINEST = null;
+    private Object levelFINE = null;
+    private Object levelINFO = null;
+    private Object levelWARNING = null;
+    private Object levelSEVERE = null;
+
+
+
+
+
 
 
     // --------------------------------------------------------- Public Methods
 
-    private void log (Level level, String msg, Throwable ex) {
+    private void log (Object level, String msg, Throwable ex) {
         // Hack (?) to get the stack trace.
         Throwable dummyException = new Throwable ();
         StackTraceElement locations[] = dummyException.getStackTrace ();
@@ -118,10 +148,15 @@ public final class Jdk14Logger implements Log {
             method = caller.getMethodName ();
         }
 
-        if (ex == null) {
-            logger.logp (level, cname, method, msg);
-        } else {
-            logger.logp (level, cname, method, msg, ex);
+        try {
+            if (ex == null) {
+                logpMethod.invoke(logger, new Object[]{level, cname, method, msg});
+            } else {
+                logpExMethod.invoke(logger, new Object[]{level, cname, method, msg, ex});
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "Logging of message '" + msg + "' failed" + (ex != null ? ":" + ex.getMessage() : "."));
         }
     }
 
@@ -129,134 +164,134 @@ public final class Jdk14Logger implements Log {
      * Log a message with debug log level.
      */
     public void debug (Object message) {
-        log (Level.FINE, String.valueOf (message), null);
+        log (levelFINE, String.valueOf (message), null);
     }
 
     /**
      * Log a message and exception with debug log level.
      */
     public void debug (Object message, Throwable exception) {
-        log (Level.FINE, String.valueOf (message), exception);
+        log (levelFINE, String.valueOf (message), exception);
     }
 
     /**
      * Log a message with error log level.
      */
     public void error (Object message) {
-        log (Level.SEVERE, String.valueOf (message), null);
+        log (levelSEVERE, String.valueOf (message), null);
     }
 
     /**
      * Log a message and exception with error log level.
      */
     public void error (Object message, Throwable exception) {
-        log (Level.SEVERE, String.valueOf (message), exception);
+        log (levelSEVERE, String.valueOf (message), exception);
     }
 
     /**
      * Log a message with fatal log level.
      */
     public void fatal (Object message) {
-        log (Level.SEVERE, String.valueOf (message), null);
+        log (levelSEVERE, String.valueOf (message), null);
     }
 
     /**
      * Log a message and exception with fatal log level.
      */
     public void fatal (Object message, Throwable exception) {
-        log (Level.SEVERE, String.valueOf (message), exception);
-    }
-
-    /**
-     * Return the native Logger instance we are using.
-     */
-    public Logger getLogger () {
-        return (this.logger);
+        log (levelSEVERE, String.valueOf (message), exception);
     }
 
     /**
      * Log a message with info log level.
      */
     public void info (Object message) {
-        log (Level.INFO, String.valueOf (message), null);
+        log (levelINFO, String.valueOf (message), null);
     }
 
     /**
      * Log a message and exception with info log level.
      */
     public void info (Object message, Throwable exception) {
-        log (Level.INFO, String.valueOf (message), exception);
+        log (levelINFO, String.valueOf (message), exception);
     }
 
     /**
      * Is debug logging currently enabled?
      */
     public boolean isDebugEnabled () {
-        return (logger.isLoggable (Level.FINE));
+        return (isLoggable (levelFINE));
     }
 
     /**
      * Is error logging currently enabled?
      */
     public boolean isErrorEnabled () {
-        return (logger.isLoggable (Level.SEVERE));
+        return (isLoggable (levelSEVERE));
     }
 
     /**
      * Is fatal logging currently enabled?
      */
     public boolean isFatalEnabled () {
-        return (logger.isLoggable (Level.SEVERE));
+        return (isLoggable (levelSEVERE));
     }
 
     /**
      * Is info logging currently enabled?
      */
     public boolean isInfoEnabled () {
-        return (logger.isLoggable (Level.INFO));
+        return (isLoggable (levelINFO));
     }
 
     /**
      * Is tace logging currently enabled?
      */
     public boolean isTraceEnabled () {
-        return (logger.isLoggable (Level.FINEST));
+        return (isLoggable (levelFINEST));
     }
 
     /**
      * Is warning logging currently enabled?
      */
     public boolean isWarnEnabled () {
-        return (logger.isLoggable (Level.WARNING));
+        return (isLoggable (levelWARNING));
     }
 
     /**
      * Log a message with trace log level.
      */
     public void trace (Object message) {
-        log (Level.FINEST, String.valueOf (message), null);
+        log (levelFINEST, String.valueOf (message), null);
     }
 
     /**
      * Log a message and exception with trace log level.
      */
     public void trace (Object message, Throwable exception) {
-        log (Level.FINEST, String.valueOf (message), exception);
+        log (levelFINEST, String.valueOf (message), exception);
     }
 
     /**
      * Log a message with warn log level.
      */
     public void warn (Object message) {
-        log (Level.WARNING, String.valueOf (message), null);
+        log (levelWARNING, String.valueOf (message), null);
     }
 
     /**
      * Log a message and exception with warn log level.
      */
     public void warn (Object message, Throwable exception) {
-        log (Level.WARNING, String.valueOf (message), exception);
+        log (levelWARNING, String.valueOf (message), exception);
     }
 
+    private boolean isLoggable(Object level) {
+        try {
+            return ((Boolean) isLoggableMethod.invoke(logger, new Object[] {level})).booleanValue();
+        } catch (Exception e) {
+            throw new RuntimeException("isLoggable call failed: " + e.getMessage());
+        }
+    }
 }
 

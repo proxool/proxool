@@ -11,8 +11,6 @@ import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
 
 import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 /**
@@ -20,9 +18,9 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/11 00:12:11 $
+ * @version $Revision: 1.7 $, $Date: 2003/09/10 22:21:04 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
  */
 class StatsRoller {
@@ -41,7 +39,7 @@ class StatsRoller {
 
     private int units;
 
-    private Timer timer = new Timer(true);
+    private boolean running = true;
 
     private CompositeStatisticsListener compositeStatisticsListener;
 
@@ -89,19 +87,29 @@ class StatsRoller {
         currentStatistics = new Statistics(now.getTime());
 
         // Automatically trigger roll if no activity
-        TimerTask tt = new TimerTask() {
+        final Thread t = new Thread() {
+
             public void run() {
-                roll();
+                while (running) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        LOG.debug("Interruption", e);
+                    }
+                    roll();
+                }
             }
+
         };
-        timer.schedule(tt, 1000, 5000);
+        t.setDaemon(true);
+        t.start();
     }
 
     /**
      * Cancels the timer that outputs the stats
      */
     protected void cancel() {
-        timer.cancel();
+        running = false;
     }
 
     private void roll() {
@@ -180,6 +188,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.7  2003/09/10 22:21:04  chr32
+ Removing > jdk 1.2 dependencies.
+
  Revision 1.6  2003/03/11 00:12:11  billhorsman
  switch to concurrent package
 

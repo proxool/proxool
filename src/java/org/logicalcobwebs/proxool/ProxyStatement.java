@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.lang.reflect.InvocationHandler;
+import net.sf.cglib.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -19,9 +19,9 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.19 $, $Date: 2003/09/05 17:01:00 $
+ * @version $Revision: 1.20 $, $Date: 2003/09/10 22:21:04 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 class ProxyStatement extends AbstractProxyStatement implements InvocationHandler {
 
@@ -122,6 +122,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.20  2003/09/10 22:21:04  chr32
+ Removing > jdk 1.2 dependencies.
+
  Revision 1.19  2003/09/05 17:01:00  billhorsman
  Trap and throw FatalSQLExceptions.
 
