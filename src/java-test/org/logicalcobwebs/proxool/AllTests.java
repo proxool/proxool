@@ -12,7 +12,7 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.19 $, $Date: 2003/04/19 13:01:01 $
+ * @version $Revision: 1.20 $, $Date: 2003/04/27 15:46:11 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -30,7 +30,6 @@ public class AllTests {
         suite.addTestSuite(ConnectionInfoTest.class);
         suite.addTestSuite(ConnectionListenerTest.class);
         suite.addTestSuite(ConnectionResetterTest.class);
-        suite.addTestSuite(DataSourceTest.class);
         suite.addTestSuite(DriverTest.class);
         suite.addTestSuite(ConnectionPoolTests.class);
         suite.addTestSuite(HouseKeeperTest.class);
@@ -59,6 +58,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.20  2003/04/27 15:46:11  billhorsman
+ moved DataSourceTest to sandbox
+
  Revision 1.19  2003/04/19 13:01:01  billhorsman
  improve tests
 
