@@ -3,16 +3,17 @@
  * See org.logicalcobwebs.proxool.package.html for details.
  * The latest version is available at http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool;
+package org.logicalcobwebs.logging;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import org.logicalcobwebs.proxool.GlobalTest;
 
 /**
  * Run all tests
  *
- * @version $Revision: 1.23 $, $Date: 2003/10/26 16:23:20 $
+ * @version $Revision: 1.1 $, $Date: 2003/10/26 16:23:20 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -26,26 +27,7 @@ public class AllTests {
      */
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(ConfigurationListenerTest.class);
-        suite.addTestSuite(ConnectionInfoTest.class);
-        suite.addTestSuite(ConnectionListenerTest.class);
-        suite.addTestSuite(ConnectionResetterTest.class);
-        suite.addTestSuite(DriverTest.class);
-        suite.addTestSuite(ConnectionPoolTest.class);
-        suite.addTestSuite(FatalSqlExceptionTest.class);
-        suite.addTestSuite(HibernateTest.class);
-        suite.addTestSuite(HouseKeeperTest.class);
-        suite.addTestSuite(HypersonicTest.class);
-        suite.addTestSuite(ManyPoolsTest.class);
-        suite.addTestSuite(PrototyperTest.class);
-        suite.addTestSuite(ProxyConnectionTest.class);
-        suite.addTestSuite(ProxyDatabaseMetaDataTest.class);
-        suite.addTestSuite(ProxyStatementTest.class);
-        suite.addTestSuite(RegistrationTest.class);
-        suite.addTestSuite(StateListenerTest.class);
-        suite.addTestSuite(UpdateDefinitionTest.class);
-        // TODO Need more investigation into why this fails sometimes.
-        // suite.addTestSuite(PerformanceTest.class);
+        suite.addTestSuite(Jdk14LoggerTest.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -62,7 +44,7 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
- Revision 1.23  2003/10/26 16:23:20  billhorsman
+ Revision 1.1  2003/10/26 16:23:20  billhorsman
  Fixed up test suites
 
  Revision 1.22  2003/09/28 09:38:39  billhorsman

@@ -16,7 +16,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.17 $, $Date: 2003/09/30 18:58:29 $
+ * @version $Revision: 1.18 $, $Date: 2003/10/26 16:23:20 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -65,6 +65,7 @@ public class GlobalTest {
         suite.addTest(org.logicalcobwebs.proxool.admin.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.admin.jmx.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.util.AllTests.suite());
+        suite.addTest(org.logicalcobwebs.logging.AllTests.suite());
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -84,6 +85,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.18  2003/10/26 16:23:20  billhorsman
+ Fixed up test suites
+
  Revision 1.17  2003/09/30 18:58:29  billhorsman
  Increase shutdown grace time to 10 seconds to make tests more robust.
 
