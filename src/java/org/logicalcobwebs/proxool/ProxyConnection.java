@@ -20,7 +20,7 @@ import java.text.DecimalFormat;
 /**
  * Manages a connection. This is wrapped up inside a...
  *
- * @version $Revision: 1.32 $, $Date: 2004/03/23 21:19:45 $
+ * @version $Revision: 1.33 $, $Date: 2004/03/26 20:00:37 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.10
@@ -165,7 +165,7 @@ public class ProxyConnection implements ProxyConnectionIF {
             // Clean up the actual connection
             connection.close();
         } catch (Throwable t) {
-            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during destruction: " + t);
+            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during destruction: ",  t);
         }
 
     }
