@@ -16,14 +16,14 @@ import java.util.Map;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.6 $, $Date: 2003/02/12 12:46:30 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/11 14:58:54 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 public class ProxyConnection extends AbstractProxyConnection implements Connection {
 
-    public ProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool) throws SQLException {
-        super(connection, id, delegateUrl, connectionPool);
+    public ProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool, int status) throws SQLException {
+        super(connection, id, delegateUrl, connectionPool, status);
     }
 
     /**
@@ -200,6 +200,9 @@ public class ProxyConnection extends AbstractProxyConnection implements Connecti
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.7  2003/03/11 14:58:54  billhorsman
+ brought inline with main tree
+
  Revision 1.6  2003/02/12 12:46:30  billhorsman
  brought up to date with recent changes in main source
 
