@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.20 $, $Date: 2002/11/08 18:03:50 $
+ * @version $Revision: 1.21 $, $Date: 2002/11/09 15:48:55 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -917,6 +917,14 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         }
     }
 
+    /**
+     * Is there a {@link ConnectionListenerIF listener} for connections
+     * @return true if there is a listener registered.
+     */
+    protected boolean isConnectionListenedTo() {
+        return (connectionListener != null);
+    }
+
     public String toString() {
         return getDefinition().toString();
     }
@@ -1068,6 +1076,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.21  2002/11/09 15:48:55  billhorsman
+ new isConnectionListenedTo() to stop unnecessary processing
+ if nobody is listening
+
  Revision 1.20  2002/11/08 18:03:50  billhorsman
  when connections are closed because they have been
  active for too long then a log message is written
