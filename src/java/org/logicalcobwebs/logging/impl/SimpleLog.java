@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/SimpleLog.java,v 1.2 2003/02/08 14:27:51 chr32 Exp $
- * $Revision: 1.2 $
- * $Date: 2003/02/08 14:27:51 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/SimpleLog.java,v 1.3 2003/03/11 00:02:10 billhorsman Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/03/11 00:02:10 $
  *
  * ====================================================================
  *
@@ -58,10 +58,21 @@
  * <http://www.apache.org/>.
  *
  */
-package org.logicalcobwebs.logging.impl;
-import org.logicalcobwebs.logging.Log;
-import java.io.InputStream;import java.lang.reflect.Method;import java.security.AccessControlException;import java.text.DateFormat;import java.text.SimpleDateFormat;import java.util.Date;import java.util.Enumeration;import java.util.Properties;
-/**
+
+package org.logicalcobwebs.logging.impl;
+
+import org.logicalcobwebs.logging.Log;
+
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.security.AccessControlException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Properties;
+
+/**
  * <p>Simple implementation of Log that sends all enabled log messages,
  * for all defined loggers, to System.err.  The following system properties
  * are supported to configure the behavior of this logger:</p>
@@ -94,15 +105,17 @@ import java.io.InputStream;import java.lang.reflect.Method;import java.securit
  * @author Rod Waldhoff
  * @author Robert Burrell Donkin
  *
- * @version $Id: SimpleLog.java,v 1.2 2003/02/08 14:27:51 chr32 Exp $
+ * @version $Id: SimpleLog.java,v 1.3 2003/03/11 00:02:10 billhorsman Exp $
  */
 public class SimpleLog implements Log {
-    // ------------------------------------------------------- Class Attributes
+
+    // ------------------------------------------------------- Class Attributes
 
     /** All system properties used by <code>Simple</code> start with this */
     protected static final String SYSTEM_PREFIX =
             "org.apache.commons.logging.simplelog.";
-    /** All system properties which start with {@link #SYSTEM_PREFIX} */
+
+    /** All system properties which start with {@link #SYSTEM_PREFIX} */
     protected static final Properties SIMLE_LOG_PROPS = new Properties ();
     /** Include the instance name in the log message? */
     private static boolean showLogName = false;
@@ -131,16 +144,19 @@ public class SimpleLog implements Log {
     public static final int LOG_LEVEL_ERROR = 5;
     /** "Fatal" level logging. */
     public static final int LOG_LEVEL_FATAL = 6;
-    /** Enable all logging levels */
+
+    /** Enable all logging levels */
     public static final int LOG_LEVEL_ALL = (LOG_LEVEL_TRACE - 1);
-    /** Enable no logging levels */
+
+    /** Enable no logging levels */
     public static final int LOG_LEVEL_OFF = (LOG_LEVEL_FATAL + 1);
 
     // ------------------------------------------------------------ Initializer
 
     // initialize class attributes
     static {
-        try {
+
+        try {
             // add all system props that start with the specified prefix
             Enumeration enum = System.getProperties ().propertyNames ();
             while (enum.hasMoreElements ()) {
@@ -185,17 +201,22 @@ public class SimpleLog implements Log {
             */
 
             String prop = SIMLE_LOG_PROPS.getProperty (SYSTEM_PREFIX + "showlogname");
-            if (prop != null) {                showLogName = "true".equalsIgnoreCase (prop);            }
+
+            if (prop != null) {
+                showLogName = "true".equalsIgnoreCase (prop);
+            }
 
             prop = SIMLE_LOG_PROPS.getProperty (SYSTEM_PREFIX + "showShortLogname");
             if (prop != null) {
                 showShortName = "true".equalsIgnoreCase (prop);
             }
-            prop = SIMLE_LOG_PROPS.getProperty (SYSTEM_PREFIX + "showdatetime");
+
+            prop = SIMLE_LOG_PROPS.getProperty (SYSTEM_PREFIX + "showdatetime");
             if (prop != null) {
                 showDateTime = "true".equalsIgnoreCase (prop);
             }
-            if (showDateTime) {
+
+            if (showDateTime) {
                 dateFormatter = new SimpleDateFormat (
                         SIMLE_LOG_PROPS.getProperty (
                                 SYSTEM_PREFIX + "dateformat", "yyyy/MM/dd HH:mm:ss:SSS zzz"));
@@ -212,7 +233,8 @@ public class SimpleLog implements Log {
     private String logName = null;
     /** The current log level */
     private int currentLogLevel;
-    private String prefix = null;
+
+    private String prefix = null;
 
 
     // ------------------------------------------------------------ Constructor
@@ -223,7 +245,8 @@ public class SimpleLog implements Log {
      * @param name log name
      */
     public SimpleLog (String name) {
-        logName = name;
+
+        logName = name;
 
         // set initial log level
         // Used to be: set default log level to ERROR
@@ -238,10 +261,12 @@ public class SimpleLog implements Log {
             lvl = SIMLE_LOG_PROPS.getProperty (SYSTEM_PREFIX + "log." + name);
             i = String.valueOf (name).lastIndexOf (".");
         }
-        if (null == lvl) {
+
+        if (null == lvl) {
             lvl = SIMLE_LOG_PROPS.getProperty (SYSTEM_PREFIX + "defaultlog");
         }
-        if ("all".equalsIgnoreCase (lvl)) {
+
+        if ("all".equalsIgnoreCase (lvl)) {
             setLevel (SimpleLog.LOG_LEVEL_ALL);
         } else if ("trace".equalsIgnoreCase (lvl)) {
             setLevel (SimpleLog.LOG_LEVEL_TRACE);
@@ -258,7 +283,8 @@ public class SimpleLog implements Log {
         } else if ("off".equalsIgnoreCase (lvl)) {
             setLevel (SimpleLog.LOG_LEVEL_OFF);
         }
-    }
+
+    }
 
 
     // -------------------------------------------------------- Properties
@@ -269,13 +295,17 @@ public class SimpleLog implements Log {
      * @param currentLogLevel new logging level
      */
     public void setLevel (int currentLogLevel) {
-        this.currentLogLevel = currentLogLevel;
-    }
-    /**
+
+        this.currentLogLevel = currentLogLevel;
+
+    }
+
+    /**
      * <p> Get logging level. </p>
      */
     public int getLevel () {
-        return currentLogLevel;
+
+        return currentLogLevel;
     }
 
 
@@ -299,12 +329,24 @@ public class SimpleLog implements Log {
 
         // append a readable representation of the log leve
         switch (type) {
-            case SimpleLog.LOG_LEVEL_TRACE:                buf.append ("[TRACE] ");                break;
-            case SimpleLog.LOG_LEVEL_DEBUG:                buf.append ("[DEBUG] ");                break;
-            case SimpleLog.LOG_LEVEL_INFO:                buf.append ("[INFO] ");                break;
-            case SimpleLog.LOG_LEVEL_WARN:                buf.append ("[WARN] ");                break;
-            case SimpleLog.LOG_LEVEL_ERROR:                buf.append ("[ERROR] ");                break;
-            case SimpleLog.LOG_LEVEL_FATAL:                buf.append ("[FATAL] ");                break;
+            case SimpleLog.LOG_LEVEL_TRACE:
+                buf.append ("[TRACE] ");
+                break;
+            case SimpleLog.LOG_LEVEL_DEBUG:
+                buf.append ("[DEBUG] ");
+                break;
+            case SimpleLog.LOG_LEVEL_INFO:
+                buf.append ("[INFO] ");
+                break;
+            case SimpleLog.LOG_LEVEL_WARN:
+                buf.append ("[WARN] ");
+                break;
+            case SimpleLog.LOG_LEVEL_ERROR:
+                buf.append ("[ERROR] ");
+                break;
+            case SimpleLog.LOG_LEVEL_FATAL:
+                buf.append ("[FATAL] ");
+                break;
         }
 
         // append the name of the log instance if so configured
@@ -333,7 +375,8 @@ public class SimpleLog implements Log {
         // print to System.err
         System.err.println (buf.toString ());
     }
-    /**
+
+    /**
      * Is the given log level currently enabled?
      *
      * @param logLevel is this level enabled?
@@ -352,99 +395,123 @@ public class SimpleLog implements Log {
      * <p> Log a message with debug log level.</p>
      */
     public final void debug (Object message) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_DEBUG)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_DEBUG)) {
             log (SimpleLog.LOG_LEVEL_DEBUG, message, null);
         }
     }
-    /**
+
+    /**
      * <p> Log an error with debug log level.</p>
      */
     public final void debug (Object message, Throwable t) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_DEBUG)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_DEBUG)) {
             log (SimpleLog.LOG_LEVEL_DEBUG, message, t);
         }
     }
-    /**
+
+    /**
      * <p> Log a message with debug log level.</p>
      */
     public final void trace (Object message) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_TRACE)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_TRACE)) {
             log (SimpleLog.LOG_LEVEL_TRACE, message, null);
         }
     }
-    /**
+
+    /**
      * <p> Log an error with debug log level.</p>
      */
     public final void trace (Object message, Throwable t) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_TRACE)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_TRACE)) {
             log (SimpleLog.LOG_LEVEL_TRACE, message, t);
         }
     }
-    /**
+
+    /**
      * <p> Log a message with info log level.</p>
      */
     public final void info (Object message) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_INFO)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_INFO)) {
             log (SimpleLog.LOG_LEVEL_INFO, message, null);
         }
     }
-    /**
+
+    /**
      * <p> Log an error with info log level.</p>
      */
     public final void info (Object message, Throwable t) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_INFO)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_INFO)) {
             log (SimpleLog.LOG_LEVEL_INFO, message, t);
         }
     }
-    /**
+
+    /**
      * <p> Log a message with warn log level.</p>
      */
     public final void warn (Object message) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_WARN)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_WARN)) {
             log (SimpleLog.LOG_LEVEL_WARN, message, null);
         }
     }
-    /**
+
+    /**
      * <p> Log an error with warn log level.</p>
      */
     public final void warn (Object message, Throwable t) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_WARN)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_WARN)) {
             log (SimpleLog.LOG_LEVEL_WARN, message, t);
         }
     }
-    /**
+
+    /**
      * <p> Log a message with error log level.</p>
      */
     public final void error (Object message) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_ERROR)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_ERROR)) {
             log (SimpleLog.LOG_LEVEL_ERROR, message, null);
         }
     }
-    /**
+
+    /**
      * <p> Log an error with error log level.</p>
      */
     public final void error (Object message, Throwable t) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_ERROR)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_ERROR)) {
             log (SimpleLog.LOG_LEVEL_ERROR, message, t);
         }
     }
-    /**
+
+    /**
      * <p> Log a message with fatal log level.</p>
      */
     public final void fatal (Object message) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_FATAL)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_FATAL)) {
             log (SimpleLog.LOG_LEVEL_FATAL, message, null);
         }
     }
-    /**
+
+    /**
      * <p> Log an error with fatal log level.</p>
      */
     public final void fatal (Object message, Throwable t) {
-        if (isLevelEnabled (SimpleLog.LOG_LEVEL_FATAL)) {
+
+        if (isLevelEnabled (SimpleLog.LOG_LEVEL_FATAL)) {
             log (SimpleLog.LOG_LEVEL_FATAL, message, t);
         }
     }
-    /**
+
+    /**
      * <p> Are debug messages currently enabled? </p>
      *
      * <p> This allows expensive operations such as <code>String</code>
@@ -452,9 +519,11 @@ public class SimpleLog implements Log {
      * logger. </p>
      */
     public final boolean isDebugEnabled () {
-        return isLevelEnabled (SimpleLog.LOG_LEVEL_DEBUG);
+
+        return isLevelEnabled (SimpleLog.LOG_LEVEL_DEBUG);
     }
-    /**
+
+    /**
      * <p> Are error messages currently enabled? </p>
      *
      * <p> This allows expensive operations such as <code>String</code>
@@ -462,9 +531,11 @@ public class SimpleLog implements Log {
      * logger. </p>
      */
     public final boolean isErrorEnabled () {
-        return isLevelEnabled (SimpleLog.LOG_LEVEL_ERROR);
+
+        return isLevelEnabled (SimpleLog.LOG_LEVEL_ERROR);
     }
-    /**
+
+    /**
      * <p> Are fatal messages currently enabled? </p>
      *
      * <p> This allows expensive operations such as <code>String</code>
@@ -472,9 +543,11 @@ public class SimpleLog implements Log {
      * logger. </p>
      */
     public final boolean isFatalEnabled () {
-        return isLevelEnabled (SimpleLog.LOG_LEVEL_FATAL);
+
+        return isLevelEnabled (SimpleLog.LOG_LEVEL_FATAL);
     }
-    /**
+
+    /**
      * <p> Are info messages currently enabled? </p>
      *
      * <p> This allows expensive operations such as <code>String</code>
@@ -482,9 +555,11 @@ public class SimpleLog implements Log {
      * logger. </p>
      */
     public final boolean isInfoEnabled () {
-        return isLevelEnabled (SimpleLog.LOG_LEVEL_INFO);
+
+        return isLevelEnabled (SimpleLog.LOG_LEVEL_INFO);
     }
-    /**
+
+    /**
      * <p> Are trace messages currently enabled? </p>
      *
      * <p> This allows expensive operations such as <code>String</code>
@@ -492,9 +567,11 @@ public class SimpleLog implements Log {
      * logger. </p>
      */
     public final boolean isTraceEnabled () {
-        return isLevelEnabled (SimpleLog.LOG_LEVEL_TRACE);
+
+        return isLevelEnabled (SimpleLog.LOG_LEVEL_TRACE);
     }
-    /**
+
+    /**
      * <p> Are warn messages currently enabled? </p>
      *
      * <p> This allows expensive operations such as <code>String</code>
@@ -502,7 +579,9 @@ public class SimpleLog implements Log {
      * logger. </p>
      */
     public final boolean isWarnEnabled () {
-        return isLevelEnabled (SimpleLog.LOG_LEVEL_WARN);
+
+        return isLevelEnabled (SimpleLog.LOG_LEVEL_WARN);
     }
 }
-
+
+

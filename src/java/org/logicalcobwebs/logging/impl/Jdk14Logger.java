@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.2 2003/02/08 14:27:50 chr32 Exp $
- * $Revision: 1.2 $
- * $Date: 2003/02/08 14:27:50 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.3 2003/03/11 00:02:07 billhorsman Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/03/11 00:02:07 $
  *
  * ====================================================================
  *
@@ -58,10 +58,15 @@
  * <http://www.apache.org/>.
  *
  */
-package org.logicalcobwebs.logging.impl;
-import org.logicalcobwebs.logging.Log;
-import java.util.logging.Level;import java.util.logging.Logger;
-/**
+
+package org.logicalcobwebs.logging.impl;
+
+import org.logicalcobwebs.logging.Log;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
  * <p>Implementation of the <code>org.logicalcobwebs.logging.Log</code>
  * interfaces that wraps the standard JDK logging mechanisms that were
  * introduced in the Merlin release (JDK 1.4).</p>
@@ -69,10 +74,12 @@ import java.util.logging.Level;import java.util.logging.Logger;
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author <a href="mailto:bloritsch@apache.org">Berin Loritsch</a>
  * @author <a href="mailto:donaldp@apache.org">Peter Donald</a>
- * @version $Revision: 1.2 $ $Date: 2003/02/08 14:27:50 $
+ * @version $Revision: 1.3 $ $Date: 2003/03/11 00:02:07 $
  */
-public final class Jdk14Logger implements Log {
-    // ----------------------------------------------------------- Constructors
+
+public final class Jdk14Logger implements Log {
+
+    // ----------------------------------------------------------- Constructors
 
 
     /**
@@ -81,8 +88,10 @@ import java.util.logging.Level;import java.util.logging.Logger;
      * @param name Name of the logger to be constructed
      */
     public Jdk14Logger (String name) {
-        logger = Logger.getLogger (name);
-    }
+
+        logger = Logger.getLogger (name);
+
+    }
 
 
     // ----------------------------------------------------- Instance Variables
@@ -108,125 +117,146 @@ import java.util.logging.Level;import java.util.logging.Logger;
             cname = caller.getClassName ();
             method = caller.getMethodName ();
         }
-        if (ex == null) {
+
+        if (ex == null) {
             logger.logp (level, cname, method, msg);
         } else {
             logger.logp (level, cname, method, msg, ex);
         }
     }
-    /**
+
+    /**
      * Log a message with debug log level.
      */
     public void debug (Object message) {
         log (Level.FINE, String.valueOf (message), null);
     }
-    /**
+
+    /**
      * Log a message and exception with debug log level.
      */
     public void debug (Object message, Throwable exception) {
         log (Level.FINE, String.valueOf (message), exception);
     }
-    /**
+
+    /**
      * Log a message with error log level.
      */
     public void error (Object message) {
         log (Level.SEVERE, String.valueOf (message), null);
     }
-    /**
+
+    /**
      * Log a message and exception with error log level.
      */
     public void error (Object message, Throwable exception) {
         log (Level.SEVERE, String.valueOf (message), exception);
     }
-    /**
+
+    /**
      * Log a message with fatal log level.
      */
     public void fatal (Object message) {
         log (Level.SEVERE, String.valueOf (message), null);
     }
-    /**
+
+    /**
      * Log a message and exception with fatal log level.
      */
     public void fatal (Object message, Throwable exception) {
         log (Level.SEVERE, String.valueOf (message), exception);
     }
-    /**
+
+    /**
      * Return the native Logger instance we are using.
      */
     public Logger getLogger () {
         return (this.logger);
     }
-    /**
+
+    /**
      * Log a message with info log level.
      */
     public void info (Object message) {
         log (Level.INFO, String.valueOf (message), null);
     }
-    /**
+
+    /**
      * Log a message and exception with info log level.
      */
     public void info (Object message, Throwable exception) {
         log (Level.INFO, String.valueOf (message), exception);
     }
-    /**
+
+    /**
      * Is debug logging currently enabled?
      */
     public boolean isDebugEnabled () {
         return (logger.isLoggable (Level.FINE));
     }
-    /**
+
+    /**
      * Is error logging currently enabled?
      */
     public boolean isErrorEnabled () {
         return (logger.isLoggable (Level.SEVERE));
     }
-    /**
+
+    /**
      * Is fatal logging currently enabled?
      */
     public boolean isFatalEnabled () {
         return (logger.isLoggable (Level.SEVERE));
     }
-    /**
+
+    /**
      * Is info logging currently enabled?
      */
     public boolean isInfoEnabled () {
         return (logger.isLoggable (Level.INFO));
     }
-    /**
+
+    /**
      * Is tace logging currently enabled?
      */
     public boolean isTraceEnabled () {
         return (logger.isLoggable (Level.FINEST));
     }
-    /**
+
+    /**
      * Is warning logging currently enabled?
      */
     public boolean isWarnEnabled () {
         return (logger.isLoggable (Level.WARNING));
     }
-    /**
+
+    /**
      * Log a message with trace log level.
      */
     public void trace (Object message) {
         log (Level.FINEST, String.valueOf (message), null);
     }
-    /**
+
+    /**
      * Log a message and exception with trace log level.
      */
     public void trace (Object message, Throwable exception) {
         log (Level.FINEST, String.valueOf (message), exception);
     }
-    /**
+
+    /**
      * Log a message with warn log level.
      */
     public void warn (Object message) {
         log (Level.WARNING, String.valueOf (message), null);
     }
-    /**
+
+    /**
      * Log a message and exception with warn log level.
      */
     public void warn (Object message, Throwable exception) {
         log (Level.WARNING, String.valueOf (message), exception);
     }
-}
-
+
+}
+

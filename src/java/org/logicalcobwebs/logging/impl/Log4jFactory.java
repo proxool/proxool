@@ -54,19 +54,30 @@
  * <http://www.apache.org/>.
  *
  */
-package org.logicalcobwebs.logging.impl;
-import org.apache.log4j.Category;import org.logicalcobwebs.logging.Log;import org.logicalcobwebs.logging.LogConfigurationException;import org.logicalcobwebs.logging.LogFactory;
-import java.util.Enumeration;import java.util.Hashtable;import java.util.Vector;
-/**
+
+package org.logicalcobwebs.logging.impl;
+
+import org.apache.log4j.Category;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogConfigurationException;
+import org.logicalcobwebs.logging.LogFactory;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
+/**
  * <p>Concrete subclass of {@link org.logicalcobwebs.logging.LogFactory} specific to log4j.
  *
  * @author Costin Manolache
  */
 public final class Log4jFactory extends LogFactory {
-    public Log4jFactory () {
+
+    public Log4jFactory () {
         super ();
     }
-    /**
+
+    /**
      * The configuration attributes for this {@link org.logicalcobwebs.logging.LogFactory}.
      */
     private Hashtable attributes = new Hashtable ();
@@ -85,7 +96,8 @@ public final class Log4jFactory extends LogFactory {
     public Object getAttribute (String name) {
         return (attributes.get (name));
     }
-    /**
+
+    /**
      * Return an array containing the names of all currently defined
      * configuration attributes.  If there are no such attributes, a zero
      * length array is returned.
@@ -102,7 +114,8 @@ public final class Log4jFactory extends LogFactory {
         }
         return (results);
     }
-    /**
+
+    /**
      * Convenience method to derive a name from the specified class and
      * call <code>getInstance(String)</code> with it.
      *
@@ -114,21 +127,29 @@ public final class Log4jFactory extends LogFactory {
     public Log getInstance (Class clazz)
             throws LogConfigurationException {
         Log instance = (Log) instances.get (clazz);
-        if (instance != null) {            return instance;        }
-        instance = new Log4JCategoryLog (Category.getInstance (clazz));
+        if (instance != null) {
+            return instance;
+        }
+
+        instance = new Log4JCategoryLog (Category.getInstance (clazz));
         instances.put (clazz, instance);
         return instance;
     }
-    public Log getInstance (String name)
+
+    public Log getInstance (String name)
             throws LogConfigurationException {
         Log instance = (Log) instances.get (name);
-        if (instance != null) {            return instance;        }
+        if (instance != null) {
+            return instance;
+        }
 
-        instance = new Log4JCategoryLog (Category.getInstance (name));
+
+        instance = new Log4JCategoryLog (Category.getInstance (name));
         instances.put (name, instance);
         return instance;
     }
-    /**
+
+    /**
      * Release any internal references to previously created {@link org.logicalcobwebs.logging.Log}
      * instances returned by this factory.  This is useful environments
      * like servlet containers, which implement application reloading by
@@ -136,11 +157,13 @@ public final class Log4jFactory extends LogFactory {
      * class loader would prevent garbage collection.
      */
     public void release () {
-        instances.clear ();
+
+        instances.clear ();
 
         // what's the log4j mechanism to cleanup ???
     }
-    /**
+
+    /**
      * Remove any configuration attribute associated with the specified name.
      * If there is no such attribute, no action is taken.
      *
@@ -149,7 +172,8 @@ public final class Log4jFactory extends LogFactory {
     public void removeAttribute (String name) {
         attributes.remove (name);
     }
-    /**
+
+    /**
      * Set the configuration attribute with the specified name.  Calling
      * this with a <code>null</code> value is equivalent to calling
      * <code>removeAttribute(name)</code>.
@@ -165,5 +189,6 @@ public final class Log4jFactory extends LogFactory {
             attributes.put (name, value);
         }
     }
-}
-
+
+}
+
