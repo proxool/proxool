@@ -7,7 +7,7 @@ package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.proxool.monitor.Monitor;
+import org.logicalcobwebs.proxool.admin.Admin;
 import org.logicalcobwebs.proxool.util.FastArrayList;
 
 import java.sql.Connection;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.50 $, $Date: 2003/02/19 23:07:46 $
+ * @version $Revision: 1.51 $, $Date: 2003/02/19 23:46:10 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -96,7 +96,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private static boolean loggedLegend;
 
-    private Monitor monitor;
+    private Admin admin;
 
     private boolean locked = false;
 
@@ -123,7 +123,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         if (definition.getStatistics() != null) {
             try {
-                monitor = new Monitor(definition);
+                admin = new Admin(definition);
             } catch (ProxoolException e) {
                 log.error("Failed to initialise statistics", e);
             }
@@ -170,8 +170,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         if (connectionCount >= getDefinition().getMaximumConnectionCount() && getAvailableConnectionCount() < 1) {
             connectionsRefusedCount++;
-            if (monitor != null) {
-                monitor.connectionRefused();
+            if (admin != null) {
+                admin.connectionRefused();
             }
             log.info(displayStatistics() + " - " + MSG_MAX_CONNECTION_COUNT);
             timeMillisOfLastRefusal = System.currentTimeMillis();
@@ -239,8 +239,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 proxyConnection.setRequester(requester);
             } else {
                 connectionsRefusedCount++;
-                if (monitor != null) {
-                    monitor.connectionRefused();
+                if (admin != null) {
+                    admin.connectionRefused();
                 }
                 timeMillisOfLastRefusal = System.currentTimeMillis();
             }
@@ -258,7 +258,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     private void throwSQLException(String message) throws SQLException {
-        throw new SQLException(message + " [monitor: " + displayStatistics() + "]");
+        throw new SQLException(message + " [admin: " + displayStatistics() + "]");
     }
 
     private ProxyConnectionIF createPoolableConnection(int state, String creator) throws SQLException {
@@ -396,8 +396,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     protected void putConnection(ProxyConnectionIF proxyConnection) {
         try {
 
-            if (monitor != null) {
-                monitor.connectionReturned(System.currentTimeMillis() - proxyConnection.getTimeLastStartActive());
+            if (admin != null) {
+                admin.connectionReturned(System.currentTimeMillis() - proxyConnection.getTimeLastStartActive());
             }
 
             // It's possible that this connection is due for expiry
@@ -519,9 +519,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     log.error("Can't wake prototypingThread", e);
                 }
 
-                // Cancel the monitor thread (for statistics)
-                if (monitor != null) {
-                    monitor.cancelAll();
+                // Cancel the admin thread (for statistics)
+                if (admin != null) {
+                    admin.cancelAll();
                 }
 
                 /* Patience, patience. */
@@ -1154,11 +1154,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     /**
-     * Get the monitor for this pool
-     * @return monitor
+     * Get the admin for this pool
+     * @return admin
      */
-    protected Monitor getMonitor() {
-        return monitor;
+    protected Admin getAdmin() {
+        return admin;
     }
 
     protected boolean isLocked() {
@@ -1182,6 +1182,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.51  2003/02/19 23:46:10  billhorsman
+ renamed monitor package to admin
+
  Revision 1.50  2003/02/19 23:07:46  billhorsman
  state changes are now only calculated every time the house
  keeper runs, but it's more accurate
@@ -1228,7 +1231,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
  checkstyle
 
  Revision 1.36  2003/01/31 11:49:28  billhorsman
- use Monitor instead of Stats
+ use Admin instead of Stats
 
  Revision 1.35  2003/01/31 00:20:05  billhorsman
  statistics is now a string to allow multiple,

@@ -7,10 +7,10 @@ package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.proxool.monitor.StatisticsIF;
-import org.logicalcobwebs.proxool.monitor.SnapshotIF;
-import org.logicalcobwebs.proxool.monitor.Monitor;
-import org.logicalcobwebs.proxool.monitor.StatisticsListenerIF;
+import org.logicalcobwebs.proxool.admin.StatisticsIF;
+import org.logicalcobwebs.proxool.admin.SnapshotIF;
+import org.logicalcobwebs.proxool.admin.Admin;
+import org.logicalcobwebs.proxool.admin.StatisticsListenerIF;
 
 import java.sql.Statement;
 import java.util.Collection;
@@ -33,9 +33,9 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.56 $, $Date: 2003/02/19 13:48:28 $
+ * @version $Revision: 1.57 $, $Date: 2003/02/19 23:46:10 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public class ProxoolFacade {
 
@@ -732,7 +732,7 @@ public class ProxoolFacade {
      * @throws ProxoolException if we couldn't find the pool
      */
     public static StatisticsIF getStatistics(String alias, String token) throws ProxoolException {
-        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor().getStatistics(token);
+        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getAdmin().getStatistics(token);
     }
 
     /**
@@ -742,7 +742,7 @@ public class ProxoolFacade {
      * @throws ProxoolException if we couldn't find the pool
      */
     public static StatisticsIF[] getStatistics(String alias) throws ProxoolException {
-        final Monitor monitor = ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor();
+        final Admin monitor = ConnectionPoolManager.getInstance().getConnectionPool(alias).getAdmin();
         if (monitor != null) {
             return monitor.getStatistics();
         } else {
@@ -756,7 +756,7 @@ public class ProxoolFacade {
      * @throws ProxoolException if the pool couldn't be found
      */
     public static void addStatisticsListener(String alias, StatisticsListenerIF statisticsListener) throws ProxoolException {
-        final Monitor monitor = ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor();
+        final Admin monitor = ConnectionPoolManager.getInstance().getConnectionPool(alias).getAdmin();
         monitor.addStatisticsListener(statisticsListener);
     }
 
@@ -805,7 +805,7 @@ public class ProxoolFacade {
             }
         }
 
-        snapshot = Monitor.getSnapshot(cp, cp.getDefinition(), connectionInfos);
+        snapshot = Admin.getSnapshot(cp, cp.getDefinition(), connectionInfos);
 
         if (detail) {
             cp.unlock();
@@ -818,6 +818,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.57  2003/02/19 23:46:10  billhorsman
+ renamed monitor package to admin
+
  Revision 1.56  2003/02/19 13:48:28  chr32
  Added 'removeConfigurationListener' method.
 

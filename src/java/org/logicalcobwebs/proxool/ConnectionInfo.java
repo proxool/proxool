@@ -9,9 +9,9 @@ import java.util.Date;
 
 /**
  * Implementation of ConnectionInfoIF. Unlike ConnectionPool it is
- * frozen and will not change. Used with a {@link org.logicalcobwebs.proxool.monitor.SnapshotIF snapshot}
+ * frozen and will not change. Used with a {@link org.logicalcobwebs.proxool.admin.SnapshotIF snapshot}
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/12 12:28:27 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/19 23:46:09 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -148,6 +148,9 @@ class ConnectionInfo implements ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfo.java,v $
+ Revision 1.4  2003/02/19 23:46:09  billhorsman
+ renamed monitor package to admin
+
  Revision 1.3  2003/02/12 12:28:27  billhorsman
  added url, proxyHashcode and delegateHashcode to
  ConnectionInfoIF
