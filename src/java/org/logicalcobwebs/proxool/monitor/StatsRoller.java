@@ -21,7 +21,7 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.4 $, $Date: 2003/01/31 16:53:23 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/02 23:32:48 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -114,23 +114,23 @@ class StatsRoller {
         if (statistics != null) {
             StringBuffer out = new StringBuffer();
 
-            out.append(timeFormat.format(statistics.getStartDate()));
+            out.append(TIME_FORMAT.format(statistics.getStartDate()));
             out.append(" - ");
-            out.append(timeFormat.format(statistics.getStopDate()));
+            out.append(TIME_FORMAT.format(statistics.getStopDate()));
             out.append(", s:");
             out.append(statistics.getServedCount());
             out.append(":");
-            out.append(decimalFormat.format(statistics.getServedPerSecond()));
+            out.append(DECIMAL_FORMAT.format(statistics.getServedPerSecond()));
 
             out.append("/s, r:");
             out.append(statistics.getRefusedCount());
             out.append(":");
-            out.append(decimalFormat.format(statistics.getRefusedPerSecond()));
+            out.append(DECIMAL_FORMAT.format(statistics.getRefusedPerSecond()));
 
             out.append("/s, a:");
-            out.append(decimalFormat.format(statistics.getAverageActiveTime()));
+            out.append(DECIMAL_FORMAT.format(statistics.getAverageActiveTime()));
             out.append("ms/");
-            out.append(decimalFormat.format(statistics.getAverageActiveCount()));
+            out.append(DECIMAL_FORMAT.format(statistics.getAverageActiveCount()));
 
             log.info(out.toString());
         }
@@ -169,6 +169,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.5  2003/02/02 23:32:48  billhorsman
+ fixed bug caused by last variable name change. :(
+
  Revision 1.4  2003/01/31 16:53:23  billhorsman
  checkstyle
 
