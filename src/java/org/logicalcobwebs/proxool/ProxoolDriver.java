@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.26 $, $Date: 2003/10/16 18:53:21 $
+ * @version $Revision: 1.27 $, $Date: 2004/06/02 20:41:13 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -89,7 +89,8 @@ public class ProxoolDriver implements Driver {
             return cp.getConnection();
 
         } catch (SQLException e) {
-            LOG.error("Problem", e);
+            // We don't log exceptions. Leave that up to the client.
+            // LOG.error("Problem", e);
             // Check to see if it's fatal. We might need to wrap it up.
             try {
                 String alias = ProxoolFacade.getAlias(url);
@@ -225,6 +226,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.27  2004/06/02 20:41:13  billhorsman
+ Don't log SQLExceptions. Leave that up to the client.
+
  Revision 1.26  2003/10/16 18:53:21  billhorsman
  When registering a new pool on the fly, indicate that it is implicit (for exception message handling)
 
