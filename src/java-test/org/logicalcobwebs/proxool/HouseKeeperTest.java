@@ -10,12 +10,14 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.SQLException;
 import java.util.Properties;
 
 /**
  * Test the house keeper in ConnectionPool
  *
- * @version $Revision: 1.7 $, $Date: 2003/09/11 23:58:05 $
+ * @version $Revision: 1.8 $, $Date: 2003/09/30 18:40:16 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -103,12 +105,128 @@ public class HouseKeeperTest extends AbstractProxoolTest {
         DriverManager.getConnection(url).close();
     }
 
+    /**
+     * Test that house keeper destroys connections that fail configured
+     * the test sql
+     */
+    public void testInvalidBeforeUse() throws Exception {
+
+        String testName = "invalidBeforeUse";
+        String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, "Invalid test");
+        info.setProperty(ProxoolConstants.TEST_BEFORE_USE_PROPERTY, Boolean.TRUE.toString());
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
+        info.setProperty(ProxoolConstants.TRACE_PROPERTY, Boolean.TRUE.toString());
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        // This should trigger a test followed the actual executed command. Because we've
+        // deliberately made the test invalid, we should get an exception when getting a
+        // connection
+        Connection connection = null;
+        Statement s = null;
+        try {
+            connection = DriverManager.getConnection(url);
+            s = connection.createStatement();
+            s.execute(TestConstants.HYPERSONIC_TEST_SQL);
+            fail("Expected to get an exception because the test failed");
+        } catch (SQLException e) {
+            LOG.debug("Expected exception.", e);
+        }
+
+    }
+
+    /**
+     * Test that house keeper destroys connections that fail configured
+     * the test sql
+     */
+    public void testInvalidAfterUse() throws Exception {
+
+        String testName = "invalidAfterUse";
+        String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, "Invalid test");
+        info.setProperty(ProxoolConstants.TEST_AFTER_USE_PROPERTY, Boolean.TRUE.toString());
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
+        info.setProperty(ProxoolConstants.TRACE_PROPERTY, Boolean.TRUE.toString());
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        // This should trigger a test as soon as we close the connection. Because we've
+        // deliberately made the test invalid then it should get thrown away
+        Connection connection = null;
+        Statement s = null;
+        try {
+            connection = DriverManager.getConnection(url);
+            s = connection.createStatement();
+            s.execute(TestConstants.HYPERSONIC_TEST_SQL);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
+
+        // There should be no available connections. We don't have a minimum setup and the one we
+        // just created on demand got thrown away because it failed its test
+        assertEquals("Available connections", 0, ProxoolFacade.getSnapshot(alias).getAvailableConnectionCount());
+
+    }
+
+    public void testBeforeAndAfterUse() throws Exception {
+
+        String testName = "beforeAndAfterUse";
+        String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, TestConstants.HYPERSONIC_TEST_SQL);
+        info.setProperty(ProxoolConstants.TEST_BEFORE_USE_PROPERTY, Boolean.TRUE.toString());
+        info.setProperty(ProxoolConstants.TEST_AFTER_USE_PROPERTY, Boolean.TRUE.toString());
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
+        info.setProperty(ProxoolConstants.TRACE_PROPERTY, Boolean.TRUE.toString());
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        Connection connection = null;
+        Statement s = null;
+        try {
+            connection = DriverManager.getConnection(url);
+            s = connection.createStatement();
+            s.execute(TestConstants.HYPERSONIC_TEST_SQL);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
+
+        // There should be one available connection.
+        assertEquals("Available connections", 1, ProxoolFacade.getSnapshot(alias).getAvailableConnectionCount());
+
+    }
+
 }
 
 
 /*
  Revision history:
  $Log: HouseKeeperTest.java,v $
+ Revision 1.8  2003/09/30 18:40:16  billhorsman
+ New tests for test-before-use and test-after-use
+
  Revision 1.7  2003/09/11 23:58:05  billhorsman
  New test for house-keeper-test-sql
 
