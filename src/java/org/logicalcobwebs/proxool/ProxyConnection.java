@@ -21,9 +21,9 @@ import java.sql.Statement;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.30 $, $Date: 2004/03/14 21:52:38 $
+ * @version $Revision: 1.31 $, $Date: 2004/03/15 21:37:33 $
  * @author billhorsman
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 class ProxyConnection extends AbstractProxyConnection implements InvocationHandler, MethodInterceptor {
 
@@ -54,9 +54,9 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
             if (method.getName().equals(CLOSE_METHOD)) {
                 close();
             } else if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
-                result = Boolean.valueOf(equals(args[0]));
+                result = equals(args[0]) ? Boolean.TRUE : Boolean.FALSE;
             } else if (method.getName().equals(IS_CLOSED_METHOD) && argCount == 0) {
-                result = Boolean.valueOf(isClosed());
+                result = isClosed() ? Boolean.TRUE : Boolean.FALSE;
             } else if (method.getName().equals(GET_META_DATA_METHOD) && argCount == 0) {
                 result = getMetaData();
             } else if (method.getName().equals(FINALIZE_METHOD)) {
@@ -111,6 +111,9 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.31  2004/03/15 21:37:33  chr32
+ Replaced usages of Boolean.valueOf(boolean). This method is not available in jdk 1.2.
+
  Revision 1.30  2004/03/14 21:52:38  brenuart
  Little improvement: don't create a new Boolean but reuse the Boolean.TRUE/FALSE static instances
 
