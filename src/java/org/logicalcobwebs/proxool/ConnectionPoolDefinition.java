@@ -21,7 +21,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.15 $, $Date: 2003/03/11 14:51:49 $
+ * @version $Revision: 1.16 $, $Date: 2003/04/10 21:50:16 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -92,6 +92,12 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private String fatalSqlExceptionsAsString;
 
     private String houseKeepingTestSql;
+
+    /**
+     * So we can set the values one by one if we want
+     */
+    public ConnectionPoolDefinition() {
+    }
 
     /**
      * Construct a new definition
@@ -799,6 +805,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.16  2003/04/10 21:50:16  billhorsman
+ empty constructor for use by DataSource
+
  Revision 1.15  2003/03/11 14:51:49  billhorsman
  more concurrency fixes relating to snapshots
 
