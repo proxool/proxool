@@ -20,7 +20,7 @@ import java.util.HashMap;
  *
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.1 $, $Date: 2004/06/02 20:43:53 $
+ * @version $Revision: 1.2 $, $Date: 2004/07/13 21:06:18 $
  * @since Proxool 0.9
  */
 public class MethodMapper {
@@ -86,11 +86,23 @@ public class MethodMapper {
         return concreteMethod;
     }
 
+    /**
+     * Don't use the one we calculate using {@link #getConcreteMethod(java.lang.reflect.Method)}, use this one instead.
+     * @param injectableMethod the method supplied by the proxy
+     * @param overridenMethod the one we are going to use (probably the same as injectrableMethod actually)
+     */ 
+    public void overrideConcreteMethod(Method injectableMethod, Method overridenMethod) {
+        cachedConcreteMethods.put(injectableMethod, overridenMethod);
+    }
+
 }
 
 /*
  Revision history:
  $Log: MethodMapper.java,v $
+ Revision 1.2  2004/07/13 21:06:18  billhorsman
+ Fix problem using injectable interfaces on methods that are declared in non-public classes.
+
  Revision 1.1  2004/06/02 20:43:53  billhorsman
  New classes to support injectable interfaces
 

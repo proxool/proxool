@@ -20,7 +20,7 @@ import java.sql.Connection;
 
 /**
  * Wraps up a {@link ProxyConnection}. It is proxied as a {@link java.sql.Connection}
- * @version $Revision: 1.2 $, $Date: 2004/06/02 20:50:47 $
+ * @version $Revision: 1.3 $, $Date: 2004/07/13 21:06:21 $
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -133,7 +133,20 @@ public class WrappedConnection implements MethodInterceptor {
                     if (concreteMethod.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
                         proxyConnection.setNeedToReset(true);
                     }
-                    result = concreteMethod.invoke(proxyConnection.getConnection(), args);
+                    try {
+                        result = concreteMethod.invoke(proxyConnection.getConnection(), args);
+                    } catch (IllegalAccessException e) {
+                        // This is probably because we are trying to access a non-public concrete class. But don't worry,
+                        // we can always use the proxy supplied method. This will only fail if we try to use an injectable
+                        // method on a method in a class that isn't public and for a method that isn't declared in an interface -
+                        // but if that is the case then that method is inaccessible by any means (even by bypassing Proxool and
+                        // using the vendor's driver directly).
+                        LOG.debug("Ignoring IllegalAccessException whilst invoking the " + concreteMethod + " concrete method and trying the " + method + " method directly.");
+                        // By overriding the method cached in the InvokerFacade we ensure that we only log this message once, and
+                        // we speed up subsequent usages by not calling the method that fails first.
+                        InvokerFacade.overrideConcreteMethod(proxyConnection.getConnection().getClass(), method, method);
+                        result = method.invoke(proxyConnection.getConnection(), args);
+                    }
                 } else {
                     throw new SQLException("You can't perform a " + concreteMethod.getName() + " operation after the connection has been closed");
                 }
@@ -228,6 +241,9 @@ public class WrappedConnection implements MethodInterceptor {
 /*
  Revision history:
  $Log: WrappedConnection.java,v $
+ Revision 1.3  2004/07/13 21:06:21  billhorsman
+ Fix problem using injectable interfaces on methods that are declared in non-public classes.
+
  Revision 1.2  2004/06/02 20:50:47  billhorsman
  Dropped obsolete InvocationHandler reference and injectable interface stuff.
 

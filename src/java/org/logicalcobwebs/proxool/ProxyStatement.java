@@ -22,7 +22,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.27 $, $Date: 2004/06/17 21:56:53 $
+ * @version $Revision: 1.28 $, $Date: 2004/07/13 21:06:18 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -67,7 +67,20 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
             } else if (concreteMethod.getName().equals(CLOSE_METHOD) && argCount == 0) {
                 close();
             } else {
-                result = concreteMethod.invoke(getStatement(), args);
+                try {
+                    result = concreteMethod.invoke(getStatement(), args);
+                } catch (IllegalAccessException e) {
+                    // This is probably because we are trying to access a non-public concrete class. But don't worry,
+                    // we can always use the proxy supplied method. This will only fail if we try to use an injectable
+                    // method on a method in a class that isn't public and for a method that isn't declared in an interface -
+                    // but if that is the case then that method is inaccessible by any means (even by bypassing Proxool and
+                    // using the vendor's driver directly).
+                    LOG.debug("Ignoring IllegalAccessException whilst invoking the " + concreteMethod + " concrete method and trying the " + method + " method directly.");
+                    // By overriding the method cached in the InvokerFacade we ensure that we only log this message once, and
+                    // we speed up subsequent usages by not calling the method that fails first.
+                    InvokerFacade.overrideConcreteMethod(getStatement().getClass(), method, method);
+                    result = method.invoke(getStatement(), args);
+                }
             }
 
             // We only dump sql calls if we are in verbose mode and debug is enabled
@@ -137,6 +150,9 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.28  2004/07/13 21:06:18  billhorsman
+ Fix problem using injectable interfaces on methods that are declared in non-public classes.
+
  Revision 1.27  2004/06/17 21:56:53  billhorsman
  Use MethodMapper for concrete methods.
 
