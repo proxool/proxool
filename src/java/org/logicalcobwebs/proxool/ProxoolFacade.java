@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.23 $, $Date: 2002/12/16 16:47:22 $
+ * @version $Revision: 1.24 $, $Date: 2002/12/16 17:15:03 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -153,23 +153,29 @@ public class ProxoolFacade {
         try {
             int endOfPrefix = url.indexOf(':');
             int endOfDriver = url.indexOf(':', endOfPrefix + 1);
-            final String driver = url.substring(endOfPrefix + 1, endOfDriver);
-            if (cpd.getDriver() == null) {
-                cpd.setDriver(driver);
-                earlyLog.debug("Setting driver for " + alias + " pool to " + driver);
-            } else if (cpd.getDriver() != null && !cpd.getDriver().equals(driver)) {
-                cpd.setDriver(driver);
-                earlyLog.debug("Updating driver for " + alias + " pool to " + driver);
-            }
-            final String delegateUrl = url.substring(endOfDriver + 1);
-            if (cpd.getUrl() == null) {
-                cpd.setUrl(delegateUrl);
-                earlyLog.debug("Setting url for " + alias + " pool to " + delegateUrl);
-            } else if (cpd.getUrl() != null && !cpd.getUrl().equals(delegateUrl)) {
-                cpd.setUrl(delegateUrl);
-                earlyLog.debug("Updating url for " + alias + " pool to " + delegateUrl);
+
+            if (endOfPrefix > -1 && endOfDriver > -1) {
+                final String driver = url.substring(endOfPrefix + 1, endOfDriver);
+                if (cpd.getDriver() == null) {
+                    cpd.setDriver(driver);
+                    earlyLog.debug("Setting driver for " + alias + " pool to " + driver);
+                } else if (cpd.getDriver() != null && !cpd.getDriver().equals(driver)) {
+                    cpd.setDriver(driver);
+                    earlyLog.debug("Updating driver for " + alias + " pool to " + driver);
+                }
+                final String delegateUrl = url.substring(endOfDriver + 1);
+                if (cpd.getUrl() == null) {
+                    cpd.setUrl(delegateUrl);
+                    earlyLog.debug("Setting url for " + alias + " pool to " + delegateUrl);
+                } else if (cpd.getUrl() != null && !cpd.getUrl().equals(delegateUrl)) {
+                    cpd.setUrl(delegateUrl);
+                    earlyLog.debug("Updating url for " + alias + " pool to " + delegateUrl);
+                }
+            } else {
+                // Using alias. Nothing to do
             }
         } catch (IndexOutOfBoundsException e) {
+            LOG.error("Invalid URL " + url, e);
             throw new SQLException("Invalid URL format.");
         }
 
@@ -590,6 +596,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.24  2002/12/16 17:15:03  billhorsman
+ fix for url
+
  Revision 1.23  2002/12/16 16:47:22  billhorsman
  fix for updating properties with zero length strings
 
