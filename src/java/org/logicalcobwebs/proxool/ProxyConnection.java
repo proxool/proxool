@@ -21,7 +21,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.7 $, $Date: 2002/10/28 08:20:23 $
+ * @version $Revision: 1.8 $, $Date: 2002/10/28 19:28:25 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -101,7 +101,7 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
                 // connection.createStatement();
                 String sqlStatement = null;
                 if (args.length > 0 && args[0] instanceof String) {
-                    sqlStatement = (String)args[0];
+                    sqlStatement = (String) args[0];
                 }
                 result = Proxy.newProxyInstance(result.getClass().getClassLoader(), types, new ProxyStatement((Statement) result, connectionPool, sqlStatement));
             }
@@ -359,6 +359,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.8  2002/10/28 19:28:25  billhorsman
+ checkstyle
+
  Revision 1.7  2002/10/28 08:20:23  billhorsman
  draft sql dump stuff
 

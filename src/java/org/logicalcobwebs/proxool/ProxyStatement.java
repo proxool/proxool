@@ -15,21 +15,20 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.HashMap;
 import java.util.TreeMap;
-import java.util.Comparator;
 
 /**
  * Delegates to Statement for all calls. But also, for all execute methods, it
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.4 $, $Date: 2002/10/28 08:20:23 $
+ * @version $Revision: 1.5 $, $Date: 2002/10/28 19:28:25 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -192,6 +191,9 @@ class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.5  2002/10/28 19:28:25  billhorsman
+ checkstyle
+
  Revision 1.4  2002/10/28 08:20:23  billhorsman
  draft sql dump stuff
 
