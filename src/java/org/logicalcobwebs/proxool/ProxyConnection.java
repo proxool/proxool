@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.14 $, $Date: 2002/11/07 12:38:04 $
+ * @version $Revision: 1.15 $, $Date: 2002/11/07 18:56:22 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -77,12 +77,13 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
     public Object invoke(Object proxy, Method m, Object[] args)
             throws Throwable {
         Object result = null;
+        int argCount = args != null ? args.length : 0;
         try {
             if (m.getName().equals(CLOSE_METHOD)) {
                 close();
-            } else if (m.getName().equals(EQUALS_METHOD) && args.length == 1) {
+            } else if (m.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = new Boolean(connection.hashCode() == args[0].hashCode());
-            } else if (m.getName().equals(IS_CLOSED_METHOD) && args.length == 0) {
+            } else if (m.getName().equals(IS_CLOSED_METHOD) && argCount == 0) {
                 result = new Boolean(getStatus() != STATUS_ACTIVE);
             } else {
                 if (m.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
@@ -100,7 +101,7 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
                 // connection.prepareCall(sql);
                 // connection.createProxyStatement();
                 String sqlStatement = null;
-                if (args != null && args.length > 0 && args[0] instanceof String) {
+                if (argCount > 0 && args[0] instanceof String) {
                     sqlStatement = (String) args[0];
                 }
                 result = ProxyFactory.createProxyStatement((Statement) result, connectionPool, sqlStatement);
@@ -379,6 +380,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.15  2002/11/07 18:56:22  billhorsman
+ fixed NullPointerException introduced yesterday on isClose() method
+
  Revision 1.14  2002/11/07 12:38:04  billhorsman
  performance improvement - only reset when it might be necessary
 
