@@ -5,7 +5,7 @@ TestHelper.buildCompleteAlternativeProperties()
 -->
 <something-else-entirely xmlns="http://sumthin.else.entirely" xmlns:proxool="http://proxool.sourceforge.net/xml-namespace">    
     <proxool:proxool>
-        <proxool:pool-name>xml-test-ns</proxool:pool-name>
+        <proxool:alias>xml-test-ns</proxool:alias>
         <proxool:driver-url>jdbc:hsqldb:.</proxool:driver-url>
         <proxool:driver-class>org.hsqldb.jdbcDriver</proxool:driver-class>
         <proxool:driver-properties>
@@ -28,7 +28,7 @@ TestHelper.buildCompleteAlternativeProperties()
     </proxool:proxool>
     <nothing-to-do-with-proxool>
         <proxool:proxool>
-            <proxool:pool-name>xml-test-ns-2</proxool:pool-name>
+            <proxool:alias>xml-test-ns-2</proxool:alias>
             <proxool:driver-url>jdbc:hsqldb:.</proxool:driver-url>
             <proxool:driver-class>org.hsqldb.jdbcDriver</proxool:driver-class>
             <proxool:driver-properties>

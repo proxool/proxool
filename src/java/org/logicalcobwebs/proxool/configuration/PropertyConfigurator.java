@@ -23,7 +23,7 @@ import java.util.Properties;
  * Uses a standard Java properties file to configure Proxool. For example:
  *
  * <pre>
- * jdbc-0.proxool.pool-name=property-test
+ * jdbc-0.proxool.alias=property-test
  * jdbc-0.proxool.driver-url=jdbc:hsqldb:.
  * jdbc-0.proxool.driver-class=org.hsqldb.jdbcDriver
  * jdbc-0.user=foo
@@ -42,7 +42,7 @@ import java.util.Properties;
  * jdbc-0.proxool.fatal-sql-exception=Fatal error
  * jdbc-0.proxool.prototype-count=2
  *
- * jdbc-1.proxool.pool-name=property-test-2
+ * jdbc-1.proxool.alias=property-test-2
  * jdbc-1.proxool.driver-url=jdbc:hsqldb:.
  * jdbc-1.proxool.driver-class=org.hsqldb.jdbcDriver
  * jdbc-1.user=scott
@@ -71,7 +71,7 @@ import java.util.Properties;
  * delegate JDBC driver.
  * </p>
  *
- * @version $Revision: 1.4 $, $Date: 2003/01/22 17:35:01 $
+ * @version $Revision: 1.5 $, $Date: 2003/01/23 10:41:05 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -142,15 +142,15 @@ public class PropertyConfigurator {
                 throw new ProxoolException("You must define the " + ProxoolConstants.DRIVER_CLASS_PROPERTY + " and the "
                     + ProxoolConstants.DRIVER_URL_PROPERTY + ".");
             }
-            final String poolName = proxoolProperties.getProperty(ProxoolConstants.POOL_NAME_PROPERTY);
+            final String alias = proxoolProperties.getProperty(ProxoolConstants.ALIAS_PROPERTY);
 
             // Build the URL; optionally defining a name
             StringBuffer url = new StringBuffer();
             url.append("proxool");
-            if (poolName != null) {
+            if (alias != null) {
                 url.append(ProxoolConstants.ALIAS_DELIMITER);
-                url.append(poolName);
-                proxoolProperties.remove(ProxoolConstants.POOL_NAME_PROPERTY);
+                url.append(alias);
+                proxoolProperties.remove(ProxoolConstants.ALIAS_PROPERTY);
             }
             url.append(ProxoolConstants.URL_DELIMITER);
             url.append(driverClass);
@@ -171,6 +171,9 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.5  2003/01/23 10:41:05  billhorsman
+ changed use of pool-name to alias for consistency
+
  Revision 1.4  2003/01/22 17:35:01  billhorsman
  checkstyle
 

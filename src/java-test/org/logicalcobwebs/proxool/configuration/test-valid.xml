@@ -6,7 +6,7 @@ TestHelper.buildCompleteAlternativeProperties()
 <!DOCTYPE proxool-config SYSTEM "src/java/org/logicalcobwebs/proxool/configuration/proxool.dtd">
 <proxool-config>
 	<proxool>
-		<pool-name>xml-test-validating</pool-name>
+		<alias>xml-test-validating</alias>
 		<driver-url>jdbc:hsqldb:.</driver-url>
 		<driver-class>org.hsqldb.jdbcDriver</driver-class>
 		<driver-properties>
@@ -29,7 +29,7 @@ TestHelper.buildCompleteAlternativeProperties()
 		<prototype-count>2</prototype-count>
 	</proxool>
 	<proxool>
-		<pool-name>xml-test-validating-2</pool-name>
+		<alias>xml-test-validating-2</alias>
 		<driver-url>jdbc:hsqldb:.</driver-url>
 		<driver-class>org.hsqldb.jdbcDriver</driver-class>
 		<driver-properties>

@@ -34,7 +34,7 @@ import java.util.Properties;
  * Example configuration:
  * <pre>
  * &lt;proxool&gt;
- *     &lt;pool-name&gt;apple&lt;/pool-name&gt;
+ *     &lt;alias&gt;apple&lt;/alias&gt;
  *     &lt;driver-url&gt;jdbc:hsqldb:.&lt;/driver-url&gt;
  *     &lt;driver-class&gt;org.hsqldb.jdbcDriver&lt;/driver-class&gt;
  *     &lt;driver-properties&gt;
@@ -85,7 +85,7 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.11 $, $Date: 2003/01/22 17:35:01 $
+ * @version $Revision: 1.12 $, $Date: 2003/01/23 10:41:05 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -213,7 +213,7 @@ public class XMLConfigurator extends DefaultHandler {
     }
 
     private void setProxoolProperty(String localName, String value) {
-        if (localName.equals(ProxoolConstants.POOL_NAME)) {
+        if (localName.equals(ProxoolConstants.ALIAS)) {
             poolName = value;
         } else if (localName.equals(ProxoolConstants.DRIVER_CLASS)) {
             driverClass = value;

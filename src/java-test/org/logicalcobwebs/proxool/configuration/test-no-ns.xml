@@ -5,7 +5,7 @@ TestHelper.buildCompleteAlternativeProperties()
 -->
 <something-else-entirely>
     <proxool>
-        <pool-name>xml-test</pool-name>
+        <alias>xml-test</alias>
         <driver-url>jdbc:hsqldb:.</driver-url>
         <driver-class>org.hsqldb.jdbcDriver</driver-class>
         <driver-properties>
@@ -28,7 +28,7 @@ TestHelper.buildCompleteAlternativeProperties()
     </proxool>
     <nothing-to-do-with-proxool>
         <proxool>
-            <pool-name>xml-test-2</pool-name>
+            <alias>xml-test-2</alias>
             <driver-url>jdbc:hsqldb:.</driver-url>
             <driver-class>org.hsqldb.jdbcDriver</driver-class>
             <driver-properties>

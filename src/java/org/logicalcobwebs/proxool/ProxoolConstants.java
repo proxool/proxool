@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.7 $, $Date: 2002/12/26 11:32:22 $
+ * @version $Revision: 1.8 $, $Date: 2003/01/23 10:41:05 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -131,13 +131,10 @@ public interface ProxoolConstants {
     public final String FATAL_SQL_EXCEPTION_PROPERTY = PROPERTY_PREFIX + FATAL_SQL_EXCEPTION;
 
     /**
-     *  Un-prefixed propety name for the Proxool pool name configuration property. Value: pool-name
+     *  Un-prefixed propety name for the Proxool alias configuration property. Value: alias
      */
-    public final String POOL_NAME = "pool-name";
-    /**
-     *  Prefixed propety name for the Proxool pool name configuration property. Value: proxool.pool-name
-     */
-    public final String POOL_NAME_PROPERTY = PROPERTY_PREFIX + POOL_NAME;
+    public final String ALIAS = "alias";
+
     /**
      *  Un-prefixed propety name for the Proxool driver class  configuration property. Value: driver-class
      */
@@ -159,8 +156,11 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.8  2003/01/23 10:41:05  billhorsman
+ changed use of pool-name to alias for consistency
+
  Revision 1.7  2002/12/26 11:32:22  billhorsman
- Moved POOL_NAME, DRIVER_URL and DRIVER_CLASS constants
+ Moved ALIAS, DRIVER_URL and DRIVER_CLASS constants
  from XMLConfgiurator to ProxoolConstants.
 
  Revision 1.6  2002/12/15 19:22:51  chr32
