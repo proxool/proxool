@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.24 $, $Date: 2003/09/30 18:39:08 $
+ * @version $Revision: 1.25 $, $Date: 2003/10/16 18:54:49 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -123,32 +123,15 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      * @param url the url that defines this pool
      * @param info additional properties (for Proxool and the delegate
      * driver)
+     * @param explicitRegister set to true if we are registering a new pool explicitly, or false
+     * if it's just because we are serving a url that we haven't come across before
      * @throws ProxoolException if anything goes wrong
      */
-    protected ConnectionPoolDefinition(String url, Properties info) throws ProxoolException {
+    protected ConnectionPoolDefinition(String url, Properties info, boolean explicitRegister) throws ProxoolException {
         this.alias = ProxoolFacade.getAlias(url);
         poolLog = LogFactory.getLog("org.logicalcobwebs.proxool." + alias);
         reset();
-        doChange(url, info, false);
-    }
-
-    /**
-     * Redefine the definition. All existing properties are reset to their
-     * default values
-     * @param url the url that defines this pool
-     * @param info additional properties (for Proxool and the delegate
-     * driver)
-     * @throws ProxoolException if anything goes wrong
-     */
-    protected void update(String url, Properties info) throws ProxoolException {
-        changedInfo.clear();
-        connectionPropertiesChanged = false;
-        poolLog.debug("Updating definition");
-        doChange(url, info, false);
-        if (connectionPropertiesChanged) {
-            poolLog.info("Mercifully killing all current connections because of definition changes");
-            ProxoolFacade.killAllConnections(alias, "of definition changes", true);
-        }
+        doChange(url, info, false, !explicitRegister);
     }
 
     /**
@@ -159,12 +142,31 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      * driver)
      * @throws ProxoolException if anything goes wrong
      */
+    protected void update(String url, Properties info) throws ProxoolException {
+        changedInfo.clear();
+        connectionPropertiesChanged = false;
+        poolLog.debug("Updating definition");
+        doChange(url, info, false, false);
+        if (connectionPropertiesChanged) {
+            poolLog.info("Mercifully killing all current connections because of definition changes");
+            ProxoolFacade.killAllConnections(alias, "of definition changes", true);
+        }
+    }
+
+    /**
+     * Redefine the definition. All existing properties are reset to their
+     * default values
+     * @param url the url that defines this pool
+     * @param info additional properties (for Proxool and the delegate
+     * driver)
+     * @throws ProxoolException if anything goes wrong
+     */
     protected void redefine(String url, Properties info) throws ProxoolException {
         reset();
         changedInfo.clear();
         connectionPropertiesChanged = false;
         poolLog.debug("Redefining definition");
-        doChange(url, info, false);
+        doChange(url, info, false, false);
 
         // Check for minimum information
         if (getUrl() == null || getDriver() == null) {
@@ -177,7 +179,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         }
     }
 
-    private boolean doChange(String url, Properties info, boolean pretend) throws ProxoolException {
+    private boolean doChange(String url, Properties info, boolean pretend, boolean implicitRegister) throws ProxoolException {
 
         boolean changed = false;
 
@@ -231,8 +233,8 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             ProxoolFacade.definitionUpdated(getAlias(), this, completeInfo, changedInfo);
         }
 
-        if (getDriver() == null || getUrl() == null) {
-            throw new ProxoolException("Attempt to use a pool with incomplete definition");
+        if ((getDriver() == null || getUrl() == null) && implicitRegister) {
+            throw new ProxoolException("Attempt to refer to a unregistered pool by its alias '" + getAlias() + "'");
         }
 
         return changed;
@@ -1099,7 +1101,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      */
     public boolean isEqual(String url, Properties info) {
         try {
-            return !doChange(url, info, true);
+            return !doChange(url, info, true, false);
         } catch (ProxoolException e) {
             LOG.error("Problem checking equality", e);
             return false;
@@ -1126,6 +1128,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.25  2003/10/16 18:54:49  billhorsman
+ Fixed javadoc for update() and redefine() methods which were transposed. Also improved exception handling for
+ incomplete pool definitions.
+
  Revision 1.24  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 
