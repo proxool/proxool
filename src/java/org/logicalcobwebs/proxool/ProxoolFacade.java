@@ -23,8 +23,8 @@ import java.util.Properties;
  * <p>You need to use this class wisely. It is obviously specfic to proxool so it will
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
- * 
- * @version $Revision: 1.6 $, $Date: 2002/10/25 15:59:32 $
+ *
+ * @version $Revision: 1.7 $, $Date: 2002/10/27 13:01:23 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -278,6 +278,7 @@ public class ProxoolFacade {
         }
 
     }
+
     /**
      * Like {@link #removeConnectionPool(java.lang.String, int)} but uses no delay. (Kills
      * everything as quickly as possible).
@@ -409,6 +410,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.7  2002/10/27 13:01:23  billhorsman
+ layout
+
  Revision 1.6  2002/10/25 15:59:32  billhorsman
  made non-public where possible
 
