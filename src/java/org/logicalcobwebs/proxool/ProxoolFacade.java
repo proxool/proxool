@@ -29,7 +29,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.73 $, $Date: 2003/10/16 18:52:35 $
+ * @version $Revision: 1.74 $, $Date: 2003/10/30 00:16:13 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -613,8 +613,13 @@ public class ProxoolFacade {
      * @throws ProxoolException if the pool couldn't be found
      */
     public static void addStatisticsListener(String alias, StatisticsListenerIF statisticsListener) throws ProxoolException {
+        // TODO investigate what happens if we add a statistics monitor after we register a listener
         final Admin monitor = ConnectionPoolManager.getInstance().getConnectionPool(alias).getAdmin();
-        monitor.addStatisticsListener(statisticsListener);
+        if (monitor != null) {
+            monitor.addStatisticsListener(statisticsListener);
+        } else {
+            throw new ProxoolException("Statistics are switched off, your can't add a listener");
+        }
     }
 
     /**
@@ -703,6 +708,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.74  2003/10/30 00:16:13  billhorsman
+ Throw a friendlier exception if you try and add a statistics listener to a pool with no statistics
+
  Revision 1.73  2003/10/16 18:52:35  billhorsman
  Fixed a bug: the redefine() method was actually calling the update() method. Also, added checks to make the
  "Attempt to use a pool with incomplete definition" exception a bit more descriptive. It's often because you
