@@ -5,19 +5,17 @@
  */
 package org.logicalcobwebs.proxool;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.DriverManager;
-import java.util.Properties;
-
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.8 $, $Date: 2004/03/23 21:19:45 $
+ * @version $Revision: 1.9 $, $Date: 2004/03/25 22:02:15 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.8
  */
 public class Prototyper {
@@ -47,6 +45,13 @@ public class Prototyper {
      */
     private int connectionsBeingMade;
 
+    /**
+     * The builder that will create *real* connections for us.
+     * Currently initialized to the default implementation until we fully
+     * support pluggable ConnectionBuilders
+     */
+    private ConnectionBuilderIF connectionBuilder = new DefaultConnectionBuilder();
+    
     public Prototyper(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
         this.log = connectionPool.getLog();
@@ -146,19 +151,33 @@ public class Prototyper {
 
 
         ProxyConnection proxyConnection = null;
-        Connection connection = null;
+        Connection realConnection = null;
 
         try {
-            Properties info = connectionPool.getDefinition().getDelegateProperties();
-            final String url = connectionPool.getDefinition().getUrl();
-            connection = DriverManager.getConnection(url, info);
-            proxyConnection = new ProxyConnection(connection, id, url, connectionPool, status);
+            // get a new *real* connection
+            realConnection = connectionBuilder.buildConnection(connectionPool.getDefinition());
+            
+            // build a proxy around it
+            
+            //TODO BRE: the connection builder has made a new connection using the information
+            // supplied in the ConnectionPoolDefinition. That's where it got the URL...
+            // The ProxyConnection is passed the ConnectionPoolDefinition as well so it doesn't 
+            // need the url in its constructor...
+            String url = connectionPool.getDefinition().getUrl();
+			proxyConnection = new ProxyConnection(realConnection, id, url, connectionPool, status);
 
             try {
-                connectionPool.onBirth(connection);
+                connectionPool.onBirth(realConnection);
             } catch (Exception e) {
                 log.error("Problem during onBirth (ignored)", e);
             }
+            
+            //TODO BRE: the actual pool of connections is maintained by the ConnectionPool. I'm not 
+            // very happy with the idea of letting the Prototyper add the newly build connection 
+            // into the pool itself. It should rather be the pool that does it, after it got a new 
+            // connection from the Prototyper. This would clearly separate the responsibilities: 
+            // ConnectionPool maintains the pool and its integrity, the Prototyper creates new 
+            // connections when instructed. 
             connectionPool.addProxyConnection(proxyConnection);
 
             if (log.isDebugEnabled()) {
@@ -212,6 +231,7 @@ public class Prototyper {
         return proxyConnection;
     }
 
+    
     /**
      * This needs to be called _everytime_ a connection is removed.
      */
@@ -270,8 +290,9 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
- Revision 1.8  2004/03/23 21:19:45  billhorsman
- Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
+ Revision 1.9  2004/03/25 22:02:15  brenuart
+ First step towards pluggable ConnectionBuilderIF & ConnectionValidatorIF.
+ Include some minor refactoring that lead to deprecation of some PrototyperController methods.
 
  Revision 1.7  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.

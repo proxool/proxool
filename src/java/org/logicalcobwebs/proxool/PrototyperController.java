@@ -8,13 +8,11 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.sql.SQLException;
-
 /**
  * Controls the {@link Prototyper prototypers}
- * @version $Revision: 1.6 $, $Date: 2004/03/23 21:19:45 $
+ * @version $Revision: 1.7 $, $Date: 2004/03/25 22:02:15 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.8
  */
 public class PrototyperController {
@@ -72,53 +70,57 @@ public class PrototyperController {
         }
     }
 
-    /**
-     * Build a new connection
-     * @param alias identifies the pool
-     * @param state the initial state it will be created as (this allows us
-     * to create it as {@link ConnectionInfoIF#STATUS_ACTIVE ACTIVE} and avoid
-     * another thread grabbing it before we can)
-     * @param creator for log audit
-     * @return the new connection
-     * @throws SQLException if there was a problem building the connection
-     * @throws ProxoolException if the alias doesn't exist
-     */
-    protected static ProxyConnection buildConnection(String alias, int state, String creator) throws SQLException, ProxoolException {
-        return getConnectionPool(alias).getPrototyper().buildConnection(state, creator);
-    }
+//    /**
+//     * Build a new connection
+//     * @param alias identifies the pool
+//     * @param state the initial state it will be created as (this allows us
+//     * to create it as {@link ConnectionInfoIF#STATUS_ACTIVE ACTIVE} and avoid
+//     * another thread grabbing it before we can)
+//     * @param creator for log audit
+//     * @return the new connection
+//     * @throws SQLException if there was a problem building the connection
+//     * @throws ProxoolException if the alias doesn't exist
+//     */
+//TODO not needed anymore - the ConnectionPool makes direct use of the Prototyper it has been assigned
+//    protected static ProxyConnectionIF buildConnection(String alias, int state, String creator) throws SQLException, ProxoolException {
+//        return getConnectionPool(alias).getPrototyper().buildConnection(state, creator);
+//    }
 
-    private static ConnectionPool getConnectionPool(String alias) throws ProxoolException {
-        return ConnectionPoolManager.getInstance().getConnectionPool(alias);
-    }
+//    private static ConnectionPool getConnectionPool(String alias) throws ProxoolException {
+//        return ConnectionPoolManager.getInstance().getConnectionPool(alias);
+//    }
 
-    /**
-     * Checks whether we are currently already building too many connections
-     * @param alias identifies the pool
-     * @throws SQLException if the throttle has been reached
-     */
-    protected static void checkSimultaneousBuildThrottle(String alias) throws SQLException, ProxoolException {
-        getConnectionPool(alias).getPrototyper().checkSimultaneousBuildThrottle();
-    }
+//    /**
+//     * Checks whether we are currently already building too many connections
+//     * @param alias identifies the pool
+//     * @throws SQLException if the throttle has been reached
+//     */
+//TODO not needed anymore - the ConnectionPool makes direct use of the Prototyper it has been assigned
+//    protected static void checkSimultaneousBuildThrottle(String alias) throws SQLException, ProxoolException {
+//        getConnectionPool(alias).getPrototyper().checkSimultaneousBuildThrottle();
+//    }
 
-    /**
-     * Cancel this prototyper and stop all prototyping immediately.
-     * @param alias identifies the pool
-     */
-    public static void cancel(String alias)  {
-        try {
-            getConnectionPool(alias).getPrototyper().cancel();
-        } catch (ProxoolException e) {
-            LOG.error("Couldn't cancel prototyper", e);
-        }
-    }
+//    /**
+//     * Cancel this prototyper and stop all prototyping immediately.
+//     * @param alias identifies the pool
+//     */
+//TODO not needed anymore - the ConnectionPool makes direct use of the Prototyper it has been assigned
+//    public static void cancel(String alias)  {
+//        try {
+//            getConnectionPool(alias).getPrototyper().cancel();
+//        } catch (ProxoolException e) {
+//            LOG.error("Couldn't cancel prototyper", e);
+//        }
+//    }
 
-    protected static void connectionRemoved(String alias) {
-        try {
-            getConnectionPool(alias).getPrototyper().connectionRemoved();
-        } catch (ProxoolException e) {
-            LOG.debug("Ignoring connection removed from cancelled prototyper");
-        }
-    }
+//TODO not needed anymore - the ConnectionPool makes direct use of the Prototyper it has been assigned
+//    protected static void connectionRemoved(String alias) {
+//        try {
+//            getConnectionPool(alias).getPrototyper().connectionRemoved();
+//        } catch (ProxoolException e) {
+//            LOG.debug("Ignoring connection removed from cancelled prototyper");
+//        }
+//    }
 
     public static boolean isKeepSweeping() {
         return keepSweeping;
@@ -134,8 +136,9 @@ public class PrototyperController {
 /*
  Revision history:
  $Log: PrototyperController.java,v $
- Revision 1.6  2004/03/23 21:19:45  billhorsman
- Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
+ Revision 1.7  2004/03/25 22:02:15  brenuart
+ First step towards pluggable ConnectionBuilderIF & ConnectionValidatorIF.
+ Include some minor refactoring that lead to deprecation of some PrototyperController methods.
 
  Revision 1.5  2003/03/10 23:43:11  billhorsman
  reapplied checkstyle that i'd inadvertently let

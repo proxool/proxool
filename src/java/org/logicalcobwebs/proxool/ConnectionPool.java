@@ -5,16 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.concurrent.ReaderPreferenceReadWriteLock;
-import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.proxool.admin.Admin;
-import org.logicalcobwebs.proxool.util.FastArrayList;
-
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,12 +15,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.logicalcobwebs.concurrent.ReaderPreferenceReadWriteLock;
+import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.admin.Admin;
+import org.logicalcobwebs.proxool.util.FastArrayList;
+
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.77 $, $Date: 2004/03/23 21:19:44 $
+ * @version $Revision: 1.78 $, $Date: 2004/03/25 22:02:15 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  */
 class ConnectionPool implements ConnectionPoolStatisticsIF {
 
@@ -111,6 +110,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      */
     private ConnectionResetter connectionResetter;
 
+    private ConnectionValidatorIF connectionValidator;
+    
+    
     protected ConnectionPool(ConnectionPoolDefinition definition) throws ProxoolException {
 
         // Use the FastArrayList for performance and thread safe
@@ -124,6 +126,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         connectionResetter = new ConnectionResetter(log, definition.getDriver());
         setDefinition(definition);
 
+        connectionValidator = new DefaultConnectionValidator();
+        
         if (definition.getStatistics() != null) {
             try {
                 admin = new Admin(definition);
@@ -167,13 +171,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             throw new SQLException(MSG_MAX_CONNECTION_COUNT);
         }
 
-        try {
-            PrototyperController.checkSimultaneousBuildThrottle(getDefinition().getAlias());
-        } catch (ProxoolException e) {
-            log.error("Unexpected problem", e);
-            throw new SQLException(e.getMessage());
-        }
-
+        prototyper.checkSimultaneousBuildThrottle();       
+        
         ProxyConnection proxyConnection = null;
 
         try {
@@ -219,8 +218,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             if (proxyConnection == null) {
                 try {
                     // No!  Let's see if we can create one
-                    proxyConnection = PrototyperController.buildConnection(
-                            getDefinition().getAlias(), ProxyConnection.STATUS_ACTIVE, "on demand");
+                    proxyConnection = prototyper.buildConnection(ProxyConnection.STATUS_ACTIVE, "on demand");
+                    
                     // Okay. So we have it. But is it working ok?
                     if (getDefinition().isTestBeforeUse()) {
                         if (!testConnection(proxyConnection)) {
@@ -269,32 +268,34 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         return ProxyFactory.getWrappedConnection(proxyConnection);
     }
 
+    /**
+     * Test the connection (if required)
+     * If the connection fails the test, it is removed from the pool.
+     * If no ConnectionValidatorIF is defined, then the test always succeed.
+     * 
+     * @param proxyConnection the connection to test
+     * @return TRUE if the connection pass the test, FALSE if it fails
+     */
     private boolean testConnection(ProxyConnectionIF proxyConnection) {
-        boolean success = false;
-        final String testSql = getDefinition().getHouseKeepingTestSql();
-        if (testSql != null && testSql.length() > 0) {
-            Statement s = null;
-            try {
-                s = proxyConnection.getConnection().createStatement();
-                s.execute(testSql);
-                success = true;
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " tested: OK");
-                }
-            } catch (Throwable t) {
-                proxyConnection.setStatus(ProxyConnectionIF.STATUS_NULL);
-                removeProxyConnection(proxyConnection, "it has problems: " + t, ConnectionPool.REQUEST_EXPIRY, true);
-            } finally {
-                if (s != null) {
-                    try {
-                        s.close();
-                    } catch (Throwable t) {
-                        // Ignore
-                        success = false;
-                    }
-                }
+        // is validation enabled ?
+        if( connectionValidator == null ) {
+            return true;
+        }
+        
+        // validate the connection
+        boolean success = connectionValidator.validate(getDefinition(), proxyConnection.getConnection());
+        
+        if( success ) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " tested: OK");
             }
         }
+        else {
+            proxyConnection.setStatus(ProxyConnectionIF.STATUS_NULL);
+            removeProxyConnection(proxyConnection, "it didn't pass the validation", ConnectionPool.REQUEST_EXPIRY, true);
+        }
+        
+        // return 
         return success;
     }
 
@@ -325,7 +326,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * Unless it's due for expiry, in which case it will... expire
      */
     protected void putConnection(ProxyConnectionIF proxyConnection) {
-
+      
         if (admin != null) {
             long now = System.currentTimeMillis();
             long start = proxyConnection.getTimeLastStartActive();
@@ -534,14 +535,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         }
                     }
 
-                    try {
-                        PrototyperController.cancel(alias);
-                    } catch (NullPointerException e) {
-                        log.error("PrototypingThread already dead", e);
-                    } catch (Exception e) {
-                        log.error("Can't wake prototypingThread", e);
-                    }
-
+                    prototyper.cancel();
+                    
                     // Silently close all connections
                     for (int i = proxyConnections.size() - 1; i >= 0; i--) {
                         long id = getProxyConnection(i).getId();
@@ -698,7 +693,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     protected void registerRemovedConnection(int status) {
         connectionCount--;
-        PrototyperController.connectionRemoved(getDefinition().getAlias());
+
+        prototyper.connectionRemoved();
+        
         connectionCountByState[status]--;
     }
 
@@ -1101,8 +1098,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
- Revision 1.77  2004/03/23 21:19:44  billhorsman
- Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
+ Revision 1.78  2004/03/25 22:02:15  brenuart
+ First step towards pluggable ConnectionBuilderIF & ConnectionValidatorIF.
+ Include some minor refactoring that lead to deprecation of some PrototyperController methods.
 
  Revision 1.76  2004/02/23 17:47:32  billhorsman
  Improved message that gets logged if the state change of a connection fails.
