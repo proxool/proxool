@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE script [
+
+    <!ELEMENT script (info*, command*)>
+    <!ATTLIST script
+        name CDATA #REQUIRED
+        driver CDATA #REQUIRED
+        url CDATA #REQUIRED
+    >
+
+    <!ELEMENT info EMPTY >
+    <!ATTLIST info
+        name CDATA #REQUIRED
+        value CDATA #REQUIRED
+    >
+
+    <!ELEMENT command EMPTY >
+    <!ATTLIST command
+        name CDATA #REQUIRED
+        sql CDATA #REQUIRED
+        exception (stop | log | ignore) #IMPLIED
+        loops CDATA #IMPLIED
+        load CDATA #IMPLIED
+    >
+
+]>
+
+<script
+    name="test"
+    driver="org.hsqldb.jdbcDriver"
+    url="jdbc:hsqldb:test"
+    >
+
+    <info
+        name="user"
+        value="sa"
+        />
+
+    <info name="proxool.maximum-connection-count" value="17" />
+    <info name="proxool.minimum-connection-count" value="5" />
+    <info name="proxool.maximum-connection-lifetime" value="60000" />
+    <info name="proxool.maximum-active-time" value="2000" />
+    <info name="proxool.house-keeping-sleep-time" value="5000" />
+
+    <command
+        name="setup"
+        sql="create table test (a int)"
+        exception="log"
+        />
+
+    <command
+        name="insert"
+        loops="10000"
+        load="20"
+        sql="insert into test values(1)"
+        exception="ignore"
+        />
+
+    <command
+        name="teardown"
+        sql="drop table test"
+        />
+
+</script>
