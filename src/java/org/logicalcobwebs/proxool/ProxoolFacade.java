@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.61 $, $Date: 2003/02/27 17:19:18 $
+ * @version $Revision: 1.62 $, $Date: 2003/02/28 10:42:59 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -171,10 +171,9 @@ public class ProxoolFacade {
      */
     protected static void shutdown(String finalizer, int delay) {
 
-        Iterator connectionPools = ConnectionPoolManager.getInstance().getConnectionPoolMap().iterator();
-        while (connectionPools.hasNext()) {
-            ConnectionPool cp = (ConnectionPool) connectionPools.next();
-            removeConnectionPool(finalizer, cp, delay);
+        ConnectionPool[] cps = ConnectionPoolManager.getInstance().getConnectionPools();
+        for (int i = 0; i < cps.length; i++) {
+            removeConnectionPool(finalizer, cps[i], delay);
         }
 
     }
@@ -632,6 +631,12 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.62  2003/02/28 10:42:59  billhorsman
+ ConnectionPoolManager now passes ProxoolFacade an
+ array of ConnectionPools rather than a Collection
+ to avoid a ConcurrentModificationException during
+ shutdown.
+
  Revision 1.61  2003/02/27 17:19:18  billhorsman
  new overloaded getSnapshot method
 

@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  *
- * @version $Revision: 1.9 $, $Date: 2003/02/07 10:27:47 $
+ * @version $Revision: 1.10 $, $Date: 2003/02/28 10:42:59 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -86,8 +86,8 @@ class ConnectionPoolManager {
     }
 
     /** @return an array of the connection pools */
-    protected Collection getConnectionPoolMap() {
-        return connectionPools;
+    protected ConnectionPool[] getConnectionPools() {
+        return (ConnectionPool[]) connectionPools.toArray(new ConnectionPool[connectionPools.size()]);
     }
 
     protected ConnectionPool createConnectionPool(ConnectionPoolDefinition connectionPoolDefinition) {
@@ -101,6 +101,7 @@ class ConnectionPoolManager {
         ConnectionPool cp = (ConnectionPool) connectionPoolMap.get(name);
         if (cp != null) {
             connectionPoolMap.remove(cp.getDefinition().getAlias());
+            connectionPools.remove(cp);
         } else {
             LOG.info("Ignored attempt to remove either non-existent or already removed connection pool " + name);
         }
@@ -114,6 +115,12 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.10  2003/02/28 10:42:59  billhorsman
+ ConnectionPoolManager now passes ProxoolFacade an
+ array of ConnectionPools rather than a Collection
+ to avoid a ConcurrentModificationException during
+ shutdown.
+
  Revision 1.9  2003/02/07 10:27:47  billhorsman
  change in shutdown procedure to allow re-registration
 
