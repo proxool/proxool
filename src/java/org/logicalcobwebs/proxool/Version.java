@@ -22,7 +22,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * 1.0.1 (2 January)
  *   A bug fix release built on January 2nd.
  *
- * @version $Revision: 1.13 $, $Date: 2003/09/11 11:17:52 $
+ * @version $Revision: 1.14 $, $Date: 2003/10/01 19:31:26 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -39,7 +39,7 @@ public class Version {
 
     private static final String BUILD_DATE = null;
 
-    private static final String CVS = "0.8.0RC1+";
+    private static final String CVS = "0.8.0RC2+";
 
     public static String getVersion() {
         StringBuffer version = new StringBuffer();
@@ -76,6 +76,9 @@ public class Version {
 /*
  Revision history:
  $Log: Version.java,v $
+ Revision 1.14  2003/10/01 19:31:26  billhorsman
+ 0.8.0RC2
+
  Revision 1.13  2003/09/11 11:17:52  billhorsman
  *** empty log message ***
 

@@ -1,14 +1,18 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.25 $
-$Date: 2003/08/30 11:44:54 $
+$Revision: 1.26 $
+$Date: 2003/10/01 19:31:54 $
 $Author: billhorsman $
 
-0.7.3 - (30 August, 2003)
+0.8.0 - (October, 2003)
 
-- Fix to documentation. Defining more than one type of fatal SQL exception
-  is done with a comma delimited list.
+- We now use Cglib's proxy library. Together with dropping the use of Timer
+  and only referencing ShutdownHooks at runtime we are now able to support
+  JDKs 1.2, 1.3 and 1.4 out of the box (Without Ant applied patches, which
+  were horrible).
+
+- Proxool is now available as a JMX component.
 
 - New getDelegateConnection() method on ProxoolFacade gives you access
   to the delegate (third party) driver if you really need it. This makes
@@ -23,15 +27,36 @@ $Author: billhorsman $
   house-keeping-sleep-time, and  maximum-active-time properly
   regardless of your timezone. This was a display bug only and didn't
   effect the behaviour of the pool itself.
-   
+
 - Connections that are about to be expired no longer bother to reset
   themselves (because they'll never be used again anyway). This was
   causing problems if the connection had connectivity problems to the
   database which then caused problems during the reset.
 
+- Added fatal-sql-exception-wrapper-class property. If a fatal exception is
+  detected then it is wrapped up inside the exception defined by this
+  property. This can make exception handling easier is frameworks like
+  Struts. Two wrappers are provided (FataSQLException and FatalRuntimeException)
+  but you can also define your own.
+
+- Added test-before-use and test-after-use properties. They will trigger a test of
+  the connection (as defined by house-keeper-test-sql) just before a connection
+  is handed out and just after it is closed (put back in the pool) respectively.
+  These are both off by default.
+
 - Fixed ConcurrentModificationException that happened in some
   environments during automatic statement closure.
-   
+
+- Fixed bug where if there was an Error during prototyping (not an SQLException,
+  not a RuntimeException but something serious like NoClassDefFoundError) then
+  the prototyper would keep attempting to make connections as fast as it could
+  (and never succeed in making any). Much better for the prototyper to give
+  up in that situation and try again when it is next asked (which, by default,
+  would be 30 seconds later).
+
+- Fix to documentation. Defining more than one type of fatal SQL exception
+  is done with a comma delimited list.
+
 0.7.2 - April 28, 2003
 
 - Moved DataSourceTest into Sandbox so that the Ant test target
