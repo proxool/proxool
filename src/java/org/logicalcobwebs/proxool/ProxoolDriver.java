@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.22 $, $Date: 2003/04/19 12:58:40 $
+ * @version $Revision: 1.23 $, $Date: 2003/08/15 10:13:24 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -203,21 +203,14 @@ public class ProxoolDriver implements Driver {
         return true;
     }
 
-    /**
-     * @see Object#finalize
-     */
-    protected void finalize() throws Throwable {
-        super.finalize();
-
-        // I guess it's safe to assume that if this driver is being
-        // finalized then the whole thing is going down?
-        ProxoolFacade.removeAllConnectionPools(0);
-    }
 }
 
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.23  2003/08/15 10:13:24  billhorsman
+ remove finalize() method
+
  Revision 1.22  2003/04/19 12:58:40  billhorsman
  fixed bug where ConfigurationListener's
  definitionUpdated was getting called too
