@@ -20,7 +20,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.3 $, $Date: 2003/01/28 11:55:04 $
+ * @version $Revision: 1.4 $, $Date: 2003/01/28 15:20:30 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -33,21 +33,44 @@ public class ProxyStatement extends AbstractProxyStatement  implements Statement
     }
 
     public ResultSet executeQuery(String sql) throws SQLException {
+        long startTime = System.currentTimeMillis();
+        Exception exception = null;
         try {
-            ResultSet rs = getStatement().executeQuery(sql);
-            return rs;
+            return getStatement().executeQuery(sql);
         } catch (SQLException e) {
             testException(e);
+            exception = e;
             throw e;
+        } finally {
+            trace(startTime, exception);
         }
     }
 
     public int executeUpdate(String sql) throws SQLException {
+        long startTime = System.currentTimeMillis();
+        Exception exception = null;
         try {
             return getStatement().executeUpdate(sql);
         } catch (SQLException e) {
             testException(e);
+            exception = e;
             throw e;
+        } finally {
+            trace(startTime, exception);
+        }
+    }
+
+    public int[] executeBatch() throws SQLException {
+        long startTime = System.currentTimeMillis();
+        Exception exception = null;
+        try {
+            return getStatement().executeBatch();
+        } catch (SQLException e) {
+            testException(e);
+            exception = e;
+            throw e;
+        } finally {
+            trace(startTime, exception);
         }
     }
 
@@ -149,15 +172,6 @@ public class ProxyStatement extends AbstractProxyStatement  implements Statement
         getStatement().clearBatch();
     }
 
-    public int[] executeBatch() throws SQLException {
-        try {
-            return getStatement().executeBatch();
-        } catch (SQLException e) {
-            testException(e);
-            throw e;
-        }
-    }
-
     public Connection getConnection() throws SQLException {
         return getStatement().getConnection();
     }
@@ -167,6 +181,9 @@ public class ProxyStatement extends AbstractProxyStatement  implements Statement
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.4  2003/01/28 15:20:30  billhorsman
+ added tracing
+
  Revision 1.3  2003/01/28 11:55:04  billhorsman
  new JDK 1.2 patches (functioning but not complete)
 
