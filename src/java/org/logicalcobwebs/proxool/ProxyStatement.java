@@ -19,7 +19,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.16 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.17 $, $Date: 2003/02/13 17:06:42 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -93,6 +93,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 
             // If we executed something then we should tell the listener.
             if (method.getName().startsWith(EXECUTE_FRAGMENT)) {
+                if (argCount > 0 && args[0] instanceof String) {
+                    setSqlStatementIfNull((String) args[0]);
+                }
                 trace(startTime, exception);
             }
 
@@ -107,6 +110,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.17  2003/02/13 17:06:42  billhorsman
+ allow for sqlStatement in execute() method
+
  Revision 1.16  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 

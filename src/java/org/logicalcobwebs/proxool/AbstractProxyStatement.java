@@ -21,7 +21,7 @@ import java.util.TreeMap;
  * statement. The subclass of this defines how we delegate to the
  * real statement.
 
- * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/13 17:06:42 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -190,12 +190,24 @@ abstract class AbstractProxyStatement {
         return isTrace;
     }
 
+    /**
+     * Sets sqlStatement if it isn't already set
+     * @param sqlStatement the statement we are sending the database
+     */
+    protected void setSqlStatementIfNull(String sqlStatement) {
+        if (this.sqlStatement == null) {
+            this.sqlStatement = sqlStatement;
+        }
+    }
 }
 
 
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.4  2003/02/13 17:06:42  billhorsman
+ allow for sqlStatement in execute() method
+
  Revision 1.3  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 
