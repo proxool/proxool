@@ -17,7 +17,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.12 $, $Date: 2003/01/30 17:22:01 $
+ * @version $Revision: 1.13 $, $Date: 2003/01/31 00:28:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -158,8 +158,10 @@ public class ProxoolDriver implements Driver {
                 + "you can set it more than once and each value is checked.");
 
         dpi[13] = new DriverPropertyInfo(ProxoolConstants.STATISTICS_PROPERTY,
-                "The sample length (in seconds) when taking statistical information, "
-                + " or zero to disable statistics. Default is zero.");
+                "The sample length when taking statistical information, comma-delimited. "
+                + "For example: '10s,15m' would mean take samples every 10 seconds and "
+                + "every 15 minutes. Valid units are s(econds), m(inutes), h(ours) and d(ays). " 
+                + "Default is null (no statistics).");
 
         return dpi;
     }
@@ -200,6 +202,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.13  2003/01/31 00:28:38  billhorsman
+ updated doc for statistics
+
  Revision 1.12  2003/01/30 17:22:01  billhorsman
  new statistics property
 
