@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.2 $, $Date: 2002/09/18 13:48:56 $
+ * @version $Revision: 1.3 $, $Date: 2002/09/19 10:33:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -333,11 +333,18 @@ public class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
     protected Connection getConnection() {
         return connection;
     }
+
+    public String toString() {
+        return getId() + " is " + ConnectionPool.getStatusDescription(getStatus());
+    }
 }
 
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.3  2002/09/19 10:33:57  billhorsman
+ added ProxyConnection#toString
+
  Revision 1.2  2002/09/18 13:48:56  billhorsman
  checkstyle and doc
 

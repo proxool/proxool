@@ -20,7 +20,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.3 $, $Date: 2002/09/18 13:48:56 $
+ * @version $Revision: 1.4 $, $Date: 2002/09/19 10:33:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -322,6 +322,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      */
     private synchronized long getNextId() {
         return nextConnectionId++;
+    }
+
+    protected static String getStatusDescription(int status) {
+        return STATUS_DESCRIPTIONS[status];
     }
 
     /**
@@ -1018,6 +1022,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.4  2002/09/19 10:33:57  billhorsman
+ added ProxyConnection#toString
+
  Revision 1.3  2002/09/18 13:48:56  billhorsman
  checkstyle and doc
 
