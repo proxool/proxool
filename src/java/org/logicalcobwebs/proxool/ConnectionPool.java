@@ -19,7 +19,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.12 $, $Date: 2002/10/29 22:58:22 $
+ * @version $Revision: 1.13 $, $Date: 2002/10/29 23:00:33 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -747,7 +747,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 while (connectionPoolUp && keepAtIt) {
 
                     String reason = null;
-                    if (connectionCount < getDefinition().getMaximumConnectionCount()) {
+                    if (connectionCount >= getDefinition().getMaximumConnectionCount()) {
                         // We don't want to make any more that the maximum
                         break;
                     } else if (connectionCount < getDefinition().getMinimumConnectionCount()) {
@@ -1043,6 +1043,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.13  2002/10/29 23:00:33  billhorsman
+ fixed sign error in prototyper (that meant that protoyping never happened)
+
  Revision 1.12  2002/10/29 22:58:22  billhorsman
  added connection hashcode to debug
 
