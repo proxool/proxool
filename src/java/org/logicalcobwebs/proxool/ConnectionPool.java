@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.19 $, $Date: 2002/11/07 19:31:25 $
+ * @version $Revision: 1.20 $, $Date: 2002/11/08 18:03:50 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -708,8 +708,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                                 // This connection has been active for way too long. We're
                                 // going to kill it :)
                                 removeProxyConnection(proxyConnection,
-                                        "it has been active for " + activeTime
-                                        + " milliseconds", FORCE_EXPIRY);
+                                        "it has been active for too long", FORCE_EXPIRY);
+
+                                log.warn("#" + idFormat.format(proxyConnection.getId()) + " was active for " + activeTime
+                                        + " milliseconds and has been removed automaticaly. The Thread responsible was named '"
+                                        + proxyConnection.getRequester() + "'.");
 
                             }
                         }
@@ -1065,6 +1068,12 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.20  2002/11/08 18:03:50  billhorsman
+ when connections are closed because they have been
+ active for too long then a log message is written
+ of level WARN, and it includes the name of the
+ thread responsible (reminder, name your threads).
+
  Revision 1.19  2002/11/07 19:31:25  billhorsman
  added sanity check against suspected situation where you
  can make more connections than the maximumConnectionCount
