@@ -14,14 +14,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * A thread that can run a single command many times.
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/09 14:45:07 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/09 15:59:18 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 class Commander implements Runnable {
 
@@ -135,6 +133,9 @@ class Commander implements Runnable {
 /*
  Revision history:
  $Log: Commander.java,v $
+ Revision 1.2  2002/11/09 15:59:18  billhorsman
+ fix doc
+
  Revision 1.1  2002/11/09 14:45:07  billhorsman
  now threaded and better exception handling
 

@@ -11,12 +11,10 @@ import java.util.Properties;
 import java.util.Vector;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * Defines a set of {@link #getCommands commands} to run. And which
  * {@link #getDriver driver} to use. And its {@link #getInfo configuration}.
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/09 15:59:52 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -115,6 +113,9 @@ class Script {
 /*
  Revision history:
  $Log: Script.java,v $
+ Revision 1.4  2002/11/09 15:59:52  billhorsman
+ fix doc
+
  Revision 1.3  2002/11/02 14:22:16  billhorsman
  Documentation
 

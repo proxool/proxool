@@ -11,11 +11,9 @@ import junit.framework.TestCase;
 import java.sql.SQLException;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * Tests that the various ways of configuring proxool work.
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/02 13:57:34 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/09 16:00:45 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -73,6 +71,9 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.3  2002/11/09 16:00:45  billhorsman
+ fix doc
+
  Revision 1.2  2002/11/02 13:57:34  billhorsman
  checkstyle
 

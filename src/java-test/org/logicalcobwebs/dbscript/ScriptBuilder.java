@@ -13,11 +13,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * Parser to get {@link org.logicalcobwebs.dbscript.Script} from XML source
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/09 14:45:07 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/09 16:00:08 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -74,12 +72,15 @@ class ScriptBuilder extends DefaultHandler {
     protected Script getScript() {
         return script;
     }
-    
+
 }
 
 /*
  Revision history:
  $Log: ScriptBuilder.java,v $
+ Revision 1.5  2002/11/09 16:00:08  billhorsman
+ fix doc
+
  Revision 1.4  2002/11/09 14:45:07  billhorsman
  now threaded and better exception handling
 

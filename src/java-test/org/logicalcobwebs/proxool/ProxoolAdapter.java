@@ -14,11 +14,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/09 14:45:35 $
+ * @version $Revision: 1.6 $, $Date: 2002/11/09 16:02:05 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -78,6 +76,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.6  2002/11/09 16:02:05  billhorsman
+ fix doc
+
  Revision 1.5  2002/11/09 14:45:35  billhorsman
  only close connection if it is open
 

@@ -17,11 +17,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
+ * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * TODO
- *
- * @version $Revision: 1.4 $, $Date: 2002/11/02 14:22:16 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/09 16:01:53 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -57,6 +55,9 @@ public class PerformanceTest extends TestCase {
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.5  2002/11/09 16:01:53  billhorsman
+ fix doc
+
  Revision 1.4  2002/11/02 14:22:16  billhorsman
  Documentation
 

@@ -12,11 +12,9 @@ import org.apache.commons.logging.LogFactory;
 import java.sql.SQLException;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * Run a {@link Script script}.
  *
- * @version $Revision: 1.6 $, $Date: 2002/11/09 14:45:07 $
+ * @version $Revision: 1.7 $, $Date: 2002/11/09 16:00:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -93,6 +91,9 @@ public class ScriptRunner {
 /*
  Revision history:
  $Log: ScriptRunner.java,v $
+ Revision 1.7  2002/11/09 16:00:34  billhorsman
+ fix doc
+
  Revision 1.6  2002/11/09 14:45:07  billhorsman
  now threaded and better exception handling
 

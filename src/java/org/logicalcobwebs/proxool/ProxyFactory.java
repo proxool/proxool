@@ -13,12 +13,10 @@ import java.sql.Statement;
 import java.lang.reflect.Proxy;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:15 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/09 15:56:52 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -62,6 +60,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.4  2002/11/09 15:56:52  billhorsman
+ fix doc
+
  Revision 1.3  2002/11/02 14:22:15  billhorsman
  Documentation
 

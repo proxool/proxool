@@ -21,11 +21,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * Allows you to run scripts from file.
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/07 19:08:54 $
+ * @version $Revision: 1.6 $, $Date: 2002/11/09 16:00:21 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -119,6 +117,9 @@ public class ScriptFacade {
 /*
  Revision history:
  $Log: ScriptFacade.java,v $
+ Revision 1.6  2002/11/09 16:00:21  billhorsman
+ fix doc
+
  Revision 1.5  2002/11/07 19:08:54  billhorsman
  Fixed up tests a bit
 

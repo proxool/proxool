@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * Uses a standard Java properties file to cofigure Proxool. For example:
  *
  * <pre>
@@ -38,7 +36,7 @@ import java.util.Properties;
  *<p>Note that there is nothing Proxool specific about this configurator. You can
  * configure any JDBC connection with it.</p>
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/09 15:57:57 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -115,6 +113,9 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.4  2002/11/09 15:57:57  billhorsman
+ fix doc
+
  Revision 1.3  2002/11/02 14:22:16  billhorsman
  Documentation
 

@@ -11,13 +11,11 @@ import java.sql.SQLException;
 import java.sql.Connection;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
- *
  * An interface that will provide connections. It differs from a real
  * {@link java.sql.Driver Driver} because it has {@link #setup} and
  * {@link #teardown} methods.
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/09 15:59:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -69,6 +67,9 @@ public interface ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ConnectionAdapterIF.java,v $
+ Revision 1.4  2002/11/09 15:59:34  billhorsman
+ fix doc
+
  Revision 1.3  2002/11/02 14:22:16  billhorsman
  Documentation
 
