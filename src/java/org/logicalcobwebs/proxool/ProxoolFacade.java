@@ -33,7 +33,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.49 $, $Date: 2003/02/07 14:45:40 $
+ * @version $Revision: 1.50 $, $Date: 2003/02/07 15:12:41 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -368,7 +368,7 @@ public class ProxoolFacade {
                 cpd.setStatistics(value);
             }
         } else if (key.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY)) {
-            if (isChanged(cpd.getStatistics(), value)) {
+            if (isChanged(cpd.getStatisticsLogLevel(), value)) {
                 changedProperties.setProperty(key, value);
                 cpd.setStatisticsLogLevel(value);
             }
@@ -747,6 +747,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.50  2003/02/07 15:12:41  billhorsman
+ fix statisticsLogLevel property recognition again
+
  Revision 1.49  2003/02/07 14:45:40  billhorsman
  fix statisticsLogLevel property recognition
 
