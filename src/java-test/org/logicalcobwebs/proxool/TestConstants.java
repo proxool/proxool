@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * Some useful constants for testing
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.5 $, $Date: 2003/09/30 18:39:39 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -27,11 +27,16 @@ public interface TestConstants {
 
     static final String HYPERSONIC_PASSWORD = "";
 
+    static final String HYPERSONIC_TEST_SQL = "SELECT COUNT(1) FROM SYSTEM_CATALOGS";
+
 }
 
 /*
  Revision history:
  $Log: TestConstants.java,v $
+ Revision 1.5  2003/09/30 18:39:39  billhorsman
+ New test sql syntax constant
+
  Revision 1.4  2003/03/03 11:12:05  billhorsman
  fixed licence
 

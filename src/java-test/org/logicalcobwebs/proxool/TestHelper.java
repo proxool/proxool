@@ -11,7 +11,7 @@ import java.util.Properties;
 /**
  * Helper for all tests
  *
- * @version $Revision: 1.20 $, $Date: 2003/03/05 23:28:55 $
+ * @version $Revision: 1.21 $, $Date: 2003/09/30 18:39:50 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -29,7 +29,7 @@ public class TestHelper {
         properties.setProperty("user", "sa");
         properties.setProperty("password", "");
         properties.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "40000");
-        properties.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, "select CURRENT_DATE");
+        properties.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, TestConstants.HYPERSONIC_TEST_SQL);
         properties.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "10");
         properties.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "3");
         properties.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY, "18000000");
@@ -140,6 +140,9 @@ public class TestHelper {
 /*
  Revision history:
  $Log: TestHelper.java,v $
+ Revision 1.21  2003/09/30 18:39:50  billhorsman
+ New test sql syntax constant
+
  Revision 1.20  2003/03/05 23:28:55  billhorsman
  deprecated maximum-new-connections property in favour of
  more descriptive simultaneous-build-throttle
