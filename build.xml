@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.69 $
-    $Date: 2003/12/13 12:39:08 $
-    $Author: billhorsman $
+    $Revision: 1.70 $
+    $Date: 2004/05/26 22:43:42 $
+    $Author: brenuart $
 
     http://proxool.sourceforge.net
 
@@ -254,6 +254,7 @@
         <echo level="verbose" message="Collecting test classes"/>
         <copy todir="${build-dir}/src/java">
             <fileset dir="src/java-test" includes="**/*.java"/>
+        	<fileset dir="src/java-test" includes="**/*.properties"/>
         </copy>
     </target>
 
