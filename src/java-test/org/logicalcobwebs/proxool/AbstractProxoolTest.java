@@ -13,12 +13,12 @@ import java.util.Stack;
 
 /**
  * Provides common code for all Proxool tests
- * @version $Revision: 1.2 $, $Date: 2003/03/03 17:38:47 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/04 10:11:09 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class AbstractProxoolTest extends TestCase {
+public abstract class AbstractProxoolTest extends TestCase {
 
     private static final Log LOG = LogFactory.getLog(AbstractProxoolTest.class);
 
@@ -56,6 +56,9 @@ public class AbstractProxoolTest extends TestCase {
 /*
  Revision history:
  $Log: AbstractProxoolTest.java,v $
+ Revision 1.3  2003/03/04 10:11:09  billhorsman
+ actually made abstract
+
  Revision 1.2  2003/03/03 17:38:47  billhorsman
  leave shutdown to AbstractProxoolTest
 
