@@ -16,7 +16,7 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/19 15:14:22 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/28 10:26:38 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -42,20 +42,20 @@ public class ConnectionListenerTest extends TestCase {
      */
     public void testAddConnectionListener() throws Exception {
         clear();
-        Properties info = new Properties();
-        info.setProperty("proxool.maximum-connection-count", "2");
-        info.setProperty("maximum-new-connections", "1");
-        info.setProperty("minimum-connection-count", "0");
-        info.setProperty("user", "sa");
-        info.setProperty("password", "");
         String alias = "connectionListenerTest";
-        String driverClass = "org.hsqldb.jdbcDriver";
-        String driverUrl = "jdbc:hsqldb:test";
-        String url = "proxool." + alias + ":" + driverClass + ":" + driverUrl;
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
+        info.setProperty(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
         Connection connection1 = DriverManager.getConnection(url, info);
         ProxoolFacade.addConnectionListener(alias, new TestConnectionListener());
         ProxoolFacade.addConnectionListener(alias, new TestConnectionListener());
-        Connection connection2 = DriverManager.getConnection(url, info);
+        Connection connection2 = DriverManager.getConnection(url);
         boolean errorOccured = false;
         try {
             connection1.createStatement().executeQuery("DINGO");
@@ -67,7 +67,6 @@ public class ConnectionListenerTest extends TestCase {
         connection2.createStatement().executeQuery("CALL 1");
         connection1.close();
         connection2.close();
-        ProxoolFacade.killAllConnections(alias);
         ProxoolFacade.removeConnectionPool(alias);
         assertTrue("Expected 2 onBirth calls, but got " + this.onBirthCalls + ".", this.onBirthCalls == 2);
         assertTrue("Expected 2 onExecute calls, but got " + this.onExecuteCalls + ".", this.onExecuteCalls == 2);
@@ -82,16 +81,16 @@ public class ConnectionListenerTest extends TestCase {
      */
     public void testRemoveConnectionListener() throws Exception {
         clear();
-        Properties info = new Properties();
-        info.setProperty("proxool.maximum-connection-count", "2");
-        info.setProperty("maximum-new-connections", "1");
-        info.setProperty("minimum-connection-count", "0");
-        info.setProperty("user", "sa");
-        info.setProperty("password", "");
         String alias = "removeConnectionListenerTest";
-        String driverClass = "org.hsqldb.jdbcDriver";
-        String driverUrl = "jdbc:hsqldb:test";
-        String url = "proxool." + alias + ":" + driverClass + ":" + driverUrl;
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
+        info.setProperty(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
         Connection connection1 = DriverManager.getConnection(url, info);
         TestConnectionListener testConnectionListener1 = new TestConnectionListener();
         TestConnectionListener testConnectionListener2 = new TestConnectionListener();
@@ -112,7 +111,6 @@ public class ConnectionListenerTest extends TestCase {
         connection2.createStatement().executeQuery("CALL 1");
         connection1.close();
         connection2.close();
-        ProxoolFacade.killAllConnections(alias);
         ProxoolFacade.removeConnectionPool(alias);
         assertTrue("Expected 0 onBirth calls, but got " + this.onBirthCalls + ".", this.onBirthCalls == 0);
         assertTrue("Expected 0 onExecute calls, but got " + this.onExecuteCalls + ".", this.onExecuteCalls == 0);
@@ -166,6 +164,12 @@ public class ConnectionListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.5  2003/02/28 10:26:38  billhorsman
+ removed killAllConnections call which should be unnecessary
+ and forced me to fix bug in ConnectionPool.shutdown where
+ onDeath wasn't getting called. Also used constants for properties
+ and used database in db directory (to clean up files)
+
  Revision 1.4  2003/02/19 15:14:22  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)
