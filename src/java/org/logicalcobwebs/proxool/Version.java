@@ -23,7 +23,7 @@ import org.logicalcobwebs.logging.LogFactory;
  *   A snapshot release built on January 2nd. This comes after the
  *   version 1.0 and before 1.1.
  *
- * @version $Revision: 1.6 $, $Date: 2003/02/12 00:50:34 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/21 15:19:09 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -40,7 +40,7 @@ public class Version {
 
     private static final String BUILD_DATE = null;
 
-    private static final String CVS = "0.6+";
+    private static final String CVS = "0.7+";
 
     public static String getVersion() {
         StringBuffer version = new StringBuffer();
@@ -77,6 +77,9 @@ public class Version {
 /*
  Revision history:
  $Log: Version.java,v $
+ Revision 1.7  2003/02/21 15:19:09  billhorsman
+ update version
+
  Revision 1.6  2003/02/12 00:50:34  billhorsman
  change the CVS version to be x.y+ (a bit more informative)
 
