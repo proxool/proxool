@@ -9,29 +9,17 @@ package org.logicalcobwebs.proxool.configuration;
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.apache.log4j.xml.DOMConfigurator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.proxool.configuration.ConfiguratorTest;
-import org.logicalcobwebs.proxool.configuration.JAXPConfiguratorTest;
-import org.logicalcobwebs.proxool.HypersonicTest;
-import org.logicalcobwebs.proxool.PerformanceTest;
-import org.logicalcobwebs.proxool.GeneralTests;
-import org.logicalcobwebs.proxool.ConnectionResetterTest;
-import org.logicalcobwebs.proxool.ThreadTest;
 import org.logicalcobwebs.proxool.GlobalTest;
 
 /**
  * Run all tests
  *
- * @version $Revision: 1.1 $, $Date: 2002/12/16 17:06:26 $
+ * @version $Revision: 1.2 $, $Date: 2002/12/16 17:35:43 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
  */
 public class AllTests {
-
-    private static final Log LOG = LogFactory.getLog(AllTests.class);
 
     /**
      * Run all tests
@@ -58,6 +46,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.2  2002/12/16 17:35:43  chr32
+ Removed redundant imports.
+
  Revision 1.1  2002/12/16 17:06:26  billhorsman
  new test structure
 
