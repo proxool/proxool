@@ -18,7 +18,7 @@ import java.sql.Statement;
  *
  * TODO
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/02 11:29:53 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/02 12:45:54 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -37,12 +37,8 @@ class ScriptRunner {
         }
 
         Command[] commands = script.getCommands();
-        LOG.debug("Running " + commands.length + " commands");
         for (int i = 0; i < commands.length; i++) {
             Command command = commands[i];
-            LOG.debug("Running command " + i + ": " + commands[i].getName() + " ("
-                    + commands[i].getLoad() + " x " + commands[i].getLoops() + ")");
-
             long start = System.currentTimeMillis();
 
             for (int loop = 0; loop < command.getLoops(); loop++) {
@@ -77,9 +73,9 @@ class ScriptRunner {
             int count = command.getLoad() * command.getLoops();
             double lap = (double)elapsed / (double)count;
             if (count > 1) {
-                LOG.info(command.getName() + " ran " + count + " commands in " + elapsed + " milliseconds (avg." + lap + ")");
+                LOG.info(adapter.getName()+ ":" + command.getName() + " ran " + count + " commands in " + elapsed + " milliseconds (avg." + lap + ")");
             } else {
-                LOG.info(command.getName() + " ran in " + elapsed + " milliseconds");
+                LOG.debug(adapter.getName() + ":" + command.getName() + " ran in " + elapsed + " milliseconds");
             }
 
         }
@@ -108,6 +104,9 @@ class ScriptRunner {
 /*
  Revision history:
  $Log: ScriptRunner.java,v $
+ Revision 1.2  2002/11/02 12:45:54  billhorsman
+ improved debug
+
  Revision 1.1  2002/11/02 11:29:53  billhorsman
  new script runner for testing
 

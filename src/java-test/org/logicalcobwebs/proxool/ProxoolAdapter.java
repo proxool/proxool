@@ -18,7 +18,7 @@ import java.sql.DriverManager;
  *
  * TODO
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/02 11:37:48 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/02 12:46:42 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -26,6 +26,10 @@ import java.sql.DriverManager;
 public class ProxoolAdapter implements ConnectionAdapterIF {
 
     private String alias = String.valueOf(hashCode());
+
+    public String getName() {
+        return "proxool";
+    }
 
     public void setup(String driver, String url, Properties info) throws SQLException {
 
@@ -58,6 +62,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.2  2002/11/02 12:46:42  billhorsman
+ improved debug
+
  Revision 1.1  2002/11/02 11:37:48  billhorsman
  New tests
 

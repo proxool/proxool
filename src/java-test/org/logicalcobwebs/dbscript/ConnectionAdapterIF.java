@@ -15,7 +15,7 @@ import java.sql.Connection;
  *
  * TODO
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/02 11:29:53 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/02 12:46:42 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -31,11 +31,16 @@ public interface ConnectionAdapterIF {
 
     void teardown() throws SQLException;
 
+    String getName();
+
 }
 
 /*
  Revision history:
  $Log: ConnectionAdapterIF.java,v $
+ Revision 1.2  2002/11/02 12:46:42  billhorsman
+ improved debug
+
  Revision 1.1  2002/11/02 11:29:53  billhorsman
  new script runner for testing
 

@@ -22,7 +22,7 @@ import java.util.Properties;
  * But it is fast. We use it as our bench mark on how could we should strive
  * to be.
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/02 11:37:48 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/02 12:46:42 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -34,6 +34,10 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
     private Connection[] connections;
 
     private int index = 0;
+
+    public String getName() {
+        return "simpool";
+    }
 
     public void setup(String driver, String url, Properties info) throws SQLException {
 
@@ -75,6 +79,9 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: SimpoolAdapter.java,v $
+ Revision 1.2  2002/11/02 12:46:42  billhorsman
+ improved debug
+
  Revision 1.1  2002/11/02 11:37:48  billhorsman
  New tests
 
