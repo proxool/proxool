@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.5 $
-    $Date: 2002/10/23 21:06:03 $
+    $Revision: 1.6 $
+    $Date: 2002/10/25 10:42:07 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -245,7 +245,7 @@
         depends="init"
         >
         <java fork="yes" classpathref="classpath" classname="junit.textui.TestRunner" >
-            <arg value="org.logicalcobwebs.proxool.GeneralTests" />
+            <arg value="org.logicalcobwebs.proxool.AllTests" />
         </java>
     </target>
 

@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.7 $, $Date: 2002/10/23 21:04:54 $
+ * @version $Revision: 1.8 $, $Date: 2002/10/25 10:41:07 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -27,15 +27,16 @@ public class GeneralTests extends TestCase {
 
     public GeneralTests(String name) {
         super(name);
-        TestHelper.configureLog4J();
     }
 
     protected void setUp() throws Exception {
-        TestHelper.setup();
+        AllTests.setup();
+        TestHelper.setupDatabase();
     }
 
     protected void tearDown() throws Exception {
-        TestHelper.tearDown();
+        TestHelper.tearDownDatabase();
+        AllTests.teardown();
     }
 
     /**
@@ -281,6 +282,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.8  2002/10/25 10:41:07  billhorsman
+ draft changes to test setup
+
  Revision 1.7  2002/10/23 21:04:54  billhorsman
  checkstyle fixes (reduced max line width and lenient naming convention
 

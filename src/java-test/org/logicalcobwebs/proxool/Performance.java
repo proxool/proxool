@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * as we keep a single threaded model (and because most systems work
  * in a multi-threaded environment is why we need a pool).
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -43,15 +43,16 @@ public class Performance extends TestCase {
      */
     public Performance(String s) {
         super(s);
-        TestHelper.configureLog4J();
     }
 
     protected void setUp() throws Exception {
-        TestHelper.setup();
+        AllTests.setup();
+        TestHelper.setupDatabase();
     }
 
     protected void tearDown() throws Exception {
-        TestHelper.tearDown();
+        TestHelper.tearDownDatabase();
+        AllTests.teardown();
     }
 
     /**

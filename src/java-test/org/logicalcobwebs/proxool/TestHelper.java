@@ -38,10 +38,6 @@ public class TestHelper {
 
     private static final String SQL_SELECT_FROM_TEST = "SELECT * FROM test";
 
-    protected static void configureLog4J() {
-        DOMConfigurator.configure("log4j.xml");
-    }
-
     protected static Properties buildProperties() {
         Properties info = new Properties();
         info.setProperty("user", USER);
@@ -110,11 +106,11 @@ public class TestHelper {
         }
     }
 
-    protected static void setup() throws SQLException, ClassNotFoundException {
+    protected static void setupDatabase() throws SQLException, ClassNotFoundException {
         execute(getDirectConnection(), SQL_CREATE_TEST_TABLE);
     }
 
-    protected static void tearDown() throws SQLException, ClassNotFoundException {
+    protected static void tearDownDatabase() throws SQLException, ClassNotFoundException {
         execute(getDirectConnection(), SQL_DROP_TEST_TABLE);
     }
 
