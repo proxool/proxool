@@ -5,39 +5,222 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.dbscript.ScriptFacade;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.xml.sax.SAXException;
+import org.logicalcobwebs.proxool.admin.StatisticsIF;
+import org.logicalcobwebs.proxool.admin.StatisticsListenerIF;
+import org.logicalcobwebs.proxool.admin.SnapshotIF;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+import java.text.DecimalFormat;
 
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.12 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.13 $, $Date: 2003/03/10 15:31:26 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
-public class PerformanceTest extends AbstractProxoolTest {
+public class PerformanceTest extends AbstractProxoolTest  implements StatisticsListenerIF {
 
     private static final Log LOG = LogFactory.getLog(PerformanceTest.class);
+
+    private static DecimalFormat millisecondsFormat = new DecimalFormat("0.00");
+
+    private Thread waitingThead;
+
+    private StatisticsIF statistics;
+    private static final int period = 10;
+    private static final int count = 1;
 
     public PerformanceTest(String s) {
         super(s);
     }
 
-    public void testScript() throws ParserConfigurationException, SAXException, IOException, SQLException {
-        String scriptLocation = System.getProperty("script");
-        if (scriptLocation != null) {
-            ScriptFacade.runScript(scriptLocation, new ProxoolAdapter());
-            ScriptFacade.runScript(scriptLocation, new SimpoolAdapter());
-        } else {
-            LOG.info("Skipping performance test because 'script' System Property was not set");
+    /**
+     * Test how many connections we can serve if we go as fast as we can!
+     * @throws ProxoolException if anything goes wrong
+     */
+    public void testPerformance() throws ProxoolException {
+
+        waitingThead = Thread.currentThread();
+
+        String alias = "testPeformance";
+        int threadCount = 5;
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, String.valueOf(threadCount));
+        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, String.valueOf(period) + "s");
+        info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_INFO);
+        ProxoolFacade.registerConnectionPool(url, info);
+        ProxoolFacade.addStatisticsListener(alias, this);
+
+        doWait();
+
+        AnnoyingConnector[] annoyingConnectors = new AnnoyingConnector[threadCount];
+        for (int i = 0; i < annoyingConnectors.length; i++) {
+            annoyingConnectors[i] = new AnnoyingConnector(alias);
+            Thread t = new Thread(annoyingConnectors[i]);
+            t.start();
         }
+
+        for (int i = 0; i < count; i++) {
+            doWait();
+        }
+
+        for (int i = 0; i < annoyingConnectors.length; i++) {
+            annoyingConnectors[i].cancel();
+        }
+
+        LOG.info("Served " + statistics.getServedCount()
+            + " at " + millisecondsFormat.format((double) (1000 * period * count) / (double) statistics.getServedCount()) + " ms per connection");
+
+    }
+
+    private void doWait() {
+        synchronized (Thread.currentThread()) {
+            try {
+                Thread.currentThread().wait(60000);
+            } catch (InterruptedException e) {
+                fail("Statistics didn't arrive as expected");
+            }
+        }
+    }
+
+    public void statistics(String alias, StatisticsIF statistics) {
+        this.statistics = statistics;
+        synchronized (waitingThead) {
+            waitingThead.notify();
+        }
+    }
+
+    public void testSnapshotImpact() throws ProxoolException {
+
+        waitingThead = Thread.currentThread();
+
+        String alias = "testPeformance";
+        int threadCount = 10;
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, String.valueOf(threadCount));
+        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, String.valueOf(period) + "s");
+        info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_INFO);
+        ProxoolFacade.registerConnectionPool(url, info);
+        ProxoolFacade.addStatisticsListener(alias, this);
+        DisagreeableSnapshotter disagreeableSnapshotter = new DisagreeableSnapshotter(alias);
+        new Thread(disagreeableSnapshotter).start();
+
+        AnnoyingConnector[] annoyingConnectors = new AnnoyingConnector[threadCount];
+        for (int i = 0; i < annoyingConnectors.length; i++) {
+            annoyingConnectors[i] = new AnnoyingConnector(alias);
+            Thread t = new Thread(annoyingConnectors[i]);
+            t.start();
+        }
+
+        doWait();
+
+        for (int i = 0; i < count; i++) {
+            doWait();
+        }
+
+        for (int i = 0; i < annoyingConnectors.length; i++) {
+            annoyingConnectors[i].cancel();
+        }
+        disagreeableSnapshotter.cancel();
+
+        LOG.info("Served " + statistics.getServedCount()
+            + " at " + millisecondsFormat.format((double) (1000 * period * count) / (double) statistics.getServedCount()) + " ms per connection");
+
+    }
+
+    class DisagreeableSnapshotter implements Runnable {
+
+        private String alias;
+
+        private boolean cancelled;
+
+        public DisagreeableSnapshotter(String alias) {
+            this.alias = alias;
+        }
+
+        public void run() {
+
+            while (!cancelled) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    LOG.error("Awoken", e);
+                }
+                try {
+                    SnapshotIF s = ProxoolFacade.getSnapshot(alias, true);
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("Snapshot: served=" + s.getServedCount() + ", active=" + s.getActiveConnectionCount());
+                    }
+                } catch (ProxoolException e) {
+                    LOG.error("Couldn't get snapshot", e);
+                }
+            }
+        }
+
+        public void cancel() {
+            cancelled = true;
+        }
+
+    }
+
+    class AnnoyingConnector implements Runnable {
+
+        private String alias;
+
+        private boolean cancelled;
+
+        private int exceptionCount;
+
+        public AnnoyingConnector(String alias) {
+            this.alias = alias;
+        }
+
+        public void run() {
+                while (!cancelled) {
+                    try {
+                        Connection connection = null;
+                        try {
+                            connection = DriverManager.getConnection(TestHelper.buildProxoolUrl(alias));
+                            Statement s = connection.createStatement();
+                            Thread.yield();
+                        } finally {
+                            if (connection != null) {
+                                connection.close();
+                            }
+                        }
+                    } catch (SQLException e) {
+                        LOG.error(Thread.currentThread().getName(), e);
+                        exceptionCount++;
+                    }
+                }
+        }
+
+        public void cancel() {
+            cancelled = true;
+        }
+
+        public int getExceptionCount() {
+            return exceptionCount;
+        }
+
     }
 
 }
@@ -45,6 +228,9 @@ public class PerformanceTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.13  2003/03/10 15:31:26  billhorsman
+ fixes
+
  Revision 1.12  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 

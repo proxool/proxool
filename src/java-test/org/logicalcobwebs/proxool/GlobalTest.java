@@ -16,7 +16,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.12 $, $Date: 2003/03/04 10:10:52 $
+ * @version $Revision: 1.13 $, $Date: 2003/03/10 15:31:26 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -50,7 +50,7 @@ public class GlobalTest {
     }
 
     public static synchronized void globalTeardown(String alias) {
-        ProxoolFacade.shutdown(alias + ":teardown", 0);
+        ProxoolFacade.shutdown(alias + ":teardown", 500);
     }
 
     /**
@@ -83,6 +83,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.13  2003/03/10 15:31:26  billhorsman
+ fixes
+
  Revision 1.12  2003/03/04 10:10:52  billhorsman
  loads ProxoolDriver
 

@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/10 15:31:26 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -44,6 +44,7 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, "true");
         ProxoolFacade.registerConnectionPool(url, info);
 
         DriverManager.getConnection(url);
@@ -56,7 +57,7 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
             LOG.debug("Ignoring expected exception", e);
         }
 
-        assertEquals("activeConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
+        assertEquals("activeConnectionCount", 2, ProxoolFacade.getSnapshot(alias, true).getActiveConnectionCount());
 
     }
 
@@ -66,6 +67,9 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionPoolTests.java,v $
+ Revision 1.6  2003/03/10 15:31:26  billhorsman
+ fixes
+
  Revision 1.5  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 
