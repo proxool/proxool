@@ -23,7 +23,7 @@ import java.util.Properties;
  * <p>You need to use this class wisely. It is obviously specfic to proxool so it will
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>.
- * @version $Revision: 1.3 $, $Date: 2002/10/23 21:04:36 $
+ * @version $Revision: 1.4 $, $Date: 2002/10/24 17:40:31 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -99,12 +99,14 @@ public class ProxoolFacade {
      */
     private static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException {
 
-        // TODO - need to rethink the way we pass ConnectionPool in here. It's
-
         Properties rememberedInfo = null;
+        String rememberedKey = null;
         if (cp != null) {
-            rememberedInfo = (Properties) infos.get(cp.getDefinition().getUrl());
+            rememberedKey = cp.getDefinition().getCompleteUrl();
+        } else {
+            rememberedKey = url;
         }
+        rememberedInfo = (Properties) infos.get(rememberedKey);
 
         if (info != null && (rememberedInfo == null || !info.equals(rememberedInfo))) {
 
@@ -120,11 +122,13 @@ public class ProxoolFacade {
             while (i.hasNext()) {
                 String key = (String) i.next();
                 String value = info.getProperty(key);
-                boolean propertyRecognised = true;
+                boolean isProxoolProperty = true;
 
                 if (key.equals(ProxoolConstants.USER_PROPERTY)) {
+                    isProxoolProperty = false;
                     cpd.setUser(value);
                 } else if (key.equals(ProxoolConstants.PASSWORD_PROPERTY)) {
+                    isProxoolProperty = false;
                     cpd.setPassword(value);
                 } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
                     try {
@@ -202,11 +206,11 @@ public class ProxoolFacade {
                     cpd.setFatalSqlException(value);
                 } else {
                     cpd.setProperty(key, value);
-                    propertyRecognised = false;
+                    isProxoolProperty = false;
                 }
 
                 if (LOG.isDebugEnabled()) {
-                    if (propertyRecognised) {
+                    if (isProxoolProperty) {
                         LOG.debug("Recognised proxool property: " + key + "=" + value);
                     } else {
                         LOG.debug("Delgating property to Driver: " + key + "=" + value);
@@ -215,12 +219,7 @@ public class ProxoolFacade {
 
             }
 
-            if (cp != null) {
-                infos.put(cp.getDefinition().getUrl(), info);
-            } else {
-                infos.put(url, info);
-            }
-
+            infos.put(rememberedKey, info);
         }
 
         return cpd.getName();
@@ -393,11 +392,18 @@ public class ProxoolFacade {
         definePool(cp, url, cpd, info);
     }
 
+    protected void finalize() throws Throwable {
+        super.finalize();
+        LOG.debug("Finalising");
+    }
 }
 
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.4  2002/10/24 17:40:31  billhorsman
+ Fixed recognition of existing pool (which was resulting in an extra configuration step - but which didn't cause any problems)
+
  Revision 1.3  2002/10/23 21:04:36  billhorsman
  checkstyle fixes (reduced max line width and lenient naming convention
 
