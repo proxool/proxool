@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/11 01:19:48 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/12 00:14:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -82,9 +82,9 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
         new Thread(new Closer(DriverManager.getConnection(url), 5000)).start();
 
         long startTime = System.currentTimeMillis();
-        ProxoolFacade.removeConnectionPool(alias, 10000);
+        ProxoolFacade.removeConnectionPool(alias, 100000);
         long shutdownTime = System.currentTimeMillis() - startTime;
-        assertTrue("shutdown took too long", shutdownTime < 8000);
+        assertTrue("shutdown took too long", shutdownTime < 50000);
         assertTrue("shutdown was too quick", shutdownTime > 2000);
     }
 
@@ -106,13 +106,13 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, "true");
         ProxoolFacade.registerConnectionPool(url, info);
 
-        // Open a connection that will close in 5 seconds
-        new Thread(new Closer(DriverManager.getConnection(url), 8000)).start();
+        // Open a connection that will close in 100 seconds
+        new Thread(new Closer(DriverManager.getConnection(url), 100000)).start();
 
         long startTime = System.currentTimeMillis();
         ProxoolFacade.removeConnectionPool(alias, 3000);
         long shutdownTime = System.currentTimeMillis() - startTime;
-        assertTrue("shutdown took too long", shutdownTime < 6000);
+        assertTrue("shutdown took too long", shutdownTime < 50000);
         assertTrue("shutdown was too quick", shutdownTime > 1000);
     }
 
@@ -150,6 +150,9 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionPoolTests.java,v $
+ Revision 1.8  2003/03/12 00:14:12  billhorsman
+ change thresholds
+
  Revision 1.7  2003/03/11 01:19:48  billhorsman
  new tests
 
