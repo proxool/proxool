@@ -18,7 +18,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.15 $, $Date: 2002/11/09 15:50:15 $
+ * @version $Revision: 1.16 $, $Date: 2002/11/09 16:09:06 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -266,9 +266,8 @@ public class GeneralTests extends TestCase {
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
             fail(e.getMessage());
-        } finally {
         }
-        
+
     }
 
     /**
@@ -392,6 +391,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.16  2002/11/09 16:09:06  billhorsman
+ checkstyle
+
  Revision 1.15  2002/11/09 15:50:15  billhorsman
  new trace property and better doc
 

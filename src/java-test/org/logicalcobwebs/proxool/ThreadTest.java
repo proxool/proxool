@@ -9,21 +9,18 @@ package org.logicalcobwebs.proxool;
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.dbscript.ScriptFacade;
 import org.logicalcobwebs.dbscript.CommandFilterIF;
 import org.logicalcobwebs.dbscript.CommandIF;
-import org.xml.sax.SAXException;
+import org.logicalcobwebs.dbscript.ScriptFacade;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Random;
 
 /**
  * Test how well Proxool works in a threaded test.
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/09 15:45:29 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/09 16:09:06 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -107,6 +104,9 @@ public class ThreadTest extends TestCase {
 /*
  Revision history:
  $Log: ThreadTest.java,v $
+ Revision 1.2  2002/11/09 16:09:06  billhorsman
+ checkstyle
+
  Revision 1.1  2002/11/09 15:45:29  billhorsman
  new thread test, using thread.xml script
 

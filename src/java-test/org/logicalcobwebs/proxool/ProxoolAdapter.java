@@ -16,7 +16,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.6 $, $Date: 2002/11/09 16:02:05 $
+ * @version $Revision: 1.7 $, $Date: 2002/11/09 16:09:06 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -58,11 +58,11 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
     public Connection getConnection()
             throws SQLException {
         return DriverManager.getConnection(ProxoolConstants.PROXOOL
-            + ProxoolConstants.ALIAS_DELIMITER + alias);
+                + ProxoolConstants.ALIAS_DELIMITER + alias);
     }
 
     public void closeConnection(Connection connection) throws SQLException {
-        if (connection != null){
+        if (connection != null) {
             connection.close();
         }
     }
@@ -76,6 +76,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.7  2002/11/09 16:09:06  billhorsman
+ checkstyle
+
  Revision 1.6  2002/11/09 16:02:05  billhorsman
  fix doc
 
