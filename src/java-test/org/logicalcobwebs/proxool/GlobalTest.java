@@ -16,9 +16,9 @@ import junit.extensions.TestSetup;
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.6 $, $Date: 2003/02/07 15:10:11 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/10 00:14:33 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
  */
 public class GlobalTest {
@@ -60,6 +60,7 @@ public class GlobalTest {
         suite.addTest(org.logicalcobwebs.proxool.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.configuration.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.monitor.AllTests.suite());
+        suite.addTest(org.logicalcobwebs.proxool.util.AllTests.suite());
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -79,6 +80,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.7  2003/02/10 00:14:33  chr32
+ Added tests for AbstractListenerContainer.
+
  Revision 1.6  2003/02/07 15:10:11  billhorsman
  add monitor tests
 
