@@ -13,7 +13,6 @@ import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.ResultMonitor;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -22,7 +21,7 @@ import java.util.Properties;
 /**
  * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/06 14:25:53 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/10 23:46:43 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -107,6 +106,9 @@ public class SnapshotTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: SnapshotTest.java,v $
+ Revision 1.12  2003/03/10 23:46:43  billhorsman
+ checkstyle
+
  Revision 1.11  2003/03/06 14:25:53  billhorsman
  fix for threading
 
