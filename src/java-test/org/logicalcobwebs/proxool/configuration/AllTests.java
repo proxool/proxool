@@ -14,7 +14,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Run all tests
  *
- * @version $Revision: 1.3 $, $Date: 2002/12/18 03:13:51 $
+ * @version $Revision: 1.4 $, $Date: 2002/12/23 02:40:21 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
@@ -22,7 +22,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 public class AllTests {
 
     /**
-     * Run all tests
+     * Create a composite test of all Proxool configuration tests.
      *
      * @return a composite test of all Proxool configuration tests.
      */
@@ -30,6 +30,7 @@ public class AllTests {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(ConfiguratorTest.class);
         suite.addTestSuite(JAXPConfiguratorTest.class);
+        suite.addTestSuite(AvalonConfiguratorTest.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -37,7 +38,6 @@ public class AllTests {
                 GlobalTest.globalSetup();
             }
         };
-
         return wrapper;
     }
 
@@ -46,6 +46,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.4  2002/12/23 02:40:21  chr32
+ Doc.
+
  Revision 1.3  2002/12/18 03:13:51  chr32
  Doc.
 
