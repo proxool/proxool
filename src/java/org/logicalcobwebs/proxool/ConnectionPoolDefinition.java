@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.30 $, $Date: 2004/03/15 02:42:44 $
+ * @version $Revision: 1.31 $, $Date: 2004/03/18 17:08:14 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -111,6 +111,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private boolean testBeforeUse;
 
     private boolean testAfterUse;
+
+    private boolean jmx;
+    private String jmxAgentId;
 
     /**
      * So we can set the values one by one if we want
@@ -1054,8 +1057,35 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     public void setSecurityCredentials(String securityCredentials) {
         this.securityCredentials = securityCredentials;
     }
-
 // End JNDI
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isJmx()
+     */
+    public boolean isJmx() {
+        return jmx;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isJmx()
+     */
+    public void setJmx(boolean jmx) {
+        this.jmx = jmx;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getJmxAgentId()
+     */
+    public String getJmxAgentId() {
+        return jmxAgentId;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getJmxAgentId()
+     */
+    public void setJmxAgentId(String jmxAgentId) {
+        this.jmxAgentId = jmxAgentId;
+    }
 
     /**
      * Returns true if {@link #redefine redefining} the pool using
@@ -1096,6 +1126,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.31  2004/03/18 17:08:14  chr32
+ Added jmx* properties.
+
  Revision 1.30  2004/03/15 02:42:44  chr32
  Removed explicit JNDI properties. Going for a generic approach instead.
 

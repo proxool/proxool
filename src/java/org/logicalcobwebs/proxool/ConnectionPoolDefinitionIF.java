@@ -22,9 +22,9 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.20 $, $Date: 2003/09/30 18:39:08 $
+ * @version $Revision: 1.21 $, $Date: 2004/03/18 17:08:14 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public interface ConnectionPoolDefinitionIF {
 
@@ -289,11 +289,27 @@ public interface ConnectionPoolDefinitionIF {
      */
     String getJndiName();
 
+    /**
+     * Indicate wether this pool should be registered with JMX or not.
+     * @return wether this pool should be registered with JMX or not.
+     */
+    boolean isJmx();
+
+    /**
+     * Get a comma separated list of JMX agent ids (as used by
+     * <code>MBeanServerFactory.findMBeanServer(String agentId)</code>) to register the pool to.
+     * @return a comma separated list of JMX agent ids (as used by
+     * <code>MBeanServerFactory.findMBeanServer(String agentId)</code>) to register the pool to.
+     */
+    String getJmxAgentId();
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.21  2004/03/18 17:08:14  chr32
+ Added jmx* properties.
+
  Revision 1.20  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 
