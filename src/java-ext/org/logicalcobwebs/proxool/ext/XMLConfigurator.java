@@ -3,11 +3,13 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool;
+package org.logicalcobwebs.proxool.ext;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import org.logicalcobwebs.proxool.ProxoolConstants;
+import org.logicalcobwebs.proxool.ProxoolFacade;
 
 import java.sql.SQLException;
 import java.util.Properties;
@@ -38,7 +40,7 @@ import java.util.Properties;
  * ignore everything apart from the contained within the &lt;proxool&gt;
  * element.</p>
  *
- * @version $Revision: 1.2 $, $Date: 2002/09/18 13:48:56 $
+ * @version $Revision: 1.1 $, $Date: 2002/09/19 08:53:41 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
