@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.2 $, $Date: 2003/08/27 18:58:11 $
+ * @version $Revision: 1.3 $, $Date: 2003/09/05 16:59:20 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -51,6 +51,48 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
             Statement s = c.createStatement();
             s.execute("drop table Z");
         } catch (SQLException e) {
+            assertTrue("Didn't expect a " + FatalSQLException.class.getName(), !(e instanceof FatalSQLException));
+            // Expected exception (foo doesn't exist)
+            LOG.debug("Expected exception (safe to ignore)", e);
+        }
+
+        try {
+            if (c != null) {
+                c.close();
+            }
+        } catch (SQLException e) {
+            LOG.debug("Couldn't close connection", e);
+        }
+
+        Thread.sleep(1000);
+
+        // Proxool should automatically throw away that connection that caused a fatal sql exception
+        assertEquals("availableConnectionCount", 0L, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
+
+    }
+
+    public void testWrappedFatalSqlException() throws Exception {
+
+        String testName = "wrappedFatalSqlException";
+        String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "Table not found");
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.WRAP_FATAL_SQL_EXCEPTIONS_PROPERTY, "true");
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        Connection c = null;
+        try {
+            c = DriverManager.getConnection(url);
+            Statement s = c.createStatement();
+            s.execute("drop table Z");
+        } catch (SQLException e) {
+            assertTrue("Expected a " + FatalSQLException.class.getName() + " but got a " + e.getClass().getName() + " instead", e instanceof FatalSQLException);
             // Expected exception (foo doesn't exist)
             LOG.debug("Expected exception (safe to ignore)", e);
         }
@@ -76,6 +118,9 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: FatalSqlExceptionTest.java,v $
+ Revision 1.3  2003/09/05 16:59:20  billhorsman
+ Tests for wrapped exceptions.
+
  Revision 1.2  2003/08/27 18:58:11  billhorsman
  Fixed up test
 
