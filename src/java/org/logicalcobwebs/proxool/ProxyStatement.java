@@ -18,7 +18,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.23 $, $Date: 2003/10/18 20:44:48 $
+ * @version $Revision: 1.24 $, $Date: 2003/10/19 09:50:33 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -81,7 +81,11 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
                 }
             }
         } catch (InvocationTargetException e) {
-            exception = e;
+            if (e.getTargetException() instanceof Exception) {
+                exception = (Exception) e.getTargetException();
+            } else {
+                exception = e;
+            }
             if (testException(e.getTargetException())) {
                 // This is really a fatal one
                 FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), e.getTargetException());
@@ -125,6 +129,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.24  2003/10/19 09:50:33  billhorsman
+ Drill down into InvocationTargetException during execution debug.
+
  Revision 1.23  2003/10/18 20:44:48  billhorsman
  Better SQL logging (embed parameter values within SQL call) and works properly with batched statements now.
 
