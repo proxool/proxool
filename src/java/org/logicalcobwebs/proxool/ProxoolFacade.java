@@ -29,7 +29,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.74 $, $Date: 2003/10/30 00:16:13 $
+ * @version $Revision: 1.75 $, $Date: 2004/02/12 12:54:49 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -354,7 +354,9 @@ public class ProxoolFacade {
      * @throws ProxoolException if we couldn't find the pool
      */
     public static boolean killConnecton(String alias, long id, boolean merciful) throws ProxoolException {
-        return ConnectionPoolManager.getInstance().getConnectionPool(alias).expireConnection(id, merciful);
+        // Let's be explicit about what we're doing here
+        boolean forceExpiry = !merciful;
+        return ConnectionPoolManager.getInstance().getConnectionPool(alias).expireConnection(id, forceExpiry);
     }
 
     /**
@@ -708,6 +710,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.75  2004/02/12 12:54:49  billhorsman
+ Fix merciful/forceExpiry confusion
+
  Revision 1.74  2003/10/30 00:16:13  billhorsman
  Throw a friendlier exception if you try and add a statistics listener to a pool with no statistics
 
