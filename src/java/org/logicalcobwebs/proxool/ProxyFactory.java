@@ -16,7 +16,7 @@ import java.lang.reflect.Proxy;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/09 15:56:52 $
+ * @version $Revision: 1.5 $, $Date: 2002/12/03 12:24:00 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -50,8 +50,8 @@ class ProxyFactory {
                 proxyConnection);
     }
 
-    protected static Object createProxyStatement(Statement delegate, ConnectionPool connectionPool, String sqlStatement) {
-        return Proxy.newProxyInstance(delegate.getClass().getClassLoader(), delegate.getClass().getInterfaces(), new ProxyStatement(delegate, connectionPool, sqlStatement));
+    protected static Object createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnection proxyConnection,  String sqlStatement) {
+        return Proxy.newProxyInstance(delegate.getClass().getClassLoader(), delegate.getClass().getInterfaces(), new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
     }
 
 
@@ -60,6 +60,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.5  2002/12/03 12:24:00  billhorsman
+ fixed fatal sql exception
+
  Revision 1.4  2002/11/09 15:56:52  billhorsman
  fix doc
 

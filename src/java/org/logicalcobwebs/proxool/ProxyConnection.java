@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.17 $, $Date: 2002/11/12 20:24:12 $
+ * @version $Revision: 1.18 $, $Date: 2002/12/03 12:24:00 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -104,7 +104,7 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
                 if (argCount > 0 && args[0] instanceof String) {
                     sqlStatement = (String) args[0];
                 }
-                result = ProxyFactory.createProxyStatement((Statement) result, connectionPool, sqlStatement);
+                result = ProxyFactory.createProxyStatement((Statement) result, connectionPool, this, sqlStatement);
             }
 
         } catch (InvocationTargetException e) {
@@ -382,6 +382,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.18  2002/12/03 12:24:00  billhorsman
+ fixed fatal sql exception
+
  Revision 1.17  2002/11/12 20:24:12  billhorsman
  checkstyle
 

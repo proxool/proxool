@@ -14,11 +14,12 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Vector;
+import java.lang.reflect.Proxy;
 
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.23 $, $Date: 2002/11/12 20:24:12 $
+ * @version $Revision: 1.24 $, $Date: 2002/12/03 12:24:00 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -378,16 +379,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     /** This means that there's something wrong the connection and it's probably best if no one uses it again. */
-    protected void throwConnection(Connection connection) {
+    protected void throwConnection(ProxyConnection proxyConnection) {
         try {
-            ProxyConnection proxyConnection = (ProxyConnection) connection;
-
-            if (proxyConnection.fromActiveToNull()) {
-                expireProxyConnection(proxyConnection, REQUEST_EXPIRY);
-            }
-        } catch (ClassCastException e) {
-            // This is probably due to getPoolableConnection returning a null.
-            log.error("Tried to throwConnection() a connection that wasn't a ProxyConnection");
+            expireConnectionAsSoonAsPossible(proxyConnection, true);
         } finally {
             calculateUpState();
         }
@@ -1076,6 +1070,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.24  2002/12/03 12:24:00  billhorsman
+ fixed fatal sql exception
+
  Revision 1.23  2002/11/12 20:24:12  billhorsman
  checkstyle
 

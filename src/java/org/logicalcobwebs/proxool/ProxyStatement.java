@@ -28,7 +28,7 @@ import java.util.TreeMap;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.9 $, $Date: 2002/11/13 18:22:04 $
+ * @version $Revision: 1.10 $, $Date: 2002/12/03 12:24:00 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -40,6 +40,8 @@ class ProxyStatement implements InvocationHandler {
 
     private ConnectionPool connectionPool;
 
+    private ProxyConnection proxyConnection;
+
     private Set resultSets = new HashSet();
 
     private static final String EXECUTE_FRAGMENT = "execute";
@@ -50,9 +52,10 @@ class ProxyStatement implements InvocationHandler {
 
     private String sqlStatement;
 
-    public ProxyStatement(Statement statement, ConnectionPool connectionPool, String sqlStatement) {
+    public ProxyStatement(Statement statement, ConnectionPool connectionPool, ProxyConnection proxyConnection, String sqlStatement) {
         this.statement = statement;
         this.connectionPool = connectionPool;
+        this.proxyConnection = proxyConnection;
         this.sqlStatement = sqlStatement;
     }
 
@@ -64,7 +67,7 @@ class ProxyStatement implements InvocationHandler {
                 // just junk it.
                 try {
                     statement.close();
-                    connectionPool.throwConnection(getConnection());
+                    connectionPool.throwConnection(proxyConnection);
                     LOG.warn("Connection has been thrown away because fatal exception was detected", e);
                 } catch (SQLException e2) {
                     LOG.error("Problem trying to throw away suspect connection", e2);
@@ -140,16 +143,16 @@ class ProxyStatement implements InvocationHandler {
             }
         } catch (InvocationTargetException e) {
             exception = e;
+            if (e.getTargetException() instanceof SQLException) {
+                testException((SQLException) e.getTargetException());
+            }
             throw e.getTargetException();
         } catch (Exception e) {
             exception = e;
             if (e instanceof SQLException) {
                 testException((SQLException) e);
-                throw e;
-            } else {
-                throw new RuntimeException("unexpected invocation exception: "
-                        + e.getMessage());
             }
+            throw e;
         } finally {
 
             // If we executed something then we should tell the listener.
@@ -202,6 +205,9 @@ class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.10  2002/12/03 12:24:00  billhorsman
+ fixed fatal sql exception
+
  Revision 1.9  2002/11/13 18:22:04  billhorsman
  fix for trace output
 
