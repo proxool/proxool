@@ -5,23 +5,24 @@
  */
 package org.logicalcobwebs.proxool.stats;
 
-import org.logicalcobwebs.proxool.FastArrayList;
-import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
-import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
+import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
+import org.logicalcobwebs.proxool.ProxoolException;
 
-import java.util.Calendar;
-import java.util.List;
 import java.util.Date;
-import java.util.TimerTask;
-import java.util.Timer;
-import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/30 17:20:19 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 00:28:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -30,92 +31,21 @@ public class Stats {
 
     private Log log;
 
-    private List statistics = new FastArrayList();
-
-    private static final int historySize = 1;
-
-    private Statistics currentStatistics;
-
-    private String alias;
-
-    private Calendar nextRollDate;
-
-    private DecimalFormat decimalFormat = new DecimalFormat("0.00");
-
-    private int period;
+    private Map statsRollers = new HashMap();
 
     /**
      * @param alias identifies the pool
-     * @param period the period in seconds between statistic samples
+     * @param definition see {@link ConnectionPoolDefinitionIF#getStatistics definition}
      */
-    public Stats(String alias, int period) {
-        this.alias = alias;
-        this.period = period;
+    public Stats(String alias, String definition) throws ProxoolException {
         log = LogFactory.getLog("org.logicalcobwebs.proxool.stats." + alias);
-        nextRollDate = Calendar.getInstance();
-        nextRollDate.clear(Calendar.SECOND);
-        nextRollDate.clear(Calendar.MILLISECOND);
-        nextRollDate.add(Calendar.SECOND, period);
 
-        currentStatistics = new Statistics(new Date());
-
-        // Automatically trigger roll if no activity
-        TimerTask tt = new TimerTask() {
-            public void run() {
-                rollSample();
-            }
-        };
-        Timer t = new Timer(true);
-        t.schedule(tt, 5000, 5000);
-    }
-
-    /**
-     * Identify the pool
-     * @return alias
-     */
-    public String getAlias() {
-        return alias;
-    }
-
-    private synchronized void rollSample() {
-        if (!isCurrent()) {
-            currentStatistics.setStopDate(nextRollDate.getTime());
-            statistics.add(currentStatistics);
-            currentStatistics = new Statistics(nextRollDate.getTime());
-            nextRollDate.add(Calendar.SECOND, period);
-            if (statistics.size() > historySize) {
-                statistics.remove(0);
-            }
-            logStats(getStatistics());
+        StringTokenizer st = new StringTokenizer(definition, ",");
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            statsRollers.put(token, new StatsRoller(alias, token));
         }
-    }
 
-    private void logStats(StatisticsIF sample) {
-
-        if (sample != null) {
-            StringBuffer out = new StringBuffer();
-
-            out.append("s:");
-            out.append(sample.getServedCount());
-            out.append(":");
-            out.append(decimalFormat.format(sample.getServedPerSecond()));
-
-            out.append("/s, r:");
-            out.append(sample.getRefusedCount());
-            out.append(":");
-            out.append(decimalFormat.format(sample.getRefusedPerSecond()));
-
-            out.append("/s, a:");
-            out.append(decimalFormat.format(sample.getAverageActiveTime()));
-            out.append("ms/");
-            out.append(decimalFormat.format(sample.getAverageActiveCount()));
-
-            log.info(out.toString());
-        }
-    }
-
-    private boolean isCurrent() {
-        return (System.currentTimeMillis() < nextRollDate.getTime().getTime());
     }
 
     /**
@@ -123,35 +53,47 @@ public class Stats {
      * @param activeTime how long the connection was active
      */
     public void connectionReturned(long activeTime) {
-        if (!isCurrent()) {
-            rollSample();
+        Iterator i = statsRollers.values().iterator();
+        while (i.hasNext()) {
+            StatsRoller statsRoller = (StatsRoller) i.next();
+            statsRoller.connectionReturned(activeTime);
         }
-        currentStatistics.connectionReturned(activeTime);
     }
 
     /**
      * Call this every time a connection is refused
      */
     public void connectionRefused() {
-        if (!isCurrent()) {
-            rollSample();
+        Iterator i = statsRollers.values().iterator();
+        while (i.hasNext()) {
+            StatsRoller statsRoller = (StatsRoller) i.next();
+            statsRoller.connectionRefused();
         }
-        currentStatistics.connectionRefused();
     }
 
     /**
-     * Returns the most recent sample that has completed its perion
+     * Returns the most recent sample that has completed its period
      * @return sample (or null if no statistics are complete yet)
      */
-    public StatisticsIF getStatistics() {
-        if (!isCurrent()) {
-            rollSample();
-        }
+    public StatisticsIF getStatistics(String token) {
         try {
-            return (StatisticsIF) statistics.get(statistics.size() - 1);
-        } catch (IndexOutOfBoundsException e) {
+            return ((StatsRoller)statsRollers.get(token)).getCompleteStatistics();
+        } catch (NullPointerException e) {
             return null;
         }
+    }
+
+    public StatisticsIF[] getStatistics() {
+        List statistics = new Vector();
+        Iterator i = statsRollers.values().iterator();
+        while (i.hasNext()) {
+            StatsRoller statsRoller = (StatsRoller) i.next();
+            StatisticsIF s = statsRoller.getCompleteStatistics();
+            if (s != null) {
+                statistics.add(s);
+            }
+        }
+        return (StatisticsIF[]) statistics.toArray(new StatisticsIF[statistics.size()]);
     }
 
     /**
@@ -180,6 +122,9 @@ public class Stats {
 /*
  Revision history:
  $Log: Stats.java,v $
+ Revision 1.2  2003/01/31 00:28:57  billhorsman
+ now handles multiple statistics
+
  Revision 1.1  2003/01/30 17:20:19  billhorsman
  fixes, improvements and doc
 
