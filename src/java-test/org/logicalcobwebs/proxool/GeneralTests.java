@@ -19,7 +19,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.3 $, $Date: 2002/09/18 13:48:56 $
+ * @version $Revision: 1.4 $, $Date: 2002/09/19 10:06:39 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -170,8 +170,9 @@ public class GeneralTests extends TestCase {
         ProxoolFacade.registerConnectionPool(prefix + alias + urlSuffix, info);
 
         final int load = 6;
-        final int count = 200;
+        final int count = 20;
         int goodHits = 0;
+        final int expectedGoodHits = 17;
 
         Connection[] connections = new Connection[count];
         for (int i = 0; i < count; i++) {
@@ -219,6 +220,7 @@ public class GeneralTests extends TestCase {
         LOG.info("Refused: " + cps.getConnectionsRefusedCount());
         assertEquals(count, cps.getConnectionsServedCount() + cps.getConnectionsRefusedCount());
         assertEquals(goodHits, cps.getConnectionsServedCount());
+        assertEquals(goodHits, expectedGoodHits);
     }
 
     private static Properties buildProperties() {
@@ -309,6 +311,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.4  2002/09/19 10:06:39  billhorsman
+ improved load test
+
  Revision 1.3  2002/09/18 13:48:56  billhorsman
  checkstyle and doc
 
