@@ -18,7 +18,7 @@ import tyrex.naming.MemoryContextFactory;
  *
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
- * @version $Revision: 1.3 $, $Date: 2004/03/15 02:46:09 $
+ * @version $Revision: 1.4 $, $Date: 2004/03/15 23:56:33 $
  * @since Proxool 0.9
  */
 public class DataSourceTest extends AbstractProxoolTest {
@@ -27,7 +27,7 @@ public class DataSourceTest extends AbstractProxoolTest {
     }
 
     /**
-     * Can we refer to the same pool by either the complete URL or the alias?
+     * Test the Proxool managed DataSource
      */
     public void testPreconfiguredDatasource() throws Exception {
         String alias = "managedDatasourceTest";
@@ -56,12 +56,46 @@ public class DataSourceTest extends AbstractProxoolTest {
         assertNotNull("Connection was null.", dataSource.getConnection());
         ProxoolFacade.removeConnectionPool(alias);
     }
+
+    /**
+     * Test the exernally manged DataSource.
+     */
+    public void testDatasource() throws Exception {
+        String alias = "datasourceTest";
+        String jndiName = "jdbc/J2EETestDB";
+
+        // pretend to be a J2EE server that instantites the data source
+        // populates its properties and binds it to JNDI
+        ProxoolDataSource dataSource = new ProxoolDataSource();
+        dataSource.setAlias(alias);
+        dataSource.setDriver(TestConstants.HYPERSONIC_DRIVER);
+        dataSource.setUrl(TestConstants.HYPERSONIC_TEST_URL);
+        dataSource.setUser(TestConstants.HYPERSONIC_USER);
+        dataSource.setPassword(TestConstants.HYPERSONIC_PASSWORD);
+
+        Hashtable env = new Hashtable();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, MemoryContextFactory.class.getName());
+        env.put(Context.URL_PKG_PREFIXES, "tyrex.naming");
+        env.put(Context.PROVIDER_URL, alias);
+        Context context = new InitialContext(env);
+        context.createSubcontext("jdbc");
+        context.bind(jndiName, dataSource);
+        // end J2EE server
+
+        // now... pretend to be a client.
+        DataSource clientDataSource = (DataSource) context.lookup(jndiName);
+        assertNotNull("Connection was null.", clientDataSource.getConnection());
+        ProxoolFacade.removeConnectionPool(alias);
+    }
 }
 
 
 /*
  Revision history:
  $Log: DataSourceTest.java,v $
+ Revision 1.4  2004/03/15 23:56:33  chr32
+ Added test for ProxoolDataSource.
+
  Revision 1.3  2004/03/15 02:46:09  chr32
  Added initial DataSourceTest.
 
