@@ -12,7 +12,7 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.25 $, $Date: 2004/03/15 02:46:09 $
+ * @version $Revision: 1.26 $, $Date: 2004/03/18 17:10:01 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
@@ -30,7 +30,7 @@ public class AllTests {
         suite.addTestSuite(ConnectionInfoTest.class);
         suite.addTestSuite(ConnectionListenerTest.class);
         suite.addTestSuite(ConnectionResetterTest.class);
-        suite.addTestSuite(DataSourceTest.class);
+        suite.addTestSuite(ProxoolDataSourceTest.class);
         suite.addTestSuite(DriverTest.class);
         suite.addTestSuite(ConnectionPoolTest.class);
         suite.addTestSuite(FatalSqlExceptionTest.class);
@@ -64,8 +64,11 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.26  2004/03/18 17:10:01  chr32
+ Renamed DataSourceTest -> ProxoolDataSourceTest. Added test for factory-configured mode.
+
  Revision 1.25  2004/03/15 02:46:09  chr32
- Added initial DataSourceTest.
+ Added initial ProxoolDataSourceTest.
 
  Revision 1.24  2003/11/04 13:23:18  billhorsman
  Added PropetyTest
@@ -80,7 +83,7 @@ public class AllTests {
  temporary removal of PerformanceTest
 
  Revision 1.20  2003/04/27 15:46:11  billhorsman
- moved DataSourceTest to sandbox
+ moved ProxoolDataSourceTest to sandbox
 
  Revision 1.19  2003/04/19 13:01:01  billhorsman
  improve tests
