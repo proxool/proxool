@@ -14,7 +14,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 /**
  * Run all tests
  *
- * @version $Revision: 1.2 $, $Date: 2002/10/27 12:03:33 $
+ * @version $Revision: 1.3 $, $Date: 2002/10/27 13:05:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -44,7 +44,7 @@ public class AllTests {
         return wrapper;
     }
 
-    public synchronized static void globalSetup() {
+    public static synchronized void globalSetup() {
         if (!initialised) {
             String log4jPath = System.getProperty("log4jPath");
             System.out.println(log4jPath);
@@ -53,7 +53,7 @@ public class AllTests {
         }
     }
 
-    public synchronized static void globalTeardown() {
+    public static synchronized void globalTeardown() {
     }
 
 }
@@ -61,6 +61,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.3  2002/10/27 13:05:02  billhorsman
+ checkstyle
+
  Revision 1.2  2002/10/27 12:03:33  billhorsman
  clear up of tests
 

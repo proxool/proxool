@@ -5,19 +5,18 @@
  */
 package org.logicalcobwebs.proxool;
 
+import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Connection;
 import java.sql.DriverPropertyInfo;
+import java.sql.SQLException;
 import java.util.Properties;
-import java.util.List;
 
 /**
  * This class acts as a virtual pool. When you ask it for a connection it
  * delegates to one of the designated real pools.
  *
- * @version $Revision: 1.1 $, $Date: 2002/10/27 12:05:39 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/27 13:05:01 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -26,7 +25,7 @@ public class VirtoolDriver implements Driver {
 
     private static final String VIRTOOL = "virtool";
 
-    String[] activePools;
+    private String[] activePools;
 
     private int nextPool;
 
@@ -75,6 +74,9 @@ public class VirtoolDriver implements Driver {
 /*
  Revision history:
  $Log: VirtoolDriver.java,v $
+ Revision 1.2  2002/10/27 13:05:01  billhorsman
+ checkstyle
+
  Revision 1.1  2002/10/27 12:05:39  billhorsman
  early, early draft
 

@@ -8,8 +8,6 @@ package org.logicalcobwebs.proxool;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolFacade;
 
 import java.sql.SQLException;
 import java.util.Properties;
@@ -40,7 +38,7 @@ import java.util.Properties;
  * ignore everything apart from the contained within the &lt;proxool&gt;
  * element.</p>
  *
- * @version $Revision: 1.4 $, $Date: 2002/10/27 12:00:16 $
+ * @version $Revision: 1.5 $, $Date: 2002/10/27 13:05:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */

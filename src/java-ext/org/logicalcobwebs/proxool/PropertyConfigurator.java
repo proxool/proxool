@@ -6,17 +6,16 @@
 */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Properties;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
-import java.sql.SQLException;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
@@ -39,7 +38,7 @@ import java.io.IOException;
  *<p>Note that there is nothing Proxool specific about this configurator. You can
  * configure any JDBC connection with it.</p>
  *
- * @version $Revision: 1.1 $, $Date: 2002/10/27 12:00:16 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/27 13:05:01 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -116,6 +115,9 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.2  2002/10/27 13:05:01  billhorsman
+ checkstyle
+
  Revision 1.1  2002/10/27 12:00:16  billhorsman
  moved classes from ext sub-package which is now obsolete - let's keep everything together in one place
 

@@ -10,8 +10,6 @@ import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.thread.ThreadSafe;
-import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.ProxoolConstants;
 
 import java.util.Properties;
 
@@ -198,7 +196,7 @@ import java.util.Properties;
  * &lt;/jdbc-manager&gt;
  * </pre>
  *
- * @version $Revision: 1.4 $, $Date: 2002/10/27 12:00:14 $
+ * @version $Revision: 1.5 $, $Date: 2002/10/27 13:05:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -302,6 +300,9 @@ public class AvalonConfigurator implements Configurable, ThreadSafe, Disposable 
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.5  2002/10/27 13:05:01  billhorsman
+ checkstyle
+
  Revision 1.4  2002/10/27 12:00:14  billhorsman
  moved classes from ext sub-package which is now obsolete - let's keep everything together in one place
 
