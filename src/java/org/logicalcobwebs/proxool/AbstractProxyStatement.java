@@ -19,7 +19,7 @@ import java.util.TreeMap;
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
- * @version $Revision: 1.13 $, $Date: 2003/10/18 20:44:48 $
+ * @version $Revision: 1.14 $, $Date: 2003/10/19 09:50:08 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -171,7 +171,7 @@ abstract class AbstractProxyStatement {
 
         // Log if configured to
         if (connectionPool.getLog().isDebugEnabled() && connectionPool.getDefinition().isTrace()) {
-            connectionPool.getLog().debug(sqlLog.toString() + " (" + (System.currentTimeMillis() - startTime) + " milliseconds" + (exception != null ? ", threw " + exception.getMessage() + ")" : ")"));
+            connectionPool.getLog().debug(sqlLog.toString() + " (" + (System.currentTimeMillis() - startTime) + " milliseconds" + (exception != null ? ", threw a " + exception.getClass().getName()  + ": " + exception.getMessage() + ")" : ")"));
         }
 
         // Send to any listener
@@ -236,6 +236,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.14  2003/10/19 09:50:08  billhorsman
+ Debug exception displays class name.
+
  Revision 1.13  2003/10/18 20:44:48  billhorsman
  Better SQL logging (embed parameter values within SQL call) and works properly with batched statements now.
 
