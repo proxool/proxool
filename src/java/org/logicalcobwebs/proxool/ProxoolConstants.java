@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.3 $, $Date: 2002/10/27 13:29:38 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/09 15:50:49 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -80,6 +80,9 @@ interface ProxoolConstants {
     public final String VERBOSE_PROPERTY = PROPERTY_PREFIX + "verbose";
 
     /** @see ProxoolDriver#getPropertyInfo */
+    public final String TRACE_PROPERTY = PROPERTY_PREFIX + "trace";
+
+    /** @see ProxoolDriver#getPropertyInfo */
     public final String FATAL_SQL_EXCEPTION_PROPERTY = PROPERTY_PREFIX + "fatal-sql-exception";
 
     /** @see ProxoolDriver#getPropertyInfo */
@@ -99,6 +102,9 @@ interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.4  2002/11/09 15:50:49  billhorsman
+ new trace constant
+
  Revision 1.3  2002/10/27 13:29:38  billhorsman
  deprecated debug-level in favour of verbose
 
