@@ -16,7 +16,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.16 $, $Date: 2003/09/07 22:10:17 $
+ * @version $Revision: 1.17 $, $Date: 2003/09/30 18:58:29 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -50,7 +50,7 @@ public class GlobalTest {
     }
 
     public static synchronized void globalTeardown(String alias) {
-        ProxoolFacade.shutdown(alias + ":teardown", 5000);
+        ProxoolFacade.shutdown(alias + ":teardown", 10000);
     }
 
     /**
@@ -84,6 +84,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.17  2003/09/30 18:58:29  billhorsman
+ Increase shutdown grace time to 10 seconds to make tests more robust.
+
  Revision 1.16  2003/09/07 22:10:17  billhorsman
  Default behaviour of test classes, if Log4J is not configured, is now DEBUG output to console.
 
