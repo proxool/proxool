@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.78 $, $Date: 2004/03/23 21:25:54 $
+ * @version $Revision: 1.79 $, $Date: 2004/03/26 15:58:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -219,6 +219,10 @@ public class ProxoolFacade {
                 LOG.debug("Unanticipated error during removal of ShutdownHook. Ignoring it.", t);
             }
         }
+
+        // Stop threads
+        PrototyperController.shutdown();
+        HouseKeeperController.shutdown();
 
     }
 
@@ -786,6 +790,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.79  2004/03/26 15:58:56  billhorsman
+ Fixes to ensure that house keeper and prototyper threads finish after shutdown.
+
  Revision 1.78  2004/03/23 21:25:54  billhorsman
  Added getAlias() call.
 

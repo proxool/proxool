@@ -8,25 +8,35 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
+import java.util.Iterator;
+
 /**
  * Controls the {@link Prototyper prototypers}
- * @version $Revision: 1.7 $, $Date: 2004/03/25 22:02:15 $
+ * @version $Revision: 1.8 $, $Date: 2004/03/26 15:58:56 $
  * @author bill
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class PrototyperController {
 
     private static final Log LOG = LogFactory.getLog(PrototyperController.class);
 
-    private static PrototyperThread prototyperThread = new PrototyperThread("Prototyper");
-
-    static {
-        prototyperThread.start();
-    }
+    private static PrototyperThread prototyperThread;
 
     private static boolean keepSweeping;
 
+    private static final String LOCK = "LOCK";
+
+    private static void startPrototyper() {
+        if (prototyperThread == null) {
+            synchronized(LOCK) {
+                if (prototyperThread == null) {
+                    prototyperThread = new PrototyperThread("Prototyper");
+                    prototyperThread.start();
+                }
+            }
+        }
+    }
     /**
      * Trigger prototyping immediately. Runs inside a new Thread so
      * control returns as quick as possible. You should call this whenever
@@ -50,6 +60,7 @@ public class PrototyperController {
                 LOG.debug("Couldn't trigger prototyper triggerSweep for '" + alias + "'  - maybe it's just been shutdown");
             }
         }
+        startPrototyper();
         try {
             // If we are currently sweeping this will cause it to loop through
             // once more
@@ -70,58 +81,6 @@ public class PrototyperController {
         }
     }
 
-//    /**
-//     * Build a new connection
-//     * @param alias identifies the pool
-//     * @param state the initial state it will be created as (this allows us
-//     * to create it as {@link ConnectionInfoIF#STATUS_ACTIVE ACTIVE} and avoid
-//     * another thread grabbing it before we can)
-//     * @param creator for log audit
-//     * @return the new connection
-//     * @throws SQLException if there was a problem building the connection
-//     * @throws ProxoolException if the alias doesn't exist
-//     */
-//TODO not needed anymore - the ConnectionPool makes direct use of the Prototyper it has been assigned
-//    protected static ProxyConnectionIF buildConnection(String alias, int state, String creator) throws SQLException, ProxoolException {
-//        return getConnectionPool(alias).getPrototyper().buildConnection(state, creator);
-//    }
-
-//    private static ConnectionPool getConnectionPool(String alias) throws ProxoolException {
-//        return ConnectionPoolManager.getInstance().getConnectionPool(alias);
-//    }
-
-//    /**
-//     * Checks whether we are currently already building too many connections
-//     * @param alias identifies the pool
-//     * @throws SQLException if the throttle has been reached
-//     */
-//TODO not needed anymore - the ConnectionPool makes direct use of the Prototyper it has been assigned
-//    protected static void checkSimultaneousBuildThrottle(String alias) throws SQLException, ProxoolException {
-//        getConnectionPool(alias).getPrototyper().checkSimultaneousBuildThrottle();
-//    }
-
-//    /**
-//     * Cancel this prototyper and stop all prototyping immediately.
-//     * @param alias identifies the pool
-//     */
-//TODO not needed anymore - the ConnectionPool makes direct use of the Prototyper it has been assigned
-//    public static void cancel(String alias)  {
-//        try {
-//            getConnectionPool(alias).getPrototyper().cancel();
-//        } catch (ProxoolException e) {
-//            LOG.error("Couldn't cancel prototyper", e);
-//        }
-//    }
-
-//TODO not needed anymore - the ConnectionPool makes direct use of the Prototyper it has been assigned
-//    protected static void connectionRemoved(String alias) {
-//        try {
-//            getConnectionPool(alias).getPrototyper().connectionRemoved();
-//        } catch (ProxoolException e) {
-//            LOG.debug("Ignoring connection removed from cancelled prototyper");
-//        }
-//    }
-
     public static boolean isKeepSweeping() {
         return keepSweeping;
     }
@@ -130,12 +89,27 @@ public class PrototyperController {
         keepSweeping = false;
     }
 
+    /**
+     * Stop all house keeper threads
+     */
+    protected static void shutdown() {
+        synchronized(LOCK) {
+            if (prototyperThread != null) {
+                LOG.info("Stopping " + prototyperThread.getName() + " thread");
+                prototyperThread.cancel();
+                prototyperThread = null;
+            }
+        }
+    }
 }
 
 
 /*
  Revision history:
  $Log: PrototyperController.java,v $
+ Revision 1.8  2004/03/26 15:58:56  billhorsman
+ Fixes to ensure that house keeper and prototyper threads finish after shutdown.
+
  Revision 1.7  2004/03/25 22:02:15  brenuart
  First step towards pluggable ConnectionBuilderIF & ConnectionValidatorIF.
  Include some minor refactoring that lead to deprecation of some PrototyperController methods.

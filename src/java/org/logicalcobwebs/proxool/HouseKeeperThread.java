@@ -11,7 +11,7 @@ import org.logicalcobwebs.logging.LogFactory;
 /**
  * Responsible for running {@link HouseKeeper#sweep sweep}
  *
- * @version $Revision: 1.3 $, $Date: 2003/04/19 12:57:29 $
+ * @version $Revision: 1.4 $, $Date: 2004/03/26 15:58:56 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -31,7 +31,7 @@ public class HouseKeeperThread extends Thread {
 
         while (!stop) {
             HouseKeeper hk = HouseKeeperController.getHouseKeeperToRun();
-            while (hk != null) {
+            while (hk != null && !stop) {
                 try {
 //                    if (LOG.isDebugEnabled()) {
 //                        LOG.debug("About to sweep " + hk.getAlias());
@@ -61,6 +61,9 @@ public class HouseKeeperThread extends Thread {
 /*
  Revision history:
  $Log: HouseKeeperThread.java,v $
+ Revision 1.4  2004/03/26 15:58:56  billhorsman
+ Fixes to ensure that house keeper and prototyper threads finish after shutdown.
+
  Revision 1.3  2003/04/19 12:57:29  billhorsman
  removed redundant debug
 

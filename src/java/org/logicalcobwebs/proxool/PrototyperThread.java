@@ -11,7 +11,7 @@ import org.logicalcobwebs.logging.LogFactory;
 /**
  * Responsible for running {@link Prototyper#sweep sweep}. There
  * could be just one of the objects, or more.
- * @version $Revision: 1.4 $, $Date: 2003/04/10 08:23:55 $
+ * @version $Revision: 1.5 $, $Date: 2004/03/26 15:58:56 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -22,6 +22,8 @@ public class PrototyperThread extends Thread {
 
     private static final Log LOG = LogFactory.getLog(PrototyperThread.class);
 
+    private boolean stop;
+
     public PrototyperThread(String name) {
         super(PROTOTYPER_THREAD_GROUP, name);
         setDaemon(true);
@@ -29,12 +31,12 @@ public class PrototyperThread extends Thread {
 
     public void run() {
 
-        while (true) {
+        while (!stop) {
             int sweptCount = 0;
-            while (PrototyperController.isKeepSweeping()) {
+            while (PrototyperController.isKeepSweeping() && !stop) {
                 PrototyperController.sweepStarted();
                 ConnectionPool[] cps = ConnectionPoolManager.getInstance().getConnectionPools();
-                for (int i = 0; i < cps.length; i++) {
+                for (int i = 0; i < cps.length && !stop; i++) {
                     Prototyper p = cps[i].getPrototyper();
                     try {
                         cps[i].acquirePrimaryReadLock();
@@ -57,6 +59,11 @@ public class PrototyperThread extends Thread {
         }
     }
 
+    protected void cancel() {
+        stop = true;
+        doNotify();
+    }
+
     private synchronized void doWait() {
         try {
             wait();
@@ -66,7 +73,7 @@ public class PrototyperThread extends Thread {
     }
 
     protected synchronized void doNotify() {
-        notify();
+        notifyAll();
     }
 
 }
@@ -75,6 +82,9 @@ public class PrototyperThread extends Thread {
 /*
  Revision history:
  $Log: PrototyperThread.java,v $
+ Revision 1.5  2004/03/26 15:58:56  billhorsman
+ Fixes to ensure that house keeper and prototyper threads finish after shutdown.
+
  Revision 1.4  2003/04/10 08:23:55  billhorsman
  removed very frequent debug
 

@@ -12,10 +12,11 @@ import org.logicalcobwebs.proxool.util.FastArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * Schedules when to run the house keeper
- * @version $Revision: 1.3 $, $Date: 2003/03/10 23:43:10 $
+ * @version $Revision: 1.4 $, $Date: 2004/03/26 15:58:56 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -93,6 +94,28 @@ public class HouseKeeperController {
         }
     }
 
+    /**
+     * Stop all house keeper threads.
+     */
+    protected static void shutdown() {
+        synchronized(LOCK) {
+            Iterator i = houseKeeperThreads.iterator();
+            while (i.hasNext()) {
+                HouseKeeperThread hkt = (HouseKeeperThread) i.next();
+                LOG.info("Stopping " + hkt.getName() + " thread");
+                hkt.cancel();
+            }
+            houseKeeperThreads.clear();
+        }
+    }
+
+    /**
+     * cancel a house keeper for a pool. This doens't stop the house keeper
+     * thread.
+     * @param alias identifies the pool
+     * @throws ProxoolException if we couldn't find the house keeper (if it had
+     * already been cancelled for instance).
+     */
     protected static void cancel(String alias) throws ProxoolException {
         HouseKeeper hk = getHouseKeeper(alias);
         houseKeepers.remove(alias);
@@ -105,6 +128,9 @@ public class HouseKeeperController {
 /*
  Revision history:
  $Log: HouseKeeperController.java,v $
+ Revision 1.4  2004/03/26 15:58:56  billhorsman
+ Fixes to ensure that house keeper and prototyper threads finish after shutdown.
+
  Revision 1.3  2003/03/10 23:43:10  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...
