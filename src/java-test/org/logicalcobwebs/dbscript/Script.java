@@ -6,8 +6,8 @@
 */
 package org.logicalcobwebs.dbscript;
 
-import java.util.Properties;
 import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 
 /**
@@ -15,7 +15,7 @@ import java.util.Vector;
  *
  * TODO
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/02 11:29:53 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/02 13:57:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -37,7 +37,7 @@ class Script {
     }
 
     protected Command[] getCommands() {
-        return (Command[])commands.toArray(new Command[commands.size()]);
+        return (Command[]) commands.toArray(new Command[commands.size()]);
     }
 
     protected String getName() {
@@ -77,6 +77,9 @@ class Script {
 /*
  Revision history:
  $Log: Script.java,v $
+ Revision 1.2  2002/11/02 13:57:34  billhorsman
+ checkstyle
+
  Revision 1.1  2002/11/02 11:29:53  billhorsman
  new script runner for testing
 

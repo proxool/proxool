@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.11 $, $Date: 2002/10/29 23:17:38 $
+ * @version $Revision: 1.12 $, $Date: 2002/11/02 13:57:34 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -25,7 +25,7 @@ public class GeneralTests extends TestCase {
 
     private static final Log LOG = LogFactory.getLog(GeneralTests.class);
 
-    private String TEST_TABLE = "test";
+    private static final String TEST_TABLE = "test";
 
     public GeneralTests(String name) {
         super(name);
@@ -294,6 +294,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.12  2002/11/02 13:57:34  billhorsman
+ checkstyle
+
  Revision 1.11  2002/10/29 23:17:38  billhorsman
  Cleaned up SQL stuff
 

@@ -25,7 +25,7 @@ import java.sql.SQLException;
  *
  * TODO
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/02 11:29:53 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/02 13:57:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -36,7 +36,7 @@ public class ScriptFacade {
 
     public static void runScript(String scriptLocation, ConnectionAdapterIF adapter) {
 
-        File scriptFile=new File(scriptLocation);
+        File scriptFile = new File(scriptLocation);
         if (!scriptFile.canRead()) {
             throw new RuntimeException("Can't read from file at " + scriptFile.getAbsolutePath());
         }
@@ -68,7 +68,7 @@ public class ScriptFacade {
             saxParser.parse(scriptFile, scriptBuilder);
             Script script = scriptBuilder.getScript();
 
-            ScriptRunner.runScript(script,  adapter);
+            ScriptRunner.runScript(script, adapter);
 
         } catch (FactoryConfigurationError factoryConfigurationError) {
             LOG.error(factoryConfigurationError);
@@ -89,6 +89,9 @@ public class ScriptFacade {
 /*
  Revision history:
  $Log: ScriptFacade.java,v $
+ Revision 1.2  2002/11/02 13:57:34  billhorsman
+ checkstyle
+
  Revision 1.1  2002/11/02 11:29:53  billhorsman
  new script runner for testing
 

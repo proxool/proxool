@@ -24,7 +24,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.10 $, $Date: 2002/10/29 08:54:45 $
+ * @version $Revision: 1.11 $, $Date: 2002/11/02 13:57:33 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -75,15 +75,15 @@ public class ProxoolFacade {
      */
     private static String getAlias(String url) throws SQLException {
         String name = url;
-        final String PREFIX = ProxoolConstants.PROXOOL + ProxoolConstants.ALIAS_DELIMITER;
+        final String prefix = ProxoolConstants.PROXOOL + ProxoolConstants.ALIAS_DELIMITER;
         try {
             int endOfPrefix = url.indexOf(':');
 
-            if (endOfPrefix > PREFIX.length()) {
-                name = url.substring(PREFIX.length(), endOfPrefix);
+            if (endOfPrefix > prefix.length()) {
+                name = url.substring(prefix.length(), endOfPrefix);
             } else if (endOfPrefix == -1) {
-                if (url.startsWith(PREFIX)) {
-                    name = url.substring(PREFIX.length());
+                if (url.startsWith(prefix)) {
+                    name = url.substring(prefix.length());
                 }
             }
 
@@ -420,6 +420,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.11  2002/11/02 13:57:33  billhorsman
+ checkstyle
+
  Revision 1.10  2002/10/29 08:54:45  billhorsman
  fix to getAlias so that it correctly extracts alias from "proxool.alias" form
 

@@ -6,19 +6,18 @@
 */
 package org.logicalcobwebs.dbscript;
 
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.dbscript.Script;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
  *
  * Parser to get {@link org.logicalcobwebs.dbscript.Script} from XML source
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/02 11:29:53 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/02 13:57:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -73,6 +72,9 @@ class ScriptBuilder extends DefaultHandler {
 /*
  Revision history:
  $Log: ScriptBuilder.java,v $
+ Revision 1.2  2002/11/02 13:57:34  billhorsman
+ checkstyle
+
  Revision 1.1  2002/11/02 11:29:53  billhorsman
  new script runner for testing
 

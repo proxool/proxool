@@ -15,14 +15,13 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Properties;
 
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
  *
  * TODO
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/02 11:37:48 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/02 13:57:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -58,6 +57,9 @@ public class PerformanceTest extends TestCase {
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.3  2002/11/02 13:57:34  billhorsman
+ checkstyle
+
  Revision 1.2  2002/11/02 11:37:48  billhorsman
  New tests
 

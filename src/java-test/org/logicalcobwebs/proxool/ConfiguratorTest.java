@@ -15,14 +15,14 @@ import java.sql.SQLException;
  *
  * Tests that the various ways of configuring proxool work.
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/02 11:37:48 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/02 13:57:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class ConfiguratorTest extends TestCase {
 
-    private String TEST_TABLE = "test";
+    private static final String TEST_TABLE = "test";
 
     /**
      * @see TestCase#TestCase
@@ -73,6 +73,9 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.2  2002/11/02 13:57:34  billhorsman
+ checkstyle
+
  Revision 1.1  2002/11/02 11:37:48  billhorsman
  New tests
 

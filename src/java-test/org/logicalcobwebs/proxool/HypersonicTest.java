@@ -7,21 +7,18 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSet;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
  *
  * TODO
  *
- * @version $Revision: 1.1 $, $Date: 2002/10/29 23:18:30 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/02 13:57:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -30,7 +27,7 @@ public class HypersonicTest extends TestCase {
 
     private static final Log LOG = LogFactory.getLog(HypersonicTest.class);
 
-    private String TEST_TABLE = "test";
+    private static final String TEST_TABLE = "test";
 
     public HypersonicTest(String s) {
         super(s);
@@ -63,6 +60,9 @@ public class HypersonicTest extends TestCase {
 /*
  Revision history:
  $Log: HypersonicTest.java,v $
+ Revision 1.2  2002/11/02 13:57:34  billhorsman
+ checkstyle
+
  Revision 1.1  2002/10/29 23:18:30  billhorsman
  Tests that hypersonic db works ok
 

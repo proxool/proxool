@@ -18,7 +18,7 @@ import java.sql.Statement;
  *
  * TODO
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/02 12:45:54 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/02 13:57:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -71,9 +71,9 @@ class ScriptRunner {
 
             long elapsed = System.currentTimeMillis() - start;
             int count = command.getLoad() * command.getLoops();
-            double lap = (double)elapsed / (double)count;
+            double lap = (double) elapsed / (double) count;
             if (count > 1) {
-                LOG.info(adapter.getName()+ ":" + command.getName() + " ran " + count + " commands in " + elapsed + " milliseconds (avg." + lap + ")");
+                LOG.info(adapter.getName() + ":" + command.getName() + " ran " + count + " commands in " + elapsed + " milliseconds (avg." + lap + ")");
             } else {
                 LOG.debug(adapter.getName() + ":" + command.getName() + " ran in " + elapsed + " milliseconds");
             }
@@ -104,6 +104,9 @@ class ScriptRunner {
 /*
  Revision history:
  $Log: ScriptRunner.java,v $
+ Revision 1.3  2002/11/02 13:57:34  billhorsman
+ checkstyle
+
  Revision 1.2  2002/11/02 12:45:54  billhorsman
  improved debug
 

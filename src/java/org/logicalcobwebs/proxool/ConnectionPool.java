@@ -8,7 +8,6 @@ package org.logicalcobwebs.proxool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.14 $, $Date: 2002/10/30 21:19:17 $
+ * @version $Revision: 1.15 $, $Date: 2002/11/02 13:57:33 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -1043,6 +1042,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.15  2002/11/02 13:57:33  billhorsman
+ checkstyle
+
  Revision 1.14  2002/10/30 21:19:17  billhorsman
  make use of ProxyFactory
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration>
+
+    <appender name="chainsaw" class="org.apache.log4j.net.SocketAppender">
+        <param name="remoteHost" value="localhost"/>
+        <param name="port" value="4445"/>
+        <param name="locationInfo" value="true"/>
+    </appender>
+
+    <root>
+        <priority value="DEBUG"/>
+        <appender-ref ref="chainsaw"/>
+    </root>
+
+</log4j:configuration>
