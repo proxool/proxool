@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.4 $, $Date: 2002/10/17 15:29:18 $
+ * @version $Revision: 1.5 $, $Date: 2002/10/24 18:15:09 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -52,10 +52,6 @@ public class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 
         ConnectionPool connectionPool = ConnectionPoolManager.getInstance().getConnectionPool(connectionPoolDefinition.getName());
         Connection connection = null;
-
-        if (connectionPoolDefinition.getDebugLevel() > ConnectionPoolDefinitionIF.DEBUG_LEVEL_QUIET) {
-            connectionPool.getLog().debug("Initialising connection #" + id + " using " + connectionPoolDefinition.getUrl());
-        }
 
         connection = DriverManager.getConnection(connectionPoolDefinition.getUrl(), connectionPoolDefinition.getProperties());
 
@@ -347,6 +343,9 @@ public class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.5  2002/10/24 18:15:09  billhorsman
+ removed unnecessary debug
+
  Revision 1.4  2002/10/17 15:29:18  billhorsman
  fixes so that equals() works
 
