@@ -8,17 +8,13 @@ package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
 
-import java.lang.reflect.Proxy;
 import java.lang.reflect.InvocationHandler;
-
-import org.logicalcobwebs.proxool.Delegate;
-import org.logicalcobwebs.proxool.DelegateIF;
-import org.logicalcobwebs.proxool.DelegateProxy;
+import java.lang.reflect.Proxy;
 
 /**
  * TODO 24-Aug-2002;bill;high; Add doc
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since TODO 24-Aug-2002;bill;high;complete
@@ -32,7 +28,7 @@ public class TestProxy extends TestCase {
     public void testProxy() {
 
         InvocationHandler ih = new DelegateProxy("Test", "Gest");
-        DelegateIF delegate = (DelegateIF) Proxy.newProxyInstance(DelegateIF.class.getClassLoader(), new Class[] {DelegateIF.class}, ih);
+        DelegateIF delegate = (DelegateIF) Proxy.newProxyInstance(DelegateIF.class.getClassLoader(), new Class[]{DelegateIF.class}, ih);
 
         WrapperIF wrapper = (WrapperIF) Proxy.getInvocationHandler(delegate);
 
@@ -44,27 +40,27 @@ public class TestProxy extends TestCase {
 
     public void testDirectPerformance() {
 
-        double start = (double)System.currentTimeMillis();
+        double start = (double) System.currentTimeMillis();
         for (int i = 0; i < max; i++) {
             DelegateIF delegate = new Delegate("direct");
             delegate.getFoo();
             delegate.getFoo();
         }
-        double elapsed = (double)System.currentTimeMillis() - start;
+        double elapsed = (double) System.currentTimeMillis() - start;
         System.out.println("Direct = " + (elapsed / max) + " milliseconds.");
 
     }
 
     public void testProxyPerformance() {
 
-        double start = (double)System.currentTimeMillis();
+        double start = (double) System.currentTimeMillis();
         for (int i = 0; i < max; i++) {
             InvocationHandler ih = new DelegateProxy("Test", "Gest");
-            DelegateIF delegate = (DelegateIF) Proxy.newProxyInstance(DelegateIF.class.getClassLoader(), new Class[] {DelegateIF.class}, ih);
+            DelegateIF delegate = (DelegateIF) Proxy.newProxyInstance(DelegateIF.class.getClassLoader(), new Class[]{DelegateIF.class}, ih);
             delegate.getFoo();
             delegate.getFoo();
         }
-        double elapsed = (double)System.currentTimeMillis() - start;
+        double elapsed = (double) System.currentTimeMillis() - start;
         System.out.println("Proxy = " + (elapsed / max) + " milliseconds.");
 
     }
@@ -75,7 +71,10 @@ public class TestProxy extends TestCase {
 /*
  Revision history:
  $Log: TestProxy.java,v $
- Revision 1.1  2002/09/13 08:14:24  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:48:56  billhorsman
+ checkstyle and doc
+
+ Revision 1.1.1.1  2002/09/13 08:14:24  billhorsman
+ new
 
 */

@@ -6,23 +6,13 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
-import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
-import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolFacade;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
 
 /**
  * Check to see if there is any overhead in using Proxy class
  *
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:14:24 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/18 13:48:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -46,8 +36,11 @@ public class ProxyPerformance extends TestCase {
 /*
  Revision history:
  $Log: ProxyPerformance.java,v $
- Revision 1.1  2002/09/13 08:14:24  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:48:56  billhorsman
+ checkstyle and doc
+
+ Revision 1.1.1.1  2002/09/13 08:14:24  billhorsman
+ new
 
 
 */

@@ -18,31 +18,13 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:13:30 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/18 13:48:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public class ProxyConnection implements InvocationHandler {
+public class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 
     private Connection connection;
-
-    /** This is the start and end state of every connection */
-    protected static final int STATUS_NULL = 0;
-
-    /** The connection is available for use */
-    protected static final int STATUS_AVAILABLE = 1;
-
-    /** The connection is in use */
-    protected static final int STATUS_ACTIVE = 2;
-
-    /** The connection is in use by the house keeping thread */
-    protected static final int STATUS_OFFLINE = 3;
-
-    /** Default - treat as normal */
-    protected static final int MARK_FOR_USE = 0;
-
-    /** The next time this connection is made available expire it. */
-    protected static final int MARK_FOR_EXPIRY = 1;
 
     private int mark;
 
@@ -179,39 +161,66 @@ public class ProxyConnection implements InvocationHandler {
         this.id = id;
     }
 
+    /**
+     * @see ConnectionInfoIF#getBirthTime
+     */
     public long getBirthTime() {
         return birthTime;
     }
 
+    /**
+     * @see ConnectionInfoIF#getAge
+     */
     public long getAge() {
         return System.currentTimeMillis() - getBirthTime();
     }
 
+    /**
+     * @see ConnectionInfoIF#getBirthTime
+     */
     public void setBirthTime(long birthTime) {
         this.birthTime = birthTime;
     }
 
+    /**
+     * @see ConnectionInfoIF#getTimeLastStartActive
+     */
     public long getTimeLastStartActive() {
         return timeLastStartActive;
     }
 
+    /**
+     * @see ConnectionInfoIF#getTimeLastStartActive
+     */
     public void setTimeLastStartActive(long timeLastStartActive) {
         this.timeLastStartActive = timeLastStartActive;
         setTimeLastStopActive(0);
     }
 
+    /**
+     * @see ConnectionInfoIF#getTimeLastStopActive
+     */
     public long getTimeLastStopActive() {
         return timeLastStopActive;
     }
 
+    /**
+     * @see ConnectionInfoIF#getTimeLastStopActive
+     */
     public void setTimeLastStopActive(long timeLastStopActive) {
         this.timeLastStopActive = timeLastStopActive;
     }
 
+    /**
+     * @see ConnectionInfoIF#getRequester
+     */
     public String getRequester() {
         return requester;
     }
 
+    /**
+     * @see ConnectionInfoIF#getRequester
+     */
     public void setRequester(String requester) {
         this.requester = requester;
     }
@@ -321,7 +330,7 @@ public class ProxyConnection implements InvocationHandler {
         return getMark() == MARK_FOR_EXPIRY;
     }
 
-    public Connection getConnection() {
+    protected Connection getConnection() {
         return connection;
     }
 }
@@ -329,8 +338,11 @@ public class ProxyConnection implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
- Revision 1.1  2002/09/13 08:13:30  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:48:56  billhorsman
+ checkstyle and doc
+
+ Revision 1.1.1.1  2002/09/13 08:13:30  billhorsman
+ new
 
  Revision 1.10  2002/08/24 19:57:15  billhorsman
  checkstyle changes

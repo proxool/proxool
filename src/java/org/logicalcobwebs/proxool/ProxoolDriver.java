@@ -14,7 +14,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:13:09 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/18 13:48:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -26,9 +26,6 @@ public class ProxoolDriver implements Driver {
         } catch (SQLException e) {
             System.out.println(e.toString());
         }
-    }
-
-    public ProxoolDriver() {
     }
 
     /**
@@ -70,10 +67,16 @@ public class ProxoolDriver implements Driver {
         return connection;
     }
 
+    /**
+     * @see Driver#acceptsURL
+     */
     public boolean acceptsURL(String url) throws SQLException {
         return (url.startsWith("proxool:"));
     }
 
+    /**
+     * @see Driver#getPropertyInfo
+     */
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
             throws SQLException {
 
@@ -131,18 +134,30 @@ public class ProxoolDriver implements Driver {
         return dpi;
     }
 
+    /**
+     * @see Driver#getMajorVersion
+     */
     public int getMajorVersion() {
         return 1;
     }
 
+    /**
+     * @see Driver#getMinorVersion
+     */
     public int getMinorVersion() {
         return 0;
     }
 
+    /**
+     * @see Driver#jdbcCompliant
+     */
     public boolean jdbcCompliant() {
         return true;
     }
 
+    /**
+     * @see Object#finalize
+     */
     protected void finalize() throws Throwable {
         super.finalize();
 
@@ -155,8 +170,11 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
- Revision 1.1  2002/09/13 08:13:09  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:48:56  billhorsman
+ checkstyle and doc
+
+ Revision 1.1.1.1  2002/09/13 08:13:09  billhorsman
+ new
 
  Revision 1.13  2002/07/10 16:14:47  billhorsman
  widespread layout changes and move constants into ProxoolConstants

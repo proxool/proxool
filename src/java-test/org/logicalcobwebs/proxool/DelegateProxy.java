@@ -6,17 +6,13 @@
 */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.proxool.Delegate;
-import org.logicalcobwebs.proxool.DelegateIF;
-
-import java.lang.reflect.Proxy;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
  * TODO 24-Aug-2002;bill;high; Add doc
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since TODO 24-Aug-2002;bill;high;complete
@@ -38,7 +34,7 @@ public class DelegateProxy implements InvocationHandler, WrapperIF {
         //if (method.getName().equals("getGoo")) {
         //    return goo;
         //} else {
-            return method.invoke(delegate, args);
+        return method.invoke(delegate, args);
         //'}
     }
 
@@ -62,7 +58,10 @@ public class DelegateProxy implements InvocationHandler, WrapperIF {
 /*
  Revision history:
  $Log: DelegateProxy.java,v $
- Revision 1.1  2002/09/13 08:14:19  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:48:56  billhorsman
+ checkstyle and doc
+
+ Revision 1.1.1.1  2002/09/13 08:14:19  billhorsman
+ new
 
 */

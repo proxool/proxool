@@ -10,9 +10,6 @@ import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.thread.ThreadSafe;
-import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolFacade;
 
 import java.util.Properties;
 
@@ -189,7 +186,7 @@ import java.util.Properties;
  * &lt;/jdbc-manager&gt;
  * </pre>
  *
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:14:16 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/18 13:48:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -293,8 +290,11 @@ public class AvalonConfigurator implements Configurable, ThreadSafe, Disposable 
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
- Revision 1.1  2002/09/13 08:14:16  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:48:56  billhorsman
+ checkstyle and doc
+
+ Revision 1.1.1.1  2002/09/13 08:14:16  billhorsman
+ new
 
  Revision 1.5  2002/08/24 19:57:15  billhorsman
  checkstyle changes

@@ -5,8 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -40,7 +38,7 @@ import java.util.Properties;
  * ignore everything apart from the contained within the &lt;proxool&gt;
  * element.</p>
  *
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:14:18 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/18 13:48:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */

@@ -6,13 +6,9 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
-import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
-import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.xml.DOMConfigurator;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,7 +19,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.2 $, $Date: 2002/09/17 22:44:19 $
+ * @version $Revision: 1.3 $, $Date: 2002/09/18 13:48:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -232,6 +228,7 @@ public class GeneralTests extends TestCase {
         info.setProperty("proxool.debug-level", "1");
         return info;
     }
+
     /**
      * Can we have multiple pools?
      */
@@ -305,13 +302,16 @@ public class GeneralTests extends TestCase {
 
     private static String prefix = "proxool.";
 
-    private static String SELECT_SQL = "SELECT * FROM test";
+    private static final String SELECT_SQL = "SELECT * FROM test";
 
 }
 
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.3  2002/09/18 13:48:56  billhorsman
+ checkstyle and doc
+
  Revision 1.2  2002/09/17 22:44:19  billhorsman
  improved tests
 
