@@ -25,7 +25,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.12 $, $Date: 2003/03/01 18:25:53 $
+ * @version $Revision: 1.13 $, $Date: 2003/03/02 01:16:37 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -89,14 +89,7 @@ public class StatisticsTest extends TestCase {
             StatisticsIF statistics1 = srm.getStatistics();
 
 
-            Connection c = DriverManager.getConnection(url);
-            // Ensure that active time is non-zero (due to rounding)
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                LOG.error("Awoken", e);
-            }
-            c.close();
+            DriverManager.getConnection(url).close();
 
             assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
             StatisticsIF statistics2 = srm.getStatistics();
@@ -113,7 +106,6 @@ public class StatisticsTest extends TestCase {
             assertEquals("servedCount", 1L, statistics2.getServedCount());
             assertEquals("servedPerSecond", 0.09, 0.11, statistics2.getServedPerSecond());
             assertEquals("refusedCount", 0L, statistics2.getRefusedCount());
-            assertTrue("averageActiveTime > 0", statistics2.getAverageActiveTime() > 0);
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -167,6 +159,9 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.13  2003/03/02 01:16:37  billhorsman
+ removed flakey average active time test
+
  Revision 1.12  2003/03/01 18:25:53  billhorsman
  *** empty log message ***
 
