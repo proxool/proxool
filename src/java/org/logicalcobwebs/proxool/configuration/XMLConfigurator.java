@@ -5,15 +5,15 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.ProxoolConstants;
+import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
-import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.ProxoolException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.Properties;
 
@@ -85,7 +85,7 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.12 $, $Date: 2003/01/23 10:41:05 $
+ * @version $Revision: 1.13 $, $Date: 2003/01/27 18:26:44 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */

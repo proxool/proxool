@@ -9,6 +9,7 @@ package org.logicalcobwebs.proxool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -21,7 +22,7 @@ import java.sql.Statement;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.10 $, $Date: 2002/12/16 11:15:19 $
+ * @version $Revision: 1.11 $, $Date: 2003/01/27 18:26:39 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -50,11 +51,11 @@ class ProxyFactory {
      * @param proxyConnection where to find the connection
      * @return
      */
-    protected static Connection getConnection(ProxyConnection proxyConnection) {
+    protected static Connection getConnection(ProxyConnectionIF proxyConnection) {
         return (Connection) Proxy.newProxyInstance(
                 Connection.class.getClassLoader(),
                 new Class[]{Connection.class},
-                proxyConnection);
+                (InvocationHandler) proxyConnection);
     }
 
     /**
@@ -68,7 +69,7 @@ class ProxyFactory {
         return ds;
     }
 
-    protected static Statement createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnection proxyConnection,  String sqlStatement) {
+    protected static Statement createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection,  String sqlStatement) {
         // We can't use Class#getInterfaces since that doesn't take
         // into account superclass interfaces. We could, laboriously,
         // work our way up the hierarchy but it doesn't seem worth while -
@@ -93,6 +94,10 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.11  2003/01/27 18:26:39  billhorsman
+ refactoring of ProxyConnection and ProxyStatement to
+ make it easier to write JDK 1.2 patch
+
  Revision 1.10  2002/12/16 11:15:19  billhorsman
  fixed getDelegateStatement
 

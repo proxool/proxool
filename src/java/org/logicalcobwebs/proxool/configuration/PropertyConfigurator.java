@@ -8,9 +8,9 @@ package org.logicalcobwebs.proxool.configuration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolConstants;
+import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -71,7 +71,7 @@ import java.util.Properties;
  * delegate JDBC driver.
  * </p>
  *
- * @version $Revision: 1.5 $, $Date: 2003/01/23 10:41:05 $
+ * @version $Revision: 1.6 $, $Date: 2003/01/27 18:26:43 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -171,6 +171,10 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.6  2003/01/27 18:26:43  billhorsman
+ refactoring of ProxyConnection and ProxyStatement to
+ make it easier to write JDK 1.2 patch
+
  Revision 1.5  2003/01/23 10:41:05  billhorsman
  changed use of pool-name to alias for consistency
 

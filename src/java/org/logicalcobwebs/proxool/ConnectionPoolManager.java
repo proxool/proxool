@@ -11,13 +11,13 @@ import org.apache.commons.logging.LogFactory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Iterator;
 
 /**
  *
- * @version $Revision: 1.6 $, $Date: 2003/01/23 11:08:26 $
+ * @version $Revision: 1.7 $, $Date: 2003/01/27 18:26:36 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -114,6 +114,10 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.7  2003/01/27 18:26:36  billhorsman
+ refactoring of ProxyConnection and ProxyStatement to
+ make it easier to write JDK 1.2 patch
+
  Revision 1.6  2003/01/23 11:08:26  billhorsman
  new setConfiguratorListener method (and remove from optional
  parameter when registering pool)

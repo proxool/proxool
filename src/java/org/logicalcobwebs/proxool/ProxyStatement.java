@@ -11,38 +11,21 @@ import org.apache.commons.logging.LogFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
 
 /**
  * Delegates to Statement for all calls. But also, for all execute methods, it
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.12 $, $Date: 2002/12/19 00:08:36 $
+ * @version $Revision: 1.13 $, $Date: 2003/01/27 18:26:40 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-class ProxyStatement implements InvocationHandler {
+class ProxyStatement extends AbstractProxyStatement implements InvocationHandler {
 
     private static final Log LOG = LogFactory.getLog(ProxyStatement.class);
-
-    private Statement statement;
-
-    private ConnectionPool connectionPool;
-
-    private ProxyConnection proxyConnection;
-
-    private Set resultSets = new HashSet();
 
     private static final String EXECUTE_FRAGMENT = "execute";
 
@@ -50,32 +33,12 @@ class ProxyStatement implements InvocationHandler {
 
     private static final String CLOSE_METHOD = "close";
 
-    private Map parameters;
+    private static final String SET_NULL_METHOD = "setNull";
 
-    private String sqlStatement;
+    private static final String SET_PREFIX = "set";
 
-    public ProxyStatement(Statement statement, ConnectionPool connectionPool, ProxyConnection proxyConnection, String sqlStatement) {
-        this.statement = statement;
-        this.connectionPool = connectionPool;
-        this.proxyConnection = proxyConnection;
-        this.sqlStatement = sqlStatement;
-    }
-
-    private void testException(SQLException e) {
-        Iterator i = connectionPool.getDefinition().getFatalSqlExceptions().iterator();
-        while (i.hasNext()) {
-            if (e.getMessage().indexOf((String) i.next()) > -1) {
-                // This SQL exception indicates a fatal problem with this connection. We should probably
-                // just junk it.
-                try {
-                    statement.close();
-                    connectionPool.throwConnection(proxyConnection);
-                    LOG.warn("Connection has been thrown away because fatal exception was detected", e);
-                } catch (SQLException e2) {
-                    LOG.error("Problem trying to throw away suspect connection", e2);
-                }
-            }
-        }
+    public ProxyStatement(Statement statement, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection, String sqlStatement) {
+        super(statement, connectionPool, proxyConnection, sqlStatement);
     }
 
     public Object invoke(Object proxy, Method method, Object[] args)
@@ -84,63 +47,33 @@ class ProxyStatement implements InvocationHandler {
         long startTime = System.currentTimeMillis();
         final int argCount = args != null ? args.length : 0;
 
-        boolean isTrace = connectionPool.isConnectionListenedTo() || (connectionPool.getDefinition().isTrace() && connectionPool.getLog().isDebugEnabled());
+        boolean isTrace = getConnectionPool().isConnectionListenedTo() || (getConnectionPool().getDefinition().isTrace() && getConnectionPool().getLog().isDebugEnabled());
 
         // We need to remember an exceptions that get thrown so that we can optionally
         // pass them to the onExecute() call below
         Exception exception = null;
         try {
             if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
-                result = new Boolean(statement.hashCode() == args[0].hashCode());
+                result = new Boolean(equals(args[0]));
             } else if (method.getName().equals(CLOSE_METHOD) && argCount == 0) {
-                statement.close();
-                proxyConnection.registerClosedStatement(statement);
+                close();
             } else {
-                result = method.invoke(statement, args);
+                result = method.invoke(getStatement(), args);
             }
 
             // We only dump sql calls if we are in verbose mode and debug is enabled
             if (isTrace) {
                 try {
 
-                    // Lazily instantiate parameters if necessary
-                    if (parameters == null) {
-                        parameters = new TreeMap(new Comparator() {
-                            public int compare(Object o1, Object o2) {
-                                int c = 0;
-
-                                if (o1 instanceof Integer && o2 instanceof Integer) {
-                                    c = ((Integer) o1).compareTo(((Integer) o2));
-                                }
-
-                                return c;
-                            }
-                        });
-                    }
-
                     // What sort of method is it
-                    if (method.getName().startsWith("set") && argCount == 2) {
-                        // Okay, we're probably setting a parameter
-                        if (method.getName().equals("setNull")) {
-                            // Treat setNull as a special case
-                            parameters.put(args[0], "*");
-                        } else {
-                            if (args[1] == null) {
-                                parameters.put(args[0], "*");
-                            } else if (args[1] instanceof String) {
-                                parameters.put(args[0], "'" + args[1] + "'");
-                            } else if (args[1] instanceof Number) {
-                                parameters.put(args[0], args[1]);
-                            } else {
-                                String className = args[1].getClass().getName();
-                                StringTokenizer st = new StringTokenizer(className, ".");
-                                while (st.hasMoreTokens()) {
-                                    className = st.nextToken();
-                                }
-                                parameters.put(args[0], className);
-                            }
-                        }
+                    if (method.getName().equals(SET_NULL_METHOD) && argCount > 0 && args[0] instanceof Integer) {
+                        int index = ((Integer)args[0]).intValue();
+                        putParameter(index, null);
+                    } else if (method.getName().startsWith(SET_PREFIX) && argCount > 1 && args[0] instanceof Integer) {
+                        int index = ((Integer)args[0]).intValue();
+                        putParameter(index, args[1]);
                     }
+
                 } catch (Exception e) {
                     // We don't want an error during dump screwing up the transaction
                     LOG.error("Ignoring error during dump", e);
@@ -162,62 +95,24 @@ class ProxyStatement implements InvocationHandler {
 
             // If we executed something then we should tell the listener.
             if (method.getName().startsWith(EXECUTE_FRAGMENT)) {
-
-                if (isTrace) {
-
-                    if (sqlStatement == null && argCount > 0 && args[0] instanceof String) {
-                        sqlStatement = (String) args[0];
-                    }
-
-                    if (sqlStatement != null) {
-                        // TODO it would be nice to format this a bit more nicely.
-                        // Maybe replace the ? in the sql with the real values. I think
-                        // the goal should be that this dump should be executable
-                        // sql. At least, it should be when we call the onExecute()
-                        // method below. That is supposed to contain performance
-                        // information and the sql that was executed.
-                    }
-
-                    // Log if configured to
-                    if (connectionPool.getLog().isDebugEnabled() && connectionPool.getDefinition().isTrace()) {
-                        connectionPool.getLog().debug(parameters + " -> " + sqlStatement + " (" + (System.currentTimeMillis() - startTime) + " milliseconds)");
-                    }
-
-                    // Send to any listener
-                    connectionPool.onExecute(parameters + " -> " + sqlStatement, (System.currentTimeMillis() - startTime), exception);
-
-                    // Clear parameters for next time
-                    parameters.clear();
-                    sqlStatement = null;
-
-                }
+                trace(startTime, exception);
             }
 
         }
 
-        if (result instanceof ResultSet) {
-            resultSets.add(result);
-        }
-
         return result;
+
     }
 
-    /**
-     * Gets the real Statement that we got from the delegate driver
-     * @return delegate statement
-     */
-    protected Statement getDelegateStatement() {
-        return statement;
-    }
-
-    private Connection getConnection() throws SQLException {
-        return statement.getConnection();
-    }
 }
 
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.13  2003/01/27 18:26:40  billhorsman
+ refactoring of ProxyConnection and ProxyStatement to
+ make it easier to write JDK 1.2 patch
+
  Revision 1.12  2002/12/19 00:08:36  billhorsman
  automatic closure of statements when a connection is closed
 

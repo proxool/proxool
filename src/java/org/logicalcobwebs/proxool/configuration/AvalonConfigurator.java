@@ -5,16 +5,16 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
+import org.apache.avalon.framework.component.Component;
 import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.thread.ThreadSafe;
-import org.apache.avalon.framework.component.Component;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -28,9 +28,9 @@ import org.xml.sax.helpers.AttributesImpl;
  * component in your bootstrap code to make this happen.
  * </p>
  *
- * @version $Revision: 1.8 $, $Date: 2002/12/23 02:59:38 $
+ * @version $Revision: 1.9 $, $Date: 2003/01/27 18:26:42 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
     private static final Log LOG = LogFactory.getLog(AvalonConfigurator.class);
@@ -121,6 +121,10 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.9  2003/01/27 18:26:42  billhorsman
+ refactoring of ProxyConnection and ProxyStatement to
+ make it easier to write JDK 1.2 patch
+
  Revision 1.8  2002/12/23 02:59:38  chr32
  Tiny doc fix.
 

@@ -10,11 +10,11 @@ import org.apache.commons.logging.LogFactory;
 
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Enumeration;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -25,7 +25,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.31 $, $Date: 2003/01/23 11:08:26 $
+ * @version $Revision: 1.32 $, $Date: 2003/01/27 18:26:36 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -598,11 +598,24 @@ public class ProxoolFacade {
             throw new ProxoolException("Statement argument is not one provided by Proxool (it's " + statement.getClass() + ")");
         }
     }
+
+    /**
+     * Get a list of all the registered pools
+     * @return an array of aliases
+     * @since Proxool 0.7
+     */
+    public static String[] getAliases() {
+        return ConnectionPoolManager.getInstance().getConnectionPoolNames();
+    }
 }
 
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.32  2003/01/27 18:26:36  billhorsman
+ refactoring of ProxyConnection and ProxyStatement to
+ make it easier to write JDK 1.2 patch
+
  Revision 1.31  2003/01/23 11:08:26  billhorsman
  new setConfiguratorListener method (and remove from optional
  parameter when registering pool)

@@ -5,6 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
+
+
 /**
  * Provides information about an individual connection. You can get a collection
  * of these from {@link ProxoolFacade#getConnectionInfos ProxoolFacade}. You
@@ -19,7 +21,7 @@ package org.logicalcobwebs.proxool;
  * }
  * </pre>
  *
- * @version $Revision: 1.5 $, $Date: 2003/01/15 00:12:13 $
+ * @version $Revision: 1.6 $, $Date: 2003/01/27 18:26:35 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -121,6 +123,10 @@ public interface ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.6  2003/01/27 18:26:35  billhorsman
+ refactoring of ProxyConnection and ProxyStatement to
+ make it easier to write JDK 1.2 patch
+
  Revision 1.5  2003/01/15 00:12:13  billhorsman
  doc
 

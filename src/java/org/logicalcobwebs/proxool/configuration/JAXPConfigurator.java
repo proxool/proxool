@@ -9,18 +9,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.Reader;
-import java.io.FileReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 
 /**
  * Configurator that uses JAXP to get a parser for Proxool configuration xml. The parser relies on JAXP version 1.1 or higher
@@ -33,9 +33,9 @@ import java.io.IOException;
  * xml should be validated or not. If you want your xml to be validated be sure to read the
  * <a href="XMLConfigurator.html#validation">Validation</a> chapter in the JavaDoc for {@link XMLConfigurator}.
  * </p>
- * @version $Revision: 1.5 $, $Date: 2002/12/18 23:31:57 $
+ * @version $Revision: 1.6 $, $Date: 2003/01/27 18:26:42 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class JAXPConfigurator {
@@ -126,6 +126,10 @@ public class JAXPConfigurator {
 /*
  Revision history:
  $Log: JAXPConfigurator.java,v $
+ Revision 1.6  2003/01/27 18:26:42  billhorsman
+ refactoring of ProxyConnection and ProxyStatement to
+ make it easier to write JDK 1.2 patch
+
  Revision 1.5  2002/12/18 23:31:57  chr32
  Expanded doc.
 
