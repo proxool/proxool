@@ -22,7 +22,7 @@ import java.util.Set;
  * {@linkplain java.sql.Driver#connect ask} for a connection or call
  * {@linkplain ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.4 $, $Date: 2002/10/25 16:00:25 $
+ * @version $Revision: 1.5 $, $Date: 2002/10/27 12:09:00 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -37,8 +37,8 @@ public interface ConnectionPoolDefinitionIF {
     /** 0 */
     public static final int DEFAULT_PROTOTYPE_COUNT = 0;
 
-    /** 5 */
-    public static final int DEFAULT_MINIMUM_CONNECTION_COUNT = 5;
+    /** 0 */
+    public static final int DEFAULT_MINIMUM_CONNECTION_COUNT = 0;
 
     /** 15 */
     public static final int DEFAULT_MAXIMUM_CONNECTION_COUNT = 15;
@@ -146,6 +146,9 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.5  2002/10/27 12:09:00  billhorsman
+ default minimum connection count changed from 5 to 0
+
  Revision 1.4  2002/10/25 16:00:25  billhorsman
  added better class javadoc
 
