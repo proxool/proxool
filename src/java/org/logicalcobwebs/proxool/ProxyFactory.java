@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -22,7 +22,7 @@ import java.sql.DatabaseMetaData;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.15 $, $Date: 2003/02/19 15:14:32 $
+ * @version $Revision: 1.16 $, $Date: 2003/03/03 11:11:58 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -109,6 +109,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.16  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.15  2003/02/19 15:14:32  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  *
  * THIS CLASS WAS COPIED FROM THE APACHE AVALON EXCALIBUR
  * VERSION 4.1. WE ARE GRATEFUL FOR THEIR CONTRIBUTION. We decided
@@ -77,7 +77,7 @@ package org.logicalcobwebs.proxool.util;
  * will take priority over those trying to get a read lock.
  *
  * @author <a href="mailto:leo.sutic@inspireinfrastructure.com">Leo Sutic</a>
- * @version CVS $Revision: 1.2 $ $Date: 2003/02/08 14:27:52 $
+ * @version CVS $Revision: 1.3 $ $Date: 2003/03/03 11:12:02 $
  * @since 4.0
  */
 public class ReadWriteLock {

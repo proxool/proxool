@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -16,7 +16,7 @@ import java.util.Properties;
  * with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.6 $, $Date: 2003/02/27 18:01:47 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/03 11:12:03 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -244,6 +244,9 @@ public class ConfigurationListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.7  2003/03/03 11:12:03  billhorsman
+ fixed licence
+
  Revision 1.6  2003/02/27 18:01:47  billhorsman
  completely rethought the test structure. it's now
  more obvious. no new tests yet though.

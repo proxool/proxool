@@ -1,15 +1,15 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.util;
 
 /**
  * A container for event listeners. Implementations should cater to only one type of listeners.
- * @version $Revision: 1.1 $, $Date: 2003/02/07 01:46:31 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/03 11:12:02 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public interface ListenerContainerIF {
@@ -36,6 +36,9 @@ public interface ListenerContainerIF {
 /*
  Revision history:
  $Log: ListenerContainerIF.java,v $
+ Revision 1.2  2003/03/03 11:12:02  billhorsman
+ fixed licence
+
  Revision 1.1  2003/02/07 01:46:31  chr32
  Initial revition.
 

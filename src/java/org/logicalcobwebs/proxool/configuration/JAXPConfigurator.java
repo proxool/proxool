@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.configuration;
 
@@ -33,7 +33,7 @@ import java.io.Reader;
  * xml should be validated or not. If you want your xml to be validated be sure to read the
  * <a href="XMLConfigurator.html#validation">Validation</a> chapter in the JavaDoc for {@link XMLConfigurator}.
  * </p>
- * @version $Revision: 1.7 $, $Date: 2003/02/06 17:41:05 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/03 11:12:00 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -126,6 +126,9 @@ public class JAXPConfigurator {
 /*
  Revision history:
  $Log: JAXPConfigurator.java,v $
+ Revision 1.8  2003/03/03 11:12:00  billhorsman
+ fixed licence
+
  Revision 1.7  2003/02/06 17:41:05  billhorsman
  now uses imported logging
 

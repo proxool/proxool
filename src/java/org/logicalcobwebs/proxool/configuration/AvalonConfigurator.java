@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.configuration;
 
@@ -43,9 +43,9 @@ import java.util.Iterator;
  * <br>Legal values are <code>true</code> or <code>false</code>. Default: <code>true</code>.
  * </p>
  *
- * @version $Revision: 1.11 $, $Date: 2003/02/19 16:52:39 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/03 11:12:00 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public class AvalonConfigurator implements Component, Configurable, ThreadSafe, Disposable {
     private static final Log LOG = LogFactory.getLog(AvalonConfigurator.class);
@@ -184,6 +184,9 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe, 
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.12  2003/03/03 11:12:00  billhorsman
+ fixed licence
+
  Revision 1.11  2003/02/19 16:52:39  chr32
  Added support for close-on-dispose attribute.
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.configuration;
 
@@ -20,7 +20,7 @@ import java.sql.SQLException;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/01 15:27:25 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/03 11:12:06 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -184,6 +184,9 @@ public class JAXPConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.10  2003/03/03 11:12:06  billhorsman
+ fixed licence
+
  Revision 1.9  2003/03/01 15:27:25  billhorsman
  checkstyle
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  *
  * THIS CLASS WAS COPIED FROM THE JAKARTA COMMONS COLLECTIONS
  * VERSION 2.1. WE ARE GRATEFUL FOR THEIR CONTRIBUTION. We decided
@@ -10,9 +10,9 @@
  */
 
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/proxool/util/FastArrayList.java,v 1.1 2003/02/07 01:40:34 chr32 Exp $
- * $Revision: 1.1 $
- * $Date: 2003/02/07 01:40:34 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/proxool/util/FastArrayList.java,v 1.2 2003/03/03 11:12:02 billhorsman Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/03/03 11:12:02 $
  *
  * ====================================================================
  *
@@ -118,8 +118,8 @@ import java.util.ListIterator;
  *
  * @since Proxool 0.6
  * @author Craig R. McClanahan
- * @author $Author: chr32 $ (current maintainer)
- * @version $Revision: 1.1 $ $Date: 2003/02/07 01:40:34 $
+ * @author $Author: billhorsman $ (current maintainer)
+ * @version $Revision: 1.2 $ $Date: 2003/03/03 11:12:02 $
  */
 
 public class FastArrayList extends ArrayList {
@@ -1381,6 +1381,9 @@ public class FastArrayList extends ArrayList {
 /*
  Revision history:
  $Log: FastArrayList.java,v $
+ Revision 1.2  2003/03/03 11:12:02  billhorsman
+ fixed licence
+
  Revision 1.1  2003/02/07 01:40:34  chr32
  Ok. Now *really* moving in from main proxool package.
 

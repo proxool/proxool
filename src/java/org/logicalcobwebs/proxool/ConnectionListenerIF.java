@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -22,7 +22,7 @@ import java.sql.SQLException;
  * ProxoolFacade.{@link org.logicalcobwebs.proxool.ProxoolFacade#addConnectionListener addConnectionListener}(alias, myConnectionListener);
  * </pre>
  *
- * @version $Revision: 1.6 $, $Date: 2003/02/08 00:35:30 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/03 11:11:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -73,6 +73,9 @@ public interface ConnectionListenerIF {
 /*
  Revision history:
  $Log: ConnectionListenerIF.java,v $
+ Revision 1.7  2003/03/03 11:11:57  billhorsman
+ fixed licence
+
  Revision 1.6  2003/02/08 00:35:30  billhorsman
  doc
 

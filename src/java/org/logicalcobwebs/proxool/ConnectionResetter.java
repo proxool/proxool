@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -22,7 +22,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.11 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/03 11:11:57 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -305,6 +305,9 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.12  2003/03/03 11:11:57  billhorsman
+ fixed licence
+
  Revision 1.11  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 

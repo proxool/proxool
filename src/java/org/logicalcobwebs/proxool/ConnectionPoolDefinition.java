@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.9 $, $Date: 2003/02/26 16:05:52 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/03 11:11:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -774,6 +774,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.10  2003/03/03 11:11:57  billhorsman
+ fixed licence
+
  Revision 1.9  2003/02/26 16:05:52  billhorsman
  widespread changes caused by refactoring the way we
  update and redefine pool definitions.

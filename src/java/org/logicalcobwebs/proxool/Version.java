@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -23,7 +23,7 @@ import org.logicalcobwebs.logging.LogFactory;
  *   A snapshot release built on January 2nd. This comes after the
  *   version 1.0 and before 1.1.
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/21 15:19:09 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/03 11:11:58 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -77,6 +77,9 @@ public class Version {
 /*
  Revision history:
  $Log: Version.java,v $
+ Revision 1.8  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.7  2003/02/21 15:19:09  billhorsman
  update version
 

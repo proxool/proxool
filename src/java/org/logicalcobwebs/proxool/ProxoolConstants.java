@@ -1,14 +1,14 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
 /**
  * All constants here please.
  *
- * @version $Revision: 1.13 $, $Date: 2003/02/26 16:05:52 $
+ * @version $Revision: 1.14 $, $Date: 2003/03/03 11:11:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -18,9 +18,9 @@ public interface ProxoolConstants {
 
     /**
      * The namespace uri associated with namepace aware Proxool xml configurations.<br>
-     * Value: http://proxool.sourceforge.net/xml-namespace
+     * Value: The latest version is available at http://proxool.sourceforge.net/xml-namespace
      */
-    public final String PROXOOL_XML_NAMESPACE_URI = "http://proxool.sourceforge.net/xml-namespace";
+    public final String PROXOOL_XML_NAMESPACE_URI = "The latest version is available at http://proxool.sourceforge.net/xml-namespace";
 
     public final String ALIAS_DELIMITER = ".";
 
@@ -203,6 +203,9 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.14  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.13  2003/02/26 16:05:52  billhorsman
  widespread changes caused by refactoring the way we
  update and redefine pool definitions.

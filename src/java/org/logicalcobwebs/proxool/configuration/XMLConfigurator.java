@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.configuration;
 
@@ -28,7 +28,7 @@ import java.util.Properties;
  * <p>Properties that you pass on to the delegate driver have to be treated specially. They
  * must be contained within a &lt;driver-properties&gt; element.</p>
  *
- * <p>See the <a href="http://proxool.sourceforge.net/properties.html" target="_new">Proxool properties</a> for documentation
+ * <p>See the <a href="The latest version is available at http://proxool.sourceforge.net/properties.html" target="_new">Proxool properties</a> for documentation
  * on the available configuration properties.</p>
  *
  * Example configuration:
@@ -85,7 +85,7 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.15 $, $Date: 2003/02/13 10:05:13 $
+ * @version $Revision: 1.16 $, $Date: 2003/03/03 11:12:00 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */

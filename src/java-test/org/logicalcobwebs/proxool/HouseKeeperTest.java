@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test the house keeper in ConnectionPool
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/02 00:53:49 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/03 11:12:04 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -117,6 +117,9 @@ public class HouseKeeperTest extends TestCase {
 /*
  Revision history:
  $Log: HouseKeeperTest.java,v $
+ Revision 1.4  2003/03/03 11:12:04  billhorsman
+ fixed licence
+
  Revision 1.3  2003/03/02 00:53:49  billhorsman
  more robust wait
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.dbscript;
 
@@ -16,7 +16,7 @@ import java.sql.Connection;
  * {@link java.sql.Driver Driver} because it has {@link #setup} and
  * {@link #tearDown} methods.
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/19 15:14:21 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/03 11:12:03 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -67,6 +67,9 @@ public interface ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ConnectionAdapterIF.java,v $
+ Revision 1.8  2003/03/03 11:12:03  billhorsman
+ fixed licence
+
  Revision 1.7  2003/02/19 15:14:21  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

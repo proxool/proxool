@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -17,7 +17,7 @@ import java.sql.SQLException;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/03 11:11:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -61,6 +61,9 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements Invocati
 /*
  Revision history:
  $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.4  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.3  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 

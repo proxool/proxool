@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.dbscript;
 
@@ -13,7 +13,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * or {@link #getLoops loops} are configured then it might run more than
  * once.
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/19 15:14:18 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/03 11:12:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -142,6 +142,9 @@ class Command implements CommandIF {
 /*
  Revision history:
  $Log: Command.java,v $
+ Revision 1.8  2003/03/03 11:12:02  billhorsman
+ fixed licence
+
  Revision 1.7  2003/02/19 15:14:18  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

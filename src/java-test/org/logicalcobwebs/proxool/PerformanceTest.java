@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -18,7 +18,7 @@ import java.sql.SQLException;
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/01 15:27:24 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/03 11:12:04 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -54,6 +54,9 @@ public class PerformanceTest extends TestCase {
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.10  2003/03/03 11:12:04  billhorsman
+ fixed licence
+
  Revision 1.9  2003/03/01 15:27:24  billhorsman
  checkstyle
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -14,7 +14,7 @@ import java.sql.Statement;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
 
- * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:53 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/03 11:11:58 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -172,6 +172,9 @@ public interface ProxyConnectionIF extends ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnectionIF.java,v $
+ Revision 1.3  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.2  2003/02/26 16:05:53  billhorsman
  widespread changes caused by refactoring the way we
  update and redefine pool definitions.

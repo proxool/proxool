@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -9,9 +9,9 @@ import java.util.Properties;
 
 /**
  * Listener for global Proxool events.
- * @version $Revision: 1.1 $, $Date: 2003/02/24 01:15:05 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/03 11:11:58 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public interface ProxoolListenerIF {
@@ -35,6 +35,9 @@ public interface ProxoolListenerIF {
 /*
  Revision history:
  $Log: ProxoolListenerIF.java,v $
+ Revision 1.2  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.1  2003/02/24 01:15:05  chr32
  Init rev.
 

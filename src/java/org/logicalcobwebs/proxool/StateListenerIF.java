@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -15,7 +15,7 @@ package org.logicalcobwebs.proxool;
  * ProxoolFacade.{@link ProxoolFacade#addStateListener addStateListenerIF}(alias, myStateListener);
  * </pre>
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/08 00:35:30 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/03 11:11:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -35,6 +35,9 @@ public interface StateListenerIF {
 /*
  Revision history:
  $Log: StateListenerIF.java,v $
+ Revision 1.5  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.4  2003/02/08 00:35:30  billhorsman
  doc
 

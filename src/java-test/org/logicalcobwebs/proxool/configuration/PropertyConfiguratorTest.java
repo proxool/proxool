@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.configuration;
 
@@ -16,7 +16,7 @@ import java.sql.SQLException;
 /**
  * Tests that the PropertyConfigurator works.
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/01 15:27:25 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/03 11:12:07 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -71,6 +71,9 @@ public class PropertyConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: PropertyConfiguratorTest.java,v $
+ Revision 1.5  2003/03/03 11:12:07  billhorsman
+ fixed licence
+
  Revision 1.4  2003/03/01 15:27:25  billhorsman
  checkstyle
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -12,7 +12,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * This is instantiated statically by ProxoolFacade. It will automatically
  * close down all the connections when teh JVM stops.
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/26 11:20:59 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/03 11:11:58 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -53,6 +53,9 @@ class ShutdownHook implements Runnable {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.6  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.5  2003/02/26 11:20:59  billhorsman
  removed debug
 

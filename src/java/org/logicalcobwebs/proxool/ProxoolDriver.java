@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.18 $, $Date: 2003/02/26 23:59:37 $
+ * @version $Revision: 1.19 $, $Date: 2003/03/03 11:11:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -216,6 +216,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.19  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.18  2003/02/26 23:59:37  billhorsman
  accept now accepts just proxool not proxool:
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.util;
 
@@ -13,9 +13,9 @@ import java.util.Iterator;
 /**
  * Test {@link AbstractListenerContainer}.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/10 00:14:33 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/03 11:12:07 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class ListenerContainerTest extends TestCase {
@@ -117,6 +117,9 @@ class TestListener implements TestListenerIF {
 /*
  Revision history:
  $Log: ListenerContainerTest.java,v $
+ Revision 1.2  2003/03/03 11:12:07  billhorsman
+ fixed licence
+
  Revision 1.1  2003/02/10 00:14:33  chr32
  Added tests for AbstractListenerContainer.
 

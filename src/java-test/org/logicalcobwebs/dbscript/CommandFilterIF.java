@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.dbscript;
 
@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * {@link #afterCommand after} a {@link CommandIF command} is executed.
  * You can also {@link #catchException catch} exceptions that happen.
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/19 15:14:19 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/03 11:12:03 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -50,6 +50,9 @@ public interface CommandFilterIF {
 /*
  Revision history:
  $Log: CommandFilterIF.java,v $
+ Revision 1.5  2003/03/03 11:12:03  billhorsman
+ fixed licence
+
  Revision 1.4  2003/02/19 15:14:19  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

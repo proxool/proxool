@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/01 15:27:24 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/03 11:12:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -83,6 +83,9 @@ public class ConnectionPoolTests extends TestCase {
 /*
  Revision history:
  $Log: ConnectionPoolTests.java,v $
+ Revision 1.3  2003/03/03 11:12:04  billhorsman
+ fixed licence
+
  Revision 1.2  2003/03/01 15:27:24  billhorsman
  checkstyle
 

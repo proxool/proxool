@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    This software is released under the Apache Software Licence. See
-    package.html for details. The latest version is available at
-    http://proxool.sourceforge.net
+    This software is released under a licence similar to the Apache Software Licence.
+    See org.logicalcobwebs.proxool.package.html for details.
+    The latest version is available at http://proxool.sourceforge.net
 
     DTD for configuring Proxool using XMLConfigurator
 
-    version $Revision: 1.2 $, $Date: 2003/01/23 10:41:05 $
+    version $Revision: 1.3 $, $Date: 2003/03/03 11:12:01 $
     author billhorsman
     author $Author: billhorsman $ (current maintainer)
     since Proxool 0.6
@@ -75,6 +75,9 @@
 <!--
  Revision history:
  $Log: proxool.dtd,v $
+ Revision 1.3  2003/03/03 11:12:01  billhorsman
+ fixed licence
+
  Revision 1.2  2003/01/23 10:41:05  billhorsman
  changed use of pool-name to alias for consistency
 

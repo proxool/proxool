@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -27,9 +27,9 @@ import java.util.Properties;
  * We should also allow simple load balancing between pools that are
  * up.
  *
- * @version $Revision: 1.1 $, $Date: 2002/12/15 19:00:32 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/03 11:12:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class VirtoolDriver implements Driver {
@@ -85,6 +85,9 @@ public class VirtoolDriver implements Driver {
 /*
  Revision history:
  $Log: VirtoolDriver.java,v $
+ Revision 1.2  2003/03/03 11:12:02  billhorsman
+ fixed licence
+
  Revision 1.1  2002/12/15 19:00:32  chr32
  Moved over from 'ext' source tree.
 

@@ -3,7 +3,7 @@
 Properties for Proxool Configurator testing. Defines the same parameters as
 TestHelper.buildCompleteAlternativeProperties()
 -->
-<something-else-entirely xmlns="http://sumthin.else.entirely" xmlns:proxool="http://proxool.sourceforge.net/xml-namespace">    
+<something-else-entirely xmlns="http://sumthin.else.entirely" xmlns:proxool="The latest version is available at http://proxool.sourceforge.net/xml-namespace">
     <proxool:proxool>
         <proxool:alias>xml-test-ns</proxool:alias>
         <proxool:driver-url>jdbc:hsqldb:db/test</proxool:driver-url>

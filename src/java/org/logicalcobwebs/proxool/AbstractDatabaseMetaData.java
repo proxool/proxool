@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -17,7 +17,7 @@ import java.sql.SQLException;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:03 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/03 11:11:56 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -81,6 +81,9 @@ public abstract class AbstractDatabaseMetaData {
 /*
  Revision history:
  $Log: AbstractDatabaseMetaData.java,v $
+ Revision 1.4  2003/03/03 11:11:56  billhorsman
+ fixed licence
+
  Revision 1.3  2003/02/06 17:41:03  billhorsman
  now uses imported logging
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.configuration;
 
@@ -82,7 +82,7 @@ import java.io.File;
  * <p>It will also automatically shutdown Proxool. See
  * {@link #destroy}.</p>
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/07 17:26:25 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/03 11:12:00 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -170,6 +170,9 @@ public class ServletConfigurator extends HttpServlet  {
 /*
  Revision history:
  $Log: ServletConfigurator.java,v $
+ Revision 1.5  2003/03/03 11:12:00  billhorsman
+ fixed licence
+
  Revision 1.4  2003/02/07 17:26:25  billhorsman
  use shutdown() instead of removeAllConnectionPools()
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -11,7 +11,7 @@ import java.util.Date;
  * Implementation of ConnectionInfoIF. Unlike ConnectionPool it is
  * frozen and will not change. Used with a {@link org.logicalcobwebs.proxool.admin.SnapshotIF snapshot}
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/19 23:46:09 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/03 11:11:56 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -148,6 +148,9 @@ class ConnectionInfo implements ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfo.java,v $
+ Revision 1.5  2003/03/03 11:11:56  billhorsman
+ fixed licence
+
  Revision 1.4  2003/02/19 23:46:09  billhorsman
  renamed monitor package to admin
 

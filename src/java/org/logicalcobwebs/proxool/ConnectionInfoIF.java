@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -22,7 +22,7 @@ import java.util.Date;
  * }
  * </pre>
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/12 12:28:27 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/03 11:11:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -151,6 +151,9 @@ public interface ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.9  2003/03/03 11:11:57  billhorsman
+ fixed licence
+
  Revision 1.8  2003/02/12 12:28:27  billhorsman
  added url, proxyHashcode and delegateHashcode to
  ConnectionInfoIF

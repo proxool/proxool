@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.admin.jmx;
 
@@ -13,9 +13,9 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Run all tests in the jmx package.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/26 19:03:43 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/03 11:12:06 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class AllTests {
@@ -42,6 +42,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.2  2003/03/03 11:12:06  billhorsman
+ fixed licence
+
  Revision 1.1  2003/02/26 19:03:43  chr32
  Init rev.
 

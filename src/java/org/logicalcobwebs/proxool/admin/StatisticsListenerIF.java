@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.admin;
 
@@ -16,7 +16,7 @@ package org.logicalcobwebs.proxool.admin;
  * ProxoolFacade.{@link org.logicalcobwebs.proxool.ProxoolFacade#addStatisticsListener addStatisticsListener}(alias, myStatisticsListener);
  * </pre>
 
- * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/03 11:11:59 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -35,6 +35,9 @@ public interface StatisticsListenerIF {
 /*
  Revision history:
  $Log: StatisticsListenerIF.java,v $
+ Revision 1.2  2003/03/03 11:11:59  billhorsman
+ fixed licence
+
  Revision 1.1  2003/02/19 23:36:51  billhorsman
  renamed monitor package to admin
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.admin;
 
@@ -14,7 +14,7 @@ import org.logicalcobwebs.logging.LogFactory;
 /**
  * A ResultMonitor specifically for Snapshots
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/01 18:17:50 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/03 11:12:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -79,6 +79,9 @@ public class StatisticsResultMonitor extends ResultMonitor {
 /*
  Revision history:
  $Log: StatisticsResultMonitor.java,v $
+ Revision 1.6  2003/03/03 11:12:06  billhorsman
+ fixed licence
+
  Revision 1.5  2003/03/01 18:17:50  billhorsman
  arrffgh. fix,
 

@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.examples;
 
@@ -15,7 +15,7 @@ import java.sql.SQLException;
 /**
  * The simplest example of all. Just gets a Connection.
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/06 17:41:03 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/03 11:12:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -102,6 +102,9 @@ public class Simple {
 /*
  Revision history:
  $Log: Simple.java,v $
+ Revision 1.6  2003/03/03 11:12:02  billhorsman
+ fixed licence
+
  Revision 1.5  2003/02/06 17:41:03  billhorsman
  now uses imported logging
 

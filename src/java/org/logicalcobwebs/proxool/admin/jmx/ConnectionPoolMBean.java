@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.admin.jmx;
 
@@ -83,9 +83,9 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.5 $, $Date: 2003/02/26 19:04:30 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/03 11:11:59 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, NotificationBroadcaster,
@@ -632,6 +632,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.6  2003/03/03 11:11:59  billhorsman
+ fixed licence
+
  Revision 1.5  2003/02/26 19:04:30  chr32
  Added active/inactive state check.
 

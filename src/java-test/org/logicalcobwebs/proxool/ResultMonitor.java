@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -12,7 +12,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Waits for a set of results to become true with timeout
  * functionality
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/02 00:53:38 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/03 11:12:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -106,6 +106,9 @@ public abstract class ResultMonitor {
 /*
  Revision history:
  $Log: ResultMonitor.java,v $
+ Revision 1.7  2003/03/03 11:12:05  billhorsman
+ fixed licence
+
  Revision 1.6  2003/03/02 00:53:38  billhorsman
  increased timeout to 60 sec!
 

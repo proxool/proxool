@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.62 $, $Date: 2003/02/28 10:42:59 $
+ * @version $Revision: 1.63 $, $Date: 2003/03/03 11:11:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -631,6 +631,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.63  2003/03/03 11:11:58  billhorsman
+ fixed licence
+
  Revision 1.62  2003/02/28 10:42:59  billhorsman
  ConnectionPoolManager now passes ProxoolFacade an
  array of ConnectionPools rather than a Collection

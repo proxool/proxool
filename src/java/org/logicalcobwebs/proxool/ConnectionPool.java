@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -24,7 +24,7 @@ import java.util.Iterator;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.55 $, $Date: 2003/02/28 18:08:55 $
+ * @version $Revision: 1.56 $, $Date: 2003/03/03 11:11:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -1197,6 +1197,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.56  2003/03/03 11:11:57  billhorsman
+ fixed licence
+
  Revision 1.55  2003/02/28 18:08:55  billhorsman
  OVERLOAD state is now triggered immediately rather
  than waiting for house keeper

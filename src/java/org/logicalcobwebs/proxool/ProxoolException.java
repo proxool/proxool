@@ -1,7 +1,7 @@
 /*
- * This software is released under the Apache Software Licence. See
- * package.html for details. The latest version is available at
- * http://proxool.sourceforge.net
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -21,9 +21,9 @@ import java.io.PrintWriter;
   * that take a cause and delegate (perhaps indirectly) to one of the
   * <tt>Throwable</tt> constructors that takes a cause.
   *
- * @version $Revision: 1.1 $, $Date: 2002/12/15 19:23:25 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/03 11:11:58 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class ProxoolException extends Exception {
