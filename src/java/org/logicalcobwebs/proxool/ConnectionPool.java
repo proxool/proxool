@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.62 $, $Date: 2003/03/11 00:32:13 $
+ * @version $Revision: 1.63 $, $Date: 2003/03/11 01:16:29 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -596,7 +596,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         // Check to see if shutdown is waiting for all connections to become
         // non-active
         if (shutdownThread != null && connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE] == 0) {
-            LOG.debug("Notifying shutdownThread that active count is now zero");
             synchronized (shutdownThread) {
                 shutdownThread.notify();
             }
@@ -987,6 +986,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.63  2003/03/11 01:16:29  billhorsman
+ removed misleasing debug
+
  Revision 1.62  2003/03/11 00:32:13  billhorsman
  fixed negative timeout
 
