@@ -15,8 +15,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
- * TODO
- * @version $Revision: 1.1 $, $Date: 2003/01/31 14:39:08 $
+ * Responsbile for a single set of statistics. It rolls over to a new set
+ * whenever it should. It provides access to the latest complete set
+ * when it is available.
+ *
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 16:53:29 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -35,9 +38,9 @@ public class StatsRoller {
 
     private int units;
 
-    private DecimalFormat decimalFormat = new DecimalFormat("0.00");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
 
-    private static final DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
     public StatsRoller(String alias, String token) throws ProxoolException {
         log = LogFactory.getLog("org.logicalcobwebs.proxool.stats." + alias);
@@ -96,23 +99,23 @@ public class StatsRoller {
         if (statistics != null) {
             StringBuffer out = new StringBuffer();
 
-            out.append(timeFormat.format(statistics.getStartDate()));
+            out.append(TIME_FORMAT.format(statistics.getStartDate()));
             out.append(" - ");
-            out.append(timeFormat.format(statistics.getStopDate()));
+            out.append(TIME_FORMAT.format(statistics.getStopDate()));
             out.append(", s:");
             out.append(statistics.getServedCount());
             out.append(":");
-            out.append(decimalFormat.format(statistics.getServedPerSecond()));
+            out.append(DECIMAL_FORMAT.format(statistics.getServedPerSecond()));
 
             out.append("/s, r:");
             out.append(statistics.getRefusedCount());
             out.append(":");
-            out.append(decimalFormat.format(statistics.getRefusedPerSecond()));
+            out.append(DECIMAL_FORMAT.format(statistics.getRefusedPerSecond()));
 
             out.append("/s, a:");
-            out.append(decimalFormat.format(statistics.getAverageActiveTime()));
+            out.append(DECIMAL_FORMAT.format(statistics.getAverageActiveTime()));
             out.append("ms/");
-            out.append(decimalFormat.format(statistics.getAverageActiveCount()));
+            out.append(DECIMAL_FORMAT.format(statistics.getAverageActiveCount()));
 
             log.info(out.toString());
         }
@@ -151,6 +154,9 @@ public class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.2  2003/01/31 16:53:29  billhorsman
+ checkstyle
+
  Revision 1.1  2003/01/31 14:39:08  billhorsman
  fixes for JDK 1.2 to remove dependency on JDK 1.3 Timer and javax.imageio
 

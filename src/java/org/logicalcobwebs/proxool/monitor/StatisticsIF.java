@@ -11,12 +11,12 @@ import java.util.Date;
  * Provides statistical performance information for a period ot
  * time.
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/31 16:38:54 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/31 16:53:23 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public interface  StatisticsIF {
+public interface StatisticsIF {
 
     /**
      * The length of time this sample represents,
@@ -82,6 +82,9 @@ public interface  StatisticsIF {
 /*
  Revision history:
  $Log: StatisticsIF.java,v $
+ Revision 1.3  2003/01/31 16:53:23  billhorsman
+ checkstyle
+
  Revision 1.2  2003/01/31 16:38:54  billhorsman
  doc (and removing public modifier for classes where possible)
 

@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * Implementation of StatisticsIF
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/31 16:38:53 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/31 16:53:22 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -86,7 +86,7 @@ class Statistics implements StatisticsIF {
      */
     public double getAverageActiveTime() {
         if (servedCount > 0) {
-            return ((double) totalActiveTime/(double) servedCount);
+            return ((double) totalActiveTime / (double) servedCount);
         } else {
             return 0.0;
         }
@@ -96,21 +96,21 @@ class Statistics implements StatisticsIF {
      * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getAverageActiveCount
      */
     public double getAverageActiveCount() {
-        return (double) totalActiveTime/(double) getPeriod();
+        return (double) totalActiveTime / (double) getPeriod();
     }
 
     /**
      * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getServedPerSecond
      */
     public double getServedPerSecond() {
-        return (double) servedCount/((double) getPeriod() / 1000.0);
+        return (double) servedCount / ((double) getPeriod() / 1000.0);
     }
 
     /**
      * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getRefusedPerSecond
      */
     public double getRefusedPerSecond() {
-        return (double) refusedCount/((double) getPeriod() / 1000.0);
+        return (double) refusedCount / ((double) getPeriod() / 1000.0);
     }
 
     /**
@@ -133,6 +133,9 @@ class Statistics implements StatisticsIF {
 /*
  Revision history:
  $Log: Statistics.java,v $
+ Revision 1.3  2003/01/31 16:53:22  billhorsman
+ checkstyle
+
  Revision 1.2  2003/01/31 16:38:53  billhorsman
  doc (and removing public modifier for classes where possible)
 

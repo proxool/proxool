@@ -13,12 +13,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.1 $, $Date: 2003/01/31 14:33:18 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 16:53:18 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -62,6 +61,9 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements Invocati
 /*
  Revision history:
  $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.2  2003/01/31 16:53:18  billhorsman
+ checkstyle
+
  Revision 1.1  2003/01/31 14:33:18  billhorsman
  fix for DatabaseMetaData
 

@@ -31,7 +31,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.37 $, $Date: 2003/01/31 11:50:39 $
+ * @version $Revision: 1.38 $, $Date: 2003/01/31 16:53:17 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -656,8 +656,8 @@ public class ProxoolFacade {
             connectionInfos = new TreeSet(new Comparator() {
                         public int compare(Object o1, Object o2) {
                             try {
-                                Date birth1 = ((ConnectionInfoIF)o1).getBirthDate();;
-                                Date birth2 = ((ConnectionInfoIF)o2).getBirthDate();;
+                                Date birth1 = ((ConnectionInfoIF) o1).getBirthDate();
+                                Date birth2 = ((ConnectionInfoIF) o2).getBirthDate();
                                 return birth1.compareTo(birth2);
                             } catch (ClassCastException e) {
                                 LOG.error("Unexpected contents of connectionInfos Set: " + o1.getClass() + " and " + o2.getClass(), e);
@@ -696,6 +696,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.38  2003/01/31 16:53:17  billhorsman
+ checkstyle
+
  Revision 1.37  2003/01/31 11:50:39  billhorsman
  changes for snapshot improvements
 

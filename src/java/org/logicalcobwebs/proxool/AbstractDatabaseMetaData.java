@@ -9,26 +9,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.DatabaseMetaData;
-import java.text.DecimalFormat;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Date;
+import java.sql.SQLException;
 
 /**
  * Contains most of the functionality that we require to manipilate the
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/31 14:33:11 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 16:53:13 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-abstract public class AbstractDatabaseMetaData {
+public abstract class AbstractDatabaseMetaData {
 
     private static final Log LOG = LogFactory.getLog(AbstractDatabaseMetaData.class);
 
@@ -87,6 +81,9 @@ abstract public class AbstractDatabaseMetaData {
 /*
  Revision history:
  $Log: AbstractDatabaseMetaData.java,v $
+ Revision 1.2  2003/01/31 16:53:13  billhorsman
+ checkstyle
+
  Revision 1.1  2003/01/31 14:33:11  billhorsman
  fix for DatabaseMetaData
 

@@ -21,7 +21,7 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.3 $, $Date: 2003/01/31 16:38:54 $
+ * @version $Revision: 1.4 $, $Date: 2003/01/31 16:53:23 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -40,9 +40,9 @@ class StatsRoller {
 
     private int units;
 
-    private DecimalFormat decimalFormat = new DecimalFormat("0.00");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
 
-    private static final DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
     public StatsRoller(String alias, String token) throws ProxoolException {
         log = LogFactory.getLog("org.logicalcobwebs.proxool.stats." + alias);
@@ -169,6 +169,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.4  2003/01/31 16:53:23  billhorsman
+ checkstyle
+
  Revision 1.3  2003/01/31 16:38:54  billhorsman
  doc (and removing public modifier for classes where possible)
 

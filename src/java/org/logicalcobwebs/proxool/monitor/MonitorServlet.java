@@ -45,7 +45,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.3 $, $Date: 2003/01/31 16:38:52 $
+ * @version $Revision: 1.4 $, $Date: 2003/01/31 16:53:21 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -68,9 +68,9 @@ public class MonitorServlet extends HttpServlet {
     private static final String STYLE_DATA = "background: white;";
     private static final String STYLE_NO_DATA = "color: #666666;";
     private static final int DATE_OFFSET = 3600000;
-    private static final DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-    private static final DateFormat dateFormat = new SimpleDateFormat("DD-MMM-yyyy HH:mm:ss");
-    private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
+    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("DD-MMM-yyyy HH:mm:ss");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
     private static final Color COLOR_ACTIVE = Color.red;
     private static final Color COLOR_AVAILABLE = Color.green;
     private static final Color COLOR_SPARE = Color.decode("#eeeeee");
@@ -191,20 +191,20 @@ public class MonitorServlet extends HttpServlet {
         for (int i = 0; i < statisticsArray.length; i++) {
             StatisticsIF statistics = statisticsArray[i];
             out.print("<b>Statistics</b> from ");
-            out.print(timeFormat.format(statistics.getStartDate()));
+            out.print(TIME_FORMAT.format(statistics.getStartDate()));
             out.print(" to ");
-            out.print(timeFormat.format(statistics.getStopDate()));
+            out.print(TIME_FORMAT.format(statistics.getStopDate()));
 
             openTable(out);
 
             // Served
-            printDefintionEntry(out, "Served", statistics.getServedCount() + " (" + decimalFormat.format(statistics.getServedPerSecond()) + "/s)");
+            printDefintionEntry(out, "Served", statistics.getServedCount() + " (" + DECIMAL_FORMAT.format(statistics.getServedPerSecond()) + "/s)");
 
             // Refused
-            printDefintionEntry(out, "Refused", statistics.getRefusedCount() + " (" + decimalFormat.format(statistics.getRefusedPerSecond()) + "/s)");
+            printDefintionEntry(out, "Refused", statistics.getRefusedCount() + " (" + DECIMAL_FORMAT.format(statistics.getRefusedPerSecond()) + "/s)");
 
             // averageActiveTime
-            printDefintionEntry(out, "Average active time", decimalFormat.format(statistics.getAverageActiveTime()) + "s");
+            printDefintionEntry(out, "Average active time", DECIMAL_FORMAT.format(statistics.getAverageActiveTime()) + "s");
 
             // activityLevel
             StringBuffer activityLevelBuffer = new StringBuffer();
@@ -241,10 +241,10 @@ public class MonitorServlet extends HttpServlet {
         printDefintionEntry(out, "Prototyping", cpd.getPrototypeCount() > 0 ? String.valueOf(cpd.getPrototypeCount()) : null);
 
         // maximumConnectionLifetime
-        printDefintionEntry(out, "Connection Lifetime", timeFormat.format(new Date(cpd.getMaximumConnectionLifetime() - DATE_OFFSET)));
+        printDefintionEntry(out, "Connection Lifetime", TIME_FORMAT.format(new Date(cpd.getMaximumConnectionLifetime() - DATE_OFFSET)));
 
         // maximumActiveTime
-        printDefintionEntry(out, "Maximum active time", timeFormat.format(new Date(cpd.getMaximumActiveTime() - DATE_OFFSET)));
+        printDefintionEntry(out, "Maximum active time", TIME_FORMAT.format(new Date(cpd.getMaximumActiveTime() - DATE_OFFSET)));
         printDefintionEntry(out, "House keeping sleep time", (cpd.getHouseKeepingSleepTime() / 1000) + "s");
 
         // houseKeepingTestSql
@@ -277,11 +277,11 @@ public class MonitorServlet extends HttpServlet {
         ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
 
         out.print("<b>Snapshot</b> at ");
-        out.println(timeFormat.format(snapshot.getSnapshotDate()));
+        out.println(TIME_FORMAT.format(snapshot.getSnapshotDate()));
         openTable(out);
 
         // dateStarted
-        printDefintionEntry(out, "Start date", dateFormat.format(snapshot.getDateStarted()));
+        printDefintionEntry(out, "Start date", DATE_FORMAT.format(snapshot.getDateStarted()));
 
         // connections
         StringBuffer connectionsBuffer = new StringBuffer();
@@ -400,12 +400,12 @@ public class MonitorServlet extends HttpServlet {
 
                 // birth
                 out.print("<td>&nbsp;");
-                out.print(timeFormat.format(connectionInfo.getBirthDate()));
+                out.print(TIME_FORMAT.format(connectionInfo.getBirthDate()));
                 out.print("</td>");
 
                 // started
                 out.print("<td>&nbsp;");
-                out.print(timeFormat.format(new Date(connectionInfo.getTimeLastStartActive())));
+                out.print(TIME_FORMAT.format(new Date(connectionInfo.getTimeLastStartActive())));
                 out.print("</td>");
 
                 // active
@@ -486,7 +486,7 @@ public class MonitorServlet extends HttpServlet {
             ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(a);
             out.println("    <tr style=\"" + style + "\">");
 
-            out.print("      <td width=\"200\" style=\""+ STYLE_CAPTION + "\">");
+            out.print("      <td width=\"200\" style=\"" + STYLE_CAPTION + "\">");
             out.print(a.equals(alias) ? ">" : "&nbsp;");
             out.println("</td>");
 
@@ -507,6 +507,9 @@ public class MonitorServlet extends HttpServlet {
 /*
  Revision history:
  $Log: MonitorServlet.java,v $
+ Revision 1.4  2003/01/31 16:53:21  billhorsman
+ checkstyle
+
  Revision 1.3  2003/01/31 16:38:52  billhorsman
  doc (and removing public modifier for classes where possible)
 

@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.proxool.ConnectionPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,11 +19,11 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.4 $, $Date: 2003/01/28 15:20:30 $
+ * @version $Revision: 1.5 $, $Date: 2003/01/31 16:53:27 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public class ProxyStatement extends AbstractProxyStatement  implements Statement {
+public class ProxyStatement extends AbstractProxyStatement implements Statement {
 
     private static final Log LOG = LogFactory.getLog(ProxyStatement.class);
 
@@ -181,6 +180,9 @@ public class ProxyStatement extends AbstractProxyStatement  implements Statement
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.5  2003/01/31 16:53:27  billhorsman
+ checkstyle
+
  Revision 1.4  2003/01/28 15:20:30  billhorsman
  added tracing
 

@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/31 16:38:51 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/31 16:53:21 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -78,7 +78,7 @@ public class Monitor {
      */
     public StatisticsIF getStatistics(String token) {
         try {
-            return ((StatsRoller)statsRollers.get(token)).getCompleteStatistics();
+            return ((StatsRoller) statsRollers.get(token)).getCompleteStatistics();
         } catch (NullPointerException e) {
             return null;
         }
@@ -124,6 +124,9 @@ public class Monitor {
 /*
  Revision history:
  $Log: Monitor.java,v $
+ Revision 1.3  2003/01/31 16:53:21  billhorsman
+ checkstyle
+
  Revision 1.2  2003/01/31 16:38:51  billhorsman
  doc (and removing public modifier for classes where possible)
 

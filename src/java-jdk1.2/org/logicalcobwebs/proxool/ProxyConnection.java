@@ -7,7 +7,6 @@ package org.logicalcobwebs.proxool;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -17,14 +16,14 @@ import java.util.Map;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.4 $, $Date: 2003/01/31 14:33:19 $
+ * @version $Revision: 1.5 $, $Date: 2003/01/31 16:53:25 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public class ProxyConnection extends AbstractProxyConnection  implements Connection {
+public class ProxyConnection extends AbstractProxyConnection implements Connection {
 
     public ProxyConnection(Connection connection, long id, ConnectionPool connectionPool) throws SQLException {
-        super(connection,  id, connectionPool);
+        super(connection, id, connectionPool);
     }
 
     /**
@@ -201,6 +200,9 @@ public class ProxyConnection extends AbstractProxyConnection  implements Connect
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.5  2003/01/31 16:53:25  billhorsman
+ checkstyle
+
  Revision 1.4  2003/01/31 14:33:19  billhorsman
  fix for DatabaseMetaData
 

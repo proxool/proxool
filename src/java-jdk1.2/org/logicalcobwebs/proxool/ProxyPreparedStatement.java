@@ -5,22 +5,18 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.proxool.ProxyStatement;
-
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
-import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -30,7 +26,7 @@ import java.util.Calendar;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.4 $, $Date: 2003/01/28 15:20:25 $
+ * @version $Revision: 1.5 $, $Date: 2003/01/31 16:53:27 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -320,6 +316,9 @@ public class ProxyPreparedStatement extends ProxyStatement implements PreparedSt
 /*
  Revision history:
  $Log: ProxyPreparedStatement.java,v $
+ Revision 1.5  2003/01/31 16:53:27  billhorsman
+ checkstyle
+
  Revision 1.4  2003/01/28 15:20:25  billhorsman
  added tracing
 

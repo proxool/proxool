@@ -23,12 +23,12 @@ import java.util.Date;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.4 $, $Date: 2003/01/31 14:33:14 $
+ * @version $Revision: 1.5 $, $Date: 2003/01/31 16:53:15 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-abstract public class AbstractProxyConnection implements ProxyConnectionIF {
+abstract class AbstractProxyConnection implements ProxyConnectionIF {
 
     private static final Log LOG = LogFactory.getLog(AbstractProxyConnection.class);
 
@@ -478,6 +478,9 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.5  2003/01/31 16:53:15  billhorsman
+ checkstyle
+
  Revision 1.4  2003/01/31 14:33:14  billhorsman
  fix for DatabaseMetaData
 

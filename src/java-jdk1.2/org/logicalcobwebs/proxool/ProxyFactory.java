@@ -10,16 +10,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.DatabaseMetaData;
 
 /**
  * A central place to build proxy objects ({@link org.logicalcobwebs.proxool.ProxyConnection connections}
  * and {@link org.logicalcobwebs.proxool.ProxyStatement statements}).
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/31 14:33:19 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/31 16:53:26 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -53,14 +53,14 @@ class ProxyFactory {
      */
     protected static Statement getDelegateStatement(Statement statement) {
         try {
-            return ((ProxyStatement)statement).getDelegateStatement();
+            return ((ProxyStatement) statement).getDelegateStatement();
         } catch (ClassCastException e) {
             LOG.error("Expected a ProxyStatement but got a " + statement.getClass() + " instead.");
             throw e;
         }
     }
 
-    protected static Statement createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection,  String sqlStatement) {
+    protected static Statement createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection, String sqlStatement) {
         return new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement);
     }
 
@@ -80,6 +80,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.3  2003/01/31 16:53:26  billhorsman
+ checkstyle
+
  Revision 1.2  2003/01/31 14:33:19  billhorsman
  fix for DatabaseMetaData
 

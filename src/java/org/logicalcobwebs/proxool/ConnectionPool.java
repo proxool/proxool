@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.36 $, $Date: 2003/01/31 11:49:28 $
+ * @version $Revision: 1.37 $, $Date: 2003/01/31 16:53:16 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -100,8 +100,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     private static boolean loggedLegend;
 
     private Monitor monitor;
-
-    private Object POOL_LOCK = "poolLock";
 
     private boolean locked = false;
 
@@ -1185,6 +1183,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.37  2003/01/31 16:53:16  billhorsman
+ checkstyle
+
  Revision 1.36  2003/01/31 11:49:28  billhorsman
  use Monitor instead of Stats
 

@@ -5,14 +5,14 @@
  */
 package org.logicalcobwebs.proxool;
 
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Implementation of DatabaseMetaData hard coded for JDK 1.2
- * @version $Revision: 1.1 $, $Date: 2003/01/31 14:33:19 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 16:53:26 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -503,7 +503,7 @@ public class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements D
     public ResultSet getProcedures(String catalog, String schemaPattern,
                                    String procedureNamePattern) throws SQLException {
         return getDatabaseMetaData().getProcedures(catalog, schemaPattern,
-                                   procedureNamePattern);
+                procedureNamePattern);
     }
 
     public ResultSet getProcedureColumns(String catalog,
@@ -511,15 +511,15 @@ public class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements D
                                          String procedureNamePattern,
                                          String columnNamePattern) throws SQLException {
         return getDatabaseMetaData().getProcedureColumns(catalog,
-                                         schemaPattern,
-                                         procedureNamePattern,
-                                         columnNamePattern);
+                schemaPattern,
+                procedureNamePattern,
+                columnNamePattern);
     }
 
     public ResultSet getTables(String catalog, String schemaPattern,
                                String tableNamePattern, String types[]) throws SQLException {
         return getDatabaseMetaData().getTables(catalog, schemaPattern,
-                               tableNamePattern, types);
+                tableNamePattern, types);
     }
 
     public ResultSet getSchemas() throws SQLException {
@@ -538,49 +538,49 @@ public class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements D
                                 String tableNamePattern, String columnNamePattern)
             throws SQLException {
         return getDatabaseMetaData().getColumns(catalog, schemaPattern,
-                                tableNamePattern, columnNamePattern);
+                tableNamePattern, columnNamePattern);
     }
 
     public ResultSet getColumnPrivileges(String catalog, String schema,
                                          String table, String columnNamePattern) throws SQLException {
         return getDatabaseMetaData().getColumnPrivileges(catalog, schema,
-                                         table, columnNamePattern);
+                table, columnNamePattern);
     }
 
     public ResultSet getTablePrivileges(String catalog, String schemaPattern,
                                         String tableNamePattern) throws SQLException {
         return getDatabaseMetaData().getTablePrivileges(catalog, schemaPattern,
-                                        tableNamePattern);
+                tableNamePattern);
     }
 
     public ResultSet getBestRowIdentifier(String catalog, String schema,
                                           String table, int scope, boolean nullable) throws SQLException {
         return getDatabaseMetaData().getBestRowIdentifier(catalog, schema,
-                                          table, scope, nullable);
+                table, scope, nullable);
     }
 
     public ResultSet getVersionColumns(String catalog, String schema,
                                        String table) throws SQLException {
         return getDatabaseMetaData().getVersionColumns(catalog, schema,
-                                       table);
+                table);
     }
 
     public ResultSet getPrimaryKeys(String catalog, String schema,
                                     String table) throws SQLException {
         return getDatabaseMetaData().getPrimaryKeys(catalog, schema,
-                                    table);
+                table);
     }
 
     public ResultSet getImportedKeys(String catalog, String schema,
                                      String table) throws SQLException {
         return getDatabaseMetaData().getImportedKeys(catalog, schema,
-                                     table);
+                table);
     }
 
     public ResultSet getExportedKeys(String catalog, String schema,
                                      String table) throws SQLException {
         return getDatabaseMetaData().getExportedKeys(catalog, schema,
-                                     table);
+                table);
     }
 
     public ResultSet getCrossReference(
@@ -588,9 +588,9 @@ public class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements D
             String foreignCatalog, String foreignSchema, String foreignTable
             ) throws SQLException {
         return getDatabaseMetaData().getCrossReference(
-            primaryCatalog, primarySchema, primaryTable,
-            foreignCatalog, foreignSchema, foreignTable
-            );
+                primaryCatalog, primarySchema, primaryTable,
+                foreignCatalog, foreignSchema, foreignTable
+        );
     }
 
     public ResultSet getTypeInfo() throws SQLException {
@@ -601,7 +601,7 @@ public class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements D
                                   boolean unique, boolean approximate)
             throws SQLException {
         return getDatabaseMetaData().getIndexInfo(catalog, schema, table,
-                                  unique, approximate);
+                unique, approximate);
     }
 
     public boolean supportsResultSetType(int type) throws SQLException {
@@ -657,7 +657,7 @@ public class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements D
                              String typeNamePattern, int[] types)
             throws SQLException {
         return getDatabaseMetaData().getUDTs(catalog, schemaPattern,
-                             typeNamePattern, types);
+                typeNamePattern, types);
     }
 
 }
@@ -666,6 +666,9 @@ public class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements D
 /*
  Revision history:
  $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.2  2003/01/31 16:53:26  billhorsman
+ checkstyle
+
  Revision 1.1  2003/01/31 14:33:19  billhorsman
  fix for DatabaseMetaData
 

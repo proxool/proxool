@@ -19,7 +19,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.14 $, $Date: 2003/01/28 11:47:08 $
+ * @version $Revision: 1.15 $, $Date: 2003/01/31 16:53:19 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -65,10 +65,10 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 
                     // What sort of method is it
                     if (method.getName().equals(SET_NULL_METHOD) && argCount > 0 && args[0] instanceof Integer) {
-                        int index = ((Integer)args[0]).intValue();
+                        int index = ((Integer) args[0]).intValue();
                         putParameter(index, null);
                     } else if (method.getName().startsWith(SET_PREFIX) && argCount > 1 && args[0] instanceof Integer) {
-                        int index = ((Integer)args[0]).intValue();
+                        int index = ((Integer) args[0]).intValue();
                         putParameter(index, args[1]);
                     }
 
@@ -107,6 +107,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.15  2003/01/31 16:53:19  billhorsman
+ checkstyle
+
  Revision 1.14  2003/01/28 11:47:08  billhorsman
  new isTrace() and made close() public
 

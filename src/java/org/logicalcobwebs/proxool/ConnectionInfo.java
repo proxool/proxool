@@ -5,15 +5,13 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.proxool.ConnectionInfoIF;
-
 import java.util.Date;
 
 /**
  * Implementation of ConnectionInfoIF. Unlike ConnectionPool it is
  * frozen and will not change. Used with a {@link org.logicalcobwebs.proxool.monitor.SnapshotIF snapshot}
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/31 11:47:14 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 16:53:15 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -109,6 +107,9 @@ class ConnectionInfo implements ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfo.java,v $
+ Revision 1.2  2003/01/31 16:53:15  billhorsman
+ checkstyle
+
  Revision 1.1  2003/01/31 11:47:14  billhorsman
  new snapshot of connection info
 
