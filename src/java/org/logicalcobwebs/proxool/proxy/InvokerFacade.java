@@ -10,10 +10,11 @@ import org.logicalcobwebs.proxool.ProxoolException;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * Invokes a method using a cached method.
- * @version $Revision: 1.2 $, $Date: 2004/07/13 21:06:16 $
+ * @version $Revision: 1.3 $, $Date: 2004/07/13 21:13:14 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -31,13 +32,18 @@ public class InvokerFacade {
      * @throws org.logicalcobwebs.proxool.ProxoolException if the method is not found.
      */
     public static Method getConcreteMethod(Class concreteClass, Method injectableMethod) throws ProxoolException {
-        Object key = concreteClass.getName() + ":" + injectableMethod.getName();
-        MethodMapper methodMapper = (MethodMapper) methodMappers.get(key);
-        if (methodMapper == null) {
-            methodMapper = new MethodMapper(concreteClass);
-            methodMappers.put(key, methodMapper);
+        // Unless the concrete class is public we can't do anything
+        if (Modifier.isPublic(concreteClass.getModifiers())) {
+            Object key = concreteClass.getName() + ":" + injectableMethod.getName();
+            MethodMapper methodMapper = (MethodMapper) methodMappers.get(key);
+            if (methodMapper == null) {
+                methodMapper = new MethodMapper(concreteClass);
+                methodMappers.put(key, methodMapper);
+            }
+            return methodMapper.getConcreteMethod(injectableMethod);
+        } else {
+            return injectableMethod;
         }
-        return methodMapper.getConcreteMethod(injectableMethod);
     }
 
     /**
@@ -62,6 +68,9 @@ public class InvokerFacade {
 /*
  Revision history:
  $Log: InvokerFacade.java,v $
+ Revision 1.3  2004/07/13 21:13:14  billhorsman
+ Optimise using injectable interfaces on methods that are declared in non-public classes by not bothering to use concrete methods at all (it's not possible).
+
  Revision 1.2  2004/07/13 21:06:16  billhorsman
  Fix problem using injectable interfaces on methods that are declared in non-public classes.
 
