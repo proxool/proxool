@@ -6,20 +6,18 @@
 package org.logicalcobwebs.proxool;
 
 /**
- * Monitors the activity of the pool so you can see whether it is
- * quiet, busy, overloaded, or down. You need to
- * {@link ProxoolFacade#setStateListener register} it with
- * ProxoolFacade first.
+ * Monitors the state of the pool so you can see whether it is
+ * quiet, busy, overloaded, or down.
  *
  * <pre>
  * String alias = "myPool";
  * StateListenerIF myStateListener = new MyStateListener();
- * ProxoolFacade.setStateListener(alias, myStateListener);
+ * ProxoolFacade.{@link ProxoolFacade#addStateListener addStateListenerIF}(alias, myStateListener);
  * </pre>
  *
- * @version $Revision: 1.3 $, $Date: 2002/12/15 19:21:42 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/08 00:35:30 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public interface StateListenerIF {
 
@@ -37,6 +35,9 @@ public interface StateListenerIF {
 /*
  Revision history:
  $Log: StateListenerIF.java,v $
+ Revision 1.4  2003/02/08 00:35:30  billhorsman
+ doc
+
  Revision 1.3  2002/12/15 19:21:42  chr32
  Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
 

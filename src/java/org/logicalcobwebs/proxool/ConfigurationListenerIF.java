@@ -11,12 +11,13 @@ import java.util.Properties;
  * Listens to any changes made to a {@link ConnectionPoolDefinitionIF definition}.
  * This gives you the opportunity to persist a definition.
  *
- * After registering a pool you should call
- * {@link ProxoolFacade#setConfigurationListener setConfigurationListener}.
- * This ensures that any changes to the definition will call this object's
- * {@link #defintionUpdated defintionUpdated} method
+ * <pre>
+ * String alias = "myPool";
+ * ConfigurationListenerIF myConfigurationListener = new MyConfigurationListener();
+ * ProxoolFacade.{@link ProxoolFacade#addConfigurationListener addConfigurationListener}(alias, myConfigurationListener);
+ * </pre>
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/23 11:41:56 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/08 00:35:30 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -37,6 +38,9 @@ public interface ConfigurationListenerIF {
 /*
  Revision history:
  $Log: ConfigurationListenerIF.java,v $
+ Revision 1.3  2003/02/08 00:35:30  billhorsman
+ doc
+
  Revision 1.2  2003/01/23 11:41:56  billhorsman
  doc
 

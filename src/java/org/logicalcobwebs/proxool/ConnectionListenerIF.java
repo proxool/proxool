@@ -19,12 +19,12 @@ import java.sql.SQLException;
  * <pre>
  * String alias = "myPool";
  * ConnectionListenerIF myConnectionListener = new MyConnectionListener();
- * ProxoolFacade.setConnectionListener(alias, myConnectionListener);
+ * ProxoolFacade.{@link org.logicalcobwebs.proxool.ProxoolFacade#addConnectionListener addConnectionListener}(alias, myConnectionListener);
  * </pre>
  *
- * @version $Revision: 1.5 $, $Date: 2002/12/15 19:21:42 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/08 00:35:30 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ConnectionListenerIF {
 
@@ -73,6 +73,9 @@ public interface ConnectionListenerIF {
 /*
  Revision history:
  $Log: ConnectionListenerIF.java,v $
+ Revision 1.6  2003/02/08 00:35:30  billhorsman
+ doc
+
  Revision 1.5  2002/12/15 19:21:42  chr32
  Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
 
