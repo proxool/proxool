@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.16 $
-    $Date: 2002/12/06 15:51:58 $
-    $Author: billhorsman $
+    $Revision: 1.17 $
+    $Date: 2002/12/15 19:49:04 $
+    $Author: chr32 $
 
     http://proxool.sourceforge.net
 
@@ -17,12 +17,6 @@
 
     <!-- Whether to include the test classes -->
     <property name="test" value="false"/>
-
-    <!-- Whether to include the Avalon dependent classes -->
-    <property name="ext.avalon" value="false"/>
-
-    <!-- Whether to include the JAXP dependent classes -->
-    <property name="ext.xml" value="false"/>
 
     <!-- Where to build everything. You might want to override
     this so that it isn't within your cvs tree. -->
@@ -83,21 +77,6 @@
         <condition property="build-test">
             <equals arg1="${test}" arg2="true"/>
         </condition>
-
-        <!--
-            Evaluate whether we should include the AvalonConfigurator
-           -->
-        <condition property="build-avalon">
-            <equals arg1="${ext.avalon}" arg2="true"/>
-        </condition>
-
-        <!--
-            Evaluate whether we should include the XMLConfigurator
-           -->
-        <condition property="build-xml">
-            <equals arg1="${ext.xml}" arg2="true"/>
-        </condition>
-
     </target>
 
     <target
@@ -115,7 +94,7 @@
 
             <fileset dir="src/java" includes="**/*.java"/>
             <fileset dir="src/java-examples" includes="**/*.java"/>
-            <fileset dir="src/java-ext" includes="**/*.java"/>
+            <fileset dir="src/java-sandbox" includes="**/*.java"/>
             <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
             <fileset dir="src/java-test" includes="**/*.java"/>
 
@@ -135,7 +114,7 @@
 
             <fileset dir="src/java" includes="**/*.java"/>
             <fileset dir="src/java-examples" includes="**/*.java"/>
-            <fileset dir="src/java-ext" includes="**/*.java"/>
+            <fileset dir="src/java-sandbox" includes="**/*.java"/>
             <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
             <fileset dir="src/java-test" includes="**/*.java"/>
 
@@ -154,8 +133,6 @@
         >
         <antcall target="build-src-core"/>
         <antcall target="build-src-jdk1.2"/>
-        <antcall target="build-src-avalon"/>
-        <antcall target="build-src-xml"/>
         <antcall target="build-src-test"/>
     </target>
 
@@ -191,7 +168,7 @@
         >
         <copy todir="${build-dir}/src/java" preservelastmodified="yes">
             <fileset dir="src/java" includes="**/*.java"/>
-            <fileset dir="src/java-ext" includes="**/PropertyConfigurator.java"/>
+            <fileset dir="src/java-sandbox" includes="**/PropertyConfigurator.java"/>
         </copy>
     </target>
 
@@ -218,33 +195,11 @@
     </target>
 
     <target
-        name="build-src-avalon"
-        depends="init"
-        if="build-avalon"
-        >
-        <echo level="verbose" message="Collecting Avalon classes"/>
-        <copy todir="${build-dir}/src/java">
-            <fileset dir="src/java-ext" includes="**/AvalonConfigurator.java"/>
-        </copy>
-    </target>
-
-    <target
-        name="build-src-xml"
-        depends="init"
-        if="build-xml"
-        >
-        <echo level="verbose" message="Collecting XML classes"/>
-        <copy todir="${build-dir}/src/java">
-            <fileset dir="src/java-ext" includes="**/XMLConfigurator.java"/>
-        </copy>
-    </target>
-
-    <target
         name="build-test"
         depends="init"
         >
         <property name="build-test" value="true"/>
-        <property name="build-ext" value="true"/>
+        <property name="build-sandbox" value="true"/>
         <antcall target="build-src"/>
         <antcall target="compile"/>
     </target>
@@ -288,7 +243,7 @@
         >
             <sourcepath path="src/java" />
             <sourcepath path="src/java-test" />
-            <sourcepath path="src/java-ext" />
+            <sourcepath path="src/java-sandbox" />
         </javadoc>
 
         <!-- Simple documentation for use by users -->
