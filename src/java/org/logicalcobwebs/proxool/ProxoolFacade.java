@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Comparator;
 import java.util.Date;
+import java.lang.reflect.Method;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -33,7 +34,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.58 $, $Date: 2003/02/24 01:15:33 $
+ * @version $Revision: 1.59 $, $Date: 2003/02/24 18:03:24 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -77,7 +78,12 @@ public class ProxoolFacade {
 
             ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
             connectionPool.start();
-            compositeProxoolListener.onRegistration(cpd, (Properties) completeInfos.get(alias));
+
+            final Properties poolProperties = (Properties) completeInfos.get(alias);
+            compositeProxoolListener.onRegistration(cpd, poolProperties);
+            if (isConfiguredForJMX(poolProperties)) {
+                registerForJmx(alias, poolProperties);
+            }
         } else {
             throw new ProxoolException("Attempt to register duplicate pool called '" + alias + "'");
         }
@@ -834,11 +840,43 @@ public class ProxoolFacade {
 
         return snapshot;
     }
+
+    // all jmx operations are done through reflection
+    // to avoid making the facade dependant on the JMX classes
+    private static boolean registerForJmx(String alias, Properties properties) {
+        boolean success = false;
+        try {
+            Class jmxHelperClass = Class.forName("org.logicalcobwebs.proxool.admin.jmx.ProxoolJMXHelper");
+            Method registerMethod = jmxHelperClass.getDeclaredMethod("registerPool", new Class[]{String.class, Properties.class});
+            registerMethod.invoke(null, new Object[]{alias, properties});
+            success = true;
+        } catch (Exception e) {
+            LOG.error("JMX registration of " + alias + " pool failed.", e);
+        }
+        return success;
+    }
+
+    /**
+     * Get wether the given pool properties contains configuration for JMX instrumentation of the pool.
+     * @param poolProperties the properties to check for JMX configuration.
+     * @return wether the given pool properties contains configuration for JMX instrumentation or not.
+     */
+    private static boolean isConfiguredForJMX(Properties poolProperties) {
+        final String jmxProperty = poolProperties.getProperty(ProxoolConstants.JMX_PROPERTY);
+        if (jmxProperty != null && jmxProperty.equalsIgnoreCase("true")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.59  2003/02/24 18:03:24  chr32
+ Added JMX operations.
+
  Revision 1.58  2003/02/24 01:15:33  chr32
  Added support for ProxoolListenerIF.
 
