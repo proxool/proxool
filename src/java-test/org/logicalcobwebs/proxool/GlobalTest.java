@@ -23,7 +23,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * 
  * The test configuration can be specified using the env property "testConfig"
  *
- * @version $Revision: 1.19 $, $Date: 2004/05/26 17:19:09 $
+ * @version $Revision: 1.20 $, $Date: 2004/05/26 22:30:21 $
  * @author bill
  * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.5
@@ -62,7 +62,7 @@ public class GlobalTest {
         Class.forName(ProxoolDriver.class.getName());
 
         // initialise test configuration
-        initTestConstants(defaultConfig);
+        initTestConstants();
 
         // remember we are correctly initialized
         initialised = true;
@@ -75,15 +75,8 @@ public class GlobalTest {
      */
     private static void initTestConstants() throws Exception
 	{
-    	String resourceName = System.getProperty("testConfig");
-    	if( resourceName==null || resourceName.length()==0 )
-    	{
-    		LOG.info("Test configuration set to default value");
-    	}
-    	else
-    	{
-    		initTestConstants(resourceName);
-    	}
+    	String resourceName = System.getProperty("testConfig", defaultConfig);
+   		initTestConstants(resourceName);
 	}
     
     /**
@@ -135,7 +128,7 @@ public class GlobalTest {
     
     
     public static synchronized void globalTeardown(String alias) {
-        ProxoolFacade.shutdown(alias + ":teardown", 10000);
+        ProxoolFacade.shutdown(alias + ":teardown", 0); //, 10000);
     }
 
     /**
@@ -171,6 +164,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.20  2004/05/26 22:30:21  brenuart
+ Fix issue where testConfig env property was not correctly handled
+
  Revision 1.19  2004/05/26 17:19:09  brenuart
  Allow JUnit tests to be executed against another database.
  By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
