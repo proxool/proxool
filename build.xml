@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.12 $
-    $Date: 2002/11/09 16:10:28 $
+    $Revision: 1.13 $
+    $Date: 2002/11/12 20:20:20 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -32,7 +32,7 @@
     <property name="debug" value="false"/>
 
     <!-- Current version -->
-    <property name="version" value="0.4"/>
+    <property name="version" value="CVS"/>
 
     <!-- Log4J configuration to use for testing. See proxool-ant.properties
     file for more infomation. -->
