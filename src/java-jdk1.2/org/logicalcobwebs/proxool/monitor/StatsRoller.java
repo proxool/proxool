@@ -19,7 +19,7 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/31 16:53:29 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/04 16:01:09 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -148,12 +148,22 @@ public class StatsRoller {
     public Statistics getCompleteStatistics() {
         return completeStatistics;
     }
+
+    /**
+     * Cancels the timer that outputs the stats. Except there isn't one
+     * in JDK 1.2 so this does nothing.
+     */
+    protected void cancel() {
+    }
 }
 
 
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.3  2003/02/04 16:01:09  billhorsman
+ implement empty cancel() method
+
  Revision 1.2  2003/01/31 16:53:29  billhorsman
  checkstyle
 
