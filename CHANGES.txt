@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.6 $
-$Date: 2002/11/13 12:32:13 $
+$Revision: 1.7 $
+$Date: 2002/11/13 17:35:40 $
 $Author: billhorsman $
 
 0.5 (scheduled for November 22, 2002)
@@ -51,6 +51,11 @@ $Author: billhorsman $
   You can also get this information if you register a ConnectionListenerIF (use
   ProxoolFacade's setConnectionListener() method). This won't effect performance
   if you're not listening or have trace off.
+
+- Prototyping is now off by default. To enable prototyping you need to set the
+  proxool.prototype-count property to something sensible (like 5, for instance).
+  [Prototyping is where spare connections are made when the active count
+  approaches the number currently available.]
 
 0.4 - September 19, 2002
 
