@@ -22,7 +22,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.8 $, $Date: 2002/11/13 18:27:59 $
+ * @version $Revision: 1.9 $, $Date: 2002/11/13 20:53:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -228,14 +228,22 @@ public class ConnectionResetter {
         // or something). We want to know about transactions that are pending.
         // It doesn't seem like a very good idea to close a connection with
         // pending transactions.
-        Iterator i = accessorMutatorMap.values().iterator();
+        Iterator i = accessorMutatorMap.keySet().iterator();
         while (i.hasNext()) {
-            Method mutator = (Method) i.next();
+            Method accessor = (Method) i.next();
+            Method mutator = (Method) accessorMutatorMap.get(accessor);
             Object[] args = {defaultValues.get(mutator)};
             try {
-                mutator.invoke(connection, args);
-                if (log.isDebugEnabled()) {
-                    log.debug(id + " - Reset: " + mutator.getName() + "(" + args[0] + ")");
+                Object currentValue = accessor.invoke(connection, null);
+                if (currentValue == null && args[0] == null) {
+                    // Nothing to do then
+                } else if (currentValue.equals(args[0])) {
+                    // Nothing to do here either
+                } else {
+                    mutator.invoke(connection, args);
+                    if (log.isDebugEnabled()) {
+                        log.debug(id + " - Reset: " + mutator.getName() + "(" + args[0] + ") from " + currentValue);
+                    }
                 }
             } catch (Throwable t) {
                 errorsEncountered = true;
@@ -251,7 +259,7 @@ public class ConnectionResetter {
                 // Setting autoCommit to true might well commit all pending
                 // transactions. But that's beyond our control.
                 connection.setAutoCommit(true);
-                log.debug(id + " - Committed and autoCommit reset back to true");
+                log.debug(id + " - autoCommit reset back to true");
             } catch (Throwable t) {
                 errorsEncountered = true;
                 log.warn(id + " - Problem calling connection.commit() or connection.setAutoCommit(true)", t);
@@ -276,6 +284,9 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.9  2002/11/13 20:53:16  billhorsman
+ now checks to see whether is necessary for each property (better logging)
+
  Revision 1.8  2002/11/13 18:27:59  billhorsman
  rethink. committing automatically is bad. so now we just
  set autoCommit back to true (which might commit anyway but
