@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.5 $, $Date: 2003/04/10 08:22:33 $
+ * @version $Revision: 1.6 $, $Date: 2003/09/11 10:44:54 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -93,7 +93,7 @@ public class Prototyper {
                     }
                     buildConnection(ProxyConnection.STATUS_AVAILABLE, reason);
                     somethingDone = true;
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.error("Prototype", e);
                     // If there's been an exception, perhaps we should stop
                     // prototyping for a while.  Otherwise if the database
@@ -260,6 +260,10 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.6  2003/09/11 10:44:54  billhorsman
+ Catch throwable not just exception during creation of connection
+ (this will catch ClassNotFoundError too)
+
  Revision 1.5  2003/04/10 08:22:33  billhorsman
  removed some very frequent debug
 
