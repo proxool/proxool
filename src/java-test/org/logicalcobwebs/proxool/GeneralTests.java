@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.12 $, $Date: 2002/11/02 13:57:34 $
+ * @version $Revision: 1.13 $, $Date: 2002/11/07 18:53:19 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -119,6 +119,42 @@ public class GeneralTests extends TestCase {
             assertTrue(mcc2 == 1);
         }
 
+    }
+
+    public void testMaximumActiveTime() {
+
+        String testName = "maximumActiveTime";
+
+        try {
+            String alias = "load";
+            Properties info = TestHelper.buildProperties();
+            info.setProperty(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY, "5000");
+            info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "5000");
+            ProxoolAdapter adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            assertEquals("Shuoldn't be any active connections yet", ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount(), 0);
+
+            Connection connection = adapter.getConnection();
+
+            assertEquals("We just opened 1 connection", ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount(), 1);
+
+            long start = System.currentTimeMillis();
+            try {
+                Thread.sleep(15000);
+            } catch (InterruptedException e) {
+                LOG.debug("Awoken.");
+            }
+
+            long elapsed = System.currentTimeMillis() - start;
+            assertTrue("Connection has not been closed after " + elapsed + " milliseconds as expected", connection.isClosed());
+
+            assertEquals("Expected the connection to be inactive", ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount(), 0);
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        }
     }
 
     /**
@@ -294,6 +330,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.13  2002/11/07 18:53:19  billhorsman
+ Slight improvement to setup
+
  Revision 1.12  2002/11/02 13:57:34  billhorsman
  checkstyle
 
