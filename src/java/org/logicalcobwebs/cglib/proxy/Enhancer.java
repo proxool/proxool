@@ -93,18 +93,6 @@ import org.logicalcobwebs.asm.ClassVisitor;
 public class Enhancer extends AbstractClassGenerator
 {
 
-    static final CallbackFilter ALL_ZERO = new CallbackFilter() {
-        public int accept(Method method) {
-            return 0;
-        }
-        public String toString() {
-            return "ALL_ZERO";
-        }
-        public int hashCode() {
-            return 999;
-        }
-    };
-
     private static final Source SOURCE = new Source(Enhancer.class.getName());
     private static final EnhancerKey KEY_FACTORY =
       (EnhancerKey)KeyFactory.create(EnhancerKey.class, KeyFactory.CLASS_BY_NAME);
@@ -331,7 +319,7 @@ public class Enhancer extends AbstractClassGenerator
             if (callbackTypes.length > 1) {
                 throw new IllegalStateException("Multiple callback types possible but no filter specified");
             }
-            filter = ALL_ZERO;
+            filter = CallbackFilter.ALL_ZERO;
         }
         
         if (superclass != null) {
