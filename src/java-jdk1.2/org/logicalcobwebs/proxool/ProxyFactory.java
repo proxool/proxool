@@ -19,7 +19,7 @@ import java.sql.Statement;
  * A central place to build proxy objects ({@link org.logicalcobwebs.proxool.ProxyConnection connections}
  * and {@link org.logicalcobwebs.proxool.ProxyStatement statements}).
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/11 14:58:56 $
+ * @version $Revision: 1.8 $, $Date: 2003/08/30 15:37:45 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -49,7 +49,22 @@ class ProxyFactory {
     }
 
     /**
+     * Gets the real Connection that we got from the delegate driver
+     * @param connection proxy connection
+     * @return deletgate connection
+     */
+    protected static Connection getDelegateConnection(Connection connection) {
+        try {
+            return ((ProxyConnection) connection).getConnection();
+        } catch (ClassCastException e) {
+            LOG.error("Expected a ProxyConnection but got a " + connection.getClass() + " instead.");
+            throw e;
+        }
+    }
+
+    /**
      * Gets the real Statement that we got from the delegate driver
+     * @param statement proxy statement
      * @return delegate statement
      */
     protected static Statement getDelegateStatement(Statement statement) {
@@ -81,6 +96,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.8  2003/08/30 15:37:45  billhorsman
+ Implement getDelegateConnection.
+
  Revision 1.7  2003/03/11 14:58:56  billhorsman
  brought inline with main tree
 
