@@ -24,7 +24,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.12 $, $Date: 2002/11/03 10:46:57 $
+ * @version $Revision: 1.13 $, $Date: 2002/11/09 15:56:31 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -393,6 +393,15 @@ public class ProxoolFacade {
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(connectionPoolName);
         if (cp != null) {
             cp.setConnectionListener(connectionListener);
+        } else {
+            StringBuffer knownPools = new StringBuffer();
+            String[] poolNames = ConnectionPoolManager.getInstance().getConnectionPoolNames();
+            for (int i = 0; i < poolNames.length; i++) {
+                knownPools.append(poolNames[i]);
+                knownPools.append(i > poolNames.length - 1 ? ", " : "");
+            }
+            LOG.warn("Couldn't add ConnectionListenerIF to " + connectionPoolName + " pool because it doesn't exist. "
+                + "I do know about " + poolNames.length + " though: " + knownPools);
         }
     }
 
@@ -424,6 +433,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.13  2002/11/09 15:56:31  billhorsman
+ log if serConnectionListener couldn't find pool
+
  Revision 1.12  2002/11/03 10:46:57  billhorsman
  hide passwords in log
 
