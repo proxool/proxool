@@ -18,7 +18,7 @@ import java.util.Properties;
  * Tests whether we are wrapping up connections correctly. There disposable
  * wrappers stop the user doing nasty things to the connection after it has
  * been closed.
- * @version $Revision: 1.2 $, $Date: 2004/03/23 21:25:54 $
+ * @version $Revision: 1.3 $, $Date: 2004/06/02 21:11:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -226,9 +226,9 @@ public class WrapperTest extends AbstractProxoolTest {
         assertTrue("c1 == c1", c1.equals(c1));
 
         Connection c2 = DriverManager.getConnection(url, info);
-        assertTrue("c1 != c2", !c1.equals(c2));
+        assertTrue("c1 == c2", c1.equals(c2));
         c2.close();
-        assertTrue("c1 != c2", !c1.equals(c2));
+        assertTrue("c1 == c2", c1.equals(c2));
 
     }
 
