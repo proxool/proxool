@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.34 $
-    $Date: 2003/02/27 18:06:53 $
+    $Revision: 1.35 $
+    $Date: 2003/02/28 12:09:46 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -64,6 +64,7 @@
         <mkdir dir="${build-dir}/classes"/>
         <mkdir dir="${build-dir}/api"/>
         <mkdir dir="${build-dir}/api-dev"/>
+        <mkdir dir="${build-dir}/reports"/>
         <tstamp/>
     </target>
 
@@ -281,13 +282,32 @@
     <target
         name="test"
         description="Runs the JUnit tests"
-        depends="clean,init,build-test,deleteTestDb"
         >
         <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}" />
-            <sysproperty key="script" value="src/java-test/org/logicalcobwebs/proxool/script.xml" />
             <arg value="org.logicalcobwebs.proxool.GlobalTest" />
         </java>
+    </target>
+
+    <target
+        name="produce-test-report"
+        description="Produce a report of the tests"
+        depends="clean,init,build-test,deleteTestDb"
+        >
+        <junit fork="true" printsummary="yes" >
+            <classpath refid="source"/>
+            <sysproperty key="log4jPath" value="${log4jPath}" />
+            <test name="org.logicalcobwebs.proxool.GlobalTest" todir="${build-dir}/reports" />
+            <formatter type="xml" />
+        </junit>
+
+        <junitreport>
+            <fileset dir="${build-dir}/reports" >
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="noframes" todir="${build-dir}/reports" />
+        </junitreport>
+
     </target>
 
     <target
