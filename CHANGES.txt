@@ -1,11 +1,11 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.5 $
-$Date: 2002/11/09 16:05:15 $
+$Revision: 1.6 $
+$Date: 2002/11/13 12:32:13 $
 $Author: billhorsman $
 
-0.5 (scheduled for November 15, 2002)
+0.5 (scheduled for November 22, 2002)
 
 - Fix finalisation of old instances. If you deploy to some environments in
   a certain way then it is possible for the class to be reloaded without the
@@ -30,7 +30,7 @@ $Author: billhorsman $
 - Improvements to the way Proxool detects changes to the pool definition
   when resending the Properties object when you get a connection. Now
   detects when it has changed which means that we don't do
-  unnecessary configuration and log is improved (we now loh properties
+  unnecessary configuration and log is improved (we now log properties
   as they are set or updated).
 
 - Fix to the ProxyConnection within the equals() method that was causing
@@ -47,10 +47,10 @@ $Author: billhorsman $
 - Connection.isClosed() now returns true when it is back in the pool.
 
 - New trace property allows you to log each execution, the SQL, the parameters
-  used, and the execution time. (use proxool.trace=true property). You can also
-  get this information if you register a ConnectionListenerIF (use ProxoolFacade's
-  setConnectionListener() method). This won't effect performance if you're not
-  listening or have trace off. 
+  used, and the execution time (DEBUG level). Use proxool.trace=true property.
+  You can also get this information if you register a ConnectionListenerIF (use
+  ProxoolFacade's setConnectionListener() method). This won't effect performance
+  if you're not listening or have trace off.
 
 0.4 - September 19, 2002
 
