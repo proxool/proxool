@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.8 $
-$Date: 2002/12/03 10:54:28 $
+$Revision: 1.9 $
+$Date: 2002/12/03 16:10:43 $
 $Author: billhorsman $
 
 0.5 (scheduled for November 22, 2002)
@@ -56,6 +56,9 @@ $Author: billhorsman $
   proxool.prototype-count property to something sensible (like 5, for instance).
   [Prototyping is where spare connections are when the number of available
   connections approaches zero.]
+
+- Fix for catching fatal SQL exceptions. This is a feature that throws away connections
+  that encounter certain types of exception.
 
 0.4 - September 19, 2002
 
