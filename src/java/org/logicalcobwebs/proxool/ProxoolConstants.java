@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.16 $, $Date: 2003/07/23 06:54:48 $
+ * @version $Revision: 1.17 $, $Date: 2003/09/05 17:00:42 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -142,6 +142,12 @@ public interface ProxoolConstants {
     /** @see ProxoolDriver#getPropertyInfo */
     public final String FATAL_SQL_EXCEPTION_PROPERTY = PROPERTY_PREFIX + FATAL_SQL_EXCEPTION;
 
+    /** @see #WRAP_FATAL_SQL_EXCEPTIONS_PROPERTY**/
+    public final String WRAP_FATAL_SQL_EXCEPTIONS = "wrap-fatal-sql-exceptions";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String WRAP_FATAL_SQL_EXCEPTIONS_PROPERTY = PROPERTY_PREFIX + WRAP_FATAL_SQL_EXCEPTIONS;
+
     public static final String STATISTICS = "statistics";
 
     /** @see ProxoolDriver#getPropertyInfo */
@@ -246,6 +252,9 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.17  2003/09/05 17:00:42  billhorsman
+ New wrap-fatal-sql-exceptions property.
+
  Revision 1.16  2003/07/23 06:54:48  billhorsman
  draft JNDI changes (shouldn't effect normal operation)
 
