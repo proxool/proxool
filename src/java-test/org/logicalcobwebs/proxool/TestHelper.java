@@ -26,11 +26,15 @@ public class TestHelper {
 
     private static final String PASSWORD = "";
 
-    private static final String PROXOOL_DRIVER = "org.logicalcobwebs.proxool.ProxoolDriver";
+    protected static final String PROXOOL_DRIVER = "org.logicalcobwebs.proxool.ProxoolDriver";
 
-    private static final String HYPERSONIC_DRIVER = "org.hsqldb.jdbcDriver";
+    protected static final String HYPERSONIC_DRIVER = "org.hsqldb.jdbcDriver";
 
-    private static final String HYPERSONIC_URL = "jdbc:hsqldb:test";
+    protected static final String HYPERSONIC_URL = "jdbc:hsqldb:test";
+
+    private static final String ORACLE_DRIVER = "oracle.jdbc.driver.OracleDriver";
+
+    private static final String ORACLE_URL = "jdbc:oracle:thin:@172.27.52.112:1527:hpgs1";
 
     protected static final String SQL_INSERT_INTO_TEST = "INSERT INTO TEST VALUES(1);";
 
@@ -52,6 +56,10 @@ public class TestHelper {
         ProxoolFacade.registerConnectionPool(getFullUrl(alias), info);
     }
 
+    protected static void registerOraclePool(String alias, Properties info) throws SQLException {
+        ProxoolFacade.registerConnectionPool(getFullOracleUrl(alias), info);
+    }
+
     protected static Connection getProxoolConnection(String url) throws ClassNotFoundException, SQLException {
         return getProxoolConnection(url, buildProperties());
     }
@@ -70,6 +78,26 @@ public class TestHelper {
         return url;
     }
 
+    protected static String buildProxoolUrl(String alias, String driver, String delegateUrl) {
+        String url = ProxoolConstants.PROXOOL
+                + ProxoolConstants.ALIAS_DELIMITER
+                + alias
+                + ProxoolConstants.URL_DELIMITER
+                + driver
+                + ProxoolConstants.URL_DELIMITER
+                + delegateUrl;
+        return url;
+    }
+
+    protected static String buildSimpoolUrl(String alias, String driver, String delegateUrl) {
+        String url = SimpoolDriver.PREFIX
+                + ProxoolConstants.URL_DELIMITER
+                + driver
+                + ProxoolConstants.URL_DELIMITER
+                + delegateUrl;
+        return url;
+    }
+
     protected static String getFullUrl(String alias) {
         String url = ProxoolConstants.PROXOOL
                 + ProxoolConstants.ALIAS_DELIMITER
@@ -81,10 +109,36 @@ public class TestHelper {
         return url;
     }
 
+    protected static String getFullOracleUrl(String alias) {
+        try {
+            Class.forName(ORACLE_DRIVER);
+        } catch (ClassNotFoundException e) {
+            LOG.error(ORACLE_DRIVER, e);
+        }
+        String url = ProxoolConstants.PROXOOL
+                + ProxoolConstants.ALIAS_DELIMITER
+                + alias
+                + ProxoolConstants.URL_DELIMITER
+                + ORACLE_DRIVER
+                + ProxoolConstants.URL_DELIMITER
+                + ORACLE_URL;
+        return url;
+    }
+
     protected static Connection getDirectConnection() throws ClassNotFoundException, SQLException {
         Connection connection = null;
         Class.forName(HYPERSONIC_DRIVER);
         connection = DriverManager.getConnection(HYPERSONIC_URL, buildProperties());
+        return connection;
+    }
+
+    protected static Connection getDirectOracleConnection() throws ClassNotFoundException, SQLException {
+        Connection connection = null;
+        Class.forName(ORACLE_DRIVER);
+        Properties info = buildProperties();
+        info.setProperty("user", "hsi_servlet");
+        info.setProperty("password", "hsi_servlet");
+        connection = DriverManager.getConnection(ORACLE_URL, info);
         return connection;
     }
 
@@ -150,6 +204,10 @@ public class TestHelper {
 
     protected static void insertRow(Connection connection, String table) throws SQLException {
         execute(connection, "INSERT INTO " + table + " VALUES(1)");
+    }
+
+    protected static void testConnection(Connection connection) throws SQLException {
+        execute(connection, "SELECT SYSDATE FROM DUAL");
     }
 
 }
