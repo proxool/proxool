@@ -25,7 +25,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.30 $, $Date: 2003/01/19 15:21:07 $
+ * @version $Revision: 1.31 $, $Date: 2003/01/23 11:08:26 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -46,25 +46,18 @@ public class ProxoolFacade {
      * Build a ConnectionPool based on this definition and then start it.
      * @param url defines the delegate driver and delegate url.
      * @param info the properties used to configure Proxool (and any for the delegate driver too) - optional
-     * @param configurator used to configure this pool, it will be notified if any changes occur to the definition - optional
      * @return the alias for this pool (or the full url if no alias is specified)
      * @throws ProxoolException if anything goes wrong
      */
-    public static String registerConnectionPool(String url, Properties info, ConfigurationListenerIF configurator) throws ProxoolException {
+    public static String registerConnectionPool(String url, Properties info) throws ProxoolException {
         String alias = getAlias(url);
 
         if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
             ConnectionPoolDefinition cpd = new ConnectionPoolDefinition();
             cpd.setAlias(alias);
-            definePool(null, url, cpd, info, null);
+            definePool(null, url, cpd, info);
             ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
             connectionPool.start();
-
-            // Associate this configurator with this pool
-            if (configurator != null) {
-                configurators.put(alias, configurator);
-            }
-
         } else {
             throw new ProxoolException("Attempt to register duplicate pool called '" + alias + "'");
         }
@@ -73,19 +66,11 @@ public class ProxoolFacade {
     }
 
     /**
-     * With no configurator
-     * @see #registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfigurationListenerIF)
-     */
-    public static String registerConnectionPool(String url, Properties info) throws ProxoolException {
-        return registerConnectionPool(url, info, null);
-    }
-
-    /**
      * With no configurator or properties (using default values)
-     * @see #registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfigurationListenerIF)
+     * @see #registerConnectionPool(java.lang.String, java.util.Properties)
      */
     public static void registerConnectionPool(String url) throws ProxoolException {
-        registerConnectionPool(url, null, null);
+        registerConnectionPool(url, null);
     }
 
     /**
@@ -131,7 +116,7 @@ public class ProxoolFacade {
      * @throws ProxoolException if there were any validation errors.
      */
     protected static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd,
-                                       Properties info, ConfigurationListenerIF configurator) throws ProxoolException {
+                                       Properties info) throws ProxoolException {
 
         Properties rememberedInfo = null;
         Properties changedProperties = null;
@@ -236,8 +221,9 @@ public class ProxoolFacade {
             infos.put(rememberedKey, clone);
         }
 
-        if (configurator != null) {
-            configurator.defintionUpdated(cpd, completeInfo, changedProperties);
+        ConfigurationListenerIF configurationListener = (ConfigurationListenerIF) configurators.get(alias);
+        if (configurationListener != null) {
+            configurationListener.defintionUpdated(cpd, completeInfo, changedProperties);
         }
 
         return cpd.getAlias();
@@ -554,6 +540,20 @@ public class ProxoolFacade {
     }
 
     /**
+     * Adds a listener that gets called everytime the configuration changes
+     * @param alias identifies the pool
+     * @param configurationListener the new listener
+     * @throws ProxoolException if we couldn't find the pool
+     */
+    public static void setConfigurationListener(String alias, ConfigurationListenerIF configurationListener) throws ProxoolException {
+        if (ConnectionPoolManager.getInstance().isPoolExists(alias)) {
+            configurators.put(alias, configurationListener);
+        } else {
+            throw new ProxoolException(ConnectionPoolManager.getInstance().getKnownPools(alias));
+        }
+    }
+
+    /**
      * @see #killAllConnections(java.lang.String)
      */
     private static final boolean MERCIFUL = true;
@@ -569,8 +569,7 @@ public class ProxoolFacade {
         String alias = getAlias(url);
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
         ConnectionPoolDefinition cpd = cp.getDefinition();
-        ConfigurationListenerIF configurator = (ConfigurationListenerIF) configurators.get(cpd.getAlias());
-        definePool(cp, url, cpd, info, configurator);
+        definePool(cp, url, cpd, info);
 
     }
 
@@ -580,8 +579,7 @@ public class ProxoolFacade {
     }
 
     protected static void updatePoolByDriver(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws ProxoolException {
-        ConfigurationListenerIF configurator = (ConfigurationListenerIF) configurators.get(cpd.getAlias());
-        definePool(cp, url, cpd, info, configurator);
+        definePool(cp, url, cpd, info);
     }
 
     /**
@@ -605,6 +603,10 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.31  2003/01/23 11:08:26  billhorsman
+ new setConfiguratorListener method (and remove from optional
+ parameter when registering pool)
+
  Revision 1.30  2003/01/19 15:21:07  billhorsman
  doc
 

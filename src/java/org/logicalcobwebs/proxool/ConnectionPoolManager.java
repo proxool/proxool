@@ -17,7 +17,7 @@ import java.util.Iterator;
 
 /**
  *
- * @version $Revision: 1.5 $, $Date: 2003/01/17 00:38:12 $
+ * @version $Revision: 1.6 $, $Date: 2003/01/23 11:08:26 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -48,22 +48,32 @@ class ConnectionPoolManager {
 
     /**
      * Get the pool by the alias
-     * @param alias what the pool is called
+     * @param alias identifies the pool
      * @return the pool
      * @throws ProxoolException if it couldn't be found
      */
     protected ConnectionPool getConnectionPool(String alias) throws ProxoolException {
         ConnectionPool cp = (ConnectionPool) connectionPoolMap.get(alias);
         if (cp == null) {
-            StringBuffer message = new StringBuffer("Couldn't find a pool called '" + alias + "'. Known pools are: ");
-            Iterator i = connectionPoolMap.keySet().iterator();
-            while (i.hasNext()) {
-                message.append((String) i.next());
-                message.append(i.hasNext() ? ", " : ".");
-            }
-            throw new ProxoolException(message.toString());
+            throw new ProxoolException(getKnownPools(alias));
         }
         return cp;
+    }
+
+    /**
+     * Convenient method for outputing a message explaining that a pool couldn't
+     * be found and listing the ones that could be found.
+     * @param alias identifies the pool
+     * @return a description of the wht the pool couldn't be found
+     */
+    protected String getKnownPools(String alias) {
+        StringBuffer message = new StringBuffer("Couldn't find a pool called '" + alias + "'. Known pools are: ");
+        Iterator i = connectionPoolMap.keySet().iterator();
+        while (i.hasNext()) {
+            message.append((String) i.next());
+            message.append(i.hasNext() ? ", " : ".");
+        }
+        return message.toString();
     }
 
     /**
@@ -104,6 +114,10 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.6  2003/01/23 11:08:26  billhorsman
+ new setConfiguratorListener method (and remove from optional
+ parameter when registering pool)
+
  Revision 1.5  2003/01/17 00:38:12  billhorsman
  wide ranging changes to clarify use of alias and url -
  this has led to some signature changes (new exceptions
