@@ -5,9 +5,9 @@
  */
 package org.logicalcobwebs.proxool.monitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -19,7 +19,7 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/04 16:01:09 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/06 23:48:10 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -161,6 +161,9 @@ public class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.4  2003/02/06 23:48:10  billhorsman
+ Use imported logging
+
  Revision 1.3  2003/02/04 16:01:09  billhorsman
  implement empty cancel() method
 

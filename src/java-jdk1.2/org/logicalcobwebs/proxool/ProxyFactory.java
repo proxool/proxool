@@ -6,8 +6,9 @@
 */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -19,7 +20,7 @@ import java.sql.Statement;
  * A central place to build proxy objects ({@link org.logicalcobwebs.proxool.ProxyConnection connections}
  * and {@link org.logicalcobwebs.proxool.ProxyStatement statements}).
  *
- * @version $Revision: 1.3 $, $Date: 2003/01/31 16:53:26 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/06 23:48:10 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -80,6 +81,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.4  2003/02/06 23:48:10  billhorsman
+ Use imported logging
+
  Revision 1.3  2003/01/31 16:53:26  billhorsman
  checkstyle
 
