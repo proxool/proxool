@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test the house keeper in ConnectionPool
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/01 15:27:24 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/02 00:53:49 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -60,11 +60,16 @@ public class HouseKeeperTest extends TestCase {
 
             assertEquals("Shouldn't be any active connections yet", 0, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
-            Connection connection = DriverManager.getConnection(url);;
+            final Connection connection = DriverManager.getConnection(url);;
+            long start = System.currentTimeMillis();
 
             assertEquals("We just opened 1 connection", 1, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
-            long start = System.currentTimeMillis();
+            new ResultMonitor() {
+                public boolean check() throws Exception {
+                    return connection.isClosed();
+                }
+            }.getResult();
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
@@ -112,6 +117,9 @@ public class HouseKeeperTest extends TestCase {
 /*
  Revision history:
  $Log: HouseKeeperTest.java,v $
+ Revision 1.3  2003/03/02 00:53:49  billhorsman
+ more robust wait
+
  Revision 1.2  2003/03/01 15:27:24  billhorsman
  checkstyle
 
