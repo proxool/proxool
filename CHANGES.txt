@@ -1,11 +1,11 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.13 $
-$Date: 2003/01/22 17:33:57 $
+$Revision: 1.14 $
+$Date: 2003/01/24 14:40:08 $
 $Author: billhorsman $
 
-0.6 (January 22, 2003)
+0.6 (January 23, 2003)
 
 - ProxoolFacade API has changed slightly. Some of the methods no
   longer throw an SQLException but a ProxoolException instead.
@@ -31,7 +31,7 @@ $Author: billhorsman $
   configuration
 
 - Bug fix for JDBC drivers that implement the Statement interface
-  indirectly (that is, extend a class that implements it rather than 
+  indirectly (that is, extend a class that implements it rather than
   implementing it directly). (Credit to Martin Crawford).
 
 - Unclosed Statements are now automatically closed when the
@@ -41,7 +41,7 @@ $Author: billhorsman $
   returned to the pool). This has no effect if autoCommit it true (default)
   or any pending transactions have been committed or already rolled back.
   This will only have an effect if you currently close connections with
-  pending transactions. 
+  pending transactions.
 
 - New ProxoolFacade#getDelegateStatement allows you to get to
   the underlying JDBC Driver's original Statement if you really need
