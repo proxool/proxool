@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Test the house keeper in ConnectionPool
  *
- * @version $Revision: 1.8 $, $Date: 2003/09/30 18:40:16 $
+ * @version $Revision: 1.9 $, $Date: 2004/06/02 21:05:19 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -137,7 +137,8 @@ public class HouseKeeperTest extends AbstractProxoolTest {
             s.execute(TestConstants.HYPERSONIC_TEST_SQL);
             fail("Expected to get an exception because the test failed");
         } catch (SQLException e) {
-            LOG.debug("Expected exception.", e);
+            // Log message only so we don't get a worrying stack trace
+            LOG.debug("Expected exception: " + e.getMessage());
         }
 
     }
@@ -224,6 +225,9 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: HouseKeeperTest.java,v $
+ Revision 1.9  2004/06/02 21:05:19  billhorsman
+ Don't log worrying stack traces for expected exceptions.
+
  Revision 1.8  2003/09/30 18:40:16  billhorsman
  New tests for test-before-use and test-after-use
 

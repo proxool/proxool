@@ -17,7 +17,7 @@ import java.util.Properties;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/04 10:58:44 $
+ * @version $Revision: 1.12 $, $Date: 2004/06/02 21:05:19 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -74,7 +74,8 @@ public class StateListenerTest extends AbstractProxoolTest {
             fail("Didn't expect second connection since maximumConnectionCount is 1");
         } catch (SQLException e) {
             // We expect a refusal here
-            LOG.debug("Expected refusal", e);
+            // Log message only so we don't get a worrying stack trace
+            LOG.debug("Ignoring expected refusal: " + e.getMessage());
         }
 
         // Test Overloaded
@@ -155,6 +156,9 @@ public class StateListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.12  2004/06/02 21:05:19  billhorsman
+ Don't log worrying stack traces for expected exceptions.
+
  Revision 1.11  2003/03/04 10:58:44  billhorsman
  checkstyle
 

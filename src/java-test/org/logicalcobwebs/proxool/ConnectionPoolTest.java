@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.1 $, $Date: 2003/10/26 16:10:46 $
+ * @version $Revision: 1.2 $, $Date: 2004/06/02 21:05:19 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -55,7 +55,8 @@ public class ConnectionPoolTest extends AbstractProxoolTest {
             DriverManager.getConnection(url);
             fail("Didn't expect to get third connection");
         } catch (SQLException e) {
-            LOG.debug("Ignoring expected exception", e);
+            // Log message only so we don't get a worrying stack trace
+            LOG.debug("Ignoring expected exception: " + e.getMessage());
         }
 
         assertEquals("activeConnectionCount", 2, ProxoolFacade.getSnapshot(alias, true).getActiveConnectionCount());
@@ -93,7 +94,8 @@ public class ConnectionPoolTest extends AbstractProxoolTest {
             c3.close();
             fail("Didn't expect to get third connection");
         } catch (SQLException e) {
-            LOG.debug("Ignoring expected exception", e);
+            // Log message only so we don't get a worrying stack trace
+            LOG.debug("Ignoring expected exception: " + e.getMessage());
         }
 
         assertEquals("activeConnectionCount", 1, ProxoolFacade.getSnapshot(alias, true).getActiveConnectionCount());
@@ -194,6 +196,9 @@ public class ConnectionPoolTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionPoolTest.java,v $
+ Revision 1.2  2004/06/02 21:05:19  billhorsman
+ Don't log worrying stack traces for expected exceptions.
+
  Revision 1.1  2003/10/26 16:10:46  billhorsman
  renamed to be more consistent
 
