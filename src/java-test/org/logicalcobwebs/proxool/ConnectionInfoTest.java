@@ -11,11 +11,12 @@ import org.logicalcobwebs.logging.LogFactory;
 import java.sql.DriverManager;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Collection;
 
 /**
  * Tests {@link ProxoolFacade#getConnectionInfos}
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/11 00:38:41 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -54,16 +55,24 @@ public class ConnectionInfoTest extends AbstractProxoolTest {
         DriverManager.getConnection(url).close();
         assertEquals("connectionInfo count", 3, ProxoolFacade.getConnectionInfos(alias).size());
 
-        Iterator i = ProxoolFacade.getConnectionInfos(alias).iterator();
-        ConnectionInfoIF ci1 = (ConnectionInfoIF) i.next();
-        ConnectionInfoIF ci2 = (ConnectionInfoIF) i.next();
-        ConnectionInfoIF ci3 = (ConnectionInfoIF) i.next();
-
-        assertEquals("#1 status", ConnectionInfoIF.STATUS_ACTIVE, ci1.getStatus());
-        assertEquals("#2 status", ConnectionInfoIF.STATUS_ACTIVE, ci2.getStatus());
-        assertEquals("#3 status", ConnectionInfoIF.STATUS_AVAILABLE, ci3.getStatus());
+        Collection connectionInfos = ProxoolFacade.getConnectionInfos(alias);
+        assertEquals("activeCount", 2, getCount(connectionInfos, ConnectionInfoIF.STATUS_ACTIVE));
+        assertEquals("availableCount", 1, getCount(connectionInfos, ConnectionInfoIF.STATUS_AVAILABLE));
 
     }
+
+    private int getCount(Collection connectionInfos, int status) {
+        int count = 0;
+        Iterator i = connectionInfos.iterator();
+        while (i.hasNext()) {
+            ConnectionInfo connectionInfo = (ConnectionInfo) i.next();
+            if (connectionInfo.getStatus() == status) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 
 }
 
@@ -71,6 +80,9 @@ public class ConnectionInfoTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionInfoTest.java,v $
+ Revision 1.6  2003/03/11 00:38:41  billhorsman
+ allowed for connections in different order
+
  Revision 1.5  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 
