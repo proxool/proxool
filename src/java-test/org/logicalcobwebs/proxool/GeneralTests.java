@@ -18,7 +18,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.19 $, $Date: 2002/11/13 20:23:58 $
+ * @version $Revision: 1.20 $, $Date: 2002/11/14 16:19:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -144,6 +144,8 @@ public class GeneralTests extends TestCase {
     public void testMaximumActiveTime() {
 
         String testName = "maximumActiveTime";
+        String threadName = Thread.currentThread().getName();
+        Thread.currentThread().setName(testName);
         ProxoolAdapter adapter = null;
         try {
             String alias = testName;
@@ -176,6 +178,7 @@ public class GeneralTests extends TestCase {
             fail(e.getMessage());
         } finally {
             adapter.tearDown();
+            Thread.currentThread().setName(threadName);
         }
 
     }
@@ -404,6 +407,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.20  2002/11/14 16:19:02  billhorsman
+ test thread name
+
  Revision 1.19  2002/11/13 20:23:58  billhorsman
  improved tests
 
