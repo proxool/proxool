@@ -13,7 +13,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Run all tests in the util package.
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/19 15:14:32 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/19 23:49:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -21,7 +21,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 public class AllTests {
 
     /**
-     * Create a composite test of all monitor package tests
+     * Create a composite test of all util package tests
      * @return test suite
      */
     public static Test suite() {
@@ -42,15 +42,11 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.3  2003/02/19 23:49:16  billhorsman
+ fixed doc
+
  Revision 1.2  2003/02/19 15:14:32  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)
 
- Revision 1.1  2003/02/10 00:14:33  chr32
- Added tests for AbstractListenerContainer.
-
- Revision 1.1  2003/02/07 15:10:36  billhorsman
- new monitor tests
-
-
-*/
+ */
