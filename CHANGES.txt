@@ -1,12 +1,18 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.23 $
-$Date: 2003/08/15 10:14:32 $
+$Revision: 1.24 $
+$Date: 2003/08/27 18:19:21 $
 $Author: billhorsman $
 
 0.7.3 - (coming soon)
 
+- New getDelegateConnection() method on ProxoolFacade gives you access
+  to the delegate (third party) driver if you really need it. This makes
+  your project dependent on both Proxool (to a small extent) and your
+  third party driver (to a bigger extent) so should be done on if
+  necessary.
+  
 - If ProxoolDriver gets garbage collected for any reason (outside our
   control) then we no longer shutdown the pool it relates to.
 
