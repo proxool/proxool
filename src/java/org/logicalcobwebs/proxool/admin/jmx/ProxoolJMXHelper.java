@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * Utilities for Proxool JMX instrumentation.
- * @version $Revision: 1.3 $, $Date: 2003/03/03 11:12:00 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/05 15:14:15 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -131,7 +131,7 @@ public class ProxoolJMXHelper {
         } else {
             StringBuffer buffer = new StringBuffer (propertyName);
             int index = -1;
-            while ((index = buffer.indexOf("-")) > -1) {
+            while ((index = buffer.toString().indexOf("-")) > -1) {
                 buffer.deleteCharAt(index);
                 buffer.setCharAt(index, Character.toUpperCase(buffer.charAt(index)));
             }
@@ -143,6 +143,9 @@ public class ProxoolJMXHelper {
 /*
  Revision history:
  $Log: ProxoolJMXHelper.java,v $
+ Revision 1.4  2003/03/05 15:14:15  billhorsman
+ fix for jdk 1.2
+
  Revision 1.3  2003/03/03 11:12:00  billhorsman
  fixed licence
 
