@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.4 $
-$Date: 2002/11/06 20:28:28 $
+$Revision: 1.5 $
+$Date: 2002/11/09 16:05:15 $
 $Author: billhorsman $
 
 0.5 (scheduled for November 15, 2002)
@@ -42,9 +42,15 @@ $Author: billhorsman $
 - Added support for resetting connection properties when it is returned to
   the pool (autoCommit, catalog, readOnly, transactionIsolation, typeMap
   and holdability). These  properties are reset to the values when the connection
-  was made everytime it is returned.
+  was made everytime it is returned. (credit to Tim Morley)
 
-- Connection.isClosed() now returns true when it is back in the pool. 
+- Connection.isClosed() now returns true when it is back in the pool.
+
+- New trace property allows you to log each execution, the SQL, the parameters
+  used, and the execution time. (use proxool.trace=true property). You can also
+  get this information if you register a ConnectionListenerIF (use ProxoolFacade's
+  setConnectionListener() method). This won't effect performance if you're not
+  listening or have trace off. 
 
 0.4 - September 19, 2002
 
