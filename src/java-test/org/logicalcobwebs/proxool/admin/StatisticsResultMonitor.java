@@ -12,7 +12,7 @@ import org.logicalcobwebs.proxool.ProxoolException;
 /**
  * A ResultMonitor specifically for Snapshots
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/01 16:18:31 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/01 16:38:40 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -43,7 +43,13 @@ public class StatisticsResultMonitor extends ResultMonitor {
      */
     public boolean check() throws Exception {
         statistics= ProxoolFacade.getStatistics(alias, token);
-        return (!statistics.getStartDate().equals(oldStatistics.getStartDate()));
+        if (statistics == null) {
+            return false;
+        } else if (oldStatistics == null) {
+            return true;
+        } else {
+            return (!statistics.getStartDate().equals(oldStatistics.getStartDate()));
+        }
     }
 
     public int getResult() throws ProxoolException {
@@ -64,6 +70,9 @@ public class StatisticsResultMonitor extends ResultMonitor {
 /*
  Revision history:
  $Log: StatisticsResultMonitor.java,v $
+ Revision 1.3  2003/03/01 16:38:40  billhorsman
+ fix
+
  Revision 1.2  2003/03/01 16:18:31  billhorsman
  fix
 
