@@ -1,9 +1,45 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.14 $
-$Date: 2003/01/24 14:40:08 $
+$Revision: 1.15 $
+$Date: 2003/02/12 00:33:51 $
 $Author: billhorsman $
+
+0.7 - scheduled for February 12, 2003
+
+- We have dropped the dependency on commons-logging.jar
+  by copying the code into our own project (retaining credit to
+  the Jakarta team, naturally).
+
+- New monitor package provides statistical
+  and snapshot information so you can measure how well Proxool, and
+  your database, is doing.
+
+- New MonitorServlet provides statistical
+  information for your web application.
+
+- The JDK 1.2 patch code has been brought up to date and now
+  passes all the unit tests.
+
+- The listener code has been redone. Proxool now allows multiple
+  listeners per pool. setFooListener has now been deprecated in
+  favour of addFooListener. And it's now thread safe (just in case you
+  add or remove a listener while the pool is running).
+
+- The new ServletConfigurator will help you
+  to configure and shutdown your pools simply by adding a few lines to
+  your servlet configuration (web.xml) file and perhaps writing an XML file.
+  No changes to your Java code.
+
+- By using ShutdownHooks (with JDK1.3 or later) we get a cleaner, more
+  reliable shutdown of the pools when the JVM stops.
+
+- Fixed bug when you asked DatabaseMetaData for the connection. It
+  now gives you back the Proxool connection, not the underlying delegate
+  connection.
+
+- Fixed bug where if you registered, removed and then re-registered a pool
+  then the new pool would not notice the Properties passed to it.
 
 0.6 (January 23, 2003)
 
