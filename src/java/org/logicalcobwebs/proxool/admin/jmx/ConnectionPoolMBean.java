@@ -35,6 +35,9 @@ import javax.management.NotificationListener;
 import javax.management.NotificationFilter;
 import javax.management.ListenerNotFoundException;
 import javax.management.Notification;
+import javax.management.MBeanRegistration;
+import javax.management.ObjectName;
+import javax.management.MBeanServer;
 
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -80,12 +83,13 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.4 $, $Date: 2003/02/26 16:37:48 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/26 19:04:30 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
- * @since Proxool 0.7
+ * @author $Author: chr32 $ (current maintainer)
+ * @since Proxool 0.8
  */
-public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, ConfigurationListenerIF, NotificationBroadcaster {
+public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, NotificationBroadcaster,
+    ProxoolListenerIF, ConfigurationListenerIF {
     /**
      * Notification type emitted when the pool definition is updated.
      */
@@ -110,6 +114,7 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
     private Properties poolProperties;
     private long definitionUpdatedSequence;
     private NotificationBroadcasterSupport notificationHelper = new NotificationBroadcasterSupport();
+    private boolean active;
 
     public ConnectionPoolMBean (String alias, Properties poolProperties)
         throws ProxoolException {
@@ -449,7 +454,7 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
     }
 
     private static MBeanAttributeInfo createProxoolAttribute (String attributeName, Class type, boolean writable) {
-        return new MBeanAttributeInfo (getValidIdentifier(attributeName), type.getName (),
+        return new MBeanAttributeInfo (ProxoolJMXHelper.getValidIdentifier(attributeName), type.getName (),
             getAttributeDescription (attributeName), true, writable, false);
     }
 
@@ -460,22 +465,8 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
         }
     }
 
-    private static String getValidIdentifier(String propertyName) {
-        if (propertyName.indexOf("-") == -1) {
-            return propertyName;
-        } else {
-            StringBuffer buffer = new StringBuffer (propertyName);
-            int index = -1;
-            while ((index = buffer.indexOf("-")) > -1) {
-                buffer.deleteCharAt(index);
-                buffer.setCharAt(index, Character.toUpperCase(buffer.charAt(index)));
-            }
-            return buffer.toString();
-        }
-    }
-
     private boolean equalsProperty(String beanAttribute, String proxoolProperty) {
-        return beanAttribute.equals(getValidIdentifier(proxoolProperty));
+        return beanAttribute.equals(ProxoolJMXHelper.getValidIdentifier(proxoolProperty));
     }
 
     private void setDelegateProperties(Properties properties, String propertyString)
@@ -561,8 +552,11 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
      */
     public void onShutdown(String alias) {
         if (alias.equals(this.poolDefinition.getAlias())) {
-            ProxoolJMXHelper.unregisterPool(this.poolDefinition.getAlias(), this.poolProperties);
-            LOG.info(this.poolDefinition.getAlias() + " MBean unregistered.");
+            if (this.active) {
+                this.active = false;
+                ProxoolJMXHelper.unregisterPool(this.poolDefinition.getAlias(), this.poolProperties);
+                LOG.info(this.poolDefinition.getAlias() + " MBean unregistered.");
+            }
         }
     }
 
@@ -600,11 +594,47 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
     public MBeanNotificationInfo[] getNotificationInfo() {
         return NOTIFICATION_INFOS;
     }
+
+    /**
+     * @see MBeanRegistration#preRegister(MBeanServer, ObjectName)
+     */
+    public ObjectName preRegister(MBeanServer mBeanServer, ObjectName objectName) throws Exception {
+        if (objectName == null) {
+            throw new ProxoolException("objectName was null, but we can not construct an MBean instance without knowing"
+                + " the pool alias.");
+        }
+        return objectName;
+    }
+
+    /**
+     * @see MBeanRegistration#postRegister(Boolean)
+     */
+    public void postRegister(Boolean success) {
+        if (success.booleanValue() == true) {
+            this.active = true;
+        }
+    }
+
+    /**
+     * @see MBeanRegistration#preDeregister()
+     */
+    public void preDeregister() throws Exception {
+        this.active = false;
+    }
+
+    /**
+     * @see MBeanRegistration#postDeregister()
+     */
+    public void postDeregister() {
+    }
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.5  2003/02/26 19:04:30  chr32
+ Added active/inactive state check.
+
  Revision 1.4  2003/02/26 16:37:48  billhorsman
  fixed spelling in ConfigurationListenerIF
 
