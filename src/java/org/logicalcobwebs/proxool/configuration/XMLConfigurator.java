@@ -67,9 +67,9 @@ import java.util.Properties;
  *
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.4 $, $Date: 2002/12/16 11:47:00 $
+ * @version $Revision: 1.5 $, $Date: 2002/12/18 03:16:03 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public class XMLConfigurator extends DefaultHandler {
     private static final Log LOG = LogFactory.getLog(XMLConfigurator.class);
@@ -232,8 +232,9 @@ public class XMLConfigurator extends DefaultHandler {
      * @see org.xml.sax.ErrorHandler#error(SAXParseException)
      */
     public void error(SAXParseException e) throws SAXException {
-        // Just log the error. We'll probably survive.
-        LOG.warn("The saxparser reported an error.", e);
+        // On error we rethrow the exception.
+        // This should cause the parser stop and an exeption be thrown back to the client.
+        throw e;
     }
 
     /**
@@ -241,8 +242,7 @@ public class XMLConfigurator extends DefaultHandler {
      */
     public void fatalError(SAXParseException e) throws SAXException {
         // On fatal error we rethrow the exception.
-        // This should make the parser stop.
-        LOG.warn("The saxparser reported a fatal error, interrupting.", e);
+        // This should cause the parser stop and an exeption be thrown back to the client.
         throw e;
     }
 }
