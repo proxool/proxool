@@ -7,7 +7,7 @@ package org.logicalcobwebs.proxool.admin.jndi;
 
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.ProxoolManagedDataSource;
+import org.logicalcobwebs.proxool.ProxoolDataSource;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -16,7 +16,7 @@ import java.util.Properties;
 
 /**
  * Utilities for Proxool JNDI operations.
- * @version $Revision: 1.1 $, $Date: 2004/03/15 02:47:02 $
+ * @version $Revision: 1.2 $, $Date: 2004/03/18 17:13:48 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.9
@@ -32,12 +32,12 @@ public class ProxoolJNDIHelper {
      * @throws ProxoolException if the JNDI binding failes.
      */
     public static void registerDatasource(String alias, Properties jndiProperties) throws ProxoolException {
-        DataSource dataSource = new ProxoolManagedDataSource(alias);
+        DataSource dataSource = new ProxoolDataSource(alias);
         final String jndiName = jndiProperties.getProperty(ProxoolConstants.JNDI_NAME);
         jndiProperties.remove(ProxoolConstants.JNDI_NAME);
         try {
             InitialContext initalContext = new InitialContext(jndiProperties);
-            initalContext.bind(jndiName, dataSource);
+            initalContext.rebind(jndiName, dataSource);
         } catch (NamingException e) {
             throw new ProxoolException("JNDI binding of DataSource for alias " + alias
                 + " failed.", e);
@@ -48,6 +48,9 @@ public class ProxoolJNDIHelper {
 /*
  Revision history:
  $Log: ProxoolJNDIHelper.java,v $
+ Revision 1.2  2004/03/18 17:13:48  chr32
+ Started using ProxoolDataSource instead of ProxoolManagedDataSource.
+
  Revision 1.1  2004/03/15 02:47:02  chr32
  Added initial DataSource support.
 
