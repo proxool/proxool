@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.19 $, $Date: 2002/12/16 11:15:19 $
+ * @version $Revision: 1.20 $, $Date: 2002/12/16 11:16:51 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -86,7 +86,7 @@ public class ProxoolFacade {
      * @see #registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfiguratorIF)
      */
     public static String registerConnectionPool(String url, Properties info) throws SQLException {
-        return registerConnectionPool(url, info,  null);
+        return registerConnectionPool(url, info, null);
     }
 
     /**
@@ -135,7 +135,8 @@ public class ProxoolFacade {
      * @return the name of the pool
      * @throws SQLException if there were any validation errors.
      */
-    protected static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info, ConfiguratorIF configurator) throws SQLException {
+    protected static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd,
+                                       Properties info, ConfiguratorIF configurator) throws SQLException {
 
         Properties rememberedInfo = null;
         Properties changedProperties = null;
@@ -339,7 +340,7 @@ public class ProxoolFacade {
         return cpd.getName();
     }
 
-    private static boolean isChanged(String oldValue, String newValue ) {
+    private static boolean isChanged(String oldValue, String newValue) {
         boolean changed = false;
         if (oldValue == null || oldValue.length() == 0) {
             if (newValue != null && newValue.length() > 0) {
@@ -509,7 +510,7 @@ public class ProxoolFacade {
                 knownPools.append(i > poolNames.length - 1 ? ", " : "");
             }
             LOG.warn("Couldn't add ConnectionListenerIF to " + connectionPoolName + " pool because it doesn't exist. "
-                + "I do know about " + poolNames.length + " though: " + knownPools);
+                    + "I do know about " + poolNames.length + " though: " + knownPools);
         }
     }
 
@@ -565,6 +566,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.20  2002/12/16 11:16:51  billhorsman
+ checkstyle
+
  Revision 1.19  2002/12/16 11:15:19  billhorsman
  fixed getDelegateStatement
 
