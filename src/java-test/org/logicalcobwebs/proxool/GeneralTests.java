@@ -8,17 +8,17 @@ package org.logicalcobwebs.proxool;
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.dbscript.ScriptFacade;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.sql.DriverManager;
 import java.util.Properties;
+import java.util.Iterator;
 
 /**
  * Various tests
  *
- * @version $Revision: 1.18 $, $Date: 2002/11/13 18:28:43 $
+ * @version $Revision: 1.19 $, $Date: 2002/11/13 20:23:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -81,47 +81,62 @@ public class GeneralTests extends TestCase {
 
     }
 
+    private void templateTest() {
+
+        String testName = "template";
+        ProxoolAdapter adapter = null;
+        try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
+        }
+
+    }
+
     /**
      * Can we update a pool definition by passing a new Properties object?
      */
     public void testUpdate() throws SQLException, ClassNotFoundException {
 
-        String alias = "update";
-
-        // Register pool
-        {
-            String url = TestHelper.getFullUrl(alias);
-            Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.insertRow(c, TEST_TABLE);
-            c.close();
-        }
-
-        ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
-        long mcc1 = cpd.getMaximumConnectionCount();
-
-        {
-            // Update explicitly using ProxoolFacade
-            Properties info = TestHelper.buildProperties();
-            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
-            ProxoolFacade.updateConnectionPool(alias, info);
-            cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
-            long mcc2 = cpd.getMaximumConnectionCount();
-
-            assertTrue(mcc1 != mcc2);
-            assertTrue(mcc2 == 2);
-        }
-
-        {
-            // Update on-the-fly using the driver
+        String testName = "template";
+        ProxoolAdapter adapter = null;
+        Connection c = null;
+        try {
+            String alias = testName;
             Properties info = TestHelper.buildProperties();
             info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
-            String url = TestHelper.getSimpleUrl(alias);
-            Connection c = TestHelper.getProxoolConnection(url, info);
-            TestHelper.insertRow(c, TEST_TABLE);
-            cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
-            long mcc2 = cpd.getMaximumConnectionCount();
-            assertTrue(mcc1 != mcc2);
-            assertTrue(mcc2 == 1);
+            adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            // Open a connection. Just for the hell of it
+            c = adapter.getConnection();
+            adapter.closeConnection(c);
+
+            assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+
+            // Update using facade
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
+            ProxoolFacade.updateConnectionPool(alias, info);
+            assertEquals("maximumConnectionCount", 2, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+
+            // Now do it on the fly
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "3");
+            c = DriverManager.getConnection(adapter.getFullUrl(), info);
+            c.close();
+            assertEquals("maximumConnectionCount", 3, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
         }
 
     }
@@ -160,7 +175,7 @@ public class GeneralTests extends TestCase {
             LOG.error("Whilst performing " + testName, e);
             fail(e.getMessage());
         } finally {
-            ScriptFacade.tearDownAdapter(adapter);
+            adapter.tearDown();
         }
 
     }
@@ -206,7 +221,7 @@ public class GeneralTests extends TestCase {
             LOG.error("Whilst performing " + testName, e);
             fail(e.getMessage());
         } finally {
-            ScriptFacade.tearDownAdapter(adapter);
+            adapter.tearDown();
         }
 
     }
@@ -215,57 +230,34 @@ public class GeneralTests extends TestCase {
      * If we ask for more simultaneous connections then we have allowed we should gracefully
      * refuse them.
      */
-    public void testLoad() throws SQLException {
+    public void testMaximumConnectionCount() throws SQLException {
 
-        String testName = "load";
+        String testName = "maximumConnectionCount";
+        ProxoolAdapter adapter = null;
         try {
-            String alias = testName;;
-
+            String alias = testName;
             Properties info = TestHelper.buildProperties();
-            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
-            TestHelper.registerPool(alias, info);
+            adapter = new ProxoolAdapter(alias);
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
 
-            final int load = 6;
-            final int count = 20;
-            int goodHits = 0;
-            final int expectedGoodHits = 17;
+            adapter.getConnection();
+            adapter.getConnection();
 
-            Connection[] connections = new Connection[count];
-            for (int i = 0; i < count; i++) {
-
-                if (i >= load && connections[i - load] != null) {
-                    connections[i - load].close();
-                }
-
-                connections[i] = null;
-                try {
-                    if (info == null) {
-                        info = TestHelper.buildProperties();
-                    }
-                    String url = TestHelper.getSimpleUrl(alias);
-                    connections[i] = TestHelper.getProxoolConnection(url, info);
-
-                    TestHelper.insertRow(connections[i], TEST_TABLE);
-                    goodHits++;
-                } catch (ClassNotFoundException e) {
-                    LOG.error("Problem finding driver?", e);
-                } catch (SQLException e) {
-                    LOG.debug(e.getMessage(), e);
-                } catch (Exception e) {
-                    LOG.error("Unexpected Exception", e);
-                }
-
+            try {
+                adapter.getConnection();
+                fail("Didn't expect to get third connection");
+            } catch (SQLException e) {
+                // Good. We expected to not get the third
             }
 
-            ConnectionPoolStatisticsIF cps = ProxoolFacade.getConnectionPoolStatistics(alias);
-            LOG.info("Served: " + cps.getConnectionsServedCount());
-            LOG.info("Refused: " + cps.getConnectionsRefusedCount());
-            assertEquals(count, cps.getConnectionsServedCount() + cps.getConnectionsRefusedCount());
-            assertEquals(goodHits, cps.getConnectionsServedCount());
-            assertEquals(goodHits, expectedGoodHits);
+            assertEquals("activeConnectionCount", 2, ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount());
+
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
             fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
         }
 
     }
@@ -274,77 +266,42 @@ public class GeneralTests extends TestCase {
      * If we ask for more simultaneous connections then we have allowed we should gracefully
      * refuse them.
      */
-    public void testInfo() throws SQLException, ClassNotFoundException {
+    public void testConnectionInfo() throws SQLException {
 
-        String alias = "info";
-        String url = TestHelper.getSimpleUrl(alias);
-        Properties info = TestHelper.buildProperties();
-        info.setProperty("proxool.prototype-count", "0");
-        info.setProperty("proxool.minimum-connection-count", "0");
-        info.setProperty("proxool.maximum-connection-count", "5");
-        TestHelper.registerPool(alias, info);
-
-        Collection connectionInfos = null;
-        final int arraySize = 5;
-
-        Connection[] connections = new Connection[arraySize];
+        String testName = "connectionInfo";
+        ProxoolAdapter adapter = null;
         try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            adapter = new ProxoolAdapter(alias);
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "3");
+            info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "0");
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
 
-            // Open 1 connection
-            connections[0] = TestHelper.getProxoolConnection(url);
-            {
-                connectionInfos = ProxoolFacade.getConnectionInfos(alias);
-                assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 1);
-                ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
-                connectionInfos.toArray(ci);
-                LOG.info("ConnectionInfo[0]=" + ci[0]);
-            }
+            Connection c1 = adapter.getConnection();
+            assertEquals("connectionInfo count", 1, ProxoolFacade.getConnectionInfos(alias).size());
 
-            // Open another
-            connections[1] = TestHelper.getProxoolConnection(url);
-            {
-                connectionInfos = ProxoolFacade.getConnectionInfos(alias);
-                assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
-                ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
-                connectionInfos.toArray(ci);
-                LOG.info("ConnectionInfo[0]=" + ci[0]);
-                LOG.info("ConnectionInfo[1]=" + ci[1]);
-            }
+            Connection c2 = adapter.getConnection();
+            assertEquals("connectionInfo count", 2, ProxoolFacade.getConnectionInfos(alias).size());
 
-            // Close the first
-            try {
-                connections[0].close();
-            } catch (SQLException e) {
-                LOG.error("Couldn't close connection 0", e);
-            }
-            {
-                connectionInfos = ProxoolFacade.getConnectionInfos(url);
-                assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
-                ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
-                connectionInfos.toArray(ci);
-                LOG.info("ConnectionInfo[0]=" + ci[0]);
-                LOG.info("ConnectionInfo[1]=" + ci[1]);
-            }
+            Connection c3 = adapter.getConnection();
+            c3.close();
+            assertEquals("connectionInfo count", 3, ProxoolFacade.getConnectionInfos(alias).size());
+
+            Iterator i =  ProxoolFacade.getConnectionInfos(alias).iterator();
+            ConnectionInfoIF ci1 = (ConnectionInfoIF) i.next();
+            ConnectionInfoIF ci2 = (ConnectionInfoIF) i.next();
+            ConnectionInfoIF ci3 = (ConnectionInfoIF) i.next();
+
+            assertEquals("#1 status", ConnectionInfoIF.STATUS_ACTIVE, ci1.getStatus());
+            assertEquals("#2 status", ConnectionInfoIF.STATUS_ACTIVE, ci2.getStatus());
+            assertEquals("#3 status", ConnectionInfoIF.STATUS_AVAILABLE, ci3.getStatus());
+
         } catch (Exception e) {
-            LOG.error("Problem", e);
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
         } finally {
-            for (int i = 0; i < arraySize; i++) {
-                try {
-                    if (connections[i] != null) {
-                        connections[i].close();
-                    }
-                } catch (SQLException e) {
-                    LOG.error("Couldn't close connection " + i, e);
-                }
-            }
-            {
-                connectionInfos = ProxoolFacade.getConnectionInfos(url);
-                assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
-                ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
-                connectionInfos.toArray(ci);
-                LOG.info("ConnectionInfo[0]=" + ci[0]);
-                LOG.info("ConnectionInfo[1]=" + ci[1]);
-            }
+            adapter.tearDown();
         }
 
     }
@@ -402,11 +359,7 @@ public class GeneralTests extends TestCase {
             LOG.error("Whilst performing " + testName, e);
             fail(e.getMessage());
         } finally {
-            try {
-                adapter.teardown();
-            } catch (SQLException e) {
-                LOG.error(e);
-            }
+            adapter.tearDown();
         }
 
     }
@@ -416,43 +369,44 @@ public class GeneralTests extends TestCase {
      */
     public void testMultiple() throws SQLException, ClassNotFoundException {
 
-        String alias1 = "pool#1";
-        String alias2 = "pool#2";
+        String testName = "template";
+        ProxoolAdapter adapter1 = null;
+        ProxoolAdapter adapter2 = null;
+        try {
+            Properties info = TestHelper.buildProperties();
+            String alias1 = testName + "1";
+            adapter1 = new ProxoolAdapter(alias1);
+            adapter1.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+            String alias2 = testName + "2";
+            adapter2 = new ProxoolAdapter(alias2);
+            adapter2.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
 
-        // #1
-        {
-            String url = TestHelper.getFullUrl(alias1);
-            Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.insertRow(c, TEST_TABLE);
+            // Open 2 connections on #1
+            adapter1.getConnection().close();
+            adapter1.getConnection().close();
+
+            // Open 1 connection on #2
+            adapter2.getConnection().close();
+
+            assertEquals("connectionsServedCount #1", 2L, ProxoolFacade.getConnectionPoolStatistics(alias1).getConnectionsServedCount());
+            assertEquals("connectionsServedCount #2", 1L, ProxoolFacade.getConnectionPoolStatistics(alias2).getConnectionsServedCount());
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter1.tearDown();
+            adapter2.tearDown();
         }
-
-        // #2
-        {
-            String url = TestHelper.getFullUrl(alias2);
-            Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.insertRow(c, TEST_TABLE);
-        }
-
-        // #2
-        {
-            String url = TestHelper.getFullUrl(alias2);
-            Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.insertRow(c, TEST_TABLE);
-        }
-
-        ConnectionPoolStatisticsIF cps1 = ProxoolFacade.getConnectionPoolStatistics(alias1);
-        assertEquals(1L, cps1.getConnectionsServedCount());
-
-        ConnectionPoolStatisticsIF cps2 = ProxoolFacade.getConnectionPoolStatistics(alias2);
-        assertEquals(2L, cps2.getConnectionsServedCount());
-
     }
-
 }
 
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.19  2002/11/13 20:23:58  billhorsman
+ improved tests
+
  Revision 1.18  2002/11/13 18:28:43  billhorsman
  checkstyle
 
