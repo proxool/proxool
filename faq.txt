@@ -1,0 +1,13 @@
+Q. When I run Ant I get an error:
+
+   "The <checkstyle> task doesn't support the nested "property" element."
+
+A. Checkstyle changed the way it is configured between versions 2.2 and 
+   2.4. You need to use 2.4 or later (not sure about 2.3). Proxool
+   includes checkstyle in the lib directory but if you have an older
+   version of checkstyle somewhere on your classpath (for instance, in
+   Ant's own lib directory) then you might have problems. Suggested 
+   work around: get rid of the old version of checkstyle (if that 
+   doesn't break anything else); edit the build.xml so it works
+   with the old format.
+
