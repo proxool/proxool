@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.56 $
-    $Date: 2003/07/08 22:12:02 $
+    $Revision: 1.57 $
+    $Date: 2003/07/23 06:56:04 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -14,6 +14,9 @@
 
     <!-- Whether to include the test classes -->
     <property name="test" value="false"/>
+
+    <!-- Whether to include the sandbox classes -->
+    <property name="sandbox" value="false"/>
 
     <!-- Where to build everything. You might want to override
     this so that it isn't within your cvs tree. -->
@@ -119,6 +122,16 @@
         <condition property="build-test">
             <equals arg1="${test}" arg2="true"/>
         </condition>
+
+        <!--
+            Evaluate whether we should build the source code
+            using the experimental stuff in the sandbox
+           -->
+        <condition property="build-sandbox">
+            <equals arg1="${sandbox}" arg2="true"/>
+        </condition>
+
+
     </target>
 
     <target
@@ -185,6 +198,7 @@
         <antcall target="build-src-jdk1.4"/>
         <antcall target="build-src-jdk1.5"/>
         <antcall target="build-src-test"/>
+        <antcall target="build-src-sandbox"/>
         <antcall target="version-stamp"/>
 
     </target>
@@ -247,6 +261,18 @@
         <antcall target="build-src-common"/>
         <copy todir="${build-dir}/src/java" overwrite="yes">
             <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
+        </copy>
+    </target>
+
+    <target
+        name="build-src-sandbox"
+        depends="init"
+        if="build-sandbox"
+        >
+        <echo level="info" message="Using Sandbox"/>
+        <antcall target="build-src-common"/>
+        <copy todir="${build-dir}/src/java" preservelastmodified="yes">
+            <fileset dir="src/java-sandbox" includes="**/*.java"/>
         </copy>
     </target>
 
