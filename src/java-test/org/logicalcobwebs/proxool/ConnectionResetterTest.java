@@ -9,18 +9,14 @@ package org.logicalcobwebs.proxool;
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.dbscript.ScriptFacade;
-import org.logicalcobwebs.dbscript.CommandFilterIF;
-import org.logicalcobwebs.dbscript.CommandIF;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Properties;
 
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/13 20:53:30 $
+ * @version $Revision: 1.6 $, $Date: 2002/12/03 10:53:08 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -130,6 +126,9 @@ public class ConnectionResetterTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.6  2002/12/03 10:53:08  billhorsman
+ checkstyle
+
  Revision 1.5  2002/11/13 20:53:30  billhorsman
  new tests for autoCommit and readOnly
 
