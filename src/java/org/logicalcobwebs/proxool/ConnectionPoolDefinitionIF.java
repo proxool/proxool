@@ -22,9 +22,9 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.21 $, $Date: 2004/03/18 17:08:14 $
+ * @version $Revision: 1.22 $, $Date: 2004/06/02 20:19:14 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ConnectionPoolDefinitionIF {
 
@@ -302,11 +302,55 @@ public interface ConnectionPoolDefinitionIF {
      * <code>MBeanServerFactory.findMBeanServer(String agentId)</code>) to register the pool to.
      */
     String getJmxAgentId();
+
+    /**
+     * The class name of an interface that should be injected everytime we make a Connection.
+     * Use this when you want to access methods on a concrete class in the vendor's Connection
+     * object that aren't declared in a public interface. Without this, the connection that
+     * gets served will only give you access to public interfaces (like Connection and any
+     * other vendor provided ones)
+     * @return the interface
+     */
+    Class getInjectableConnectionInterface();
+
+    /**
+     * The class name of an interface that should be injected everytime we make a Statement.
+     * Use this when you want to access methods on a concrete class in the vendor's Statement
+     * object that aren't declared in a public interface. Without this, the statement that
+     * is provided will only give you access to public interfaces (like Statement and any
+     * other vendor provided ones)
+     * @return the interface
+     */
+    Class getInjectableStatementInterface();
+
+    /**
+     * The class name of an interface that should be injected everytime we make a PreparedStatement.
+     * Use this when you want to access methods on a concrete class in the vendor's PreparedStatement
+     * object that aren't declared in a public interface. Without this, the PreparedStatement that
+     * is provided will only give you access to public interfaces (like PreparedStatement and any
+     * other vendor provided ones)
+     * @return the interface
+     */
+    Class getInjectablePreparedStatementInterface();
+
+    /**
+     * The class name of an interface that should be injected everytime we make a CallableStatement.
+     * Use this when you want to access methods on a concrete class in the vendor's CallableStatement
+     * object that aren't declared in a public interface. Without this, the CallableStatement that
+     * is provided will only give you access to public interfaces (like CallableStatement and any
+     * other vendor provided ones)
+     * @return the interface
+     */
+    Class getInjectableCallableStatementInterface();
+
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.22  2004/06/02 20:19:14  billhorsman
+ Added injectable interface properties
+
  Revision 1.21  2004/03/18 17:08:14  chr32
  Added jmx* properties.
 

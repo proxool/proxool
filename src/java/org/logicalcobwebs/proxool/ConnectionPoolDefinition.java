@@ -16,13 +16,14 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.lang.reflect.Modifier;
 
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.31 $, $Date: 2004/03/18 17:08:14 $
+ * @version $Revision: 1.32 $, $Date: 2004/06/02 20:19:14 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
@@ -113,7 +114,16 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private boolean testAfterUse;
 
     private boolean jmx;
+
     private String jmxAgentId;
+
+    private Class injectableConnectionInterface;
+
+    private Class injectableStatementInterface;
+
+    private Class injectablePreparedStatementInterface;
+
+    private Class injectableCallableStatementInterface;
 
     /**
      * So we can set the values one by one if we want
@@ -260,6 +270,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         // These groups of properties have been split off to make this method smaller
         changed = changed || setHouseKeeperProperty(key, value, pretend);
         changed = changed || setLoggingProperty(key, value, pretend);
+        changed = changed || setInjectableProperty(key, value, pretend);
         changed = changed || setJndiProperty(key, value, pretend);
 
         if (key.equals(ProxoolConstants.USER_PROPERTY)) {
@@ -439,6 +450,44 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                 changed = true;
                 if (!pretend) {
                     setTrace(valueAsBoolean);
+                }
+            }
+        }
+        return changed;
+    }
+
+    /**
+     * Subset of {@link #setAnyProperty} to avoid overly long method
+     * @see #setAnyProperty
+     */
+    private boolean setInjectableProperty(String key, String value, boolean pretend) {
+        boolean changed = false;
+        if (key.equals(ProxoolConstants.INJECTABLE_CONNECTION_INTERFACE_NAME_PROPERTY)) {
+            if (isChanged(getInjectableConnectionInterfaceName(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setInjectableConnectionInterfaceName(value.length() > 0 ? value : null);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.INJECTABLE_STATEMENT_INTERFACE_NAME_PROPERTY)) {
+            if (isChanged(getInjectableStatementInterfaceName(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setInjectableStatementInterfaceName(value.length() > 0 ? value : null);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.INJECTABLE_PREPARED_STATEMENT_INTERFACE_NAME_PROPERTY)) {
+            if (isChanged(getInjectablePreparedStatementInterfaceName(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setInjectablePreparedStatementInterfaceName(value.length() > 0 ? value : null);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.INJECTABLE_CALLABLE_STATEMENT_INTERFACE_NAME_PROPERTY)) {
+            if (isChanged(getInjectableCallableStatememtInterfaceName(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setInjectableCallableStatementInterfaceName(value.length() > 0 ? value : null);
                 }
             }
         }
@@ -1088,6 +1137,128 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     }
 
     /**
+     * @see ConnectionPoolDefinitionIF#getInjectableConnectionInterface()
+     */
+    public Class getInjectableConnectionInterface() {
+        return injectableConnectionInterface;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getInjectableConnectionInterface()
+     */
+    public String getInjectableConnectionInterfaceName() {
+        if (getInjectableConnectionInterface() != null) {
+            return getInjectableConnectionInterface().getName();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param injectableConnectionInterfaceName the fully qualified class name
+     * @see ConnectionPoolDefinitionIF#getInjectableConnectionInterface()
+     */
+    public void setInjectableConnectionInterfaceName(String injectableConnectionInterfaceName) {
+        this.injectableConnectionInterface = getInterface(injectableConnectionInterfaceName);
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getInjectableStatementInterface()
+     */
+    public Class getInjectableStatementInterface() {
+        return injectableStatementInterface;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getInjectableStatementInterface()
+     */
+    public String getInjectableStatementInterfaceName() {
+        if (getInjectableStatementInterface() != null) {
+            return getInjectableStatementInterface().getName();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param injectableStatementInterfaceName the fully qualified class name
+     * @see ConnectionPoolDefinitionIF#getInjectableStatementInterface()
+     */
+    public void setInjectableStatementInterfaceName(String injectableStatementInterfaceName) {
+        this.injectableStatementInterface = getInterface(injectableStatementInterfaceName);
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getInjectablePreparedStatementInterface()
+     */
+    public Class getInjectablePreparedStatementInterface() {
+        return injectablePreparedStatementInterface;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getInjectablePreparedStatementInterface()
+     */
+    public String getInjectablePreparedStatementInterfaceName() {
+        if (getInjectablePreparedStatementInterface() != null) {
+            return getInjectablePreparedStatementInterface().getName();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param injectablePreparedStatementInterfaceName the fully qualified class name
+     * @see ConnectionPoolDefinitionIF#getInjectablePreparedStatementInterface()
+     */
+    public void setInjectablePreparedStatementInterfaceName(String injectablePreparedStatementInterfaceName) {
+        this.injectablePreparedStatementInterface = getInterface(injectablePreparedStatementInterfaceName);
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getInjectableCallableStatementInterface()
+     */
+    public String getInjectableCallableStatememtInterfaceName() {
+        if (getInjectableCallableStatementInterface() != null) {
+            return getInjectableCallableStatementInterface().getName();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getInjectableCallableStatementInterface()
+     */
+    public Class getInjectableCallableStatementInterface() {
+        return injectableCallableStatementInterface;
+    }
+
+    /**
+     * @param injectableCallableStatementInterfaceName the fully qualified class name
+     * @see ConnectionPoolDefinitionIF#getInjectableCallableStatementInterface()
+     */
+    public void setInjectableCallableStatementInterfaceName(String injectableCallableStatementInterfaceName) {
+        this.injectableCallableStatementInterface = getInterface(injectableCallableStatementInterfaceName);
+    }
+
+    private Class getInterface(String className) {
+        try {
+            Class clazz = null;
+            if (className != null && className.length() > 0) {
+                clazz = Class.forName(className);
+                if (!clazz.isInterface()) {
+                    throw new IllegalArgumentException(className + " is a class. It must be an interface.");
+                }
+                if (!Modifier.isPublic(clazz.getModifiers())) {
+                    throw new IllegalArgumentException(className + " is a protected interface. It must be public.");
+                }
+            }
+            return clazz;
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(className + " couldn't be found");
+        }
+    }
+
+    /**
      * Returns true if {@link #redefine redefining} the pool using
      * these parameters would not change the definition. You can
      * use this to decide whether or not to trigger a change
@@ -1126,6 +1297,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.32  2004/06/02 20:19:14  billhorsman
+ Added injectable interface properties
+
  Revision 1.31  2004/03/18 17:08:14  chr32
  Added jmx* properties.
 
