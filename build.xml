@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.52 $
-    $Date: 2003/03/12 22:27:20 $
+    $Revision: 1.53 $
+    $Date: 2003/04/28 20:06:40 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -352,7 +352,7 @@
             <batchtest todir="${build-dir}/reports">
                 <fileset dir="src/java-test"
                     includes="**/*Test.java"
-                    excludes="**/GlobalTest.java,**/AbstractProxoolTest.java"
+                    excludes="**/GlobalTest.java,**/AbstractProxoolTest.java,**/PerformanceTest.java"
                     />
             </batchtest>
             <formatter type="xml"/>
