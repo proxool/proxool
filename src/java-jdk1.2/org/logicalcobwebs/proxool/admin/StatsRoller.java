@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.logging.Log;
@@ -16,7 +16,7 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/11 00:32:12 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/20 00:33:14 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -151,6 +151,9 @@ public class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.1  2003/02/20 00:33:14  billhorsman
+ renamed monitor package -> admin
+
  Revision 1.7  2003/02/11 00:32:12  billhorsman
  added daemon to roll stats
 

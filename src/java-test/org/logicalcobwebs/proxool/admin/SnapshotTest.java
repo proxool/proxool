@@ -13,26 +13,27 @@ import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.ConnectionInfoIF;
 
 import java.sql.Connection;
 import java.util.Properties;
 
 /**
- * Test {@link StatisticsIF}
+ * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/19 23:36:50 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/20 00:33:15 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class StatisticsTest extends TestCase {
+public class SnapshotTest extends TestCase {
 
-    private static final Log LOG = LogFactory.getLog(StatisticsTest.class);
+    private static final Log LOG = LogFactory.getLog(SnapshotTest.class);
 
     /**
      * @see TestCase#TestCase
      */
-    public StatisticsTest(String s) {
+    public SnapshotTest(String s) {
         super(s);
     }
 
@@ -71,20 +72,38 @@ public class StatisticsTest extends TestCase {
             // Register pool
             ProxoolFacade.registerConnectionPool(url, info);
 
-            // Skip past the first set because they will probably be for only part
-            // of the 10s period.
-            StatisticsIF statistics = waitForNextStatistics(alias, "10s", null, 20000);
+            {
+                Connection c = TestHelper.getProxoolConnection(url);
+                c.close();
 
+                SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
 
-            Connection c = TestHelper.getProxoolConnection(url);
-            c.close();
+                assertEquals("servedCount", 1L, snapshot.getServedCount());
+                assertEquals("refusedCount", 0L, snapshot.getRefusedCount());
+                assertEquals("availableConnectionCount", 1, snapshot.getAvailableConnectionCount());
+                assertEquals("activeConnectionCount", 0, snapshot.getActiveConnectionCount());
 
-            statistics = waitForNextStatistics(alias, "10s", statistics, 20000);
+                ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
+                assertEquals("connectionInfos.length", 1, connectionInfos.length);
+                assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_AVAILABLE, connectionInfos[0].getStatus());
+            }
 
-            assertEquals("servedCount", 1L, statistics.getServedCount());
-            assertEquals("servedPerSecond", 0.09, 0.11, statistics.getServedPerSecond());
-            assertEquals("refusedCount", 0L, statistics.getRefusedCount());
-            assertTrue("averageActiveTime > 0", statistics.getAverageActiveTime() > 0);
+            {
+                Connection c = TestHelper.getProxoolConnection(url);
+
+                SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
+
+                assertEquals("servedCount", 2L, snapshot.getServedCount());
+                assertEquals("refusedCount", 0L, snapshot.getRefusedCount());
+                assertEquals("availableConnectionCount", 0, snapshot.getAvailableConnectionCount());
+                assertEquals("activeConnectionCount", 1, snapshot.getActiveConnectionCount());
+
+                ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
+                assertEquals("connectionInfos.length", 1, connectionInfos.length);
+                assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_ACTIVE, connectionInfos[0].getStatus());
+
+                c.close();
+            }
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -99,43 +118,22 @@ public class StatisticsTest extends TestCase {
 
     }
 
-    private StatisticsIF waitForNextStatistics(String alias, String token, StatisticsIF oldStatistics, int timeout) throws ProxoolException {
-        long startWaiting = System.currentTimeMillis();
-        StatisticsIF statistics = null;
-        while (statistics == null || statistics == oldStatistics) {
-            if (System.currentTimeMillis() - startWaiting > timeout) {
-                fail("Statistics didn't arrive within expected 20 seconds");
-            }
-            statistics = ProxoolFacade.getStatistics(alias, token);
-        }
-        return statistics;
-    }
-
-    class TestListener implements StatisticsListenerIF {
-
-        private StatisticsIF statistics;;
-
-        public void statistics(String alias, StatisticsIF statistics) {
-            this.statistics = statistics;
-        }
-
-        public StatisticsIF getStatistics() {
-            return statistics;
-        }
-    }
 }
 
 /*
  Revision history:
- $Log: StatisticsTest.java,v $
+ $Log: SnapshotTest.java,v $
+ Revision 1.1  2003/02/20 00:33:15  billhorsman
+ renamed monitor package -> admin
+
  Revision 1.3  2003/02/19 23:36:50  billhorsman
  renamed monitor package to admin
 
- Revision 1.2  2003/02/19 15:14:31  billhorsman
+ Revision 1.2  2003/02/19 15:14:29  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)
 
  Revision 1.1  2003/02/07 17:28:36  billhorsman
  *** empty log message ***
 
-  */
+ */

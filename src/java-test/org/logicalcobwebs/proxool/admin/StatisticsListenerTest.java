@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/19 23:36:50 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/20 00:33:15 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -117,6 +117,9 @@ public class StatisticsListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.1  2003/02/20 00:33:15  billhorsman
+ renamed monitor package -> admin
+
  Revision 1.5  2003/02/19 23:36:50  billhorsman
  renamed monitor package to admin
 
