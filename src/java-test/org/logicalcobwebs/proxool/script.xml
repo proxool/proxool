@@ -37,8 +37,7 @@
         value="sa"
         />
 
-    <info name="proxool.debug-level" value="1" />
-    <info name="proxool.maximum-connection-count" value="5" />
+    <info name="proxool.maximum-connection-count" value="6" />
     <info name="proxool.minimum-connection-count" value="5" />
 
     <command
@@ -49,7 +48,7 @@
 
     <command
         name="insert"
-        loops="50"
+        loops="2500"
         load="5"
         sql="insert into test values(1)"
         />
