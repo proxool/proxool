@@ -14,7 +14,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Run all tests
  *
- * @version $Revision: 1.2 $, $Date: 2002/12/16 17:35:43 $
+ * @version $Revision: 1.3 $, $Date: 2002/12/18 03:13:51 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
@@ -24,7 +24,7 @@ public class AllTests {
     /**
      * Run all tests
      *
-     * @return a composite test of all Proxool tests.
+     * @return a composite test of all Proxool configuration tests.
      */
     public static Test suite() {
         TestSuite suite = new TestSuite();
@@ -46,6 +46,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.3  2002/12/18 03:13:51  chr32
+ Doc.
+
  Revision 1.2  2002/12/16 17:35:43  chr32
  Removed redundant imports.
 
