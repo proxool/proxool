@@ -15,11 +15,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Various tests
  *
- * @version $Revision: 1.4 $, $Date: 2002/09/19 10:06:39 $
+ * @version $Revision: 1.5 $, $Date: 2002/09/19 10:34:47 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -223,6 +225,99 @@ public class GeneralTests extends TestCase {
         assertEquals(goodHits, expectedGoodHits);
     }
 
+    /**
+     * If we ask for more simultaneous connections then we have allowed we should gracefully
+     * refuse them.
+     */
+    public void testInfo() throws SQLException {
+
+        String alias = "info";
+        Properties info = buildProperties();
+        info.setProperty("proxool.prototype-count", "0");
+        info.setProperty("proxool.minimum-connection-count", "0");
+        info.setProperty("proxool.maximum-connection-count", "5");
+        ProxoolFacade.registerConnectionPool(prefix + alias + urlSuffix, info);
+        Collection connectionInfos = null;
+        final int ARRAY_SIZE = 5;
+
+        Connection[] connections = new Connection[ARRAY_SIZE];
+        try {
+
+            // Open 1 connection
+            connections[0] = getConnection(alias);
+            {
+                connectionInfos = ProxoolFacade.getConnectionInfos(alias);
+                assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 1);
+                ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
+                connectionInfos.toArray(ci);
+                LOG.info("ConnectionInfo[0]=" + ci[0]);
+            }
+
+            // Open another
+            connections[1] = getConnection(alias);
+            {
+                connectionInfos = ProxoolFacade.getConnectionInfos(alias);
+                assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
+                ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
+                connectionInfos.toArray(ci);
+                LOG.info("ConnectionInfo[0]=" + ci[0]);
+                LOG.info("ConnectionInfo[1]=" + ci[1]);
+            }
+
+            // Close the first
+            try {
+                connections[0].close();
+            } catch (SQLException e) {
+                LOG.error("Couldn't close connection 0", e);
+            }
+            {
+                connectionInfos = ProxoolFacade.getConnectionInfos(alias);
+                assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
+                ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
+                connectionInfos.toArray(ci);
+                LOG.info("ConnectionInfo[0]=" + ci[0]);
+                LOG.info("ConnectionInfo[1]=" + ci[1]);
+            }
+
+        } finally {
+            for (int i = 0; i < ARRAY_SIZE; i++) {
+                try {
+                    if (connections[i] != null) {
+                        connections[i].close();
+                    }
+                } catch (SQLException e) {
+                    LOG.error("Couldn't close connection " + i, e);
+                }
+            }
+            {
+                connectionInfos = ProxoolFacade.getConnectionInfos(alias);
+                assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
+                ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
+                connectionInfos.toArray(ci);
+                LOG.info("ConnectionInfo[0]=" + ci[0]);
+                LOG.info("ConnectionInfo[1]=" + ci[1]);
+            }
+        }
+
+    }
+
+    private Connection getConnection(String alias) {
+        Connection connection = null;
+        try {
+            Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
+
+            connection = DriverManager.getConnection(prefix + alias);
+
+        } catch (ClassNotFoundException e) {
+            LOG.error("Problem finding driver?", e);
+        } catch (SQLException e) {
+            LOG.debug("Ignorable SQLException", e);
+        } catch (Exception e) {
+            LOG.error("Unexpected Exception", e);
+        }
+        return connection;
+    }
+
     private static Properties buildProperties() {
         Properties info = new Properties();
         info.setProperty("user", USER);
@@ -311,6 +406,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.5  2002/09/19 10:34:47  billhorsman
+ new testInfo test
+
  Revision 1.4  2002/09/19 10:06:39  billhorsman
  improved load test
 
