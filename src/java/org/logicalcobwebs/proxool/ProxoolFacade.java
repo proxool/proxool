@@ -29,7 +29,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.71 $, $Date: 2003/08/30 14:54:04 $
+ * @version $Revision: 1.72 $, $Date: 2003/09/07 22:09:21 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -42,6 +42,12 @@ public class ProxoolFacade {
     private static CompositeProxoolListener compositeProxoolListener = new CompositeProxoolListener();
 
     private static boolean versionLogged = false;
+
+    /**
+     * This is the thread that has been registered with {@link Runtime} as a
+     * shutdownHook. It is removed during shutdown.
+     */
+    private static Thread shutdownHook;
 
     /**
      * Build a ConnectionPool based on this definition and then start it.
@@ -211,6 +217,17 @@ public class ProxoolFacade {
         ConnectionPool[] cps = ConnectionPoolManager.getInstance().getConnectionPools();
         for (int i = 0; i < cps.length; i++) {
             removeConnectionPool(finalizer, cps[i], delay);
+        }
+
+        // If a shutdown hook was registered then remove it
+        try {
+            if (shutdownHook != null) {
+                ShutdownHook.remove(shutdownHook);
+            }
+        } catch (Throwable t) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Unanticipated error during removal of ShutdownHook. Ignoring it.", t);
+            }
         }
 
     }
@@ -655,11 +672,27 @@ public class ProxoolFacade {
             return false;
         }
     }
+
+    /**
+     * By remembering the most recent {@link ShutdownHook} ProxoolFacade
+     * will know to disable it when it is {@link #shutdown}. It will gracefully
+     * cope with the fact that it may be shutting down by the request of the
+     * sutdownHook. If you don't do this and do several "hot deploys" then you
+     * end up with a series of shutdown hooks. We only every want one.
+     * @param t the thread that will be run as a shutdown hook
+     * @see ShutdownHook
+     */
+    protected static void setShutdownHook(Thread t) {
+        shutdownHook = t;
+    }
 }
 
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.72  2003/09/07 22:09:21  billhorsman
+ Remove any registered ShutdownHooks during shutdown.
+
  Revision 1.71  2003/08/30 14:54:04  billhorsman
  Checkstyle
 
