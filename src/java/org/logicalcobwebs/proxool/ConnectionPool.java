@@ -9,7 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.Proxy;
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -20,15 +19,13 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.4 $, $Date: 2002/09/19 10:33:57 $
+ * @version $Revision: 1.5 $, $Date: 2002/10/16 11:46:23 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private Log log;
-
-    /** TODO try to avoid expiring all connections at once! */
 
     private static final String[] STATUS_DESCRIPTIONS = {"NULL", "AVAILABLE", "ACTIVE", "OFFLINE"};
 
@@ -258,7 +255,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             connection = (Connection) ProxyConnection.newInstance(getNextId(), getDefinition());
             proxyConnection = (ProxyConnection) Proxy.getInvocationHandler(connection);
 
-            onBirth(connection);
+            try {
+                onBirth(connection);
+            } catch (Exception e) {
+                log.error("Problem during onBirth (ignored)", e);
+            }
             switch (state) {
                 case ProxyConnection.STATUS_ACTIVE:
                     proxyConnection.fromOfflineToActive();
@@ -390,7 +391,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             try {
                 onDeath(proxyConnection.getConnection());
             } catch (SQLException e) {
-                log.error(e);
+                log.error("Problem during onDeath (ignored)", e);
             }
 
             // The reallyClose() method also decrements the connectionCount.
@@ -666,9 +667,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                             }
                         }
 
-                        // TODO What should we do with very old active connections? */
-
-                    } // END for (int i = poolableConnections.size() - 1; i >= 0; i--)
+                    }
 
                     setRecentlyStartedActiveConnectionCount(recentlyStartedActiveConnectionCountTemp);
 
@@ -881,13 +880,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         }
     }
 
-    /** Call the onBirth() method on each StateListenerIF . */
-    protected void cleanupClob(Connection connection, Clob clob) throws SQLException {
-        if (connectionListener != null) {
-            connectionListener.cleanupClob(connection, clob);
-        }
-    }
-
     public String toString() {
         return getDefinition().toString();
     }
@@ -1022,6 +1014,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.5  2002/10/16 11:46:23  billhorsman
+ removed obsolete cleanupClob method and made onBirth call failsafe
+
  Revision 1.4  2002/09/19 10:33:57  billhorsman
  added ProxyConnection#toString
 
