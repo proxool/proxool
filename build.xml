@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.59 $
-    $Date: 2003/08/30 15:39:56 $
+    $Revision: 1.60 $
+    $Date: 2003/09/07 22:15:04 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -40,6 +40,9 @@
 
     <!-- Passed to JVM when running tests -->
     <property name="jvmargs" value=""/>
+
+    <!-- What test suite to run when calling the "test" target -->
+    <property name="test-suite" value="org.logicalcobwebs.proxool.GlobalTest"/>
 
     <!-- Classpath -->
     <path id="source" path="${build-dir}/classes">
@@ -286,7 +289,7 @@
             <fileset
                 dir="src/java"
                 includes="**/*.java"
-                excludes="**/Jdk14Logger.java,**/ProxyCallableStatement.java,**/ProxyConnection.java,**/ProxyDatabaseMetData.java,**/ProxyFactory.java,**/ProxyPreparedStatement.java,**/ShutdownHook.java,**/StatsRoller.java"/>
+                excludes="**/Jdk14Logger.java,**/ProxyCallableStatement.java,**/ProxyConnection.java,**/ProxyDatabaseMetData.java,**/ProxyFactory.java,**/ProxyPreparedStatement.java,**/StatsRoller.java"/>
         </copy>
     </target>
 
@@ -350,7 +353,7 @@
         >
         <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}"/>
-            <arg value="org.logicalcobwebs.proxool.GlobalTest"/>
+            <arg value="${test-suite}"/>
             <jvmarg line="${jvmargs}"/>
         </java>
 <!--
@@ -474,6 +477,47 @@
         depends="init"
         >
         <java classpathref="binary" classname="org.logicalcobwebs.proxool.Version"/>
+    </target>
+
+    <target
+        name="echo-jdk"
+        >
+        <antcall target="echo-jdk12"/>
+        <antcall target="echo-jdk13"/>
+        <antcall target="echo-jdk14"/>
+        <antcall target="echo-jdk15"/>
+    </target>
+
+    <target
+        name="echo-jdk12"
+        depends="evaluate-properties"
+        if="build-jdk1.2"
+        >
+        <echo level="info" message="Using JDK1.2"/>
+    </target>
+
+    <target
+        name="echo-jdk13"
+        depends="evaluate-properties"
+        if="build-jdk1.3"
+        >
+        <echo level="info" message="Using JDK1.3"/>
+    </target>
+
+    <target
+        name="echo-jdk14"
+        depends="evaluate-properties"
+        if="build-jdk1.4"
+        >
+        <echo level="info" message="Using JDK1.4"/>
+    </target>
+
+    <target
+        name="echo-jdk15"
+        depends="evaluate-properties"
+        if="build-jdk1.5"
+        >
+        <echo level="info" message="Using JDK1.5"/>
     </target>
 
 </project>
