@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.22 $, $Date: 2002/12/16 11:14:51 $
+ * @version $Revision: 1.23 $, $Date: 2002/12/16 11:51:28 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -101,6 +101,9 @@ public class GeneralTests extends TestCase {
 
     }
 
+    /**
+     * That we can get the delegate driver's Statement from the one
+     */
     public void testDelegateStatement() {
 
         String testName = "delegateStatement";
@@ -451,7 +454,7 @@ public class GeneralTests extends TestCase {
             }
 
             c.close();
-            
+
             assertEquals("availableConnectionCount", 0L, ProxoolFacade.getConnectionPoolStatistics(alias).getAvailableConnectionCount());
 
         } catch (Exception e) {
@@ -469,6 +472,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.23  2002/12/16 11:51:28  billhorsman
+ doc
+
  Revision 1.22  2002/12/16 11:14:51  billhorsman
  new delegateStatement test
 
