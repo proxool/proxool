@@ -85,7 +85,7 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.6 $, $Date: 2002/12/18 23:31:57 $
+ * @version $Revision: 1.7 $, $Date: 2002/12/23 02:42:24 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -128,7 +128,13 @@ public class XMLConfigurator extends DefaultHandler {
     public void startElement(String uri, String lname, String qname, Attributes attributes) throws SAXException {
         content.setLength(0);
 
-        if (lname.equals(PROXOOL)) {
+        if (!namespaceOk(uri)) {
+            return;
+        }
+
+        final String elementName = getElementName(uri, lname, qname);
+        
+        if (elementName.equals(PROXOOL)) {
             if (insideProxool) {
                 throw new SAXException("A <" + PROXOOL + "> element can't contain another <" + PROXOOL + "> element.");
             }
@@ -139,10 +145,10 @@ public class XMLConfigurator extends DefaultHandler {
         }
 
         if (insideProxool) {
-            if (lname.equals(DRIVER_PROPERTIES)) {
+            if (elementName.equals(DRIVER_PROPERTIES)) {
                 insideDelegateProperties = true;
             } else if (insideDelegateProperties) {
-                if (lname.equals(PROPERTY)) {
+                if (elementName.equals(PROPERTY)) {
                     setDriverProperty(attributes);
                 }
             }
@@ -162,13 +168,14 @@ public class XMLConfigurator extends DefaultHandler {
      * @see org.xml.sax.ContentHandler#endElement
      */
     public void endElement(String uri, String lname, String qname) throws SAXException {
-        if (uri != null && uri.length() > 0 && !uri.equals(ProxoolConstants.PROXOOL_XML_NAMESPACE_URI)) {
-            // not our namespace
+        if (!namespaceOk(uri)) {
             return;
         }
 
+        final String elementName = getElementName(uri, lname, qname);
+
         // Are we ending a proxool configuration section?
-        if (lname.equals(PROXOOL)) {
+        if (elementName.equals(PROXOOL)) {
 
             // Check that we have defined the minimum information
             if (driverClass == null || driverUrl == null) {
@@ -202,11 +209,11 @@ public class XMLConfigurator extends DefaultHandler {
             insideProxool = false;
         }
 
-        if (insideProxool && !lname.equals(PROXOOL)) {
-            if (lname.equals(DRIVER_PROPERTIES)) {
+        if (insideProxool && !elementName.equals(PROXOOL)) {
+            if (elementName.equals(DRIVER_PROPERTIES)) {
                 insideDelegateProperties = false;
             } else if (!insideDelegateProperties) {
-                setProxoolProperty(lname, content.toString().trim());
+                setProxoolProperty(elementName, content.toString().trim());
             }
         }
     }
@@ -230,7 +237,8 @@ public class XMLConfigurator extends DefaultHandler {
         final String name = attributes.getValue(NAME);
         final String value = attributes.getValue(VALUE);
         if (name == null || name.length() < 1 || value == null) {
-            throw new SAXException("Name or value attribute missing from property element.");
+            throw new SAXException("Name or value attribute missing from property element."
+                + "Name: '" + name + "' Value: '" + value + "'.");
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Adding driver property " + name + " with value " + value + ".");
@@ -262,5 +270,18 @@ public class XMLConfigurator extends DefaultHandler {
         // On fatal error we rethrow the exception.
         // This should cause the parser stop and an exeption be thrown back to the client.
         throw e;
+    }
+
+    // If no namespace use qname, else use lname.
+    private String getElementName(String uri, String lname, String qname) {
+        if (uri == null || "".equals(uri)) {
+            return qname;
+        } else {
+            return lname;
+        }
+    }
+
+    private boolean namespaceOk(String uri) {
+        return uri == null || uri.length() == 0 || uri.equals(ProxoolConstants.PROXOOL_XML_NAMESPACE_URI);
     }
 }
