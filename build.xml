@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.30 $
-    $Date: 2003/02/21 15:17:07 $
-    $Author: billhorsman $
+    $Revision: 1.31 $
+    $Date: 2003/02/25 16:51:59 $
+    $Author: chr32 $
 
     http://proxool.sourceforge.net
 
@@ -187,9 +187,10 @@
         <javac srcdir="${build-dir}/src/java" destdir="${build-dir}/classes" debug="${debug}">
             <classpath refid="source"/>
 		</javac>
-        <!-- Copy dtd's into the compiled classes directory. -->
+        <!-- Copy dtd's and properties into the compiled classes directory. -->
         <copy todir="${build-dir}/classes">
             <fileset dir="src/java" includes="**/*.dtd"/>
+            <fileset dir="src/java" includes="**/*.properties"/>
         </copy>
     </target>
 
