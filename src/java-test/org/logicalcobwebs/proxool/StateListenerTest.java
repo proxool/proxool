@@ -19,7 +19,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/28 17:41:13 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/01 15:24:09 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -51,8 +51,9 @@ public class StateListenerTest extends TestCase {
             info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
             info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
             info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
-            info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "5000");
-            info.setProperty(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY, "5000");
+            info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
+            info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
+            info.setProperty(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY, "6000");
             ProxoolFacade.registerConnectionPool(url, info);
 
             assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
@@ -176,6 +177,9 @@ public class StateListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.5  2003/03/01 15:24:09  billhorsman
+ tweaked properties
+
  Revision 1.4  2003/02/28 17:41:13  billhorsman
  more robust wait for state change
 
