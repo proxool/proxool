@@ -5,21 +5,29 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
+
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Properties;
 
 /**
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.12 $, $Date: 2004/05/26 17:19:10 $
+ * @version $Revision: 1.13 $, $Date: 2004/06/02 20:04:00 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class ConnectionListenerTest extends AbstractProxoolTest {
+
+    private static final Log LOG = LogFactory.getLog(ConnectionListenerTest.class);
 
     private int onBirthCalls;
     private int onDeathCalls;
@@ -80,6 +88,66 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
         assertTrue("Expected 2 onExecute calls, but got " + this.onExecuteCalls + ".", this.onExecuteCalls == 2);
         assertTrue("Expected 2 onFail calls, but got " + this.onFailCalls + ".", this.onFailCalls == 2);
         assertTrue("Expected 4 onDeath calls, but got " + this.onDeathCalls + ".", this.onDeathCalls == 4);
+    }
+
+    /**
+     * See whether the command parameter passed to {@link ConnectionListenerIF#onFail(java.lang.String, java.lang.Exception)}
+     * is correct. And assume it is also right for onExecute.
+     * @throws Exception if the test fails.
+     */
+    public void testExecuteCommand() throws Exception {
+        clear();
+        String alias = "executeCommand";
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        Connection connection1 = DriverManager.getConnection(url, info);
+        final TestConnectionListener tcl = new TestConnectionListener();
+        ProxoolFacade.addConnectionListener(alias, tcl);
+
+        // provoke execution error
+        java.util.Date date = null;
+        try {
+            PreparedStatement ps = connection1.prepareStatement("select * from NOTHING where a = ? and b = ? and c = ? and d = ? and e = ?");
+            ps.setBoolean(1, true);
+            Calendar c = Calendar.getInstance();
+            date = c.getTime();
+            ps.setDate(2, new Date(c.getTime().getTime()));
+            ps.setInt(3, 3);
+            ps.setDouble(4, 4.0);
+            ps.setString(5, "test");
+            ps.execute();
+        } catch (SQLException e) {
+            // we expect this
+        }
+        LOG.debug(tcl.getCommand());
+        assertEquals("command", "select * from NOTHING where a = true and b = '" + AbstractProxyStatement.getDateAsString(date) + "' and c = 3 and d = 4.0 and e = 'test';", tcl.getCommand().trim());
+
+        // Check that it works with no parameters
+        final String s2 = "select * from NOTHING;";
+        try {
+            tcl.clear();
+            PreparedStatement ps = connection1.prepareStatement(s2);
+            ps.execute();
+        } catch (SQLException e) {
+            // we expect this
+        }
+        LOG.debug(tcl.getCommand());
+        assertEquals("command", s2, tcl.getCommand().trim());
+
+        try {
+            tcl.clear();
+            PreparedStatement ps = connection1.prepareStatement(s2);
+            ps.execute();
+        } catch (SQLException e) {
+            // we expect this
+        }
+        LOG.debug(tcl.getCommand());
+        assertEquals("command", s2, tcl.getCommand().trim());
+
     }
 
     /**
@@ -153,6 +221,9 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 //    }
 
     class TestConnectionListener implements ConnectionListenerIF {
+
+        String command;
+
         public void onBirth(Connection connection) throws SQLException {
             onBirthCalls++;
         }
@@ -163,10 +234,20 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 
         public void onExecute(String command, long elapsedTime) {
             onExecuteCalls++;
+            this.command = command;
         }
 
         public void onFail(String command, Exception exception) {
             onFailCalls++;
+            this.command = command;
+        }
+
+        public String getCommand() {
+            return command;
+        }
+
+        public void clear() {
+            command = null;
         }
     }
 }
@@ -174,6 +255,9 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.13  2004/06/02 20:04:00  billhorsman
+ Added test for onExecute command
+
  Revision 1.12  2004/05/26 17:19:10  brenuart
  Allow JUnit tests to be executed against another database.
  By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
