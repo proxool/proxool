@@ -56,6 +56,7 @@ public class TestHelper {
     public static Properties buildCompleteAlternativeProperties() {
         Properties properties = new Properties();
         properties.setProperty("user", "sa");
+        properties.setProperty("password", "");
         properties.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "40000");
         properties.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, "select CURRENT_DATE");
         properties.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "10");
@@ -81,6 +82,7 @@ public class TestHelper {
     public static void equalsCompleteAlternativeProperties(ConnectionPoolDefinitionIF connectionPoolDefinition)
         throws ProxoolException {
         checkProperty("user", "sa", connectionPoolDefinition.getProperties().getProperty("user"));
+        checkProperty("password", "", connectionPoolDefinition.getProperties().getProperty("password"));
         checkProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME, 40000,
             connectionPoolDefinition.getHouseKeepingSleepTime());
         checkProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL, "select CURRENT_DATE",
