@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.54 $
-    $Date: 2003/04/29 07:31:19 $
+    $Revision: 1.55 $
+    $Date: 2003/06/18 10:04:47 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -23,7 +23,7 @@
     <property name="debug" value="true"/>
 
     <!-- Currect release, e.g. 0.6 -->
-    <property name="release" value="0.7.1"/>
+    <property name="release" value="0.7.2"/>
 
     <!-- Currect release, e.g. 0.6 -->
     <property name="junit-report-description" value="Unit Test Report for CVS Snapshot"/>
@@ -333,8 +333,7 @@
             <sysproperty key="log4jPath" value="${log4jPath}"/>
             <batchtest todir="${build-dir}/reports">
                 <fileset dir="src/java-test"
-                    includes="**/*Test.java"
-                    excludes="**/GlobalTest.java,**/AbstractProxoolTest.java,**/PerformanceTest.java"
+                    includes="**/PerformanceTest.java"
                     />
             </batchtest>
         </junit>
