@@ -14,7 +14,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.8 $, $Date: 2002/12/04 13:19:43 $
+ * @version $Revision: 1.9 $, $Date: 2002/12/11 01:48:41 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -120,11 +120,11 @@ public class ProxoolDriver implements Driver {
 
             dpi[7] = new DriverPropertyInfo(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY,
                     "This helps us determine whether the pool status. As long as at least one connection was started within this threshold (milliseconds) or there "
-                    + " are some spare connections available then we assume the pool is up.");
+                    + " are some spare connections available then we assume the pool is up. Defaults to 60 seconds.");
             dpi[7].value = String.valueOf(cpd.getRecentlyStartedThreshold());
 
             dpi[8] = new DriverPropertyInfo(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY,
-                    "This helps us determine the pool status. If we have refused a connection within this threshold (milliseconds) then we are overloaded.");
+                    "This helps us determine the pool status. If we have refused a connection within this threshold (milliseconds) then we are overloaded. Defaults to 60 seconds.");
             dpi[8].value = String.valueOf(cpd.getOverloadWithoutRefusalLifetime());
 
             dpi[9] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY,
@@ -183,6 +183,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.9  2002/12/11 01:48:41  billhorsman
+ added default values for property info documentation
+
  Revision 1.8  2002/12/04 13:19:43  billhorsman
  draft ConfiguratorIF stuff for persistent configuration
 
