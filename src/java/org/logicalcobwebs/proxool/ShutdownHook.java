@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
  * This is instantiated statically by ProxoolFacade. It will automatically
  * close down all the connections when teh JVM stops.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/04 15:04:17 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/04 17:19:11 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -21,11 +21,21 @@ class ShutdownHook implements Runnable {
 
     private static final Log LOG = LogFactory.getLog(ShutdownHook.class);
 
+    private static boolean registered;
+
+    protected static void init() {
+        if (!registered) {
+            registered = true;
+            new ShutdownHook();
+        }
+    }
+
     /**
      * Registers this ShutdownHook with Runtime
      */
-    public ShutdownHook() {
+    private ShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(this));
+        LOG.debug("Registering ShutdownHook");
     }
 
     /**
@@ -33,6 +43,7 @@ class ShutdownHook implements Runnable {
      * @see ProxoolFacade#removeAllConnectionPools
      */
     public void run() {
+        LOG.debug("Running ShutdownHook");
         Thread.currentThread().setName("Shutdown Hook");
         ProxoolFacade.removeAllConnectionPools(0);
     }
@@ -43,6 +54,9 @@ class ShutdownHook implements Runnable {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.2  2003/02/04 17:19:11  billhorsman
+ ShutdownHook now initialises
+
  Revision 1.1  2003/02/04 15:04:17  billhorsman
  New ShutdownHook
 
