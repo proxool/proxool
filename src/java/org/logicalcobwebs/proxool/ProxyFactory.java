@@ -26,7 +26,7 @@ import java.lang.reflect.Modifier;
  * object given a proxy.
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.27 $, $Date: 2004/06/02 20:50:47 $
+ * @version $Revision: 1.28 $, $Date: 2004/06/17 21:58:36 $
  * @since Proxool 0.5
  */
 class ProxyFactory {
@@ -124,6 +124,9 @@ class ProxyFactory {
      * @return an array of classes (all interfaces) that this class implements.
      */
     private static Class[] getInterfaces(Class clazz, ConnectionPool connectionPool) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Looking up injectable interfaces for " + clazz);
+        }
         Class[] interfaceArray = (Class[]) interfaceMap.get(clazz);
         if (interfaceArray == null) {
             Set interfaces = new HashSet();
@@ -132,30 +135,57 @@ class ProxyFactory {
                 // Work out which interface we should be injecting (if it has been configured). Make sure
                 // we check CallableStatement then PreparedStatement then Statement or all three will get
                 // caught by Statement
-                Class injectableClass = null;
                 if (Connection.class.isAssignableFrom(clazz)) {
-                    injectableClass = connectionPool.getDefinition().getInjectableConnectionInterface();
-                } else if (CallableStatement.class.isAssignableFrom(clazz)) {
-                    injectableClass = connectionPool.getDefinition().getInjectableCallableStatementInterface();
-                } else if (PreparedStatement.class.isAssignableFrom(clazz)) {
-                    injectableClass = connectionPool.getDefinition().getInjectablePreparedStatementInterface();
-                } else if (Statement.class.isAssignableFrom(clazz)) {
-                    injectableClass = connectionPool.getDefinition().getInjectableStatementInterface();
+                    Class injectableClass = connectionPool.getDefinition().getInjectableConnectionInterface();
+                    // Inject it if it was configured.
+                    if (injectableClass != null) {
+                        interfaces.add(injectableClass);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Injecting " + injectableClass + " into " + clazz);
+                        }
+                    }
                 }
-                // Inject it if it was configured.
-                if (injectableClass != null) {
-                    interfaces.add(injectableClass);
+                if (CallableStatement.class.isAssignableFrom(clazz)) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Getting injectableCallableStatementInterface");
+                    }
+                    Class injectableClass = connectionPool.getDefinition().getInjectableCallableStatementInterface();
+                    // Inject it if it was configured.
+                    if (injectableClass != null) {
+                        interfaces.add(injectableClass);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Injecting " + injectableClass + " into " + clazz);
+                        }
+                    }
+                }
+                if (PreparedStatement.class.isAssignableFrom(clazz)) {
+                    Class injectableClass = connectionPool.getDefinition().getInjectablePreparedStatementInterface();
+                    // Inject it if it was configured.
+                    if (injectableClass != null) {
+                        interfaces.add(injectableClass);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Injecting " + injectableClass + " into " + clazz);
+                        }
+                    }
+                }
+                if (Statement.class.isAssignableFrom(clazz)) {
+                    Class injectableClass = connectionPool.getDefinition().getInjectableStatementInterface();
+                    // Inject it if it was configured.
+                    if (injectableClass != null) {
+                        interfaces.add(injectableClass);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Injecting " + injectableClass + " into " + clazz);
+                        }
+                    }
                 }
             }
             interfaceArray = (Class[]) interfaces.toArray(new Class[interfaces.size()]);
-/*
             if (LOG.isDebugEnabled()) {
                 for (int i = 0; i < interfaceArray.length; i++) {
                     Class aClass = interfaceArray[i];
                     LOG.debug("Implementing " + aClass);
                 }
             }
-*/
             interfaceMap.put(clazz, interfaceArray);
 /*
         } else {
@@ -259,6 +289,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.28  2004/06/17 21:58:36  billhorsman
+ Injectable interface fixes.
+
  Revision 1.27  2004/06/02 20:50:47  billhorsman
  Dropped obsolete InvocationHandler reference and injectable interface stuff.
 
