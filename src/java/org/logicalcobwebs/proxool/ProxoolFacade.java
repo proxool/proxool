@@ -7,6 +7,8 @@ package org.logicalcobwebs.proxool;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.stats.StatisticsIF;
+import org.logicalcobwebs.proxool.stats.SnapshotIF;
 
 import java.sql.Statement;
 import java.util.Collection;
@@ -25,7 +27,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.32 $, $Date: 2003/01/27 18:26:36 $
+ * @version $Revision: 1.33 $, $Date: 2003/01/30 17:22:23 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -362,6 +364,12 @@ public class ProxoolFacade {
             cpd.setTrace(Boolean.valueOf(value).booleanValue());
         } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
             cpd.setFatalSqlException(value);
+        } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
+            int valueAsInt = Integer.parseInt(value);
+            if (cpd.getStatistics() != valueAsInt) {
+                changedProperties.setProperty(key, value);
+                cpd.setStatistics(valueAsInt);
+            }
         } else {
             cpd.setProperty(key, value);
             isProxoolProperty = false;
@@ -448,6 +456,7 @@ public class ProxoolFacade {
      * @param alias to identify the pool
      * @return the statistics
      * @throws ProxoolException if we couldn't find the pool
+     * @deprecated use {@link #getSnapshot}
      */
     public static ConnectionPoolStatisticsIF getConnectionPoolStatistics(String alias) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias);
@@ -459,7 +468,7 @@ public class ProxoolFacade {
      * @param alias to identify the pool
      * @return a horrible string describing the statistics
      * @throws ProxoolException if we couldn't find the pool
-     * @deprecated this will not be present in version 1.0. Better to use {@link #getConnectionPoolStatistics}
+     * @deprecated use {@link #getSnapshot}
      */
     public static String getConnectionPoolStatisticsDump(String alias) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias).displayStatistics();
@@ -607,11 +616,35 @@ public class ProxoolFacade {
     public static String[] getAliases() {
         return ConnectionPoolManager.getInstance().getConnectionPoolNames();
     }
+
+    /**
+     * Get the lastest performance statistics for this pool
+     * @param alias identifies the pool
+     * @return a sample containing the statistics
+     * @throws ProxoolException if we couldn't find the pool
+     */
+    public static StatisticsIF getStatistics(String alias) throws ProxoolException {
+        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getStats().getStatistics();
+    }
+
+    /**
+     * Gives a snapshot of what the pool is doing
+     * @param alias identifies the pool
+     * @return the current status of the pool
+     * @throws ProxoolException if we couldn't find the pool
+     */
+    public static SnapshotIF getSnapshot(String alias) throws ProxoolException {
+        ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
+        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getStats().getSnapshot(cp, cp.getDefinition());
+    }
 }
 
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.33  2003/01/30 17:22:23  billhorsman
+ add statistics support
+
  Revision 1.32  2003/01/27 18:26:36  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch

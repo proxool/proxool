@@ -7,6 +7,7 @@ package org.logicalcobwebs.proxool;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.stats.Stats;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.33 $, $Date: 2003/01/27 18:26:35 $
+ * @version $Revision: 1.34 $, $Date: 2003/01/30 17:22:21 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -98,6 +99,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private static boolean loggedLegend;
 
+    private Stats stats;
+
     /**
      * Initialised in {@link ConnectionPool#ConnectionPool constructor}.
      */
@@ -117,6 +120,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         connectionResetter = new ConnectionResetter(log, definition.getDriver());
         setDefinition(definition);
         connectionPoolUp = true;
+
+        if (definition.getStatistics() > 0) {
+            stats = new Stats(definition.getAlias(), definition.getStatistics());
+        }
     }
 
     /** Starts up house keeping and prototyper threads. */
@@ -157,6 +164,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         if (connectionCount >= getDefinition().getMaximumConnectionCount() && getAvailableConnectionCount() < 1) {
             connectionsRefusedCount++;
+            if (stats != null) {
+                stats.connectionRefused();
+            }
             log.info(displayStatistics() + " - " + MSG_MAX_CONNECTION_COUNT);
             timeMillisOfLastRefusal = System.currentTimeMillis();
             calculateUpState();
@@ -227,6 +237,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 calculateUpState();
             } else {
                 connectionsRefusedCount++;
+                if (stats != null) {
+                    stats.connectionRefused();
+                }
                 timeMillisOfLastRefusal = System.currentTimeMillis();
                 calculateUpState();
             }
@@ -377,6 +390,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      */
     protected void putConnection(ProxyConnectionIF proxyConnection) {
         try {
+
+            if (stats != null) {
+                stats.connectionReturned(System.currentTimeMillis() - proxyConnection.getTimeLastStartActive());
+            }
+
             // It's possible that this connection is due for expiry
             if (proxyConnection.isMarkedForExpiry()) {
                 if (proxyConnection.fromActiveToNull()) {
@@ -1126,6 +1144,14 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         return reloadMonitor.getLoadDate();
     }
 
+    /**
+     * Get the stats for this pool
+     * @return stats
+     */
+    protected Stats getStats() {
+        return stats;
+    }
+
     private static final boolean FORCE_EXPIRY = true;
 
     private static final boolean REQUEST_EXPIRY = false;
@@ -1135,6 +1161,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.34  2003/01/30 17:22:21  billhorsman
+ add statistics support
+
  Revision 1.33  2003/01/27 18:26:35  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch
