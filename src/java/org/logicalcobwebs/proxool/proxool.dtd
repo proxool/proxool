@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+    This software is released under the Apache Software Licence. See
+    package.html for details. The latest version is available at
+    http://proxool.sourceforge.net
+
+    DTD for configuring Proxool using XMLConfigurator
+
+    version $Revision: 1.1 $, $Date: 2002/12/11 00:55:09 $
+    author billhorsman
+    author $Author: billhorsman $ (current maintainer)
+    since Proxool 0.6
+
+  -->
+<!ELEMENT proxool (name, class, url, minimum-connection-count?, maximum-connection-count?,
+ maximum-connection-lifetime?, maximum-new-connections?, house-keeping-sleep-time?,
+ house-keeping-test-sql?, prototype-count?, recently-started-threshold?,
+ overload-without-refusal-lifetime?, maximum-active-time?, verbose?,
+ trace?, fatal-sql-exception?, delegate-properties?)>
+
+<!-- TODO doc -->
+<!ELEMENT name (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT class (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT url (#PCDATA) >
+
+<!-- TODO doc -->
+<!ELEMENT minimum-connection-count (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT maximum-connection-count (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT maximum-connection-lifetime (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT maximum-new-connections (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT house-keeping-sleep-time (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT house-keeping-test-sql (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT prototype-count (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT recently-started-threshold (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT overload-without-refusal-lifetime (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT maximum-active-time (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT verbose (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT trace (#PCDATA) >
+<!-- TODO doc -->
+<!ELEMENT fatal-sql-exception (#PCDATA) >
+
+
+<!-- This contains all the properties that  are passed onto the
+    delegate driver. -->
+<!ELEMENT delegate-properties (property*) >
+
+<!-- TODO doc -->
+<!ELEMENT property EMPTY >
+<!ATTLIST property
+    name CDATA #REQUIRED
+    value CDATA #REQUIRED
+>
+
+<!--
+ Revision history:
+ $Log: proxool.dtd,v $
+ Revision 1.1  2002/12/11 00:55:09  billhorsman
+ draft
+
+-->
