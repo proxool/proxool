@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.44 $
-    $Date: 2003/03/05 18:53:06 $
+    $Revision: 1.45 $
+    $Date: 2003/03/06 11:33:03 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -224,7 +224,7 @@
         depends="init"
         if="build-jdk1.2"
         >
-        <echo level="verbose" message="Using JDK1.2"/>
+        <echo level="info" message="Using JDK1.2"/>
         <antcall target="build-src-common"/>
         <copy todir="${build-dir}/src/java" overwrite="yes">
             <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
@@ -270,7 +270,7 @@
         depends="init"
         if="build-jdk1.5"
         >
-        <echo level="verbose" message="Using JDK1.4"/>
+        <echo level="info" message="Using JDK1.5"/>
         <copy todir="${build-dir}/src/java" preservelastmodified="yes">
             <fileset dir="src/java" includes="**/*.java"/>
         </copy>
