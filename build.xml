@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.49 $
-    $Date: 2003/03/11 14:58:30 $
+    $Revision: 1.50 $
+    $Date: 2003/03/12 15:59:34 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -22,11 +22,8 @@
     <!-- Whether we include debug information in JAR file -->
     <property name="debug" value="true"/>
 
-    <!-- Current version e.g. 0.6.* -->
-    <property name="version" value="0.7.*"/>
-
     <!-- Currect release, e.g. 0.6 -->
-    <property name="release" value="0.7"/>
+    <property name="release" value="0.7.1"/>
 
     <!-- Currect release, e.g. 0.6 -->
     <property name="junit-report-description" value="Unit Test Report for CVS Snapshot"/>
@@ -181,13 +178,32 @@
     <target
         name="build-src"
         description="Gathers the source code together ready for compiling"
-        depends="init,evaluate-properties"
+        depends="clean,init,evaluate-properties"
         >
         <antcall target="build-src-jdk1.2"/>
         <antcall target="build-src-jdk1.3"/>
         <antcall target="build-src-jdk1.4"/>
         <antcall target="build-src-jdk1.5"/>
         <antcall target="build-src-test"/>
+        <antcall target="version-stamp"/>
+
+    </target>
+
+    <target
+        name="version-stamp"
+        if="version"
+    >
+        <replace
+            file="${build-dir}/src/java/org/logicalcobwebs/proxool/Version.java"
+            token="VERSION = null"
+            value='VERSION = "${release}"'
+            />
+
+        <replace
+            file="${build-dir}/src/java/org/logicalcobwebs/proxool/Version.java"
+            token="BUILD_DATE = null"
+            value='BUILD_DATE = "${TODAY}"'
+            />
 
     </target>
 
@@ -212,7 +228,7 @@
         depends="init,build-src,compile"
         >
         <manifest file="${build-dir}/etc/MANIFEST.MF">
-            <attribute name="Proxool-Version" value="${version}"/>
+            <attribute name="Proxool-Version" value="${release}"/>
             <attribute name="Date" value="${TODAY}"/>
         </manifest>
         <jar
@@ -265,7 +281,6 @@
         <echo level="info" message="Using JDK1.4"/>
         <copy todir="${build-dir}/src/java" preservelastmodified="yes">
             <fileset dir="src/java" includes="**/*.java"/>
-            <fileset dir="src/java-sandbox" includes="**/*.java"/>
         </copy>
     </target>
 
@@ -306,11 +321,23 @@
         description="Runs the JUnit tests"
         depends="clean,init,build-test,deleteTestDb"
         >
+        <!--
         <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}"/>
             <arg value="org.logicalcobwebs.proxool.GlobalTest"/>
             <jvmarg line="${jvmargs}"/>
         </java>
+        -->
+        <junit fork="true" printsummary="yes">
+            <classpath refid="source"/>
+            <sysproperty key="log4jPath" value="${log4jPath}"/>
+            <batchtest todir="${build-dir}/reports">
+                <fileset dir="src/java-test"
+                    includes="**/*Test.java"
+                    excludes="**/GlobalTest.java,**/AbstractProxoolTest.java"
+                    />
+            </batchtest>
+        </junit>
     </target>
 
     <target
@@ -364,10 +391,30 @@
 
     <target
         name="javadoc"
-        description="Produce Javadoc API"
+        description="Produce Javadoc API for users"
         depends="init,build-src,compile">
 
-        <!-- Full documentation for use by developers -->
+        <javadoc
+            sourcepath="src/java"
+            destdir="${build-dir}/api"
+            packagenames="org.logicalcobwebs.*"
+            doctitle="Proxool API}"
+            windowtitle="Proxool API}"
+            public="true"
+            />
+
+        <!-- Copy dtd's over to the doc. -->
+        <copy todir="${build-dir}/api">
+            <fileset dir="src/java" includes="**/*.dtd"/>
+        </copy>
+
+    </target>
+
+    <target
+        name="javadoc-dev"
+        description="Produce Javadoc API for developers"
+        depends="init,build-src,compile">
+
         <javadoc
             destdir="${build-dir}/api-dev"
             packagenames="org.logicalcobwebs.*"
@@ -380,22 +427,11 @@
             <sourcepath path="src/java-sandbox"/>
         </javadoc>
 
-        <!-- Simple documentation for use by users -->
-        <javadoc
-            sourcepath="src/java"
-            destdir="${build-dir}/api"
-            packagenames="org.logicalcobwebs.*"
-            doctitle="Proxool API}"
-            windowtitle="Proxool API}"
-            public="true"
-            />
         <!-- Copy dtd's over to the doc. -->
-        <copy todir="${build-dir}/api">
-            <fileset dir="src/java" includes="**/*.dtd"/>
-        </copy>
         <copy todir="${build-dir}/api-dev">
             <fileset dir="src/java" includes="**/*.dtd"/>
         </copy>
+
     </target>
 
     <target
