@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.33 $
-    $Date: 2003/02/27 18:03:44 $
+    $Revision: 1.34 $
+    $Date: 2003/02/27 18:06:53 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -30,11 +30,7 @@
 
     <!-- Log4J configuration to use for testing. See proxool-ant.properties
     file for more infomation. -->
-    <property name="log4jPath" value=""/>
-
-    <!-- Log4J configuration to use for testing. See proxool-ant.properties
-    file for more infomation. -->
-    <property name="log4jTestPath" value="src/java-test/org/logicalcobwebs/proxool/log4j-test.xml"/>
+    <property name="log4jPath" value="src/java-test/org/logicalcobwebs/proxool/log4j-test.xml"/>
 
     <!-- Classpath -->
     <path id="source" path="${build-dir}/classes" >
@@ -288,7 +284,7 @@
         depends="clean,init,build-test,deleteTestDb"
         >
         <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
-            <sysproperty key="log4jPath" value="${log4jTestPath}" />
+            <sysproperty key="log4jPath" value="${log4jPath}" />
             <sysproperty key="script" value="src/java-test/org/logicalcobwebs/proxool/script.xml" />
             <arg value="org.logicalcobwebs.proxool.GlobalTest" />
         </java>
