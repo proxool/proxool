@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.9 $, $Date: 2002/10/27 12:03:33 $
+ * @version $Revision: 1.10 $, $Date: 2002/10/29 08:54:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -86,6 +86,7 @@ public class GeneralTests extends TestCase {
             String url = TestHelper.getFullUrl(alias);
             Connection c = TestHelper.getProxoolConnection(url);
             TestHelper.testConnection(c);
+            c.close();
         }
 
         ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
@@ -177,6 +178,7 @@ public class GeneralTests extends TestCase {
     public void testInfo() throws SQLException, ClassNotFoundException {
 
         String alias = "info";
+        String url = TestHelper.getSimpleUrl(alias);
         Properties info = TestHelper.buildProperties();
         info.setProperty("proxool.prototype-count", "0");
         info.setProperty("proxool.minimum-connection-count", "0");
@@ -190,7 +192,7 @@ public class GeneralTests extends TestCase {
         try {
 
             // Open 1 connection
-            connections[0] = TestHelper.getProxoolConnection(alias);
+            connections[0] = TestHelper.getProxoolConnection(url);
             {
                 connectionInfos = ProxoolFacade.getConnectionInfos(alias);
                 assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 1);
@@ -200,7 +202,7 @@ public class GeneralTests extends TestCase {
             }
 
             // Open another
-            connections[1] = TestHelper.getProxoolConnection(alias);
+            connections[1] = TestHelper.getProxoolConnection(url);
             {
                 connectionInfos = ProxoolFacade.getConnectionInfos(alias);
                 assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
@@ -217,14 +219,15 @@ public class GeneralTests extends TestCase {
                 LOG.error("Couldn't close connection 0", e);
             }
             {
-                connectionInfos = ProxoolFacade.getConnectionInfos(alias);
+                connectionInfos = ProxoolFacade.getConnectionInfos(url);
                 assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
                 ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
                 connectionInfos.toArray(ci);
                 LOG.info("ConnectionInfo[0]=" + ci[0]);
                 LOG.info("ConnectionInfo[1]=" + ci[1]);
             }
-
+        } catch (Exception e) {
+            LOG.error("Problem", e);
         } finally {
             for (int i = 0; i < arraySize; i++) {
                 try {
@@ -236,7 +239,7 @@ public class GeneralTests extends TestCase {
                 }
             }
             {
-                connectionInfos = ProxoolFacade.getConnectionInfos(alias);
+                connectionInfos = ProxoolFacade.getConnectionInfos(url);
                 assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
                 ConnectionInfoIF[] ci = new ConnectionInfoIF[connectionInfos.size()];
                 connectionInfos.toArray(ci);
@@ -289,6 +292,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.10  2002/10/29 08:54:04  billhorsman
+ fixed testUpdate (wasn't closing a connection)
+
  Revision 1.9  2002/10/27 12:03:33  billhorsman
  clear up of tests
 
