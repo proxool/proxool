@@ -1,11 +1,11 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.19 $
-$Date: 2003/03/12 15:59:54 $
+$Revision: 1.20 $
+$Date: 2003/04/19 13:02:01 $
 $Author: billhorsman $
 
-0.7.1 - scheduled for March 2003
+0.7.1 - April 19, 2003
 
 - Added a lot of concurrency code - mainly using concurrent package
   written by Doug Lea. 
@@ -38,6 +38,13 @@ $Author: billhorsman $
 - Refactoring of house keeper and prototyper so that the number of threads
   used by Proxool is more scalable. (Proxool used to create two threads
   per pool).
+
+- Moved AdminServlet to servlet sub-package to make way for upcoming
+  JMX admin implementation.
+
+- Fixed bug where ConfigurationListenerIF.definitionUpdated was getting called
+  when you passed a Properties object to the Driver regardless if whether the
+  definition had changed.
 
 0.7 - February 21, 2003
 
