@@ -22,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.18 $, $Date: 2003/03/04 10:58:44 $
+ * @version $Revision: 1.19 $, $Date: 2003/03/06 10:37:41 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -67,17 +67,17 @@ public class StatisticsTest extends AbstractProxoolTest {
         // of the 10s period.
         StatisticsResultMonitor srm = new StatisticsResultMonitor(alias, "10s");
         assertEquals("Timeout", ResultMonitor.SUCCESS, srm.getResult());
-        StatisticsIF statistics1 = srm.getStatistics();
+        srm.getStatistics();
 
 
         DriverManager.getConnection(url).close();
 
         assertEquals("Timeout", ResultMonitor.SUCCESS, srm.getResult());
-        StatisticsIF statistics2 = srm.getStatistics();
+        StatisticsIF statistics = srm.getStatistics();
 
-        assertEquals("servedCount", 1L, statistics2.getServedCount());
-        assertEquals("servedPerSecond", 0.09, 0.11, statistics2.getServedPerSecond());
-        assertEquals("refusedCount", 0L, statistics2.getRefusedCount());
+        assertEquals("servedCount", 1L, statistics.getServedCount());
+        assertEquals("servedPerSecond", 0.09, 0.11, statistics.getServedPerSecond());
+        assertEquals("refusedCount", 0L, statistics.getRefusedCount());
 
     }
 
@@ -117,6 +117,9 @@ public class StatisticsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.19  2003/03/06 10:37:41  billhorsman
+ better timeout assertion
+
  Revision 1.18  2003/03/04 10:58:44  billhorsman
  checkstyle
 
