@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.37 $
-    $Date: 2003/03/02 01:08:40 $
+    $Revision: 1.38 $
+    $Date: 2003/03/02 01:13:24 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -321,7 +321,7 @@
             tofile="${build-dir}/reports/${junit-report-name}" />
 
         <replace
-            file="${build-dir}/reports/junit-${junit-report-name}.html"
+            file="${build-dir}/reports/junit-${junit-report-name}"
             token="Unit Test Results"
             value="${junit-report-description}"
             />
