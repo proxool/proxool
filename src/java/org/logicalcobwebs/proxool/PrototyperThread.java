@@ -11,7 +11,7 @@ import org.logicalcobwebs.logging.LogFactory;
 /**
  * Responsible for running {@link Prototyper#sweep sweep}. There
  * could be just one of the objects, or more.
- * @version $Revision: 1.3 $, $Date: 2003/03/10 23:43:12 $
+ * @version $Revision: 1.4 $, $Date: 2003/04/10 08:23:55 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -49,9 +49,9 @@ public class PrototyperThread extends Thread {
                     }
                 }
             }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Swept " + sweptCount + " pools");
-            }
+//            if (LOG.isDebugEnabled()) {
+//                LOG.debug("Swept " + sweptCount + " pools");
+//            }
 
             doWait();
         }
@@ -75,6 +75,9 @@ public class PrototyperThread extends Thread {
 /*
  Revision history:
  $Log: PrototyperThread.java,v $
+ Revision 1.4  2003/04/10 08:23:55  billhorsman
+ removed very frequent debug
+
  Revision 1.3  2003/03/10 23:43:12  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...
