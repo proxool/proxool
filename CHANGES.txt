@@ -1,9 +1,21 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.31 $
-$Date: 2003/11/05 11:22:41 $
+$Revision: 1.32 $
+$Date: 2003/12/13 12:21:54 $
 $Author: billhorsman $
+
+0.8.3 - 14 December 2003
+
+- Switched to Cglib 2.0 and ASM 1.4. Repackaged them both to org.logicalcobwebs.clgib and
+  org.logicalcobwebs.asm respectively. This means that you no longer need to include
+  cglib in your classpath. (Note: other projects may still require it - the repackaged
+  version is just for use by Proxool). This removes our dependency on any version of Cglib
+  or ASM and avoids any potential Jar conflicts.
+
+- Made house keeper connection test more robust - credit John Hume
+
+- Removed JDK 1.4 specific code in ShutdownHook
 
 0.8.2 - 5 November 2003
 
