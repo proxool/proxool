@@ -26,9 +26,9 @@ import org.apache.log.Priority;
 /**
  * Tests that the AvalonConfgiuration works.
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/19 15:14:26 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/19 16:52:00 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.6
  */
 public class AvalonConfiguratorTest extends TestCase {
@@ -61,18 +61,15 @@ public class AvalonConfiguratorTest extends TestCase {
         } catch (ProxoolException e) {
             fail(e.getMessage());
         }
-        ProxoolFacade.removeConnectionPool("avalon-test");
-        ProxoolFacade.removeConnectionPool("avalon-test-2");
         this.componentManager.dispose();
     }
 
     /**
      * Test that the configuration succeds and that all expected properties
      * has been received by Proxool. The configuration file uses namspaces.
-     * @throws org.apache.avalon.framework.component.ComponentException if the configuration fails.
-     * @throws java.sql.SQLException if ProxoolFacade operation fails.
+     * @throws Exception if the test is interrupted.
      */
-    public void testWithNamspaces() throws Exception {
+    public void testWithNamespaces() throws Exception {
         initializeAvalon("src/java-test/org/logicalcobwebs/proxool/configuration/role.conf",
             "src/java-test/org/logicalcobwebs/proxool/configuration/component-ns.conf");
         this.componentManager.lookup(AvalonConfigurator.ROLE);
@@ -89,6 +86,54 @@ public class AvalonConfiguratorTest extends TestCase {
         ProxoolFacade.removeConnectionPool("avalon-test-ns");
         ProxoolFacade.removeConnectionPool("avalon-test-ns-2");
         this.componentManager.dispose();
+    }
+
+    /**
+     * Test that a configurator that does not have close-on-dispose="false"
+     * closes the pools it has configured when it is disposed.
+     * @throws Exception if the test is interrupted.
+     */
+    public void testDisposeOnClose() throws Exception {
+        initializeAvalon("src/java-test/org/logicalcobwebs/proxool/configuration/role.conf",
+            "src/java-test/org/logicalcobwebs/proxool/configuration/component.conf");
+        this.componentManager.lookup(AvalonConfigurator.ROLE);
+        this.componentManager.dispose();
+        try {
+            ProxoolFacade.getConnectionPoolDefinition("avalon-test");
+            fail("ProxoolFacade found pool 'avalon-test' but we expected the configurator to have removed it.");
+        } catch (ProxoolException e) {
+            // This is what we want.
+        }
+        try {
+            ProxoolFacade.getConnectionPoolDefinition("avalon-test-2");
+            fail("ProxoolFacade found pool 'avalon-test-2' but we expected the configurator to have removed it.");
+        } catch (ProxoolException e) {
+            // This is what we want.
+        }
+    }
+
+    /**
+     * Test that a configurator that does have close-on-dispose="false"
+     * does not close the pools it has configured when it is disposed.
+     * @throws Exception if the test is interrupted.
+     */
+    public void testNotDisposeOnClose() throws Exception {
+        initializeAvalon("src/java-test/org/logicalcobwebs/proxool/configuration/role.conf",
+            "src/java-test/org/logicalcobwebs/proxool/configuration/component-ns.conf");
+        this.componentManager.lookup(AvalonConfigurator.ROLE);
+        this.componentManager.dispose();
+        try {
+            ProxoolFacade.getConnectionPoolDefinition("avalon-test-ns");
+        } catch (ProxoolException e) {
+            fail("ProxoolFacade did not find pool 'avalon-test-ns' but we didn't expect the configurator to have removed it.");
+        }
+        try {
+            ProxoolFacade.getConnectionPoolDefinition("avalon-test-ns-2");
+        } catch (ProxoolException e) {
+            fail("ProxoolFacade did not find pool 'avalon-ns-test-2' but we didn't expect the configurator to have removed it.");
+        }
+        ProxoolFacade.removeConnectionPool("avalon-test-ns");
+        ProxoolFacade.removeConnectionPool("avalon-test-ns-2");
     }
 
     private void initializeAvalon(String roleFile, String componentFile) throws Exception {
@@ -133,6 +178,9 @@ public class AvalonConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: AvalonConfiguratorTest.java,v $
+ Revision 1.4  2003/02/19 16:52:00  chr32
+ Added tests for close-on-dispose functionality.
+
  Revision 1.3  2003/02/19 15:14:26  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)
