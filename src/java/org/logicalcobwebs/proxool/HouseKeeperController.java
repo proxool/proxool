@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 /**
  * Schedules when to run the house keeper
- * @version $Revision: 1.4 $, $Date: 2004/03/26 15:58:56 $
+ * @version $Revision: 1.5 $, $Date: 2004/06/02 20:38:32 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -51,14 +51,16 @@ public class HouseKeeperController {
         HouseKeeper houseKeeper = null;
         synchronized (LOCK) {
             for (int i = 0; i < houseKeeperList.size(); i++) {
-                if (houseKeeperIndex > houseKeeperList.size() - 1) {
+                HouseKeeper hk = null;
+                try {
+                    hk = (HouseKeeper) houseKeeperList.get(houseKeeperIndex);
+                    if (hk.isSweepDue()) {
+                        houseKeeper = hk;
+                        break;
+                    }
+                    houseKeeperIndex++;
+                } catch (IndexOutOfBoundsException e) {
                     houseKeeperIndex = 0;
-                }
-                HouseKeeper hk = (HouseKeeper) houseKeeperList.get(houseKeeperIndex);
-                houseKeeperIndex++;
-                if (hk.isSweepDue()) {
-                    houseKeeper = hk;
-                    break;
                 }
             }
         }
@@ -128,6 +130,9 @@ public class HouseKeeperController {
 /*
  Revision history:
  $Log: HouseKeeperController.java,v $
+ Revision 1.5  2004/06/02 20:38:32  billhorsman
+ More robust round robin of house keepers.
+
  Revision 1.4  2004/03/26 15:58:56  billhorsman
  Fixes to ensure that house keeper and prototyper threads finish after shutdown.
 
