@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool;
 
 
@@ -20,7 +19,7 @@ import java.sql.Statement;
  * A central place to build proxy objects ({@link org.logicalcobwebs.proxool.ProxyConnection connections}
  * and {@link org.logicalcobwebs.proxool.ProxyStatement statements}).
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/12 12:46:30 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/19 23:47:23 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -82,6 +81,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.6  2003/02/19 23:47:23  billhorsman
+ fixed copyright
+
  Revision 1.5  2003/02/12 12:46:30  billhorsman
  brought up to date with recent changes in main source
 
