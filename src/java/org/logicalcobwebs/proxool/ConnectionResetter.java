@@ -21,7 +21,7 @@ import java.util.HashSet;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/06 20:25:08 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/07 12:38:04 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -46,6 +46,11 @@ public class ConnectionResetter {
      * @see #reset
      */
     private Map defaultValues = new HashMap();
+
+    /**
+     * We use this to guess if we are changing a property that will need resetting
+     */
+    protected static final String MUTATOR_PREFIX = "set";
 
     /**
      * Pass in the log to use
@@ -73,6 +78,7 @@ public class ConnectionResetter {
     private void addReset(String accessorName, String mutatorName) {
 
         try {
+
             Method accessor = null;
             Method mutator = null;
 
@@ -106,6 +112,11 @@ public class ConnectionResetter {
             } else if (accessorMutatorMap.containsValue(mutator)) {
                 log.warn("Ignoring attempt to map duplicate reset method " + mutatorName);
             } else {
+
+                if (mutatorName.indexOf(MUTATOR_PREFIX) != 0) {
+                    log.warn("Resetter mutator " + mutatorName + " does not start with " + MUTATOR_PREFIX
+                            + " as expected. Proxool maynot recognise that a reset is necessary.");
+                }
 
                 if (accessor.getParameterTypes().length > 0) {
                     log.info("Ignoring attempt to map accessor method " + accessorName + ". It must have no arguments.");
@@ -195,6 +206,9 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.2  2002/11/07 12:38:04  billhorsman
+ performance improvement - only reset when it might be necessary
+
  Revision 1.1  2002/11/06 20:25:08  billhorsman
  New class responsible for resetting connections when
  they are returned to the pool.

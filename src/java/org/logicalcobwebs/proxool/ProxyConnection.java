@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.13 $, $Date: 2002/11/06 20:26:49 $
+ * @version $Revision: 1.14 $, $Date: 2002/11/07 12:38:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -53,6 +53,11 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 
     private static final String EQUALS_METHOD = "equals";
 
+    /**
+     * Whether we have invoked a method that requires us to reset
+     */
+    private boolean needToReset = false;
+
     protected ProxyConnection(Connection connection, long id, ConnectionPool connectionPool) throws SQLException {
         this.connection = connection;
         setId(id);
@@ -80,6 +85,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
             } else if (m.getName().equals(IS_CLOSED_METHOD) && args.length == 0) {
                 result = new Boolean(getStatus() != STATUS_ACTIVE);
             } else {
+                if (m.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
+                    needToReset = true;
+                }
                 result = m.invoke(connection, args);
             }
 
@@ -144,11 +152,14 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
      */
     public void close() throws SQLException {
         try {
-            // This call should be as quick as possible. Should we consider only
-            // calling it if values have changed? The trouble with that is that it
-            // means keeping track when they change and that might be even
-            // slower
-            connectionPool.resetConnection(connection);
+            if (needToReset) {
+                // This call should be as quick as possible. Should we consider only
+                // calling it if values have changed? The trouble with that is that it
+                // means keeping track when they change and that might be even
+                // slower
+                connectionPool.resetConnection(connection);
+                needToReset = false;
+            }
             connectionPool.putConnection(this);
         } catch (Throwable t) {
             connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during closure: ", t);
@@ -368,6 +379,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.14  2002/11/07 12:38:04  billhorsman
+ performance improvement - only reset when it might be necessary
+
  Revision 1.13  2002/11/06 20:26:49  billhorsman
  improved doc, added connection resetting, and made
  isClosed() work correctly
