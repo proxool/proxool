@@ -18,9 +18,9 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.7 $, $Date: 2003/09/10 22:21:04 $
+ * @version $Revision: 1.8 $, $Date: 2003/10/27 20:24:48 $
  * @author bill
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 class StatsRoller {
@@ -113,19 +113,21 @@ class StatsRoller {
     }
 
     private void roll() {
-        try {
-            readWriteLock.writeLock().acquire();
-            if (!isCurrent()) {
-                currentStatistics.setStopDate(nextRollDate.getTime());
-                completeStatistics = currentStatistics;
-                currentStatistics = new Statistics(nextRollDate.getTime());
-                nextRollDate.add(units, period);
-                compositeStatisticsListener.statistics(alias, completeStatistics);
+        if (!isCurrent()) {
+            try {
+                readWriteLock.writeLock().acquire();
+                if (!isCurrent()) {
+                    currentStatistics.setStopDate(nextRollDate.getTime());
+                    completeStatistics = currentStatistics;
+                    currentStatistics = new Statistics(nextRollDate.getTime());
+                    nextRollDate.add(units, period);
+                    compositeStatisticsListener.statistics(alias, completeStatistics);
+                }
+            } catch (Throwable e) {
+                LOG.error("Unable to roll statistics log", e);
+            } finally {
+                readWriteLock.writeLock().release();
             }
-        } catch (InterruptedException e) {
-            LOG.error("Unable to roll statistics log", e);
-        } finally {
-            readWriteLock.writeLock().release();
         }
     }
 
@@ -137,9 +139,7 @@ class StatsRoller {
      * @see org.logicalcobwebs.proxool.admin.Admin#connectionReturned
      */
     public void connectionReturned(long activeTime) {
-        if (!isCurrent()) {
-            roll();
-        }
+        roll();
         try {
             readWriteLock.readLock().acquire();
             currentStatistics.connectionReturned(activeTime);
@@ -154,9 +154,7 @@ class StatsRoller {
      * @see org.logicalcobwebs.proxool.admin.Admin#connectionRefused
      */
     public void connectionRefused() {
-        if (!isCurrent()) {
-            roll();
-        }
+        roll();
         try {
             readWriteLock.readLock().acquire();
             currentStatistics.connectionRefused();
@@ -188,6 +186,10 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.8  2003/10/27 20:24:48  billhorsman
+ roll() now makes an additional call to isCurrent() *before* it asks for a write lock. Before it
+ was getting a write lock every five seconds which effectively blocks all connections (if only briefly).
+
  Revision 1.7  2003/09/10 22:21:04  chr32
  Removing > jdk 1.2 dependencies.
 
