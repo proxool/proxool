@@ -28,7 +28,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.65 $, $Date: 2003/03/11 14:51:53 $
+ * @version $Revision: 1.66 $, $Date: 2003/04/10 21:49:34 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -65,17 +65,21 @@ public class ProxoolFacade {
 
         if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
             ConnectionPoolDefinition cpd = new ConnectionPoolDefinition(url, info);
-            ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
-            connectionPool.start();
-            compositeProxoolListener.onRegistration(cpd, cpd.getCompleteInfo());
-            if (isConfiguredForJMX(cpd.getCompleteInfo())) {
-                registerForJmx(alias, cpd.getCompleteInfo());
-            }
+            registerConnectionPool(cpd);
         } else {
             throw new ProxoolException("Attempt to register duplicate pool called '" + alias + "'");
         }
 
         return alias;
+    }
+
+    protected static void registerConnectionPool(ConnectionPoolDefinition connectionPoolDefinition) throws ProxoolException {
+        ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(connectionPoolDefinition);
+        connectionPool.start();
+        compositeProxoolListener.onRegistration(connectionPoolDefinition, connectionPoolDefinition.getCompleteInfo());
+        if (isConfiguredForJMX(connectionPoolDefinition.getCompleteInfo())) {
+            registerForJmx(connectionPoolDefinition.getAlias(), connectionPoolDefinition.getCompleteInfo());
+        }
     }
 
     /**
@@ -610,6 +614,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.66  2003/04/10 21:49:34  billhorsman
+ refactored registration slightly to allow DataSource access
+
  Revision 1.65  2003/03/11 14:51:53  billhorsman
  more concurrency fixes relating to snapshots
 
