@@ -16,9 +16,9 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.6 $, $Date: 2003/02/08 14:27:52 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/11 00:32:12 $
  * @author bill
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class StatsRoller {
@@ -38,6 +38,8 @@ public class StatsRoller {
     private CompositeStatisticsListener compositeStatisticsListener;
 
     private String alias;
+
+    private boolean running = true;
 
     public StatsRoller(String alias, CompositeStatisticsListener compositeStatisticsListener, String token) throws ProxoolException {
         this.alias = alias;
@@ -80,13 +82,30 @@ public class StatsRoller {
         LOG.debug("Collecting first statistics for '" + token + "' at " + nextRollDate.getTime());
         currentStatistics = new Statistics(now.getTime());
 
+        final Thread t = new Thread() {
+
+            public void run() {
+                while (running) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        LOG.debug("Interruption", e);
+                    }
+                    roll();
+                }
+            }
+
+        };
+        t.setDaemon(true);
+        t.start();
+
     }
 
     /**
      * Cancels the timer that outputs the stats
      */
     protected void cancel() {
-        // Nothing to do. No Timer in JDK 1.2
+        running = false;
     }
 
     private synchronized void roll() {
@@ -132,6 +151,9 @@ public class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.7  2003/02/11 00:32:12  billhorsman
+ added daemon to roll stats
+
  Revision 1.6  2003/02/08 14:27:52  chr32
  Style fixes.
  Also tried to fix the dublicate linebreaks in the logging classes.
