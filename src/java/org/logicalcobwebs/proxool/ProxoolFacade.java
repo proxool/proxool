@@ -32,7 +32,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.41 $, $Date: 2003/02/05 00:20:01 $
+ * @version $Revision: 1.42 $, $Date: 2003/02/05 17:05:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -56,7 +56,7 @@ public class ProxoolFacade {
      * @return the alias for this pool (or the full url if no alias is specified)
      * @throws ProxoolException if anything goes wrong
      */
-    public static String registerConnectionPool(String url, Properties info) throws ProxoolException {
+    public synchronized static String registerConnectionPool(String url, Properties info) throws ProxoolException {
         String alias = getAlias(url);
 
         if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
@@ -702,6 +702,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.42  2003/02/05 17:05:02  billhorsman
+ registerConnectionPool is now synchronized
+
  Revision 1.41  2003/02/05 00:20:01  billhorsman
  copes with pools with no statistics
 
