@@ -21,7 +21,7 @@ import java.util.TreeMap;
  * statement. The subclass of this defines how we delegate to the
  * real statement.
 
- * @version $Revision: 1.10 $, $Date: 2003/03/10 23:43:09 $
+ * @version $Revision: 1.11 $, $Date: 2003/09/05 16:26:50 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -59,12 +59,14 @@ abstract class AbstractProxyStatement {
      * away (and it won't be made available again)
      * @param e the exception to test
      */
-    protected void testException(SQLException e) {
+    protected boolean testException(SQLException e) {
+        boolean fatalSqlExceptionDetected = false;
         Iterator i = connectionPool.getDefinition().getFatalSqlExceptions().iterator();
         while (i.hasNext()) {
             if (e.getMessage().indexOf((String) i.next()) > -1) {
                 // This SQL exception indicates a fatal problem with this connection. We should probably
                 // just junk it.
+                fatalSqlExceptionDetected = true;
                 try {
                     statement.close();
                     connectionPool.throwConnection(proxyConnection, "Fatal SQL Exception has been detected");
@@ -78,6 +80,7 @@ abstract class AbstractProxyStatement {
                 }
             }
         }
+        return fatalSqlExceptionDetected;
     }
 
     /**
@@ -209,6 +212,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.11  2003/09/05 16:26:50  billhorsman
+ testException() now returns true if a fatal exception was detected.
+
  Revision 1.10  2003/03/10 23:43:09  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...
