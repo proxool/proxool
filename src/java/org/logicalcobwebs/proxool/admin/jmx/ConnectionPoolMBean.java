@@ -80,9 +80,9 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.3 $, $Date: 2003/02/25 16:50:31 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/26 16:37:48 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, ConfigurationListenerIF, NotificationBroadcaster {
@@ -568,9 +568,9 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
 
     /**
      * Update the attributes of this MBean and emit a {@link #NOTIFICATION_TYPE_DEFINITION_UPDATED} event.
-     * @see ConfigurationListenerIF#defintionUpdated(ConnectionPoolDefinitionIF, Properties, Properties)
+     * @see ConfigurationListenerIF#definitionUpdated(ConnectionPoolDefinitionIF, Properties, Properties)
      */
-    public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo,
+    public void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo,
         Properties changedInfo) {
         this.poolDefinition = connectionPoolDefinition;
         this.poolProperties = completeInfo;
@@ -605,6 +605,9 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.4  2003/02/26 16:37:48  billhorsman
+ fixed spelling in ConfigurationListenerIF
+
  Revision 1.3  2003/02/25 16:50:31  chr32
  Added JMX notification and doc.
 
