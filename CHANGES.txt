@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.3 $
-$Date: 2002/10/25 11:06:01 $
+$Revision: 1.4 $
+$Date: 2002/11/06 20:28:28 $
 $Author: billhorsman $
 
 0.5 (scheduled for November 15, 2002)
@@ -38,6 +38,13 @@ $Author: billhorsman $
   problems when adding them to some collections).
 
 - Improvements to test classes. Lots more tests.
+
+- Added support for resetting connection properties when it is returned to
+  the pool (autoCommit, catalog, readOnly, transactionIsolation, typeMap
+  and holdability). These  properties are reset to the values when the connection
+  was made everytime it is returned.
+
+- Connection.isClosed() now returns true when it is back in the pool. 
 
 0.4 - September 19, 2002
 
