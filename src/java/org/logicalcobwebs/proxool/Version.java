@@ -20,7 +20,7 @@ package org.logicalcobwebs.proxool;
  *   A snapshot release built on January 2nd. This comes after the
  *   version 1.0 and before 1.1.
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/14 23:50:59 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/16 11:22:00 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -41,7 +41,7 @@ public class Version {
              * This means that we haven't used the Ant script so this
              * is just our best guess at the version.
              */
-            return "0.5+";
+            return "0.6+";
         }
     }
 
@@ -50,6 +50,9 @@ public class Version {
 /*
  Revision history:
  $Log: Version.java,v $
+ Revision 1.2  2003/01/16 11:22:00  billhorsman
+ new version
+
  Revision 1.1  2003/01/14 23:50:59  billhorsman
  keeps track of version
 
