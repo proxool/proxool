@@ -1,16 +1,33 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.12 $
-$Date: 2003/01/15 00:15:53 $
+$Revision: 1.13 $
+$Date: 2003/01/22 17:33:57 $
 $Author: billhorsman $
 
-0.6 (scheduled for December 12, 2002)
+0.6 (January 22, 2003)
+
+- ProxoolFacade API has changed slightly. Some of the methods no
+  longer throw an SQLException but a ProxoolException instead.
+  This might lead to some small changes in your code.
+
+- There used to be some ambiguity about whether you referred to a
+  pool by its alias or its full url (when using ProxoolFacade). This has
+  now been fixed. This means you can now change the url (to use a
+  different database for instance) without creating a new pool.
+
+- Version information is now logged so you can tell what version of
+  Proxool you are using.
+
+- ConnectionPoolStatisticsIF now reports the time the pool was started.
+
+- We now use FastArrayList (from Jakarta Commons) instead of the
+  JDK's Vector for improved collection support.
 
 - New XMLConfigurator and PropertyConfigurator to make it easy
   to configure proxool from a file.
 
-- New ConfiguratorIF interface allows you to implement persistent
+- New ConfigurationListenerIF interface allows you to implement persistent
   configuration
 
 - Bug fix for JDBC drivers that implement the Statement interface
