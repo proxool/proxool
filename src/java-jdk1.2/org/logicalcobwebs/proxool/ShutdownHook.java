@@ -11,12 +11,19 @@ package org.logicalcobwebs.proxool;
  * does nothing at all. You are responsible for calling
  * {@link ProxoolFacade#removeAllConnectionPools} yourself.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/04 15:09:39 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/08 00:56:03 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class ShutdownHook {
+class ShutdownHook {
+
+    /**
+     * Does nothing.
+     */
+    protected static void init() {
+        // Nothing to do.
+    }
 
 }
 
@@ -24,6 +31,9 @@ public class ShutdownHook {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.2  2003/02/08 00:56:03  billhorsman
+ merge changes from main source
+
  Revision 1.1  2003/02/04 15:09:39  billhorsman
  JDK 1.2 disables use of ShutdownHook
 

@@ -19,14 +19,14 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/06 23:48:10 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/08 00:56:03 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class StatsRoller {
 
-    private Log log;
+    private static final Log LOG = LogFactory.getLog(StatsRoller.class);
 
     private Statistics completeStatistics;
 
@@ -38,12 +38,13 @@ public class StatsRoller {
 
     private int units;
 
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+    private CompositeStatisticsListener compositeStatisticsListener;
 
-    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    private String alias;
 
-    public StatsRoller(String alias, String token) throws ProxoolException {
-        log = LogFactory.getLog("org.logicalcobwebs.proxool.stats." + alias);
+    public StatsRoller(String alias, CompositeStatisticsListener compositeStatisticsListener, String token) throws ProxoolException {
+        this.alias = alias;
+        this.compositeStatisticsListener = compositeStatisticsListener;
 
         nextRollDate = Calendar.getInstance();
         if (token.endsWith("s")) {
@@ -79,9 +80,16 @@ public class StatsRoller {
             nextRollDate.add(units, period);
         }
 
-        log.debug("Collecting first statistics for '" + token + "' at " + nextRollDate.getTime());
+        LOG.debug("Collecting first statistics for '" + token + "' at " + nextRollDate.getTime());
         currentStatistics = new Statistics(now.getTime());
 
+    }
+
+    /**
+     * Cancels the timer that outputs the stats
+     */
+    protected void cancel() {
+        // Nothing to do. No Timer in JDK 1.2
     }
 
     private synchronized void roll() {
@@ -90,34 +98,7 @@ public class StatsRoller {
             completeStatistics = currentStatistics;
             currentStatistics = new Statistics(nextRollDate.getTime());
             nextRollDate.add(units, period);
-            logStats(completeStatistics);
-        }
-    }
-
-    private void logStats(StatisticsIF statistics) {
-
-        if (statistics != null) {
-            StringBuffer out = new StringBuffer();
-
-            out.append(TIME_FORMAT.format(statistics.getStartDate()));
-            out.append(" - ");
-            out.append(TIME_FORMAT.format(statistics.getStopDate()));
-            out.append(", s:");
-            out.append(statistics.getServedCount());
-            out.append(":");
-            out.append(DECIMAL_FORMAT.format(statistics.getServedPerSecond()));
-
-            out.append("/s, r:");
-            out.append(statistics.getRefusedCount());
-            out.append(":");
-            out.append(DECIMAL_FORMAT.format(statistics.getRefusedPerSecond()));
-
-            out.append("/s, a:");
-            out.append(DECIMAL_FORMAT.format(statistics.getAverageActiveTime()));
-            out.append("ms/");
-            out.append(DECIMAL_FORMAT.format(statistics.getAverageActiveCount()));
-
-            log.info(out.toString());
+            compositeStatisticsListener.statistics(alias, completeStatistics);
         }
     }
 
@@ -148,19 +129,15 @@ public class StatsRoller {
     public Statistics getCompleteStatistics() {
         return completeStatistics;
     }
-
-    /**
-     * Cancels the timer that outputs the stats. Except there isn't one
-     * in JDK 1.2 so this does nothing.
-     */
-    protected void cancel() {
-    }
 }
 
 
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.5  2003/02/08 00:56:03  billhorsman
+ merge changes from main source
+
  Revision 1.4  2003/02/06 23:48:10  billhorsman
  Use imported logging
 
