@@ -8,7 +8,6 @@ package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
 
-import java.sql.SQLException;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -19,9 +18,9 @@ import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.GlobalTest;
 
 /**
- * Tests that the various ways of configuring proxool work.
+ * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.3 $, $Date: 2002/12/16 17:06:53 $
+ * @version $Revision: 1.4 $, $Date: 2002/12/26 11:35:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -80,19 +79,14 @@ public class ConfiguratorTest extends TestCase {
 
     }
 
-    /**
-     * Load test file and check that Proxool is properly configured
-     */
-    public void testPropertyConfigurator() throws SQLException {
-
-        PropertyConfigurator.configure("src/java-test/org/logicalcobwebs/proxool/configuration/test.properties");
-
-    }
 }
 
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.4  2002/12/26 11:35:02  billhorsman
+ Removed test regarding property configurator.
+
  Revision 1.3  2002/12/16 17:06:53  billhorsman
  new test structure
 
