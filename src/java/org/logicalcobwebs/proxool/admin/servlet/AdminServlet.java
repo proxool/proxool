@@ -45,7 +45,7 @@ import java.util.Calendar;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.7 $, $Date: 2003/08/06 20:08:58 $
+ * @version $Revision: 1.8 $, $Date: 2003/09/29 17:49:19 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -250,6 +250,7 @@ public class AdminServlet extends HttpServlet {
             fatalSqlExceptions = fatalSqlExceptionsBuffer.toString();
         }
         printDefinitionEntry(out, "Fatal SQL exceptions", fatalSqlExceptions);
+        printDefinitionEntry(out, "Wrapper", cpd.getFatalSqlExceptionWrapper());
 
         // statistics
         printDefinitionEntry(out, "Statistics", cpd.getStatistics());
@@ -568,6 +569,9 @@ public class AdminServlet extends HttpServlet {
 /*
  Revision history:
  $Log: AdminServlet.java,v $
+ Revision 1.8  2003/09/29 17:49:19  billhorsman
+ Includes new fatal-sql-exception-wrapper-class in display
+
  Revision 1.7  2003/08/06 20:08:58  billhorsman
  fix timezone display of time (for millisecond based properties)
 
