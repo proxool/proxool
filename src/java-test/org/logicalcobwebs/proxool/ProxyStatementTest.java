@@ -18,33 +18,17 @@ import java.util.Properties;
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/03 17:09:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class ProxyStatementTest extends TestCase {
+public class ProxyStatementTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(ProxyStatementTest.class);
 
     public ProxyStatementTest(String alias) {
         super(alias);
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalSetup}
-     * @see TestCase#setUp
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalTeardown}
-     * @see TestCase#setUp
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
     }
 
     /**
@@ -122,6 +106,9 @@ public class ProxyStatementTest extends TestCase {
 /*
  Revision history:
  $Log: ProxyStatementTest.java,v $
+ Revision 1.4  2003/03/03 17:09:05  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.3  2003/03/03 11:12:05  billhorsman
  fixed licence
 

@@ -18,12 +18,12 @@ import java.util.Properties;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/03 17:09:06 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class StateListenerTest extends TestCase {
+public class StateListenerTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(StateListenerTest.class);
 
@@ -105,24 +105,6 @@ public class StateListenerTest extends TestCase {
 
     }
 
-
-    /**
-     * Calls {@link GlobalTest#globalSetup}
-     * @see TestCase#setUp
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-        Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalTeardown}
-     * @see TestCase#setUp
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
-    }
-
     class TestStateListener implements StateListenerIF {
 
         private boolean somethingHappened;
@@ -181,6 +163,9 @@ public class StateListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.9  2003/03/03 17:09:06  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.8  2003/03/03 11:12:05  billhorsman
  fixed licence
 

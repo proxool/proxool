@@ -15,12 +15,12 @@ import java.util.Properties;
 /**
  * Test that we can update the definition of a pool
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/03 17:09:07 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class UpdateDefinitionTest extends TestCase {
+public class UpdateDefinitionTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(UpdateDefinitionTest.class);
 
@@ -29,30 +29,13 @@ public class UpdateDefinitionTest extends TestCase {
     }
 
     /**
-     * Calls {@link GlobalTest#globalSetup}
-     * @see TestCase#setUp
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalTeardown}
-     * @see TestCase#setUp
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
-    }
-
-    /**
      * Can we change the delegate URL of a pool
      */
     public void testChangeUrl() throws Exception {
 
         String testName = "changeUrl";
-
+        String alias = testName;
         try {
-            String alias = testName;
 
             String url1 = TestHelper.buildProxoolUrl(alias,
                     TestConstants.HYPERSONIC_DRIVER,
@@ -87,6 +70,8 @@ public class UpdateDefinitionTest extends TestCase {
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
             throw e;
+        } finally {
+            ProxoolFacade.removeConnectionPool(alias);
         }
     }
 
@@ -141,9 +126,8 @@ public class UpdateDefinitionTest extends TestCase {
     public void testUpdateUsingAPI() throws Exception, ClassNotFoundException {
 
         String testName = "updateUsingAPI";
-
+        String alias = testName;
         try {
-            String alias = testName;
 
             String url = ProxoolConstants.PROXOOL
                     + ProxoolConstants.ALIAS_DELIMITER
@@ -177,6 +161,8 @@ public class UpdateDefinitionTest extends TestCase {
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
             throw e;
+        } finally {
+            ProxoolFacade.removeConnectionPool(alias);
         }
 
     }
@@ -187,6 +173,9 @@ public class UpdateDefinitionTest extends TestCase {
 /*
  Revision history:
  $Log: UpdateDefinitionTest.java,v $
+ Revision 1.4  2003/03/03 17:09:07  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.3  2003/03/03 11:12:05  billhorsman
  fixed licence
 

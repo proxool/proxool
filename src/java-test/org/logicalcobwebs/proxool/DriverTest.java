@@ -15,12 +15,12 @@ import java.util.Properties;
 /**
  * Tests {@link ProxoolDriver}
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/03 11:12:04 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/03 17:08:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class DriverTest extends TestCase {
+public class DriverTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(DriverTest.class);
 
@@ -74,6 +74,9 @@ public class DriverTest extends TestCase {
 /*
  Revision history:
  $Log: DriverTest.java,v $
+ Revision 1.3  2003/03/03 17:08:57  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.2  2003/03/03 11:12:04  billhorsman
  fixed licence
 

@@ -16,12 +16,12 @@ import java.util.Properties;
  * with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/03 11:12:03 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/03 17:08:54 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class ConfigurationListenerTest extends TestCase {
+public class ConfigurationListenerTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(ConfigurationListenerTest.class);
 
@@ -182,22 +182,6 @@ public class ConfigurationListenerTest extends TestCase {
         }
     }
 
-    /**
-     * Calls {@link org.logicalcobwebs.proxool.GlobalTest#globalSetup}
-     * @see junit.framework.TestCase#setUp
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    /**
-     * Calls {@link org.logicalcobwebs.proxool.GlobalTest#globalTeardown}
-     * @see junit.framework.TestCase#setUp
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
-    }
-
     class MyConfigurationListener implements ConfigurationListenerIF {
 
         private Properties completeInfo;
@@ -244,6 +228,9 @@ public class ConfigurationListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.8  2003/03/03 17:08:54  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.7  2003/03/03 11:12:03  billhorsman
  fixed licence
 

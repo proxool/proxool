@@ -10,18 +10,19 @@ import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.sql.SQLException;
 
 /**
  * Tests that the PropertyConfigurator works.
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/03 11:12:07 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/03 17:09:18 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
-public class PropertyConfiguratorTest extends TestCase {
+public class PropertyConfiguratorTest extends AbstractProxoolTest {
 
     /**
      * @see TestCase#TestCase
@@ -53,24 +54,14 @@ public class PropertyConfiguratorTest extends TestCase {
 
     }
 
-    /**
-     * @see TestCase#setUp()
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    /**
-     * @see TestCase#tearDown()
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
-    }
 }
 
 /*
  Revision history:
  $Log: PropertyConfiguratorTest.java,v $
+ Revision 1.6  2003/03/03 17:09:18  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.5  2003/03/03 11:12:07  billhorsman
  fixed licence
 

@@ -16,12 +16,12 @@ import java.util.Properties;
 /**
  * Tests {@link ProxoolFacade#getConnectionInfos}
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/03 11:12:04 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/03 17:08:55 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class ConnectionInfoTest extends TestCase {
+public class ConnectionInfoTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(ConnectionInfoTest.class);
 
@@ -79,6 +79,9 @@ public class ConnectionInfoTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionInfoTest.java,v $
+ Revision 1.4  2003/03/03 17:08:55  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.3  2003/03/03 11:12:04  billhorsman
  fixed licence
 

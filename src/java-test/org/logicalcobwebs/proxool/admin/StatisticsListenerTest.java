@@ -13,6 +13,7 @@ import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.sql.DriverManager;
 import java.util.Properties;
@@ -20,12 +21,12 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/03 17:09:08 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class StatisticsListenerTest extends TestCase {
+public class StatisticsListenerTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(StatisticsListenerTest.class);
 
@@ -34,22 +35,6 @@ public class StatisticsListenerTest extends TestCase {
      */
     public StatisticsListenerTest(String s) {
         super(s);
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalSetup}
-     * @see TestCase#setUp
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalTeardown}
-     * @see TestCase#setUp
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
     }
 
     /**
@@ -147,6 +132,9 @@ public class StatisticsListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.9  2003/03/03 17:09:08  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.8  2003/03/03 11:12:05  billhorsman
  fixed licence
 

@@ -10,6 +10,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.xml.sax.InputSource;
 
 import java.io.FileInputStream;
@@ -20,12 +21,12 @@ import java.sql.SQLException;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.10 $, $Date: 2003/03/03 11:12:06 $
+ * @version $Revision: 1.11 $, $Date: 2003/03/03 17:09:18 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
-public class JAXPConfiguratorTest extends TestCase {
+public class JAXPConfiguratorTest extends AbstractProxoolTest {
 
     /**
      * @see TestCase#TestCase
@@ -129,7 +130,7 @@ public class JAXPConfiguratorTest extends TestCase {
      * @throws SQLException if ProxoolFacade operation fails.
      * @throws FileNotFoundException if the xml file is not found.
      */
-    public void testValidiationFailure() throws SQLException, FileNotFoundException {
+    public void testValidiationFailure() throws SQLException, FileNotFoundException, ProxoolException {
         final String xmlFile = "src/java-test/org/logicalcobwebs/proxool/configuration/test-not-valid.xml";
         final InputSource inputSource = new InputSource(new FileInputStream(xmlFile));
         inputSource.setSystemId(getWorkingDirectoryUrl());
@@ -138,6 +139,9 @@ public class JAXPConfiguratorTest extends TestCase {
             JAXPConfigurator.configure(inputSource, true);
         } catch (ProxoolException e) {
             failure = true;
+        } finally {
+            ProxoolFacade.removeConnectionPool("xml-test-validating");
+            ProxoolFacade.removeConnectionPool("xml-test-validating-2");
         }
         assertTrue("Configuration did not fail on unvalid xml document.", failure);
     }
@@ -166,24 +170,14 @@ public class JAXPConfiguratorTest extends TestCase {
         return "file://" + userDir;
     }
 
-    /**
-     * @see TestCase#setUp()
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    /**
-     * @see TestCase#tearDown()
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
-    }
 }
 
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.11  2003/03/03 17:09:18  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.10  2003/03/03 11:12:06  billhorsman
  fixed licence
 

@@ -16,25 +16,17 @@ import java.util.Properties;
 /**
  * Test the house keeper in ConnectionPool
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/03 11:12:04 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/03 17:08:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class HouseKeeperTest extends TestCase {
+public class HouseKeeperTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(HouseKeeperTest.class);
 
     public HouseKeeperTest(String alias) {
         super(alias);
-    }
-
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
     }
 
     /**
@@ -117,6 +109,9 @@ public class HouseKeeperTest extends TestCase {
 /*
  Revision history:
  $Log: HouseKeeperTest.java,v $
+ Revision 1.5  2003/03/03 17:08:57  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.4  2003/03/03 11:12:04  billhorsman
  fixed licence
 

@@ -13,6 +13,7 @@ import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -32,12 +33,12 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPoolMBean}.
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/03 11:12:06 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/03 17:09:09 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class ConnectionPoolMBeanTest extends TestCase {
+public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
     private MBeanServer mBeanServer;
     private boolean notified;
 
@@ -220,30 +221,33 @@ public class ConnectionPoolMBeanTest extends TestCase {
     }
 
     /**
-     * Calls {@link GlobalTest#globalSetup}
+     * Calls {@link AbstractProxoolTest#setUp}
      * @see TestCase#setUp
      */
     protected void setUp() throws Exception {
         this.notified = false;
         Class.forName(ProxoolDriver.class.getName());
         this.mBeanServer = MBeanServerFactory.createMBeanServer();
-        GlobalTest.globalSetup();
+        super.setUp();
     }
 
     /**
-     * Calls {@link GlobalTest#globalTeardown}
+     * Calls {@link AbstractProxoolTest#tearDown}
      * @see TestCase#setUp
      */
     protected void tearDown() throws Exception {
         MBeanServerFactory.releaseMBeanServer(this.mBeanServer);
         this.mBeanServer = null;
-        GlobalTest.globalTeardown();
+        super.tearDown();
     }
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolMBeanTest.java,v $
+ Revision 1.5  2003/03/03 17:09:09  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.4  2003/03/03 11:12:06  billhorsman
  fixed licence
 

@@ -19,12 +19,12 @@ import java.util.Random;
 /**
  * Test how well Proxool works in a threaded test.
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/03 17:09:06 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
-public class ThreadTest extends TestCase {
+public class ThreadTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(ThreadTest.class);
 
@@ -34,14 +34,6 @@ public class ThreadTest extends TestCase {
 
     public ThreadTest(String s) {
         super(s);
-    }
-
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
     }
 
     /**
@@ -103,6 +95,9 @@ public class ThreadTest extends TestCase {
 /*
  Revision history:
  $Log: ThreadTest.java,v $
+ Revision 1.8  2003/03/03 17:09:06  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.7  2003/03/03 11:12:05  billhorsman
  fixed licence
 

@@ -12,12 +12,12 @@ import org.logicalcobwebs.logging.LogFactory;
 /**
  * Very basic test to see if Hypersonic test database is working
  *
- * @version $Revision: 1.10 $, $Date: 2003/03/03 11:12:04 $
+ * @version $Revision: 1.11 $, $Date: 2003/03/03 17:08:57 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
-public class HypersonicTest extends TestCase {
+public class HypersonicTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(HypersonicTest.class);
 
@@ -25,14 +25,6 @@ public class HypersonicTest extends TestCase {
 
     public HypersonicTest(String s) {
         super(s);
-    }
-
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
     }
 
     public void testHypersonic() throws Exception {
@@ -52,6 +44,9 @@ public class HypersonicTest extends TestCase {
 /*
  Revision history:
  $Log: HypersonicTest.java,v $
+ Revision 1.11  2003/03/03 17:08:57  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.10  2003/03/03 11:12:04  billhorsman
  fixed licence
 

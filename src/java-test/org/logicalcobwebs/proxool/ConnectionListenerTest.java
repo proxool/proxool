@@ -16,12 +16,12 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/03 11:12:04 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/03 17:08:55 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class ConnectionListenerTest extends TestCase {
+public class ConnectionListenerTest extends AbstractProxoolTest {
 
     private int onBirthCalls;
     private int onDeathCalls;
@@ -126,20 +126,12 @@ public class ConnectionListenerTest extends TestCase {
     }
 
     /**
-     * Calls {@link GlobalTest#globalSetup}
+     * Calls {@link AbstractProxoolTest#setUp}
      * @see TestCase#setUp
      */
     protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
+        super.setUp();
         Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalTeardown}
-     * @see TestCase#setUp
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
     }
 
     class TestConnectionListener implements ConnectionListenerIF {
@@ -164,6 +156,9 @@ public class ConnectionListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.8  2003/03/03 17:08:55  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.7  2003/03/03 11:12:04  billhorsman
  fixed licence
 

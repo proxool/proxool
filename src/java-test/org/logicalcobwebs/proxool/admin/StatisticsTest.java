@@ -15,6 +15,7 @@ import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ResultMonitor;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.sql.DriverManager;
 import java.text.DecimalFormat;
@@ -23,12 +24,12 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.15 $, $Date: 2003/03/03 11:12:06 $
+ * @version $Revision: 1.16 $, $Date: 2003/03/03 17:09:09 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class StatisticsTest extends TestCase {
+public class StatisticsTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(StatisticsTest.class);
 
@@ -39,22 +40,6 @@ public class StatisticsTest extends TestCase {
      */
     public StatisticsTest(String s) {
         super(s);
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalSetup}
-     * @see TestCase#setUp
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalTeardown}
-     * @see TestCase#setUp
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
     }
 
     /**
@@ -148,6 +133,9 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.16  2003/03/03 17:09:09  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.15  2003/03/03 11:12:06  billhorsman
  fixed licence
 

@@ -19,18 +19,19 @@ import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.io.File;
 
 /**
  * Tests that the AvalonConfgiuration works.
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/03 11:12:06 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/03 17:09:12 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
-public class AvalonConfiguratorTest extends TestCase {
+public class AvalonConfiguratorTest extends AbstractProxoolTest {
     private ExcaliburComponentManager componentManager;
 
     /**
@@ -159,24 +160,14 @@ public class AvalonConfiguratorTest extends TestCase {
         componentManager.initialize();
     }
 
-    /**
-     * @see TestCase#setUp()
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    /**
-     * @see TestCase#tearDown()
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
-    }
 }
 
 /*
  Revision history:
  $Log: AvalonConfiguratorTest.java,v $
+ Revision 1.8  2003/03/03 17:09:12  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.7  2003/03/03 11:12:06  billhorsman
  fixed licence
 

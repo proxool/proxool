@@ -16,27 +16,18 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/03 11:12:04 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/03 17:08:55 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class ConnectionPoolTests extends TestCase {
+public class ConnectionPoolTests extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(ConnectionPoolTests.class);
 
     public ConnectionPoolTests(String name) {
         super(name);
     }
-
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
-    }
-
 
     /**
      * If we ask for more simultaneous connections then we have allowed we should gracefully
@@ -83,6 +74,9 @@ public class ConnectionPoolTests extends TestCase {
 /*
  Revision history:
  $Log: ConnectionPoolTests.java,v $
+ Revision 1.4  2003/03/03 17:08:55  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.3  2003/03/03 11:12:04  billhorsman
  fixed licence
 

@@ -16,12 +16,12 @@ import java.util.Properties;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/03 11:12:04 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/03 17:08:56 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
-public class ConnectionResetterTest extends TestCase {
+public class ConnectionResetterTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(ConnectionResetterTest.class);
 
@@ -30,22 +30,6 @@ public class ConnectionResetterTest extends TestCase {
      */
     public ConnectionResetterTest(String s) {
         super(s);
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalSetup}
-     * @see TestCase#setUp
-     */
-    protected void setUp() throws Exception {
-        GlobalTest.globalSetup();
-    }
-
-    /**
-     * Calls {@link GlobalTest#globalTeardown}
-     * @see TestCase#setUp
-     */
-    protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
     }
 
     /**
@@ -131,6 +115,9 @@ public class ConnectionResetterTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.12  2003/03/03 17:08:56  billhorsman
+ all tests now extend AbstractProxoolTest
+
  Revision 1.11  2003/03/03 11:12:04  billhorsman
  fixed licence
 
