@@ -19,7 +19,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.11 $, $Date: 2002/10/28 19:44:03 $
+ * @version $Revision: 1.12 $, $Date: 2002/10/29 22:58:22 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -289,6 +289,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     if (getDefinition().getDebugLevel() == ConnectionPoolDefinitionIF.DEBUG_LEVEL_LOUD) {
                         out.append(" -> ");
                         out.append(getDefinition().getUrl());
+                        out.append(" (");
+                        out.append(Integer.toHexString(proxyConnection.getConnection().hashCode()));
+                        out.append(")");
                     }
                     log.debug(out);
                 }
@@ -1040,6 +1043,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.12  2002/10/29 22:58:22  billhorsman
+ added connection hashcode to debug
+
  Revision 1.11  2002/10/28 19:44:03  billhorsman
  small change to cleanup log
 
