@@ -1,0 +1,32 @@
+Changes to Proxool
+----------------
+
+$Revision: 1.1 $
+$Date: 2002/09/13 08:12:32 $
+$Author: billhorsman $
+
+I N T R O D U C T I O N
+
+A Java SQL Driver that provides a connection pool wrapper around another
+Driver of your choice. Very simple to migrate existing code. Fully configurable.
+Fast, mature and robust. Transparently adds connection pooling to your
+existing JDBC driver.F I L E S
+
+doc/index.html
+  Snapshot of http://proxool.sourceforge.net
+
+doc/api/index.html
+  Javadoc API
+
+src/java
+  The core Java source code (this is all you need to use proxool)
+
+src/java-jdk1.2
+  A patch that allows you to use JDK1.2. Use the Ant build.xml file to build a
+  patched source tree that avoids the use of JDK1.3's Proxy class.
+
+src/java-test
+  JUnit tests that you might find interesting but are not required to use Proxool
+
+src/java-ext
+  Some useful files to help you integrate Proxool into your application.

@@ -1,0 +1,242 @@
+<?xml version="1.0"?>
+<!--
+    $Revision: 1.1 $
+    $Date: 2002/09/13 08:12:29 $
+    $Author: billhorsman $
+
+    http://proxool.sourceforge.net
+
+-->
+<project name="Proxool" default="build-jar" basedir=".">
+
+    <!-- Use this to avoid having to pass properties in the command line -->
+    <property file="proxool-ant.properties"/>
+
+    <!-- The target JDK (dictates which source files we use) -->
+    <property name="jdk" value="1.3"/>
+
+    <!-- Whether to include the test classes -->
+    <property name="test" value="false"/>
+
+    <!-- Whether to include the Avalon dependent classes -->
+    <property name="ext.avalon" value="false"/>
+
+    <!-- Whether to include the JAXP dependent classes -->
+    <property name="ext.xml" value="false"/>
+
+    <!-- Where to build everything. You might want to override
+    this so that it isn't within your cvs tree. -->
+    <property name="build-dir" value="build"/>
+
+    <!-- Whether we include debug information in JAR file -->
+    <property name="debug" value="false"/>
+
+    <!-- Current version -->
+    <property name="version" value="0.4"/>
+
+    <!-- Classpath -->
+    <path id="classpath">
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <taskdef name="checkstyle" classname="com.puppycrawl.tools.checkstyle.CheckStyleTask">
+        <classpath refid="classpath"/>
+    </taskdef>
+
+    <!--
+        Build necessary directories
+       -->
+    <target
+        name="init"
+        >
+        <mkdir dir="${build-dir}/src/java"/>
+        <mkdir dir="${build-dir}/etc"/>
+        <mkdir dir="${build-dir}/deploy"/>
+        <mkdir dir="${build-dir}/classes"/>
+        <tstamp/>
+    </target>
+
+    <target
+        name="evaluate-properties"
+        >
+        <!--
+            Evaluate whether we should build the source code
+            for JDK1.3 (or later)
+           -->
+        <condition property="build-core">
+            <or>
+                <equals arg1="${jdk}" arg2="1.3"/>
+                <equals arg1="${jdk}" arg2="1.4"/>
+            </or>
+        </condition>
+
+        <!--
+            Evaluate whether we should build the source code
+            for JDK1.2
+           -->
+        <condition property="build-jdk1.2">
+            <equals arg1="${jdk}" arg2="1.2"/>
+        </condition>
+
+        <!--
+            Evaluate whether we should build the source code
+            with test classes
+           -->
+        <condition property="build-test">
+            <equals arg1="${test}" arg2="true"/>
+        </condition>
+
+        <!--
+            Evaluate whether we should include the AvalonConfigurator
+           -->
+        <condition property="build-avalon">
+            <equals arg1="${ext.avalon}" arg2="true"/>
+        </condition>
+
+        <!--
+            Evaluate whether we should include the XMLConfigurator
+           -->
+        <condition property="build-xml">
+            <equals arg1="${ext.xml}" arg2="true"/>
+        </condition>
+
+    </target>
+
+    <target
+        name="clean"
+        description="Cleans build directory"
+        >
+        <delete dir="${build-dir}"/>
+    </target>
+
+    <target
+        name="checkstyle"
+        description="Checks Java code for style"
+        >
+        <checkstyle maxLineLen="150" javadocScope="protected" ignoreLineLengthPattern="^\s*\*\s*(See also the &lt;a href=|@deprecated)">
+            <fileset dir="src/java" includes="**/*.java"/>
+            <fileset dir="src/java-examples" includes="**/*.java"/>
+            <fileset dir="src/java-ext" includes="**/*.java"/>
+            <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
+            <fileset dir="src/java-test" includes="**/*.java"/>
+        </checkstyle>
+    </target>
+
+    <target
+        name="build-src"
+        description="Gathers the source code together ready for compiling"
+        depends="init,evaluate-properties"
+        >
+        <antcall target="build-src-core"/>
+        <antcall target="build-src-jdk1.2"/>
+        <antcall target="build-src-avalon"/>
+        <antcall target="build-src-xml"/>
+        <antcall target="build-src-test"/>
+    </target>
+
+    <target
+        name="compile"
+        description="Compiles the code"
+        depends="init,build-src"
+        >
+        <javac srcdir="${build-dir}/src/java" destdir="${build-dir}/classes" debug="${debug}">
+            <classpath refid="classpath"/>
+		</javac>
+    </target>
+
+    <target
+        name="build-jar"
+        description="Compiles and builds the JAR file"
+        depends="init,build-src,compile"
+        >
+        <manifest file="${build-dir}/etc/MANIFEST.MF" >
+            <attribute name="Proxool-Version" value="${version}"/>
+            <attribute name="Date" value="${TODAY}"/>
+        </manifest>
+        <jar
+            jarfile="${build-dir}/deploy/proxool-${version}.jar"
+            basedir="${build-dir}/classes"
+            manifest="${build-dir}/etc/MANIFEST.MF"
+            />
+    </target>
+
+    <target
+        name="build-src-core"
+        depends="init"
+        if="build-core"
+        >
+        <copy todir="${build-dir}/src/java" preservelastmodified="yes">
+            <fileset dir="src/java" includes="**/*.java"/>
+        </copy>
+    </target>
+
+    <target
+        name="build-src-jdk1.2"
+        depends="init"
+        if="build-jdk1.2"
+        >
+        <copy todir="${build-dir}/src/java">
+            <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
+        </copy>
+    </target>
+
+    <target
+        name="build-src-test"
+        depends="init"
+        if="build-test"
+        >
+        <copy todir="${build-dir}/src/java">
+            <fileset dir="src/java-test" includes="**/*.java"/>
+        </copy>
+    </target>
+
+    <target
+        name="build-src-avalon"
+        depends="init"
+        if="build-avalon"
+        >
+        <copy todir="${build-dir}/src/java">
+            <fileset dir="src/java-ext" includes="**/AvalonConfigurator.java"/>
+        </copy>
+    </target>
+
+    <target
+        name="build-src-xml"
+        depends="init"
+        if="build-xml"
+        >
+        <copy todir="${build-dir}/src/java">
+            <fileset dir="src/java-ext" includes="**/XMLConfigurator.java"/>
+        </copy>
+    </target>
+
+    <target
+        name="test"
+        description="Runs the JUnit tests"
+        depends="init"
+        >
+        <property name="build-test" value="true"/>
+        <!--antcall target="build-src"/>
+        <antcall target="compile"/ -->
+        <java classpathref="classpath" classpath="$[build-dir}/classes" classname="junit.textui.TestRunner" >
+            <arg value="org.logicalcobwebs.proxool.GeneralTests" />
+		</java>
+    </target>
+
+    <target
+        name="javadoc"
+        description="Produce Javadoc API"
+        depends="init,build-src,compile">
+        <javadoc
+            sourcepath="${build-dir}/src/java"
+            destdir="${build-dir}/api"
+            packagenames="org.logicalcobwebs.*"
+            doctitle="Proxool API Documentation"
+            windowtitle="Proxool API Documentation"
+            header="&lt;a target=&quot;_parent&quot; href=&quot;../index.html&quot;&gt;Proxool&lt;/a&gt;"
+        />
+    </target>
+
+</project>
