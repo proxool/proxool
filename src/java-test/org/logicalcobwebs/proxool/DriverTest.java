@@ -14,7 +14,7 @@ import java.util.Properties;
 /**
  * Tests {@link ProxoolDriver}
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.5 $, $Date: 2003/04/29 12:04:18 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -54,7 +54,7 @@ public class DriverTest extends AbstractProxoolTest {
 
         // Get it back by name
         url = TestHelper.buildProxoolUrl(alias);
-        DriverManager.getConnection(url).close();
+        DriverManager.getConnection(ProxoolConstants.PROXOOL + "." + alias).close();
         assertEquals("servedCount", 3, ProxoolFacade.getSnapshot(alias).getServedCount());
 
     }
@@ -66,6 +66,9 @@ public class DriverTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: DriverTest.java,v $
+ Revision 1.5  2003/04/29 12:04:18  billhorsman
+ fix test
+
  Revision 1.4  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 
