@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.38 $, $Date: 2003/02/02 23:35:48 $
+ * @version $Revision: 1.39 $, $Date: 2003/02/04 15:59:50 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -520,6 +520,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     log.error("PrototypingThread already dead", e);
                 } catch (Exception e) {
                     log.error("Can't wake prototypingThread", e);
+                }
+
+                // Cancel the monitor thread (for statistics)
+                if (monitor != null) {
+                    monitor.cancelAll();
                 }
 
                 /* Patience, patience. */
@@ -1178,6 +1183,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.39  2003/02/04 15:59:50  billhorsman
+ finalize now shuts down StatsRoller timer
+
  Revision 1.38  2003/02/02 23:35:48  billhorsman
  removed ReloadMonitor to remove use of System properties
 

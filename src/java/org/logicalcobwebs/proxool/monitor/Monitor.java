@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.3 $, $Date: 2003/01/31 16:53:21 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/04 15:59:49 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -84,6 +84,17 @@ public class Monitor {
         }
     }
 
+    /**
+     * Cancels the timer that outputs the stats
+     */
+    public void cancelAll() {
+        Iterator i = statsRollers.values().iterator();
+        while (i.hasNext()) {
+            StatsRoller statsRoller = (StatsRoller) i.next();
+            statsRoller.cancel();
+        }
+    }
+
     public StatisticsIF[] getStatistics() {
         List statistics = new Vector();
         Iterator i = statsRollers.values().iterator();
@@ -124,6 +135,9 @@ public class Monitor {
 /*
  Revision history:
  $Log: Monitor.java,v $
+ Revision 1.4  2003/02/04 15:59:49  billhorsman
+ finalize now shuts down StatsRoller timer
+
  Revision 1.3  2003/01/31 16:53:21  billhorsman
  checkstyle
 

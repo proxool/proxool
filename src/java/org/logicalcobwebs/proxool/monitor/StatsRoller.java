@@ -21,7 +21,7 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/02 23:32:48 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/04 15:59:49 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -39,6 +39,8 @@ class StatsRoller {
     private int period;
 
     private int units;
+
+    private Timer timer = new Timer();
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
 
@@ -95,8 +97,14 @@ class StatsRoller {
                 }
             }
         };
-        Timer t = new Timer(true);
-        t.schedule(tt, 5000, 5000);
+        timer.schedule(tt, 5000, 5000);
+    }
+
+    /**
+     * Cancels the timer that outputs the stats
+     */
+    protected void cancel() {
+        timer.cancel();
     }
 
     private synchronized void roll() {
@@ -169,6 +177,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.6  2003/02/04 15:59:49  billhorsman
+ finalize now shuts down StatsRoller timer
+
  Revision 1.5  2003/02/02 23:32:48  billhorsman
  fixed bug caused by last variable name change. :(
 
