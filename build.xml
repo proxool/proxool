@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.46 $
-    $Date: 2003/03/07 14:43:59 $
+    $Revision: 1.47 $
+    $Date: 2003/03/07 14:45:01 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -345,6 +345,12 @@
             file="${build-dir}/reports/${junit-report-name}"
             token="&lt;h1&gt;Unit Test Results&lt;/h1&gt;"
             value=""
+            />
+
+        <replace
+            file="${build-dir}/reports/${junit-report-name}"
+            token="68%"
+            value="100%"
             />
 
         <replace
