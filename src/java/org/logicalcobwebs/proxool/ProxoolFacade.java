@@ -33,7 +33,7 @@ import java.util.Hashtable;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.69 $, $Date: 2003/08/27 18:03:20 $
+ * @version $Revision: 1.70 $, $Date: 2003/08/28 10:55:49 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -85,6 +85,7 @@ public class ProxoolFacade {
         if (isConfiguredForJMX(connectionPoolDefinition.getCompleteInfo())) {
             registerForJmx(connectionPoolDefinition.getAlias(), connectionPoolDefinition.getCompleteInfo());
         }
+/*
 // Start JNDI
         if (connectionPoolDefinition.getJndiName() != null) {
             try {
@@ -113,6 +114,7 @@ public class ProxoolFacade {
             }
         }
 // End JNDI
+*/
     }
 
     /**
@@ -662,6 +664,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.70  2003/08/28 10:55:49  billhorsman
+ comment out JNDI stuff for now
+
  Revision 1.69  2003/08/27 18:03:20  billhorsman
  added new getDelegateConnection() method
 
