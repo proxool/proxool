@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/LogFactory.java,v 1.2 2003/02/08 14:27:50 chr32 Exp $
- * $Revision: 1.2 $
- * $Date: 2003/02/08 14:27:50 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/LogFactory.java,v 1.3 2004/03/23 21:40:04 brenuart Exp $
+ * $Revision: 1.3 $
+ * $Date: 2004/03/23 21:40:04 $
  *
  * ====================================================================
  *
@@ -71,7 +71,7 @@
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.2 $ $Date: 2003/02/08 14:27:50 $
+ * @version $Revision: 1.3 $ $Date: 2004/03/23 21:40:04 $
  */
 public abstract class LogFactory {
     // ----------------------------------------------------- Manifest Constants
@@ -457,25 +457,41 @@
     protected static LogFactory newFactory (String factoryClass,
                                             ClassLoader classLoader)
             throws LogConfigurationException {
-        try {
-            if (classLoader == null) {                classLoader = LogFactory.class.getClassLoader ();            }
-            Class clazz = null;
+
+        if (classLoader == null) {            classLoader = LogFactory.class.getClassLoader ();        }
+        Class clazz = null;
+
+        // first the thread class loader
+        try {
+            clazz = classLoader.loadClass (factoryClass);
+        } catch (ClassNotFoundException ex) {
+        }
+        
+        // if failed (i.e. no implementation is
+        // found in the webapp), try the caller's loader
+        // if we haven't already...
+        if( clazz==null ) {
             try {
-                // first the thread class loader
-                clazz = classLoader.loadClass (factoryClass);
-            } catch (ClassNotFoundException ex) {
-                // if this failed (i.e. no implementation is
-                // found in the webapp), try the caller's loader
-                // if we haven't already...
                 if (classLoader != LogFactory.class.getClassLoader ()) {
                     classLoader = LogFactory.class.getClassLoader ();
                     clazz = classLoader.loadClass (factoryClass);
                 }
+            } catch (ClassNotFoundException ex) {
             }
-            LogFactory factory = (LogFactory) clazz.newInstance ();
-            return factory;
-        } catch (Exception e) {
-            throw new LogConfigurationException (e);
+        }
+        
+        // so, we got one ?
+        if( clazz==null )
+            throw new LogConfigurationException("LogFactory instantiation error: "+factoryClass+" not found");
+        
+        // make sure the class is a LogFactory
+        if( ! LogFactory.class.isAssignableFrom(clazz) )
+            throw new LogConfigurationException("LogFactory instantiation error: "+factoryClass+" is not a LogFactory");
+        
+        // create a new instance
+        try {            return (LogFactory) clazz.newInstance ();
+        } catch (Throwable t) {
+            throw new LogConfigurationException("LogFactory instantiation error: "+factoryClass+" threw exception when creating new instance", t);
         }
     }
 }
