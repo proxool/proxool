@@ -1,11 +1,11 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.30 $
-$Date: 2003/11/05 00:19:48 $
+$Revision: 1.31 $
+$Date: 2003/11/05 11:22:41 $
 $Author: billhorsman $
 
-0.8.2 - 4 November 2003
+0.8.2 - 5 November 2003
 
 - Fixed bug where delegate properties weren't being passed onto the delegate driver. If you weren't
   passing any properties other than username and password to the delegate driver then this didn't
