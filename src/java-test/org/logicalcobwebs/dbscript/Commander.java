@@ -16,7 +16,7 @@ import java.sql.Statement;
 /**
  * A thread that can run a single command many times.
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/09 15:59:18 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/15 00:08:15 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -63,7 +63,7 @@ class Commander implements Runnable {
                     }
 
                 } catch (SQLException e) {
-                    if (!commandFilter.catchException(command, e)) {
+                    if (commandFilter != null && !commandFilter.catchException(command, e)) {
                         keepGoing = false;
                     }
                     if (command.isIgnoreException()) {
@@ -133,6 +133,10 @@ class Commander implements Runnable {
 /*
  Revision history:
  $Log: Commander.java,v $
+ Revision 1.3  2003/01/15 00:08:15  billhorsman
+ check for commandFilter existence to avoid unnecessary
+ log clutter
+
  Revision 1.2  2002/11/09 15:59:18  billhorsman
  fix doc
 
