@@ -22,24 +22,25 @@ import java.util.Iterator;
  * listeneres to be added or removed. Your code sould look like this:
  * <code>
  * <pre>
- *      Iterator listenerIterator = null;
- try {
- listenerIterator = getListenerIterator();
- if (listenerIterator != null) {
- // ... Iterate through the listeners and notify them
- }
- } catch (InterruptedException e) {
- LOG.error("Tried to aquire read lock for " + MyClass.class.getName()
- + " iterator but was interrupted.");
- } finally {
- releaseReadLock();
- }
+ *
+     Iterator listenerIterator = null;
+     try {
+         listenerIterator = getListenerIterator();
+         if (listenerIterator != null) {
+            // ... Iterate through the listeners and notify them
+         }
+     } catch (InterruptedException e) {
+         LOG.error("Tried to aquire read lock for " + MyClass.class.getName()
+             + " iterator but was interrupted.");
+     } finally {
+         releaseReadLock();
+     }
  </pre>
  </code>
  * </p>
- * @version $Revision: 1.3 $, $Date: 2003/02/07 17:20:18 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/19 19:35:21 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
  */
 public abstract class AbstractListenerContainer implements ListenerContainerIF {
@@ -121,6 +122,9 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF {
 /*
  Revision history:
  $Log: AbstractListenerContainer.java,v $
+ Revision 1.4  2003/02/19 19:35:21  chr32
+ Formated code in javadoc.
+
  Revision 1.3  2003/02/07 17:20:18  billhorsman
  checkstyle
 
