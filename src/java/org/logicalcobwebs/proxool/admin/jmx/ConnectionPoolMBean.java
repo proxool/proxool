@@ -29,6 +29,12 @@ import javax.management.Attribute;
 import javax.management.InvalidAttributeValueException;
 import javax.management.AttributeList;
 import javax.management.MBeanParameterInfo;
+import javax.management.NotificationBroadcaster;
+import javax.management.NotificationBroadcasterSupport;
+import javax.management.NotificationListener;
+import javax.management.NotificationFilter;
+import javax.management.ListenerNotFoundException;
+import javax.management.Notification;
 
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -38,51 +44,79 @@ import java.text.MessageFormat;
 
 /**
  * JMX DynamicMBean adapter for a Proxool connection pool.<br>
- * Supports the following attributes:
- *<code><pre>   alias
- * driver-url
- * driver-class
- * driver-properties
- * house-keeping-sleep-time
- * house-keeping-test-sql
- * maximum-connection-count
- * maximum-connection-lifetime
- * maximum-new-connections
- * minimum-connection-count
- * recently-started-threshold
- * overload-without-refusal-lifetime
- * maximum-active-time
- * verbose
- * trace
- * fatal-sql-exception
- * prototype-count
- * </pre>
- * </code>
- * ...and the following operation:
- * <code><pre>   shutdown
- * </pre></code>
- * @version $Revision: 1.2 $, $Date: 2003/02/24 18:01:57 $
+ * See the configuration documentation to learn
+ * how to activate a pool for JMX. No programming is necessary to do this.
+ * <p>
+ * <b>Attributes</b>
+ * <ul>
+ * <li>alias</li>
+ * <li>driverClass</li>
+ * <li>driverUrl</li>
+ * <li>driverProperties</li>
+ * <li>fatalSqlException</li>
+ * <li>houseKeepingSleeptime</li>
+ * <li>houseKeepingTestSql</li>
+ * <li>maximumActiveTime</li>
+ * <li>maximumConnectionCount</li>
+ * <li>maximumConnectionLifetime</li>
+ * <li>minimumConnectionCount</li>
+ * <li>maximumNewConnections</li>
+ * <li>overloadWithoutRefusalLifetime</li>
+ * <li>recentlyStartedThreshold</li>
+ * <li>prototypeCount</li>
+ * <li>trace</li>
+ * <li>verbose</li>
+ * </ul>
+ * </p>
+ * <p>
+ * <b>Operations</b>
+ * <ul>
+ * <li>shutdown</li>
+ * </ul>
+ * </p>
+ * <p>
+ * <b>Notifications</b>
+ * <ul>
+ * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
+ * </ul>
+ * </p>
+ * @version $Revision: 1.3 $, $Date: 2003/02/25 16:50:31 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
  */
-public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, ConfigurationListenerIF {
+public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, ConfigurationListenerIF, NotificationBroadcaster {
+    /**
+     * Notification type emitted when the pool definition is updated.
+     */
+    public static final String NOTIFICATION_TYPE_DEFINITION_UPDATED = "proxool.definitionUpdated";
+
+
     private static final Log LOG = LogFactory.getLog (ConnectionPoolMBean.class);
     private static final String CLASS_NAME = ConnectionPoolMBean.class.getName ();
+
+    private static final String RECOURCE_NAME_MBEAN_POOL_DESCRIPTION = "mbean.pool.description";
+    private static final String RECOURCE_NAME_MBEAN_NOTIFICATION_DESCRIPTION = "mbean.notification.description";
+    private static final String RECOURCE_NAME_MBEAN_NOTIFICATION_DEF_UPDATED = "mbean.notification.defUpdated";
+
+
     private static final ResourceBundle ATTRIBUTE_DESCRIPTIONS_RESOURCE = createAttributeDescriptionsResource ();
     private static final ResourceBundle JMX_RESOURCE = createJMXResource ();
+
+    private static final MBeanNotificationInfo[] NOTIFICATION_INFOS = getNotificationInfos();
 
     private MBeanInfo mBeanInfo;
     private ConnectionPoolDefinitionIF poolDefinition;
     private Properties poolProperties;
-
+    private long definitionUpdatedSequence;
+    private NotificationBroadcasterSupport notificationHelper = new NotificationBroadcasterSupport();
 
     public ConnectionPoolMBean (String alias, Properties poolProperties)
         throws ProxoolException {
         this.poolDefinition = ProxoolFacade
             .getConnectionPoolDefinition(alias);
         this.poolProperties = poolProperties;
-        buildDynamicMBeanInfo (this.poolDefinition.getAlias ());
+        this.mBeanInfo = getDynamicMBeanInfo(this.poolDefinition.getAlias ());
         ProxoolFacade.addProxoolListener(this);
         ProxoolFacade.addConfigurationListener(alias, this);
     }
@@ -335,7 +369,7 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
         return mBeanInfo;
     }
 
-    private void buildDynamicMBeanInfo (String alias) {
+    private MBeanInfo getDynamicMBeanInfo (String alias) {
         final MBeanAttributeInfo[] attributeInfos = new MBeanAttributeInfo[]{
             createProxoolAttribute (ProxoolConstants.ALIAS, String.class, false),
             createProxoolAttribute (ProxoolConstants.DRIVER_PROPERTIES, String.class),
@@ -364,7 +398,7 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
                 new MBeanParameterInfo[]{}, "void", MBeanOperationInfo.ACTION)
         };
 
-        mBeanInfo = new MBeanInfo (CLASS_NAME, MessageFormat.format (getJMXText ("mbean.pool"),
+        return new MBeanInfo (CLASS_NAME, MessageFormat.format (getJMXText (RECOURCE_NAME_MBEAN_POOL_DESCRIPTION),
             new Object[]{alias}), attributeInfos, constructorInfos, operationInfos, new MBeanNotificationInfo[0]);
     }
 
@@ -504,6 +538,13 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
         }
     }
 
+    private static MBeanNotificationInfo[] getNotificationInfos() {
+        return new MBeanNotificationInfo[] {
+            new MBeanNotificationInfo(
+                new String[]{NOTIFICATION_TYPE_DEFINITION_UPDATED}, Notification.class.getName(), getJMXText(RECOURCE_NAME_MBEAN_NOTIFICATION_DESCRIPTION))
+        };
+    }
+
     // Listener methods
 
     /**
@@ -526,19 +567,47 @@ public class ConnectionPoolMBean implements DynamicMBean, ProxoolListenerIF, Con
     }
 
     /**
-     * Update the attributes of this MBean.
-s     * @see ConfigurationListenerIF#defintionUpdated(ConnectionPoolDefinitionIF, Properties, Properties)
+     * Update the attributes of this MBean and emit a {@link #NOTIFICATION_TYPE_DEFINITION_UPDATED} event.
+     * @see ConfigurationListenerIF#defintionUpdated(ConnectionPoolDefinitionIF, Properties, Properties)
      */
     public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo,
         Properties changedInfo) {
         this.poolDefinition = connectionPoolDefinition;
         this.poolProperties = completeInfo;
+        this.notificationHelper.sendNotification(new Notification(NOTIFICATION_TYPE_DEFINITION_UPDATED, this,
+            definitionUpdatedSequence++, System.currentTimeMillis(),
+            getJMXText(RECOURCE_NAME_MBEAN_NOTIFICATION_DEF_UPDATED)));
+    }
+
+    /**
+     * @see NotificationBroadcaster#addNotificationListener(NotificationListener, NotificationFilter, Object)
+     */
+    public void addNotificationListener(NotificationListener notificationListener, NotificationFilter notificationFilter,
+        Object handBack) throws IllegalArgumentException {
+        this.notificationHelper.addNotificationListener(notificationListener, notificationFilter, handBack);
+    }
+
+    /**
+     * @see NotificationBroadcaster#removeNotificationListener(NotificationListener)
+     */
+    public void removeNotificationListener(NotificationListener notificationListener) throws ListenerNotFoundException {
+        this.notificationHelper.removeNotificationListener(notificationListener);
+    }
+
+    /**
+     * @see NotificationBroadcaster#getNotificationInfo()
+     */
+    public MBeanNotificationInfo[] getNotificationInfo() {
+        return NOTIFICATION_INFOS;
     }
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.3  2003/02/25 16:50:31  chr32
+ Added JMX notification and doc.
+
  Revision 1.2  2003/02/24 18:01:57  chr32
  1st working version.
 
