@@ -14,13 +14,14 @@ import org.logicalcobwebs.proxool.admin.SnapshotIF;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 import java.text.DecimalFormat;
 
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.16 $, $Date: 2003/03/11 14:58:32 $
+ * @version $Revision: 1.17 $, $Date: 2003/11/04 13:54:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -36,6 +37,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
     private StatisticsIF statistics;
     private static final int PERIOD = 5;
     private static final int COUNT = 6;
+    private long servedCount;
 
     public PerformanceTest(String s) {
         super(s);
@@ -45,12 +47,12 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
      * Test how many connections we can serve if we go as fast as we can!
      * @throws ProxoolException if anything goes wrong
      */
-    public void testPerformance() throws ProxoolException {
+    public void testPerformance() throws ProxoolException, InterruptedException {
 
         waitingThead = Thread.currentThread();
 
         String alias = "testPeformance";
-        int threadCount = 5;
+        int threadCount = 20;
         String url = TestHelper.buildProxoolUrl(alias,
                 TestConstants.HYPERSONIC_DRIVER,
                 TestConstants.HYPERSONIC_TEST_URL);
@@ -58,10 +60,16 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, String.valueOf(threadCount));
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, String.valueOf(Boolean.TRUE));
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, String.valueOf(threadCount));
+/*
         info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, String.valueOf(PERIOD) + "s");
         info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_INFO);
+*/
         ProxoolFacade.registerConnectionPool(url, info);
+/*
         ProxoolFacade.addStatisticsListener(alias, this);
+*/
 
         doWait();
 
@@ -80,8 +88,26 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
             annoyingConnectors[i].cancel();
         }
 
-        LOG.info("Served " + statistics.getServedCount()
-            + " at " + millisecondsFormat.format((double) (1000 * PERIOD * COUNT) / (double) statistics.getServedCount()) + " ms per connection");
+        for (int i = 0; i < 5; i++) {
+            int activeConnectionCount = ProxoolFacade.getSnapshot(alias).getActiveConnectionCount();
+            if (activeConnectionCount > 0) {
+                LOG.info("Waiting for 10 seconds for connections to become inactive (" + activeConnectionCount + ")");
+                Thread.sleep(10000);
+            } else {
+                break;
+            }
+        }
+
+        final SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
+        LOG.info("Active count: " + snapshot.getActiveConnectionCount());
+        LOG.info("Available count: " + snapshot.getAvailableConnectionCount());
+        ConnectionInfoIF[] cis = snapshot.getConnectionInfos();
+        LOG.info("Found " + cis.length + " connetions with a detailed snapshot" + "");
+        for (int i = 0; i < cis.length; i++) {
+            ConnectionInfoIF ci = cis[i];
+            LOG.info("#" + ci.getId() + ": " + ci.getStatus() + ", lap=" + (ci.getTimeLastStopActive() - ci.getTimeLastStartActive()));
+        }
+        LOG.info("Served a total of " + ProxoolFacade.getSnapshot(alias).getServedCount());
 
     }
 
@@ -96,6 +122,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
     }
 
     public void statistics(String alias, StatisticsIF statistics) {
+        this.servedCount += statistics.getServedCount();
         this.statistics = statistics;
         synchronized (waitingThead) {
             waitingThead.notify();
@@ -115,6 +142,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, String.valueOf(threadCount));
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, String.valueOf(threadCount));
         info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, String.valueOf(PERIOD) + "s");
         info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_INFO);
         info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, String.valueOf(Boolean.TRUE));
@@ -219,13 +247,6 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
             return running;
         }
 
-        private void checkForDisparity(int count1, int count2, String description) {
-            if (count1 != count2) {
-                LOG.error(description + " disparity: " + count1 + " != " + count2);
-                disparityNoticed = true;
-            }
-        }
-
         private int getCount(ConnectionInfoIF[] connectionInfos, int status) {
             int count = 0;
             for (int i = 0; i < connectionInfos.length; i++) {
@@ -265,11 +286,15 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
                 while (!cancelled) {
                     try {
                         Connection connection = null;
+                        Statement s = null;
                         try {
                             connection = DriverManager.getConnection(TestHelper.buildProxoolUrl(alias));
-                            connection.createStatement();
+                            s = connection.createStatement();
                             Thread.yield();
                         } finally {
+                            if (s != null) {
+                                s.close();
+                            }
                             if (connection != null) {
                                 connection.close();
                             }
@@ -301,6 +326,9 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.17  2003/11/04 13:54:02  billhorsman
+ checkstyle
+
  Revision 1.16  2003/03/11 14:58:32  billhorsman
  put PerformanceTest back in the global test
 

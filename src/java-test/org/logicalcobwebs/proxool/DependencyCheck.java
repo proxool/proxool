@@ -10,14 +10,13 @@ import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.logging.impl.SimpleLog;
 
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Properties;
 
 /**
  * A minimal check to see what libraries we need to include with
  * our binary distribution
  *
- * @version $Revision: 1.1 $, $Date: 2003/10/25 18:38:17 $
+ * @version $Revision: 1.2 $, $Date: 2003/11/04 13:54:02 $
  * @author Bill Horsman {bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -65,6 +64,9 @@ public class DependencyCheck {
 /*
  Revision history:
  $Log: DependencyCheck.java,v $
+ Revision 1.2  2003/11/04 13:54:02  billhorsman
+ checkstyle
+
  Revision 1.1  2003/10/25 18:38:17  billhorsman
  Not a test, just a standalone class you can run to see what libraries you need to use Proxool.
  It just checks the core features - you're gonna need other libraries for things like JAXP

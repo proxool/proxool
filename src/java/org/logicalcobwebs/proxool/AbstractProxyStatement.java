@@ -19,7 +19,7 @@ import java.util.TreeMap;
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
- * @version $Revision: 1.16 $, $Date: 2003/10/27 12:21:59 $
+ * @version $Revision: 1.17 $, $Date: 2003/11/04 13:54:02 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -172,7 +172,8 @@ abstract class AbstractProxyStatement {
         if (isTrace()) {
             // Log if configured to
             if (connectionPool.getLog().isDebugEnabled() && connectionPool.getDefinition().isTrace()) {
-                connectionPool.getLog().debug(sqlLog.toString() + " (" + (System.currentTimeMillis() - startTime) + " milliseconds" + (exception != null ? ", threw a " + exception.getClass().getName()  + ": " + exception.getMessage() + ")" : ")"));
+                connectionPool.getLog().debug(sqlLog.toString() + " (" + (System.currentTimeMillis() - startTime) + " milliseconds"
+                        + (exception != null ? ", threw a " + exception.getClass().getName()  + ": " + exception.getMessage() + ")" : ")"));
             }
             // Send to any listener
             connectionPool.onExecute(sqlLog.toString(), (System.currentTimeMillis() - startTime), exception);
@@ -239,6 +240,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.17  2003/11/04 13:54:02  billhorsman
+ checkstyle
+
  Revision 1.16  2003/10/27 12:21:59  billhorsman
  Optimisation to avoid preparing sql log if tracing is off.
 

@@ -6,12 +6,11 @@
 package org.logicalcobwebs.logging;
 
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
-import org.logicalcobwebs.proxool.ConnectionPoolTest;
 
 /**
  * Test {@link org.logicalcobwebs.logging.impl.Jdk14Logger}
  *
- * @version $Revision: 1.2 $, $Date: 2003/10/26 16:11:35 $
+ * @version $Revision: 1.3 $, $Date: 2003/11/04 13:54:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
