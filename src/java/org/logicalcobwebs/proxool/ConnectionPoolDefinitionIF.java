@@ -22,9 +22,9 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.8 $, $Date: 2002/12/15 19:21:42 $
+ * @version $Revision: 1.9 $, $Date: 2002/12/17 14:20:44 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ConnectionPoolDefinitionIF {
 
@@ -138,10 +138,28 @@ public interface ConnectionPoolDefinitionIF {
      */
     int getDebugLevel();
 
+    /**
+     * Get the list of fatal SQL exception (Strings) fragments that will
+     * trigger the death of a Connection.
+     * All SQLExceptions are caught and tested for containing this 
+     * text fragment. If it matches than this connection is considered useless
+     * and it is discarded. Regardless of what happens the exception
+     * is always thrown back to the user.
+     * @return the list of exception fragments (String)
+     */
     Set getFatalSqlExceptions();
 
+    /**
+     *
+     * @return
+     */
     String getHouseKeepingTestSql();
 
+   /**
+    * The URL that was used to define this pool. For example:
+    * proxool:org.hsqldb.jdbcDriver:jdbc:hsqldb:test
+    * @return the complete url
+    */
     String getCompleteUrl();
 
     /**
@@ -166,6 +184,9 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.9  2002/12/17 14:20:44  billhorsman
+ doc
+
  Revision 1.8  2002/12/15 19:21:42  chr32
  Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
 
