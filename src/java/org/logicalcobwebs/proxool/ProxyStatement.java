@@ -11,6 +11,7 @@ import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.cglib.proxy.MethodInterceptor;
 import org.logicalcobwebs.cglib.proxy.MethodProxy;
 import org.logicalcobwebs.cglib.proxy.InvocationHandler;
+import org.logicalcobwebs.proxool.proxy.InvokerFacade;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +22,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.26 $, $Date: 2004/06/02 20:48:14 $
+ * @version $Revision: 1.27 $, $Date: 2004/06/17 21:56:53 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -56,16 +57,17 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
         long startTime = System.currentTimeMillis();
         final int argCount = args != null ? args.length : 0;
 
+        Method concreteMethod = InvokerFacade.getConcreteMethod(getStatement().getClass(), method);
         // We need to remember an exceptions that get thrown so that we can optionally
         // pass them to the onExecute() call below
         Exception exception = null;
         try {
-            if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
+            if (concreteMethod.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = new Boolean(equals(args[0]));
-            } else if (method.getName().equals(CLOSE_METHOD) && argCount == 0) {
+            } else if (concreteMethod.getName().equals(CLOSE_METHOD) && argCount == 0) {
                 close();
             } else {
-                result = method.invoke(getStatement(), args);
+                result = concreteMethod.invoke(getStatement(), args);
             }
 
             // We only dump sql calls if we are in verbose mode and debug is enabled
@@ -73,10 +75,10 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
                 try {
 
                     // What sort of method is it
-                    if (method.getName().equals(SET_NULL_METHOD) && argCount > 0 && args[0] instanceof Integer) {
+                    if (concreteMethod.getName().equals(SET_NULL_METHOD) && argCount > 0 && args[0] instanceof Integer) {
                         int index = ((Integer) args[0]).intValue();
                         putParameter(index, null);
-                    } else if (method.getName().startsWith(SET_PREFIX) && argCount > 1 && args[0] instanceof Integer) {
+                    } else if (concreteMethod.getName().startsWith(SET_PREFIX) && argCount > 1 && args[0] instanceof Integer) {
                         int index = ((Integer) args[0]).intValue();
                         putParameter(index, args[1]);
                     }
@@ -106,16 +108,16 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
             throw e;
         } finally {
 
-            if (method.getName().equals(ADD_BATCH_METHOD)) {
+            if (concreteMethod.getName().equals(ADD_BATCH_METHOD)) {
                 // If we have just added a batch call then we need to update the sql log
                 if (argCount > 0 && args[0] instanceof String) {
                     setSqlStatementIfNull((String) args[0]);
                 }
                 appendToSqlLog();
-            } else if (method.getName().equals(EXECUTE_BATCH_METHOD)) {
+            } else if (concreteMethod.getName().equals(EXECUTE_BATCH_METHOD)) {
                 // executing a batch should do a trace
                 trace(startTime, exception);
-            } else if (method.getName().startsWith(EXECUTE_FRAGMENT)) {
+            } else if (concreteMethod.getName().startsWith(EXECUTE_FRAGMENT)) {
                 // executing should update the log and do a trace
                 if (argCount > 0 && args[0] instanceof String) {
                     setSqlStatementIfNull((String) args[0]);
@@ -135,6 +137,9 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.27  2004/06/17 21:56:53  billhorsman
+ Use MethodMapper for concrete methods.
+
  Revision 1.26  2004/06/02 20:48:14  billhorsman
  Dropped obsolete InvocationHandler reference.
 
