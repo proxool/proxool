@@ -7,7 +7,6 @@ package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -21,14 +20,14 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.16 $, $Date: 2003/04/10 21:50:16 $
+ * @version $Revision: 1.17 $, $Date: 2003/04/19 12:58:41 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     // TODO Should we check for defintion reads whilst updating?
-    
+
     private static final Log LOG = LogFactory.getLog(ConnectionPoolDefinition.class);
 
     /**
@@ -110,7 +109,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         this.alias = ProxoolFacade.getAlias(url);
         poolLog = LogFactory.getLog("org.logicalcobwebs.proxool." + alias);
         reset();
-        doChange(url, info);
+        doChange(url, info, false);
     }
 
     /**
@@ -125,7 +124,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         changedInfo.clear();
         connectionPropertiesChanged = false;
         poolLog.debug("Updating definition");
-        doChange(url, info);
+        doChange(url, info, false);
         if (connectionPropertiesChanged) {
             poolLog.info("Mercifully killing all current connections because of definition changes");
             ProxoolFacade.killAllConnections(alias, "of definition changes", true);
@@ -145,7 +144,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         changedInfo.clear();
         connectionPropertiesChanged = false;
         poolLog.debug("Redefining definition");
-        doChange(url, info);
+        doChange(url, info, false);
 
         // Check for minimum information
         if (getUrl() == null || getDriver() == null) {
@@ -158,7 +157,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         }
     }
 
-    private void doChange(String url, Properties info) throws ProxoolException {
+    private boolean doChange(String url, Properties info, boolean pretend) throws ProxoolException {
+
+        boolean changed = false;
 
         try {
             int endOfPrefix = url.indexOf(':');
@@ -167,14 +168,20 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             if (endOfPrefix > -1 && endOfDriver > -1) {
                 final String driver = url.substring(endOfPrefix + 1, endOfDriver);
                 if (isChanged(getDriver(), driver)) {
-                    logChange(true, ProxoolConstants.DELEGATE_DRIVER_PROPERTY, driver);
-                    setDriver(driver);
+                    changed = true;
+                    if (!pretend) {
+                        logChange(true, ProxoolConstants.DELEGATE_DRIVER_PROPERTY, driver);
+                        setDriver(driver);
+                    }
                 }
 
                 final String delegateUrl = url.substring(endOfDriver + 1);
                 if (isChanged(getUrl(), delegateUrl)) {
-                    logChange(true, ProxoolConstants.DELEGATE_URL_PROPERTY, delegateUrl);
-                    setUrl(delegateUrl);
+                    changed = true;
+                    if (!pretend) {
+                        logChange(true, ProxoolConstants.DELEGATE_URL_PROPERTY, delegateUrl);
+                        setUrl(delegateUrl);
+                    }
                 }
             } else {
                 // Using alias. Nothing to do
@@ -184,23 +191,31 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             throw new ProxoolException("Invalid URL: '" + url + "'");
         }
 
-        setCompleteUrl(url);
+        if (!pretend) {
+            setCompleteUrl(url);
+        }
 
         if (info != null) {
             Iterator i = info.keySet().iterator();
             while (i.hasNext()) {
                 String key = (String) i.next();
                 String value = info.getProperty(key);
-                setAnyProperty(key, value);
-                completeInfo.setProperty(key, value);
+                changed = changed | setAnyProperty(key, value, pretend);
+                if (!pretend) {
+                    completeInfo.setProperty(key, value);
+                }
             }
         }
 
-        ProxoolFacade.definitionUpdated(getAlias(), this, completeInfo, changedInfo);
+        if (!pretend) {
+            ProxoolFacade.definitionUpdated(getAlias(), this, completeInfo, changedInfo);
+        }
 
         if (getDriver() == null || getUrl() == null) {
             throw new ProxoolException("Attempt to use a pool with incomplete definition");
         }
+
+        return changed;
     }
 
     private void logChange(boolean proxoolProperty, String key, String value) {
@@ -213,7 +228,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         }
     }
 
-    private void setAnyProperty(String key, String value) throws ProxoolException {
+    private boolean setAnyProperty(String key, String value, boolean pretend) throws ProxoolException {
 
         boolean proxoolProperty = true;
         boolean changed = false;
@@ -221,49 +236,67 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             proxoolProperty = false;
             if (isChanged(getUser(), value)) {
                 changed = true;
-                setUser(value);
+                if (!pretend) {
+                    setUser(value);
+                }
             }
         } else if (key.equals(ProxoolConstants.PASSWORD_PROPERTY)) {
             proxoolProperty = false;
             if (isChanged(getPassword(), value)) {
                 changed = true;
-                setPassword(value);
+                if (!pretend) {
+                    setPassword(value);
+                }
             }
         } else if (key.equals(ProxoolConstants.DELEGATE_DRIVER_PROPERTY)) {
             if (isChanged(getDriver(), value)) {
                 changed = true;
-                setDriver(value);
+                if (!pretend) {
+                    setDriver(value);
+                }
             }
         } else if (key.equals(ProxoolConstants.DELEGATE_URL_PROPERTY)) {
             if (isChanged(getUrl(), value)) {
                 changed = true;
-                setUrl(value);
+                if (!pretend) {
+                    setUrl(value);
+                }
             }
         } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
             if (getHouseKeepingSleepTime() != getInt(key, value)) {
                 changed = true;
-                setHouseKeepingSleepTime(getInt(key, value));
+                if (!pretend) {
+                    setHouseKeepingSleepTime(getInt(key, value));
+                }
             }
         } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
             if (isChanged(getHouseKeepingTestSql(), value)) {
                 changed = true;
-                setHouseKeepingTestSql(value);
+                if (!pretend) {
+                    setHouseKeepingTestSql(value);
+                }
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY)) {
             if (getMaximumConnectionCount() != getInt(key, value)) {
                 changed = true;
-                setMaximumConnectionCount(getInt(key, value));
+                if (!pretend) {
+                    setMaximumConnectionCount(getInt(key, value));
+                }
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY)) {
             if (getMaximumConnectionLifetime() != getInt(key, value)) {
                 changed = true;
-                setMaximumConnectionLifetime(getInt(key, value));
+                if (!pretend) {
+                    setMaximumConnectionLifetime(getInt(key, value));
+                }
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY)) {
             poolLog.warn("Use of " + ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY + " is deprecated. Use more descriptive " + ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY + " instead.");
             if (getSimultaneousBuildThrottle() != getInt(key, value)) {
                 changed = true;
-                setSimultaneousBuildThrottle(getInt(key, value));
+                if (!pretend) {
+                    setSimultaneousBuildThrottle(getInt(key, value));
+                }
             }
         } else if (key.equals(ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY)) {
             if (getSimultaneousBuildThrottle() != getInt(key, value)) {
@@ -273,82 +306,109 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         } else if (key.equals(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY)) {
             if (getMinimumConnectionCount() != getInt(key, value)) {
                 changed = true;
-                setMinimumConnectionCount(getInt(key, value));
+                if (!pretend) {
+                    setMinimumConnectionCount(getInt(key, value));
+                }
             }
         } else if (key.equals(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY)) {
             if (getPrototypeCount() != getInt(key, value)) {
                 changed = true;
-                setPrototypeCount(getInt(key, value));
+                if (!pretend) {
+                    setPrototypeCount(getInt(key, value));
+                }
             }
         } else if (key.equals(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY)) {
             if (getRecentlyStartedThreshold() != getInt(key, value)) {
                 changed = true;
-                setRecentlyStartedThreshold(getInt(key, value));
+                if (!pretend) {
+                    setRecentlyStartedThreshold(getInt(key, value));
+                }
             }
         } else if (key.equals(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY)) {
             if (getOverloadWithoutRefusalLifetime() != getInt(key, value)) {
                 changed = true;
-                setOverloadWithoutRefusalLifetime(getInt(key, value));
+                if (!pretend) {
+                    setOverloadWithoutRefusalLifetime(getInt(key, value));
+                }
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY)) {
             if (getMaximumActiveTime() != getInt(key, value)) {
                 changed = true;
-                setMaximumActiveTime(getInt(key, value));
+                if (!pretend) {
+                    setMaximumActiveTime(getInt(key, value));
+                }
             }
         } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
             if (value != null && value.equals("1")) {
                 poolLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
                 if (!isVerbose()) {
                     changed = true;
-                    setVerbose(true);
+                    if (!pretend) {
+                        setVerbose(true);
+                    }
                 }
             } else {
                 poolLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=0 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=false instead.");
                 if (isVerbose()) {
                     changed = true;
-                    setVerbose(false);
+                    if (!pretend) {
+                        setVerbose(false);
+                    }
                 }
             }
         } else if (key.equals(ProxoolConstants.VERBOSE_PROPERTY)) {
             final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
             if (isVerbose() != valueAsBoolean) {
                 changed = true;
-                setVerbose(valueAsBoolean);
+                if (!pretend) {
+                    setVerbose(valueAsBoolean);
+                }
             }
         } else if (key.equals(ProxoolConstants.TRACE_PROPERTY)) {
             final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
             if (isTrace() != valueAsBoolean) {
                 changed = true;
-                setTrace(valueAsBoolean);
+                if (!pretend) {
+                    setTrace(valueAsBoolean);
+                }
             }
         } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
             if (isChanged(fatalSqlExceptionsAsString, value)) {
                 changed = true;
-                setFatalSqlExceptionsAsString(value);
+                if (!pretend) {
+                    setFatalSqlExceptionsAsString(value);
+                }
             }
         } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
             if (isChanged(getStatistics(), value)) {
                 changed = true;
-                setStatistics(value);
+                if (!pretend) {
+                    setStatistics(value);
+                }
             }
         } else if (key.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY)) {
             if (isChanged(getStatisticsLogLevel(), value)) {
                 changed = true;
-                setStatisticsLogLevel(value);
+                if (!pretend) {
+                    setStatisticsLogLevel(value);
+                }
             }
         } else {
             if (isChanged(getDelegateProperty(key), value)) {
                 changed = true;
-                setDelegateProperty(key, value);
+                if (!pretend) {
+                    setDelegateProperty(key, value);
+                }
             }
             proxoolProperty = false;
         }
 
-        if (changed) {
+        if (changed && !pretend) {
             logChange(proxoolProperty, key, value);
             changedInfo.setProperty(key, value);
         }
 
+        return changed;
     }
 
     private int getInt(String key, String value) throws ProxoolException {
@@ -390,7 +450,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         maximumConnectionCount = DEFAULT_MAXIMUM_CONNECTION_COUNT;
         houseKeepingSleepTime = DEFAULT_HOUSE_KEEPING_SLEEP_TIME;
         houseKeepingTestSql = null;
-        simultaneousBuildThrottle = DEFAULT_MAXIMUM_NEW_CONNECTIONS;
+        simultaneousBuildThrottle = DEFAULT_SIMULTANEOUS_BUILD_THROTTLE;
         recentlyStartedThreshold = DEFAULT_RECENTLY_STARTED_THRESHOLD;
         overloadWithoutRefusalLifetime = DEFAULT_OVERLOAD_WITHOUT_REFUSAL_THRESHOLD;
         maximumActiveTime = DEFAULT_MAXIMUM_ACTIVE_TIME;
@@ -745,9 +805,11 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     public void setFatalSqlExceptionsAsString(String fatalSqlExceptionsAsString) {
         this.fatalSqlExceptionsAsString = fatalSqlExceptionsAsString;
         fatalSqlExceptions.clear();
-        StringTokenizer st = new StringTokenizer(fatalSqlExceptionsAsString, FATAL_SQL_EXCEPTIONS_DELIMITER);
-        while (st.hasMoreTokens()) {
-            fatalSqlExceptions.add(st.nextToken());
+        if (fatalSqlExceptionsAsString != null) {
+            StringTokenizer st = new StringTokenizer(fatalSqlExceptionsAsString, FATAL_SQL_EXCEPTIONS_DELIMITER);
+            while (st.hasMoreTokens()) {
+                fatalSqlExceptions.add(st.nextToken());
+            }
         }
     }
 
@@ -800,11 +862,50 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         this.statisticsLogLevel = statisticsLogLevel;
     }
 
+    /**
+     * Returns true if {@link #redefine redefining} the pool using
+     * these parameters would not change the definition. You can
+     * use this to decide whether or not to trigger a change
+     * {@link ConfigurationListenerIF#definitionUpdated event}.
+     *
+     * @param url the url (containing alias and possible delegate url and driver)
+     * @param info the properties
+     * @return true if the definition is identical to that that represented by these parameters
+     */
+    public boolean isEqual(String url, Properties info) {
+        try {
+            return doChange(url, info, true);
+        } catch (ProxoolException e) {
+            LOG.error("Problem checking equality", e);
+            return false;
+        }
+/*
+        boolean equal = true;
+
+        if (info == null && completeInfo != null) {
+            equal = false;
+        } else if (info != null && completeInfo == null) {
+            equal = false;
+        } else if (!info.equals(completeInfo)) {
+            equal = false;
+        } else if (!url.equals(completeUrl)) {
+            equal = false;
+        }
+
+        return equal;
+*/
+    }
+
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.17  2003/04/19 12:58:41  billhorsman
+ fixed bug where ConfigurationListener's
+ definitionUpdated was getting called too
+ frequently
+
  Revision 1.16  2003/04/10 21:50:16  billhorsman
  empty constructor for use by DataSource
 

@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.21 $, $Date: 2003/03/10 23:43:12 $
+ * @version $Revision: 1.22 $, $Date: 2003/04/19 12:58:40 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -81,7 +81,9 @@ public class ProxoolDriver implements Driver {
                 // Perhaps we should be redefining the definition?
                 cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
                 ConnectionPoolDefinition cpd = cp.getDefinition();
-                cpd.redefine(url, info);
+                if (!cpd.isEqual(url, info)) {
+                    cpd.redefine(url, info);
+                }
             } else {
                 cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
             }
@@ -216,6 +218,11 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.22  2003/04/19 12:58:40  billhorsman
+ fixed bug where ConfigurationListener's
+ definitionUpdated was getting called too
+ frequently
+
  Revision 1.21  2003/03/10 23:43:12  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...
