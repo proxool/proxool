@@ -15,9 +15,9 @@ import java.util.Properties;
 /**
  * Test whether Proxool is happy to run lots of pools. Is it scalable?
  *
- * @version $Revision: 1.1 $, $Date: 2003/03/05 18:49:27 $
+ * @version $Revision: 1.2 $, $Date: 2004/05/26 17:19:09 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ManyPoolsTest extends AbstractProxoolTest {
@@ -40,7 +40,8 @@ public class ManyPoolsTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
         info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "2");
         info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "30000");
-
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, TestConstants.HYPERSONIC_TEST_SQL);
+        
         final int poolCount = 100;
         String alias[] = new String[poolCount];
         for (int i = 0; i < poolCount; i++) {
@@ -73,6 +74,11 @@ public class ManyPoolsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ManyPoolsTest.java,v $
+ Revision 1.2  2004/05/26 17:19:09  brenuart
+ Allow JUnit tests to be executed against another database.
+ By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
+ This behavior can be overriden by setting the 'testConfig' environment property to another location.
+
  Revision 1.1  2003/03/05 18:49:27  billhorsman
  moved test to right tree
 

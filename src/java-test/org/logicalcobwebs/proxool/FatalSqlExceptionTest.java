@@ -17,9 +17,9 @@ import java.util.Properties;
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.6 $, $Date: 2004/03/23 21:16:05 $
+ * @version $Revision: 1.7 $, $Date: 2004/05/26 17:19:09 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.8
  */
 public class FatalSqlExceptionTest extends AbstractProxoolTest {
@@ -40,11 +40,11 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
                 TestConstants.HYPERSONIC_DRIVER,
                 TestConstants.HYPERSONIC_TEST_URL);
         Properties info = new Properties();
-        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "Table not found");
-        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, String.valueOf(Boolean.TRUE));
-        info.setProperty(ProxoolConstants.TRACE_PROPERTY, String.valueOf(Boolean.TRUE));
-        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, TestConstants.FATAL_SQL_EXCEPTION);
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, 			String.valueOf(Boolean.TRUE));
+        info.setProperty(ProxoolConstants.TRACE_PROPERTY, 				String.valueOf(Boolean.TRUE));
+        info.setProperty(ProxoolConstants.USER_PROPERTY, 				TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, 			TestConstants.HYPERSONIC_PASSWORD);
         ProxoolFacade.registerConnectionPool(url, info);
 
         Connection c1 = null;
@@ -66,12 +66,12 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
             assertTrue("Expected same connection back", id1 == id2);
             Statement s = c2.createStatement();
             // Doing it twice will guarantee a failure. Even if it exists
-            s.execute("drop table Z");
-            s.execute("drop table Z");
+            s.execute(TestConstants.FATAL_SQL_STATEMENT);
+            s.execute(TestConstants.FATAL_SQL_STATEMENT);
         } catch (SQLException e) {
             assertTrue("Didn't expect a " + FatalSQLException.class.getName(), !(e instanceof FatalSQLException));
             // Expected exception (foo doesn't exist)
-            LOG.debug("Expected exception (safe to ignore)", e);
+            //LOG.debug("Expected exception (safe to ignore)", e);
         } finally {
             if (c2 != null) {
                 c2.close();
@@ -92,6 +92,7 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
 
     }
 
+    
     public void testWrappedFatalSqlException() throws Exception {
 
         String testName = "wrappedFatalSqlException";
@@ -101,21 +102,21 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
                 TestConstants.HYPERSONIC_DRIVER,
                 TestConstants.HYPERSONIC_TEST_URL);
         Properties info = new Properties();
-        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "Table not found");
-        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, TestConstants.FATAL_SQL_EXCEPTION);
+        info.setProperty(ProxoolConstants.USER_PROPERTY, 				TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY, FatalSQLException.class.getName());
-        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, 			TestConstants.HYPERSONIC_PASSWORD);
         ProxoolFacade.registerConnectionPool(url, info);
 
         Connection c = null;
         try {
             c = DriverManager.getConnection(url);
             Statement s = c.createStatement();
-            s.execute("drop table Z");
+            s.execute(TestConstants.FATAL_SQL_STATEMENT);
         } catch (SQLException e) {
             assertTrue("Expected a " + FatalSQLException.class.getName() + " but got a " + e.getClass().getName() + " instead", e instanceof FatalSQLException);
             // Expected exception (foo doesn't exist)
-            LOG.debug("Expected exception (safe to ignore)", e);
+            //LOG.debug("Expected exception (safe to ignore)", e);
         }
 
         try {
@@ -142,17 +143,17 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
                 TestConstants.HYPERSONIC_DRIVER,
                 TestConstants.HYPERSONIC_TEST_URL);
         Properties info = new Properties();
-        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "Table not found");
-        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, TestConstants.FATAL_SQL_EXCEPTION);
+        info.setProperty(ProxoolConstants.USER_PROPERTY, 				TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY, FatalRuntimeException.class.getName());
-        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, 			TestConstants.HYPERSONIC_PASSWORD);
         ProxoolFacade.registerConnectionPool(url, info);
 
         Connection c = null;
         try {
             c = DriverManager.getConnection(url);
             Statement s = c.createStatement();
-            s.execute("drop table Z");
+            s.execute(TestConstants.FATAL_SQL_STATEMENT);
         } catch (RuntimeException e) {
             assertTrue("Expected a " + FatalRuntimeException.class.getName() + " but got a " + e.getClass().getName() + " instead", e instanceof FatalRuntimeException);
             // Expected exception (foo doesn't exist)
@@ -183,10 +184,10 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
                 TestConstants.HYPERSONIC_DRIVER,
                 TestConstants.HYPERSONIC_TEST_URL);
         Properties info = new Properties();
-        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "Table not found");
-        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, TestConstants.FATAL_SQL_EXCEPTION);
+        info.setProperty(ProxoolConstants.USER_PROPERTY, 				TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY, "org.does.not.Exist");
-        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, 			TestConstants.HYPERSONIC_PASSWORD);
         try {
             ProxoolFacade.registerConnectionPool(url, info);
             fail("Registration was expected to have failed");
@@ -206,11 +207,11 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
                 TestConstants.HYPERSONIC_DRIVER,
                 TestConstants.HYPERSONIC_TEST_URL);
         Properties info = new Properties();
-        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "Table not found");
-        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, TestConstants.FATAL_SQL_EXCEPTION);
+        info.setProperty(ProxoolConstants.USER_PROPERTY, 				TestConstants.HYPERSONIC_USER);
         // ProxoolException isn't a RuntimeException or an SQLException
         info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY, ProxoolException.class.getName());
-        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, 			TestConstants.HYPERSONIC_PASSWORD);
         try {
             ProxoolFacade.registerConnectionPool(url, info);
             fail("Registration was expected to have failed");
@@ -226,6 +227,11 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: FatalSqlExceptionTest.java,v $
+ Revision 1.7  2004/05/26 17:19:09  brenuart
+ Allow JUnit tests to be executed against another database.
+ By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
+ This behavior can be overriden by setting the 'testConfig' environment property to another location.
+
  Revision 1.6  2004/03/23 21:16:05  billhorsman
  make use of new getId() to compare connections
 

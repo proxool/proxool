@@ -17,9 +17,9 @@ import java.util.Properties;
 /**
  * Test the prototyper in ConnectionPool
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/10 15:31:26 $
+ * @version $Revision: 1.10 $, $Date: 2004/05/26 17:19:09 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.8
  */
 public class PrototyperTest extends AbstractProxoolTest {
@@ -46,6 +46,8 @@ public class PrototyperTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
         info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "2");
         info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, TestConstants.HYPERSONIC_TEST_SQL);
+        
         String url = ProxoolConstants.PROXOOL
                 + ProxoolConstants.ALIAS_DELIMITER
                 + alias
@@ -114,6 +116,7 @@ public class PrototyperTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
         info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "0");
         info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, TestConstants.HYPERSONIC_TEST_SQL);
         String url = TestHelper.buildProxoolUrl(alias, TestConstants.HYPERSONIC_DRIVER, TestConstants.HYPERSONIC_TEST_URL);
         ProxoolFacade.registerConnectionPool(url, info);
 
@@ -135,6 +138,11 @@ public class PrototyperTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: PrototyperTest.java,v $
+ Revision 1.10  2004/05/26 17:19:09  brenuart
+ Allow JUnit tests to be executed against another database.
+ By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
+ This behavior can be overriden by setting the 'testConfig' environment property to another location.
+
  Revision 1.9  2003/03/10 15:31:26  billhorsman
  fixes
 

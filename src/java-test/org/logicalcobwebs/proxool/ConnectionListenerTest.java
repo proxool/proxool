@@ -14,9 +14,9 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/10 23:31:04 $
+ * @version $Revision: 1.12 $, $Date: 2004/05/26 17:19:10 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.7
  */
 public class ConnectionListenerTest extends AbstractProxoolTest {
@@ -54,6 +54,8 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
         ProxoolFacade.addConnectionListener(alias, new TestConnectionListener());
         ProxoolFacade.addConnectionListener(alias, new TestConnectionListener());
         Connection connection2 = DriverManager.getConnection(url);
+        
+        // provoke execution error
         boolean errorOccured = false;
         try {
             connection1.createStatement().executeQuery("DINGO");
@@ -61,11 +63,19 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
             // we want this.
             errorOccured = true;
         }
-        assertTrue("We failed to proovoke a connection failure.", errorOccured);
-        connection2.createStatement().executeQuery("CALL 1");
+        assertTrue("We failed to provoke a connection failure.", errorOccured);
+        
+        // following statement should be ok
+        connection2.createStatement().executeQuery(TestConstants.HYPERSONIC_TEST_SQL);
+        
+        // close both connections
         connection1.close();
         connection2.close();
+        
+        // shutdown connection pool
         ProxoolFacade.removeConnectionPool(alias);
+        
+        // test results
         assertTrue("Expected 2 onBirth calls, but got " + this.onBirthCalls + ".", this.onBirthCalls == 2);
         assertTrue("Expected 2 onExecute calls, but got " + this.onExecuteCalls + ".", this.onExecuteCalls == 2);
         assertTrue("Expected 2 onFail calls, but got " + this.onFailCalls + ".", this.onFailCalls == 2);
@@ -98,6 +108,8 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
         assertTrue("Failed to remove testConnectionListener2", ProxoolFacade.removeConnectionListener(alias, testConnectionListener2));
         ProxoolFacade.removeConnectionListener(alias, testConnectionListener2);
         Connection connection2 = DriverManager.getConnection(url, info);
+        
+        // provoke execution error
         boolean errorOccured = false;
         try {
             connection1.createStatement().executeQuery("DINGO");
@@ -106,10 +118,18 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
             errorOccured = true;
         }
         assertTrue("We failed to proovoke a connection failure.", errorOccured);
-        connection2.createStatement().executeQuery("CALL 1");
+        
+        // following statement should be ok
+        connection2.createStatement().executeQuery(TestConstants.HYPERSONIC_TEST_SQL);
+        
+        // close connections
         connection1.close();
         connection2.close();
+        
+        // shutdown connection pool
         ProxoolFacade.removeConnectionPool(alias);
+        
+        // validate results
         assertTrue("Expected 0 onBirth calls, but got " + this.onBirthCalls + ".", this.onBirthCalls == 0);
         assertTrue("Expected 0 onExecute calls, but got " + this.onExecuteCalls + ".", this.onExecuteCalls == 0);
         assertTrue("Expected 0 onFail calls, but got " + this.onFailCalls + ".", this.onFailCalls == 0);
@@ -123,14 +143,14 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
         this.onFailCalls = 0;
     }
 
-    /**
-     * Calls {@link AbstractProxoolTest#setUp}
-     * @see junit.framework.TestCase#setUp
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-        Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
-    }
+//    /**
+//     * Calls {@link AbstractProxoolTest#setUp}
+//     * @see junit.framework.TestCase#setUp
+//     */
+//    protected void setUp() throws Exception {
+//        super.setUp();
+//        Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
+//    }
 
     class TestConnectionListener implements ConnectionListenerIF {
         public void onBirth(Connection connection) throws SQLException {
@@ -154,6 +174,11 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.12  2004/05/26 17:19:10  brenuart
+ Allow JUnit tests to be executed against another database.
+ By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
+ This behavior can be overriden by setting the 'testConfig' environment property to another location.
+
  Revision 1.11  2003/03/10 23:31:04  billhorsman
  fixed deprecated properties and doc
 

@@ -16,9 +16,9 @@ import java.sql.DriverManager;
  * with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.11 $, $Date: 2003/04/27 15:44:19 $
+ * @version $Revision: 1.12 $, $Date: 2004/05/26 17:19:09 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.7
  */
 public class ConfigurationListenerTest extends AbstractProxoolTest {
@@ -135,8 +135,8 @@ public class ConfigurationListenerTest extends AbstractProxoolTest {
         String alias = testName;
 
         // Register pool
-        final String delegateUrl1 = TestConstants.HYPERSONIC_URL_PREFIX + "1";
-        final String delegateUrl2 = TestConstants.HYPERSONIC_URL_PREFIX + "2";
+        final String delegateUrl1 = TestConstants.HYPERSONIC_TEST_URL;
+        final String delegateUrl2 = TestConstants.HYPERSONIC_TEST_URL2;
 
         final String url1 = TestHelper.buildProxoolUrl(alias,
                 TestConstants.HYPERSONIC_DRIVER,
@@ -235,6 +235,11 @@ public class ConfigurationListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.12  2004/05/26 17:19:09  brenuart
+ Allow JUnit tests to be executed against another database.
+ By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
+ This behavior can be overriden by setting the 'testConfig' environment property to another location.
+
  Revision 1.11  2003/04/27 15:44:19  billhorsman
  better tests
 

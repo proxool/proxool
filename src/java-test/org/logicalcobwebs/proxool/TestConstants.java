@@ -6,34 +6,76 @@
 package org.logicalcobwebs.proxool;
 
 /**
- * Some useful constants for testing
+ * Some useful constants for testing.
+ * 
+ * Note: these values will be overriden at startup by the GlobalTest init procedure.
  *
- * @version $Revision: 1.5 $, $Date: 2003/09/30 18:39:39 $
+ * @version $Revision: 1.6 $, $Date: 2004/05/26 17:19:09 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.5
  */
-public interface TestConstants {
+public class TestConstants {
 
-    static final String PROXOOL_DRIVER = "org.logicalcobwebs.proxool.ProxoolDriver";
+	/**
+	 * Proxool Driver class
+	 */
+    public static String PROXOOL_DRIVER = "org.logicalcobwebs.proxool.ProxoolDriver";
 
-    static final String HYPERSONIC_DRIVER = "org.hsqldb.jdbcDriver";
+    /**
+     * JDBC driver class
+     */
+    public static String HYPERSONIC_DRIVER = "org.hsqldb.jdbcDriver";
 
-    static final String HYPERSONIC_URL_PREFIX = "jdbc:hsqldb:db/";
+    /**
+     * URL connection base (without database)
+     */
+    public static String HYPERSONIC_URL_PREFIX = "jdbc:hsqldb:db/";
 
-    static final String HYPERSONIC_TEST_URL = HYPERSONIC_URL_PREFIX + "test";
+    /**
+     * URL to a first test database. User should have rw access
+     */
+    public static String HYPERSONIC_TEST_URL  = HYPERSONIC_URL_PREFIX + "test";
+    
+    /**
+     * URL to a second test database
+     */
+    public static String HYPERSONIC_TEST_URL2 = HYPERSONIC_URL_PREFIX + "2";
+    
+    /**
+     * Connection credentials
+     */
+    public static String HYPERSONIC_USER = "sa";
 
-    static final String HYPERSONIC_USER = "sa";
+    /**
+     * Connection credentials
+     */
+    public static String HYPERSONIC_PASSWORD = "";
 
-    static final String HYPERSONIC_PASSWORD = "";
+    /**
+     * SQL statement that should always succeed
+     */
+    public static String HYPERSONIC_TEST_SQL = "SELECT COUNT(1) FROM SYSTEM_CATALOGS";
 
-    static final String HYPERSONIC_TEST_SQL = "SELECT COUNT(1) FROM SYSTEM_CATALOGS";
-
+    /**
+     * SQL statement that should always fail
+     */
+    public static String FATAL_SQL_STATEMENT = "drop table Z";
+    
+    /**
+     * SQLException message fragment used to detect fatal exceptions
+     */
+    public static String FATAL_SQL_EXCEPTION = "Table not found";
 }
 
 /*
  Revision history:
  $Log: TestConstants.java,v $
+ Revision 1.6  2004/05/26 17:19:09  brenuart
+ Allow JUnit tests to be executed against another database.
+ By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
+ This behavior can be overriden by setting the 'testConfig' environment property to another location.
+
  Revision 1.5  2003/09/30 18:39:39  billhorsman
  New test sql syntax constant
 

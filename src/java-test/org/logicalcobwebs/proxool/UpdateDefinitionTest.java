@@ -14,9 +14,9 @@ import java.util.Properties;
 /**
  * Test that we can update the definition of a pool
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/04 12:50:44 $
+ * @version $Revision: 1.7 $, $Date: 2004/05/26 17:19:10 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.8
  */
 public class UpdateDefinitionTest extends AbstractProxoolTest {
@@ -37,16 +37,16 @@ public class UpdateDefinitionTest extends AbstractProxoolTest {
 
         String url1 = TestHelper.buildProxoolUrl(alias,
                 TestConstants.HYPERSONIC_DRIVER,
-                TestConstants.HYPERSONIC_URL_PREFIX + "1");
+                TestConstants.HYPERSONIC_TEST_URL);
 
         String url2 = TestHelper.buildProxoolUrl(alias,
                 TestConstants.HYPERSONIC_DRIVER,
-                TestConstants.HYPERSONIC_URL_PREFIX + "2");
+                TestConstants.HYPERSONIC_TEST_URL2);
 
         Properties info = new Properties();
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-        info.setProperty("proxool.minimum-connection-count", "2");
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "2");
 
         // register pool
         ProxoolFacade.registerConnectionPool(url1, info);
@@ -119,7 +119,7 @@ public class UpdateDefinitionTest extends AbstractProxoolTest {
                 + ProxoolConstants.URL_DELIMITER
                 + TestConstants.HYPERSONIC_DRIVER
                 + ProxoolConstants.URL_DELIMITER
-                + "jdbc:hsqldb:db/update";
+                + TestConstants.HYPERSONIC_TEST_URL2; //"jdbc:hsqldb:db/update";
 
 
         LOG.debug("Register pool");
@@ -150,6 +150,11 @@ public class UpdateDefinitionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: UpdateDefinitionTest.java,v $
+ Revision 1.7  2004/05/26 17:19:10  brenuart
+ Allow JUnit tests to be executed against another database.
+ By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
+ This behavior can be overriden by setting the 'testConfig' environment property to another location.
+
  Revision 1.6  2003/03/04 12:50:44  billhorsman
  fix
 
