@@ -14,7 +14,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 /**
  * Run all tests
  *
- * @version $Revision: 1.3 $, $Date: 2002/10/27 13:05:02 $
+ * @version $Revision: 1.4 $, $Date: 2002/10/28 21:37:54 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -48,7 +48,9 @@ public class AllTests {
         if (!initialised) {
             String log4jPath = System.getProperty("log4jPath");
             System.out.println(log4jPath);
-            DOMConfigurator.configure(log4jPath);
+            if (log4jPath != null && log4jPath.length() > 0) {
+                DOMConfigurator.configure(log4jPath);
+            }
             initialised = true;
         }
     }
@@ -61,6 +63,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.4  2002/10/28 21:37:54  billhorsman
+ now allows for non-existent log4jPath
+
  Revision 1.3  2002/10/27 13:05:02  billhorsman
  checkstyle
 
