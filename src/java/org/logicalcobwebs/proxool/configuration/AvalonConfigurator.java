@@ -10,12 +10,19 @@ import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.thread.ThreadSafe;
+import org.apache.avalon.framework.activity.Disposable;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolConstants;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.ProxoolException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Configurator for the <a href="http://jakarta.apache.org/avalon/framework/" target="_new">Avalon Framework</a>.
@@ -27,17 +34,37 @@ import org.xml.sax.helpers.AttributesImpl;
  * simply configures Proxool when Avalon calls its <code>configure</code> method. You need to lookup this
  * component in your bootstrap code to make this happen.
  * </p>
+ * <p>
+ * The configuration takes one attribute: <code>close-on-dispose</code>
+ * <br>
+ * You can use this to let this configurator know
+ * wether or not to close the pools it has created
+ * when it is disposed.
+ * <br>Legal values are <code>true</code> or <code>false</code>. Default: <code>true</code>.
+ * </p>
  *
- * @version $Revision: 1.10 $, $Date: 2003/02/06 17:41:05 $
+ * @version $Revision: 1.11 $, $Date: 2003/02/19 16:52:39 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
-public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
+public class AvalonConfigurator implements Component, Configurable, ThreadSafe, Disposable {
     private static final Log LOG = LogFactory.getLog(AvalonConfigurator.class);
+
     /**
      * Avalon ROLE id for this component.
      */
     public static final String ROLE = AvalonConfigurator.class.getName();
+
+    /**
+     * Constant for the boolean "close-on-dispose" attribute that signifies
+     * wether or not this configurator shall close the pools it has created
+     * when it is disposed. Legal values are "true" or "false". Default: true.
+     *
+     */
+    public static final String CLOSE_ON_DISPOSE_ATTRIBUTE = "close-on-dispose";
+
+    private boolean closeOnDispose = true;
+    private final List configuredPools = new ArrayList(3);
 
     /**
      * Check that all top level elements are named proxool and hand them to
@@ -47,6 +74,7 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
      */
     public void configure(Configuration configuration) throws ConfigurationException {
         final XMLConfigurator xmlConfigurator = new XMLConfigurator();
+        this.closeOnDispose = configuration.getAttributeAsBoolean(CLOSE_ON_DISPOSE_ATTRIBUTE, true);
         final Configuration[] children = configuration.getChildren();
         for (int i = 0; i < children.length; ++i) {
             if (!children[i].getName().equals(ProxoolConstants.PROXOOL)) {
@@ -61,6 +89,30 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
         } catch (SAXException e) {
             throw new ConfigurationException("", e);
         }
+    }
+
+    /**
+     * If {@link #CLOSE_ON_DISPOSE_ATTRIBUTE} is set: Close all connection pools that this configurator has configured.
+     * <br>...else: do nothing.
+     */
+    public void dispose() {
+        LOG.info("Disposing.");
+        if (this.closeOnDispose) {
+            Iterator configuredPools = this.configuredPools.iterator();
+            String alias = null;
+            while (configuredPools.hasNext()) {
+                alias = (String) configuredPools.next();
+                LOG.info("Closing connection pool '" + alias + "'.");
+                try {
+                    ProxoolFacade.removeConnectionPool(alias);
+                } catch (ProxoolException e) {
+                    LOG.error("Closing of connection pool '" + alias + "' failed.", e);
+                }
+            }
+        } else {
+            LOG.info(CLOSE_ON_DISPOSE_ATTRIBUTE + " attribute is not set, so configured pools will not be closed.");
+        }
+        LOG.info("Disposed.");
     }
 
     // Parse the properties recursively, and report found properties to the given XMLConfigurator
@@ -94,6 +146,17 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
                 reportProperties(xmlConfigurator, children);
             }
             xmlConfigurator.endElement(namespace, lName, qName);
+            if (lName.equals(ProxoolConstants.PROXOOL) || qName.equals(ProxoolConstants.PROXOOL)) {
+                Configuration conf = configuration.getChild(ProxoolConstants.ALIAS, false);
+                if (conf != null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Adding to configured pools: " + conf.getValue());
+                    }
+                    this.configuredPools.add(conf.getValue());
+                } else {
+                    LOG.error("proxool element was missing required element 'alias'");
+                }
+            }
         }
     }
 
@@ -121,6 +184,9 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.11  2003/02/19 16:52:39  chr32
+ Added support for close-on-dispose attribute.
+
  Revision 1.10  2003/02/06 17:41:05  billhorsman
  now uses imported logging
 
