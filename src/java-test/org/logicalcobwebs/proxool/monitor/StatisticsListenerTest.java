@@ -9,7 +9,6 @@ package org.logicalcobwebs.proxool.monitor;
 import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.proxool.ConnectionResetter;
 import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
@@ -20,9 +19,9 @@ import java.sql.Connection;
 import java.util.Properties;
 
 /**
- * Test whether the {@link ConnectionResetter} works.
+ * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/07 15:11:33 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/07 17:28:23 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -55,8 +54,7 @@ public class StatisticsListenerTest extends TestCase {
     }
 
     /**
-     * Test whether autoCommit is correctly reset when a connection is
-     * returned to the pool.
+     * Can we listen to statistics
      */
     public void testListener() {
 
@@ -120,6 +118,9 @@ public class StatisticsListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.3  2003/02/07 17:28:23  billhorsman
+ checkstyle and doc
+
  Revision 1.2  2003/02/07 15:11:33  billhorsman
  checkstyle
 
