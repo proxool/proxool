@@ -16,9 +16,9 @@ import java.util.Properties;
 
 /**
  * Utilities for Proxool JNDI operations.
- * @version $Revision: 1.2 $, $Date: 2004/03/18 17:13:48 $
+ * @version $Revision: 1.3 $, $Date: 2004/06/17 21:33:12 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
  */
 public class ProxoolJNDIHelper {
@@ -26,7 +26,7 @@ public class ProxoolJNDIHelper {
     }
 
     /**
-     * Create a {@link org.logicalcobwebs.proxool.ProxoolManagedDataSource} with the given alias
+     * Create a {@link org.logicalcobwebs.proxool.ProxoolDataSource} with the given alias
      * and bind it to JNDI using the given jndi properties.
      * @param jndiProperties the jndi related configuration properties.
      * @throws ProxoolException if the JNDI binding failes.
@@ -48,6 +48,9 @@ public class ProxoolJNDIHelper {
 /*
  Revision history:
  $Log: ProxoolJNDIHelper.java,v $
+ Revision 1.3  2004/06/17 21:33:12  billhorsman
+ JavaDoc fix
+
  Revision 1.2  2004/03/18 17:13:48  chr32
  Started using ProxoolDataSource instead of ProxoolManagedDataSource.
 
