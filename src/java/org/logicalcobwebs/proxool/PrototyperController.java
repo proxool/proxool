@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 /**
  * Controls the {@link Prototyper prototypers}
- * @version $Revision: 1.4 $, $Date: 2003/03/10 16:28:02 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/10 23:43:11 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -61,6 +61,9 @@ public class PrototyperController {
             prototyperThread.doNotify();
         } catch (IllegalMonitorStateException e) {
             LOG.debug("Hmm", e);
+            if (Thread.activeCount() > 10 && LOG.isInfoEnabled()) {
+                LOG.info("Suspicious thread count of " + Thread.activeCount());
+            }
         } catch (IllegalThreadStateException e) {
             // Totally expected. Should happen all the time. Just means that
             // we are already sweeping.
@@ -132,6 +135,10 @@ public class PrototyperController {
 /*
  Revision history:
  $Log: PrototyperController.java,v $
+ Revision 1.5  2003/03/10 23:43:11  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.4  2003/03/10 16:28:02  billhorsman
  removed debug trace
 

@@ -8,11 +8,15 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
- * @version $Revision: 1.13 $, $Date: 2003/03/10 15:26:45 $
+ * @version $Revision: 1.14 $, $Date: 2003/03/10 23:43:09 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -110,6 +114,10 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.14  2003/03/10 23:43:09  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.13  2003/03/10 15:26:45  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

@@ -10,14 +10,18 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 /**
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
 
- * @version $Revision: 1.9 $, $Date: 2003/03/10 15:26:42 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/10 23:43:09 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -67,7 +71,7 @@ abstract class AbstractProxyStatement {
 
                     // We should check all the existing connections as soon as possible
                     HouseKeeperController.sweepNow(connectionPool.getDefinition().getAlias());
-                    
+
                     LOG.warn("Connection has been thrown away because fatal exception was detected", e);
                 } catch (SQLException e2) {
                     LOG.error("Problem trying to throw away suspect connection", e2);
@@ -205,6 +209,10 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.10  2003/03/10 23:43:09  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.9  2003/03/10 15:26:42  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

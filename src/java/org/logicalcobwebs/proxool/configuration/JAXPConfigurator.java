@@ -8,7 +8,11 @@ package org.logicalcobwebs.proxool.configuration;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.xml.sax.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -29,7 +33,7 @@ import java.io.Reader;
  * xml should be validated or not. If you want your xml to be validated be sure to read the
  * <a href="XMLConfigurator.html#validation">Validation</a> chapter in the JavaDoc for {@link XMLConfigurator}.
  * </p>
- * @version $Revision: 1.9 $, $Date: 2003/03/10 15:26:54 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/10 23:43:15 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -122,6 +126,10 @@ public class JAXPConfigurator {
 /*
  Revision history:
  $Log: JAXPConfigurator.java,v $
+ Revision 1.10  2003/03/10 23:43:15  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.9  2003/03/10 15:26:54  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

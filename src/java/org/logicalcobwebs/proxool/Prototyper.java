@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.2 $, $Date: 2003/03/10 15:26:47 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/10 23:43:10 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -26,7 +26,7 @@ public class Prototyper {
 
     private long connectionCount;
 
-    private Object LOCK = new Integer(1);
+    private final Object lock = new Integer(1);
 
     private boolean sweepNeeded = true;
 
@@ -122,7 +122,7 @@ public class Prototyper {
     protected ProxyConnectionIF buildConnection(int state, String creator) throws SQLException, ProxoolException {
 
         long id = 0;
-        synchronized (LOCK) {
+        synchronized (lock) {
 
             // Check that we are allowed to make another connection
             if (connectionCount >= getDefinition().getMaximumConnectionCount()) {
@@ -210,7 +210,7 @@ public class Prototyper {
             }
         } finally {
 
-            synchronized (LOCK) {
+            synchronized (lock) {
                 if (proxyConnection == null) {
                     // If there has been an exception then we won't be using this one and
                     // we need to decrement the counter
@@ -282,6 +282,10 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.3  2003/03/10 23:43:10  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.2  2003/03/10 15:26:47  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

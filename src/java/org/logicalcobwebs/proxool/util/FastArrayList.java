@@ -10,9 +10,9 @@
  */
 
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/proxool/util/FastArrayList.java,v 1.3 2003/03/10 15:27:00 billhorsman Exp $
- * $Revision: 1.3 $
- * $Date: 2003/03/10 15:27:00 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/proxool/util/FastArrayList.java,v 1.4 2003/03/10 23:43:18 billhorsman Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/03/10 23:43:18 $
  *
  * ====================================================================
  *
@@ -74,7 +74,12 @@
 package org.logicalcobwebs.proxool.util;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 
 /**
@@ -114,7 +119,7 @@ import java.util.*;
  * @since Proxool 0.6
  * @author Craig R. McClanahan
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.3 $ $Date: 2003/03/10 15:27:00 $
+ * @version $Revision: 1.4 $ $Date: 2003/03/10 23:43:18 $
  */
 
 public class FastArrayList extends ArrayList {
@@ -1376,6 +1381,10 @@ public class FastArrayList extends ArrayList {
 /*
  Revision history:
  $Log: FastArrayList.java,v $
+ Revision 1.4  2003/03/10 23:43:18  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.3  2003/03/10 15:27:00  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

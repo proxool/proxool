@@ -11,12 +11,16 @@ import org.logicalcobwebs.logging.LogFactory;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.13 $, $Date: 2003/03/10 15:26:45 $
+ * @version $Revision: 1.14 $, $Date: 2003/03/10 23:43:09 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -792,6 +796,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.14  2003/03/10 23:43:09  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.13  2003/03/10 15:26:45  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

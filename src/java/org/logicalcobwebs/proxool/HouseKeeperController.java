@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * Schedules when to run the house keeper
- * @version $Revision: 1.2 $, $Date: 2003/03/10 15:26:46 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/10 23:43:10 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -32,7 +32,7 @@ public class HouseKeeperController {
 
     private static List houseKeeperThreads = new FastArrayList();
 
-    private static Object LOCK = new Integer(1);
+    private static final Object LOCK = new Integer(1);
 
     private static HouseKeeper getHouseKeeper(String alias) throws ProxoolException {
         final HouseKeeper houseKeeper = (HouseKeeper) houseKeepers.get(alias);
@@ -105,6 +105,10 @@ public class HouseKeeperController {
 /*
  Revision history:
  $Log: HouseKeeperController.java,v $
+ Revision 1.3  2003/03/10 23:43:10  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.2  2003/03/10 15:26:46  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

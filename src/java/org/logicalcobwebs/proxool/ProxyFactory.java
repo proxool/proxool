@@ -10,14 +10,20 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.sql.*;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 /**
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.18 $, $Date: 2003/03/10 15:26:49 $
+ * @version $Revision: 1.19 $, $Date: 2003/03/10 23:43:13 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -104,6 +110,10 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.19  2003/03/10 23:43:13  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.18  2003/03/10 15:26:49  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

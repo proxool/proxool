@@ -7,7 +7,11 @@ package org.logicalcobwebs.proxool.admin.servlet;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.proxool.*;
+import org.logicalcobwebs.proxool.ConnectionInfoIF;
+import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
+import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.Version;
 import org.logicalcobwebs.proxool.admin.SnapshotIF;
 import org.logicalcobwebs.proxool.admin.StatisticsIF;
 
@@ -40,7 +44,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/10 15:26:51 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/10 23:43:14 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -542,6 +546,10 @@ public class AdminServlet extends HttpServlet {
 /*
  Revision history:
  $Log: AdminServlet.java,v $
+ Revision 1.6  2003/03/10 23:43:14  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.5  2003/03/10 15:26:51  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

@@ -5,6 +5,7 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -18,14 +19,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
-
 /**
  * Contains most of the functionality that we require to manipilate the
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.15 $, $Date: 2003/03/10 15:26:42 $
+ * @version $Revision: 1.16 $, $Date: 2003/03/10 23:43:07 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -34,7 +33,7 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 
     static final int STATUS_FORCE = -1;
 
-    WriterPreferenceReadWriteLock statusReadWriteLock = new WriterPreferenceReadWriteLock();
+    private WriterPreferenceReadWriteLock statusReadWriteLock = new WriterPreferenceReadWriteLock();
 
     private static final Log LOG = LogFactory.getLog(AbstractProxyConnection.class);
 
@@ -439,6 +438,10 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.16  2003/03/10 23:43:07  billhorsman
+ reapplied checkstyle that i'd inadvertently let
+ IntelliJ change...
+
  Revision 1.15  2003/03/10 15:26:42  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)
