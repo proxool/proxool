@@ -14,7 +14,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.3 $, $Date: 2002/10/17 15:25:37 $
+ * @version $Revision: 1.4 $, $Date: 2002/10/23 21:04:36 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -80,54 +80,62 @@ public class ProxoolDriver implements Driver {
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
             throws SQLException {
 
-        DriverPropertyInfo[] dpi = new DriverPropertyInfo[16];
+        DriverPropertyInfo[] dpi = new DriverPropertyInfo[12];
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(url);
 
         if (cp != null) {
 
             ConnectionPoolDefinitionIF cpd = cp.getDefinition();
 
-            dpi[0] = new DriverPropertyInfo(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "How long the house keeping thread sleeps for (milliseconds). Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_HOUSE_KEEPING_SLEEP_TIME + ".");
+            dpi[0] = new DriverPropertyInfo(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY,
+                    "How long the house keeping thread sleeps for (milliseconds). Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_HOUSE_KEEPING_SLEEP_TIME + ".");
             dpi[0].value = String.valueOf(cpd.getHouseKeepingSleepTime());
 
-            dpi[1] = new DriverPropertyInfo(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, "If the house keeping thread finds and idle connections it will test them with this SQL statement. It should be _very_ quick to execute. Something like checking the current date or something. If not defined then this test is omitted.");
+            dpi[1] = new DriverPropertyInfo(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY,
+                    "If the house keeping thread finds and idle connections it will test them with this SQL statement. "
+                    + "It should be _very_ quick to execute. Something like checking the current date or something. If not defined then this test is omitted.");
             dpi[1].value = cpd.getHouseKeepingTestSql();
 
-            dpi[2] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "The maximum amount of connections to the database. Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_CONNECTION_COUNT + ".");
+            dpi[2] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY,
+                    "The maximum amount of connections to the database. Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_CONNECTION_COUNT + ".");
             dpi[2].value = String.valueOf(cpd.getMaximumConnectionCount());
 
-            dpi[3] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY, "Any idle connections older than this will be removed by the housekeeper (milliseconds). Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_CONNECTION_LIFETIME + ".");
+            dpi[3] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY,
+                    "Any idle connections older than this will be removed by the housekeeper (milliseconds). Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_CONNECTION_LIFETIME + ".");
             dpi[3].value = String.valueOf(cpd.getMaximumConnectionLifetime());
 
-            dpi[4] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY, "This is the maximum number of connections we can be building at any one time. That is, the number of new connections that have been requested but aren't yet available for use. Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_NEW_CONNECTIONS + ".");
+            dpi[4] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY,
+                    "This is the maximum number of connections we can be building at any one time. That is, the number of new connections that have been requested but aren't "
+                    + "yet available for use. Defaults to " + ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_NEW_CONNECTIONS + ".");
             dpi[4].value = String.valueOf(cpd.getMaximumNewConnections());
 
-            dpi[5] = new DriverPropertyInfo(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "If the connection cound it less than this then the housekeeper will build some more.");
+            dpi[5] = new DriverPropertyInfo(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY,
+                    "If the connection cound it less than this then the housekeeper will build some more.");
             dpi[5].value = String.valueOf(cpd.getMinimumConnectionCount());
 
-            dpi[6] = new DriverPropertyInfo(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "If there are fewer than this number of connections available then we will build some more (assuming the maximum-connection-count is not exceeded).");
+            dpi[6] = new DriverPropertyInfo(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY,
+                    "If there are fewer than this number of connections available then we will build some more (assuming the maximum-connection-count is not exceeded).");
             dpi[6].value = String.valueOf(cpd.getPrototypeCount());
 
-            dpi[7] = new DriverPropertyInfo(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY, "This helps us determine whether the pool status. As long as at least one connection was started within this threshold (milliseconds) or there are some spare connections available then we assume the pool is up.");
+            dpi[7] = new DriverPropertyInfo(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY,
+                    "This helps us determine whether the pool status. As long as at least one connection was started within this threshold (milliseconds) or there "
+                    + " are some spare connections available then we assume the pool is up.");
             dpi[7].value = String.valueOf(cpd.getRecentlyStartedThreshold());
 
-            dpi[8] = new DriverPropertyInfo(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY, "This helps us determine the pool status. If we have refused a connection within this threshold (milliseconds) then we are overloaded.");
+            dpi[8] = new DriverPropertyInfo(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY,
+                    "This helps us determine the pool status. If we have refused a connection within this threshold (milliseconds) then we are overloaded.");
             dpi[8].value = String.valueOf(cpd.getOverloadWithoutRefusalLifetime());
 
-            dpi[9] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY, "If a connection is active for longer than this (milliseconds) then we assume it has stalled or something. And we kill it.");
+            dpi[9] = new DriverPropertyInfo(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY,
+                    "If a connection is active for longer than this (milliseconds) then we assume it has stalled or something. And we kill it.");
             dpi[9].value = String.valueOf(cpd.getMaximumActiveTime());
 
-            dpi[10] = new DriverPropertyInfo(ProxoolConstants.DEBUG_LEVEL_PROPERTY, "Either 0 (quiet) or 1 (loud). Default is 0.");
+            dpi[10] = new DriverPropertyInfo(ProxoolConstants.DEBUG_LEVEL_PROPERTY,
+                    "Either 0 (quiet) or 1 (loud). Default is 0.");
 
-            dpi[11] = new DriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "All SQLExceptions are caught and tested for containing this text fragment. If it matches than this connection is considered useless and it is discarded. Regardless of what happens the exception is alway thrown again.");
-
-            dpi[12] = new DriverPropertyInfo(ProxoolConstants.LOG_PROPERTY, "The file name to log to. By default it does not log debug or info.");
-
-            dpi[13] = new DriverPropertyInfo(ProxoolConstants.LOG_DEBUG_PROPERTY, "If true and " + ProxoolConstants.LOG_PROPERTY + " is defined then it will log debug stuff. Default is false.");
-
-            dpi[14] = new DriverPropertyInfo(ProxoolConstants.LOG_INFO_PROPERTY, "If true and " + ProxoolConstants.LOG_PROPERTY + " is defined then it will log info stuff. Default is false.");
-
-            dpi[15] = new DriverPropertyInfo(ProxoolConstants.LOG_AUTO_FLUSH_PROPERTY, "If true and " + ProxoolConstants.LOG_PROPERTY + " is defined then the log will flush on every message. This is inefficient but sometimes useful for debugging.");
+            dpi[11] = new DriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY,
+                    "All SQLExceptions are caught and tested for containing this text fragment. If it matches than this connection is considered useless "
+                    + "and it is discarded. Regardless of what happens the exception is alway thrown again.");
 
         }
 
@@ -170,6 +178,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.4  2002/10/23 21:04:36  billhorsman
+ checkstyle fixes (reduced max line width and lenient naming convention
+
  Revision 1.3  2002/10/17 15:25:37  billhorsman
  use the url when updating, not the name
 

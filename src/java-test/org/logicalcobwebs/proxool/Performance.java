@@ -7,13 +7,13 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Test what the performance of Proxool is compared to a "theoretical"
@@ -21,10 +21,10 @@ import org.apache.commons.logging.LogFactory;
  * as we keep a single threaded model (and because most systems work
  * in a multi-threaded environment is why we need a pool).
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since TODO 24-Aug-2002;bill;high;complete
+ * @since Proxool 0.5
  */
 public class Performance extends TestCase {
 
@@ -34,8 +34,13 @@ public class Performance extends TestCase {
 
     private static final int THREADS = 10;
 
+    private static final int MAX_PROXIES = 10000;
+
     private static final String ALIAS_PERFORMANCE = "performance";
 
+    /**
+     * @see TestCase#TestCase
+     */
     public Performance(String s) {
         super(s);
         TestHelper.configureLog4J();
@@ -49,7 +54,21 @@ public class Performance extends TestCase {
         TestHelper.tearDown();
     }
 
-    public void testPerfectPool() throws SQLException, ClassNotFoundException {
+    /**
+     * Test how Proxool matches up to the perfect pool
+     *
+     * @throws SQLException if there is any problem
+     * @throws ClassNotFoundException if we can't find a driver
+     */
+    public void testProxool() throws SQLException, ClassNotFoundException {
+
+        double perfect = getPerfectPoolTime();
+        double proxool = getProxoolTime();
+
+        LOG.info("Proxool overhead is " + (proxool - perfect) + " milliseconds.");
+    }
+
+    private double getPerfectPoolTime() throws SQLException, ClassNotFoundException {
 
         LOG.info("Testing perfect pool");
 
@@ -64,9 +83,10 @@ public class Performance extends TestCase {
         long elapsed = System.currentTimeMillis() - start;
         LOG.info("Perfect pool tested " + (LOOPS * THREADS) + " connections in " + elapsed + " milliseconds.");
 
+        return (elapsed / (double) (LOOPS * THREADS));
     }
 
-    public void testProxool() throws SQLException, ClassNotFoundException {
+    private double getProxoolTime() throws SQLException, ClassNotFoundException {
 
         LOG.info("Testing proxool");
 
@@ -87,10 +107,51 @@ public class Performance extends TestCase {
         }
 
         long elapsed = System.currentTimeMillis() - start;
-        LOG.info("Proxool tested " +  (LOOPS * THREADS) + " connections in " + elapsed + " milliseconds.");
+        LOG.info("Proxool tested " + (LOOPS * THREADS) + " connections in " + elapsed + " milliseconds.");
+
+        return (elapsed / (double) (LOOPS * THREADS));
 
     }
 
+    /**
+     * Test the overhead of using the {@link Proxy} class instead of normal
+     * delegation.
+     */
+    public void testProxy() {
 
+        double direct = getDirectTime();
+        double proxy = getProxyTime();
+
+        LOG.info("Proxy overhead is " + (proxy - direct) + " milliseconds.");
+    }
+
+    private double getDirectTime() {
+
+        double start = (double) System.currentTimeMillis();
+        for (int i = 0; i < MAX_PROXIES; i++) {
+            DelegateIF delegate = new Delegate("direct");
+            delegate.getFoo();
+            delegate.getFoo();
+        }
+        double elapsed = (double) System.currentTimeMillis() - start;
+
+        return (elapsed / (double) (MAX_PROXIES));
+
+    }
+
+    private double getProxyTime() {
+
+        double start = (double) System.currentTimeMillis();
+        for (int i = 0; i < MAX_PROXIES; i++) {
+            InvocationHandler ih = new DelegateProxy("Test", "Gest");
+            DelegateIF delegate = (DelegateIF) Proxy.newProxyInstance(DelegateIF.class.getClassLoader(), new Class[]{DelegateIF.class}, ih);
+            delegate.getFoo();
+            delegate.getFoo();
+        }
+        double elapsed = (double) System.currentTimeMillis() - start;
+
+        return (elapsed / (double) (MAX_PROXIES));
+
+    }
 
 }

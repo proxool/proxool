@@ -10,16 +10,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
 import java.util.Collection;
+import java.util.Properties;
 
 /**
  * Various tests
  *
- * @version $Revision: 1.6 $, $Date: 2002/10/19 17:00:38 $
+ * @version $Revision: 1.7 $, $Date: 2002/10/23 21:04:54 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -184,9 +182,9 @@ public class GeneralTests extends TestCase {
         TestHelper.registerPool(alias, info);
 
         Collection connectionInfos = null;
-        final int ARRAY_SIZE = 5;
+        final int arraySize = 5;
 
-        Connection[] connections = new Connection[ARRAY_SIZE];
+        Connection[] connections = new Connection[arraySize];
         try {
 
             // Open 1 connection
@@ -226,7 +224,7 @@ public class GeneralTests extends TestCase {
             }
 
         } finally {
-            for (int i = 0; i < ARRAY_SIZE; i++) {
+            for (int i = 0; i < arraySize; i++) {
                 try {
                     if (connections[i] != null) {
                         connections[i].close();
@@ -283,6 +281,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.7  2002/10/23 21:04:54  billhorsman
+ checkstyle fixes (reduced max line width and lenient naming convention
+
  Revision 1.6  2002/10/19 17:00:38  billhorsman
  added performance test, and created TestHelper to make it all simpler
 

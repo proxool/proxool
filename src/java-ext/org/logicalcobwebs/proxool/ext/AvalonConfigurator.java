@@ -78,7 +78,8 @@ import java.util.Properties;
  *   <td>house-keeping-test-sql</td>
  *   <td>no</td>
  *   <td>And valid SQL statement</td>
- *   <td>During house keeping, any idle connection will be asked to execute this statement. If any exception is thrown then the Connection is destroyed. It should be a really simple, fast statement.</td>
+ *   <td>During house keeping, any idle connection will be asked to execute this statement. If any exception
+ *      is thrown then the Connection is destroyed. It should be a really simple, fast statement.</td>
  * </tr>
  *
  * <tr>
@@ -99,7 +100,8 @@ import java.util.Properties;
  *   <td>maximum-new-connections</td>
  *   <td>no</td>
  *   <td>Integer >= 0</td>
- *   <td>In order to prevent overloading, this is the maximum number of connections that you can have that are in the progress of being made. If it is zero then there is no limit. That is, ones we have started to make but haven't finished yet. Default is zero.</td>
+ *   <td>In order to prevent overloading, this is the maximum number of connections that you can have that are in
+ *      the progress of being made. If it is zero then there is no limit. That is, ones we have started to make but haven't finished yet. Default is zero.</td>
  * </tr>
  *
  * <tr>
@@ -113,21 +115,28 @@ import java.util.Properties;
  *   <td>prototype-count</td>
  *   <td>no</td>
  *   <td>Integer >= 0</td>
- *   <td>This is the number of spare connections we will strive to have. So, if we have a prototypeCount of 5 but only 3 spare connections the prototyper will make an additional 2. This is important because it can take around a seconds to establish a connection, and if we are being very strict about killing connections when they get too old it happens a fair bit. Default is 5.</td>
+ *   <td>This is the number of spare connections we will strive to have. So, if we have a prototypeCount of 5 but only 3 spare connections
+ *      the prototyper will make an additional 2. This is important because it can take around a seconds to establish a connection, and if
+ *      we are being very strict about killing connections when they get too old it happens a fair bit. Default is 5.</td>
  * </tr>
  *
  * <tr>
  *   <td>recently-started-threshold</td>
  *   <td>no</td>
  *   <td>Integer >= 1 (milliseconds), sensible value is more than the longest predicted connection time.</td>
- *   <td>We use this to decide whether a connection is locked up or not. It's like a timeout but reacts a little differently. As long as we have at least one connection that was started more recently than this threshold, or we have some available connections, then the pool is considered to be up. Default is 60000 (1 minute).</td>
+ *   <td>We use this to decide whether a connection is locked up or not. It's like a timeout but reacts a little differently. As long as
+ *      we have at least one connection that was started more recently than this threshold, or we have some available connections, then
+ *      the pool is considered to be up. Default is 60000 (1 minute).</td>
  * </tr>
  *
  * <tr>
  *   <td>overload-without-refusal-lifetime</td>
  *   <td>no</td>
  *   <td>Integer >= 0 (milliseconds)</td>
- *   <td>This is the time in milliseconds after the last time that we refused a connection that we still consider ourselves to be overloaded. We have to do this because, even when overloaded, it's not impossible for the available connection count to be high and it's possible to be serving a lot of connections. Recognising an overload is easy (we refuse a connection) - it's recognising when we stop being overloaded that is hard. Hence this fudge :) Default is 60000 (1 minute).</td>
+ *   <td>This is the time in milliseconds after the last time that we refused a connection that we still consider ourselves to be overloaded.
+ *      We have to do this because, even when overloaded, it's not impossible for the available connection count to be high and it's possible
+ *      to be serving a lot of connections. Recognising an overload is easy (we refuse a connection) - it's recognising when we stop being
+ *      overloaded that is hard. Hence this fudge :) Default is 60000 (1 minute).</td>
  * </tr>
  *
  * <tr>
@@ -148,7 +157,8 @@ import java.util.Properties;
  *   <td>fatal-sql-exception</td>
  *   <td>no</td>
  *   <td>Any String</td>
- *   <td>If an exception is thrown and its message contains this String then the Connection is destroyed. Use if for exceptions that might indicate a problem with the actual Connection. You can have multiple entries.</td>
+ *   <td>If an exception is thrown and its message contains this String then the Connection is destroyed. Use if for exceptions that might
+ *      indicate a problem with the actual Connection. You can have multiple entries.</td>
  * </tr>
  *
  * <tr>
@@ -188,7 +198,7 @@ import java.util.Properties;
  * &lt;/jdbc-manager&gt;
  * </pre>
  *
- * @version $Revision: 1.1 $, $Date: 2002/09/19 08:53:41 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/23 21:04:37 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -258,7 +268,7 @@ public class AvalonConfigurator implements Configurable, ThreadSafe, Disposable 
 
             /* TODO log somewhere
             if (log.isDebugEnabled()) {
-                log.debug("Connecting to " + cpd.getUrl());
+                log.debug("Connecting to " + cpd.getSimpleUrl());
                 log.debug("maximumConnectionLifetime=" + cpd.getMaximumConnectionLifetime());
             }
             */
@@ -292,6 +302,9 @@ public class AvalonConfigurator implements Configurable, ThreadSafe, Disposable 
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.2  2002/10/23 21:04:37  billhorsman
+ checkstyle fixes (reduced max line width and lenient naming convention
+
  Revision 1.1  2002/09/19 08:53:41  billhorsman
  created new ext package
 
@@ -326,7 +339,8 @@ public class AvalonConfigurator implements Configurable, ThreadSafe, Disposable 
  improved doc
 
  Revision 1.3  2002/06/05 09:01:31  billhorsman
- removed ConnectionFacadeIF interface in preparation for new, cleaner ProxoolFacade class. _And_ did a code layout update. Why, of why did I mix that up with one commit? It makes it unclear where the cosmetic changes and code changes were made. I won't do it again.
+ removed ConnectionFacadeIF interface in preparation for new, cleaner ProxoolFacade class. _And_ did a code layout update. Why, of
+ why did I mix that up with one commit? It makes it unclear where the cosmetic changes and code changes were made. I won't do it again.
 
  Revision 1.2  2002/06/04 22:23:00  billhorsman
  added class header comments

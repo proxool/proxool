@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * want to perform a task when the connection is born or dies. Actually,
  * the reason why we originally did this is no obsolete. But the code
  * remains here just in case.
- * @version $Revision: 1.2 $, $Date: 2002/10/16 11:45:52 $
+ * @version $Revision: 1.3 $, $Date: 2002/10/23 21:04:36 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -26,7 +26,7 @@ public interface ConnectionListenerIF {
      *
      * @param connection the connection that has just been created
      * @throws SQLException if anything goes wrong (which will then be logged but ignored)
-     */ 
+     */
     void onBirth(Connection connection) throws SQLException;
 
     /**
@@ -64,6 +64,9 @@ public interface ConnectionListenerIF {
 /*
  Revision history:
  $Log: ConnectionListenerIF.java,v $
+ Revision 1.3  2002/10/23 21:04:36  billhorsman
+ checkstyle fixes (reduced max line width and lenient naming convention
+
  Revision 1.2  2002/10/16 11:45:52  billhorsman
  removed obsolete cleanupClob method and added more javadoc
 

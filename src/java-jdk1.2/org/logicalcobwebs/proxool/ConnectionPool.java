@@ -19,7 +19,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.2 $, $Date: 2002/09/18 13:47:13 $
+ * @version $Revision: 1.3 $, $Date: 2002/10/23 21:04:37 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -985,6 +985,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.3  2002/10/23 21:04:37  billhorsman
+ checkstyle fixes (reduced max line width and lenient naming convention
+
  Revision 1.2  2002/09/18 13:47:13  billhorsman
  fixes for new logging
 
@@ -1001,7 +1004,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
  added test (andbug fixes) for FileLogger
 
  Revision 1.7  2002/07/02 08:39:55  billhorsman
- getConnectionInfos now returns a Collection instead of an array. displayStatistics is now available to ProxoolFacade. Prototyper no longer tries to make connections when maximum is reached (stopping unnecessary log messages). bug fix.
+ getConnectionInfos now returns a Collection instead of an array. displayStatistics is now available to ProxoolFacade.
+ Prototyper no longer tries to make connections when maximum is reached (stopping unnecessary log messages). bug fix.
 
  Revision 1.6  2002/06/28 11:19:47  billhorsman
  improved doc

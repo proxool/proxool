@@ -10,10 +10,10 @@ import org.apache.commons.logging.LogFactory;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -23,7 +23,7 @@ import java.util.HashMap;
  * <p>You need to use this class wisely. It is obviously specfic to proxool so it will
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>.
- * @version $Revision: 1.2 $, $Date: 2002/10/17 15:27:31 $
+ * @version $Revision: 1.3 $, $Date: 2002/10/23 21:04:36 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -114,14 +114,13 @@ public class ProxoolFacade {
                 } else {
                     LOG.debug("Updating properties on " + url);
                 }
-        }
+            }
 
             Iterator i = info.keySet().iterator();
             while (i.hasNext()) {
                 String key = (String) i.next();
                 String value = info.getProperty(key);
                 boolean propertyRecognised = true;
-
 
                 if (key.equals(ProxoolConstants.USER_PROPERTY)) {
                     cpd.setUser(value);
@@ -206,7 +205,7 @@ public class ProxoolFacade {
                     propertyRecognised = false;
                 }
 
-                if (LOG.isDebugEnabled() ) {
+                if (LOG.isDebugEnabled()) {
                     if (propertyRecognised) {
                         LOG.debug("Recognised proxool property: " + key + "=" + value);
                     } else {
@@ -399,6 +398,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.3  2002/10/23 21:04:36  billhorsman
+ checkstyle fixes (reduced max line width and lenient naming convention
+
  Revision 1.2  2002/10/17 15:27:31  billhorsman
  better reporting of property settings
 
