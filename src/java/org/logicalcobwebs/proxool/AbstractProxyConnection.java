@@ -16,7 +16,6 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -24,7 +23,7 @@ import java.util.Set;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.19 $, $Date: 2003/07/08 22:04:22 $
+ * @version $Revision: 1.20 $, $Date: 2003/07/08 22:24:43 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -201,7 +200,6 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
                 }
             } else {
                 // Close any open statements, as specified in JDBC
-                Iterator i = openStatements.iterator();
                 Statement[] statements = (Statement[]) openStatements.toArray(new Statement[openStatements.size()]);
                 for (int j = 0; j < statements.length; j++) {
                     Statement statement = statements[j];
@@ -449,6 +447,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.20  2003/07/08 22:24:43  billhorsman
+ damn. no need to build the iterator now.
+
  Revision 1.19  2003/07/08 22:04:22  billhorsman
  attempt to fix possible ConcurrentModificationException
  except I can't reproduce it in this environment. It now
