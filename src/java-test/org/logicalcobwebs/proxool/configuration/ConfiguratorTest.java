@@ -16,11 +16,13 @@ import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ProxoolAdapter;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.GlobalTest;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 
 /**
  * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.9 $, $Date: 2003/02/07 09:35:52 $
+ * @version $Revision: 1.10 $, $Date: 2003/02/07 10:11:35 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -67,8 +69,9 @@ public class ConfiguratorTest extends TestCase {
             newInfo.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "3");
             adapter.update(newInfo);
 
-            assertNotNull("adapter.getConnectionPoolDefinition() is null", adapter.getConnectionPoolDefinition());
-            assertEquals("prototypeCount", 3, adapter.getConnectionPoolDefinition().getPrototypeCount());
+            final ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
+            assertNotNull("definition is null", cpd);
+            assertEquals("prototypeCount", 3, cpd.getPrototypeCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -84,6 +87,9 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.10  2003/02/07 10:11:35  billhorsman
+ fix
+
  Revision 1.9  2003/02/07 09:35:52  billhorsman
  changed alias for testConfigurator
 
