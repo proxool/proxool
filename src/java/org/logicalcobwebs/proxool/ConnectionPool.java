@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.73 $, $Date: 2003/12/09 18:54:55 $
+ * @version $Revision: 1.74 $, $Date: 2004/02/12 13:02:17 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -355,7 +355,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             if (!proxyConnection.setStatus(ProxyConnectionIF.STATUS_ACTIVE, ProxyConnectionIF.STATUS_AVAILABLE)) {
                 log.warn("Unable to set status of connection " + proxyConnection.getId()
                         + " from " + getStatusDescription(ProxyConnectionIF.STATUS_ACTIVE)
-                        + "to " + getStatusDescription(ProxyConnectionIF.STATUS_AVAILABLE)
+                        + " to " + getStatusDescription(ProxyConnectionIF.STATUS_AVAILABLE)
                         + ". It remains " + getStatusDescription(proxyConnection.getStatus()));
             }
         }
@@ -857,7 +857,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             // able to cope with connections being removed whilst we are going round this loop
             try {
                 proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
-            } catch (ArrayIndexOutOfBoundsException e) {
+            } catch (IndexOutOfBoundsException e) {
                 nextAvailableConnection = 0;
                 proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
             }
@@ -1092,6 +1092,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.74  2004/02/12 13:02:17  billhorsman
+ Catch correct exception when iterating through list.
+
  Revision 1.73  2003/12/09 18:54:55  billhorsman
  Make closure of statement during connection test more robust - credit to John Hume
 
