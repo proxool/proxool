@@ -10,12 +10,13 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.Properties;
 
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/10 15:31:26 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/11 01:19:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -61,12 +62,97 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
 
     }
 
+    /**
+     * Checks whether shutdown is patient enough to wait for active connections
+     */
+    public void testShutdownPatience() throws ProxoolException, SQLException {
+
+        String testName = "shutdownPatience";
+        String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, "true");
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        // Open a connection that will close in 5 seconds
+        new Thread(new Closer(DriverManager.getConnection(url), 5000)).start();
+
+        long startTime = System.currentTimeMillis();
+        ProxoolFacade.removeConnectionPool(alias, 10000);
+        long shutdownTime = System.currentTimeMillis() - startTime;
+        assertTrue("shutdown took too long", shutdownTime < 8000);
+        assertTrue("shutdown was too quick", shutdownTime > 2000);
+    }
+
+    /**
+     * Checks whether shutdown is impatient enough to shutdown even if
+     * some connections are still active
+     */
+    public void testShutdownImpatience() throws ProxoolException, SQLException {
+
+        String testName = "shutdownImpatience";
+        String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, "true");
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        // Open a connection that will close in 5 seconds
+        new Thread(new Closer(DriverManager.getConnection(url), 8000)).start();
+
+        long startTime = System.currentTimeMillis();
+        ProxoolFacade.removeConnectionPool(alias, 3000);
+        long shutdownTime = System.currentTimeMillis() - startTime;
+        assertTrue("shutdown took too long", shutdownTime < 6000);
+        assertTrue("shutdown was too quick", shutdownTime > 1000);
+    }
+
+    class Closer implements Runnable {
+
+        private Connection connection;
+
+        private long duration;
+
+        public Closer(Connection connection, long duration) {
+            this.connection = connection;
+            this.duration = duration;
+        }
+
+        public void run() {
+            long startTime = System.currentTimeMillis();
+            try {
+                Thread.sleep(duration);
+            } catch (InterruptedException e) {
+                LOG.error("Awoken", e);
+            }
+            try {
+                connection.close();
+                LOG.debug("Connection closed after " + (System.currentTimeMillis() - startTime)
+                        + " milliseconds.");
+            } catch (SQLException e) {
+                LOG.error("Problem closing connection", e);
+            }
+        }
+
+    }
 
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolTests.java,v $
+ Revision 1.7  2003/03/11 01:19:48  billhorsman
+ new tests
+
  Revision 1.6  2003/03/10 15:31:26  billhorsman
  fixes
 
