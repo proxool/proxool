@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Enumeration;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -24,7 +25,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.14 $, $Date: 2002/11/13 11:28:38 $
+ * @version $Revision: 1.15 $, $Date: 2002/11/13 19:12:24 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -236,7 +237,18 @@ public class ProxoolFacade {
 
             }
 
-            infos.put(rememberedKey, info);
+            // Clone the property. Otherwise we won't detect changes if the
+            // same properties object is passed back in (but with different
+            // content)
+            Properties clone = new Properties();
+            Enumeration e = info.propertyNames();
+            while (e.hasMoreElements()) {
+                String key = (String) e.nextElement();
+                String value = info.getProperty(key);
+                clone.setProperty(key, value);
+            }
+
+            infos.put(rememberedKey, clone);
         }
 
         return cpd.getName();
@@ -435,6 +447,10 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.15  2002/11/13 19:12:24  billhorsman
+ fix where update properties weren't being recognised
+ when the properties object was the same as the original
+
  Revision 1.14  2002/11/13 11:28:38  billhorsman
  trace property wasn't being configured
 
