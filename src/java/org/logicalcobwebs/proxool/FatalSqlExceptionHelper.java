@@ -1,16 +1,20 @@
+/*
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
-/*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
-
+/**
+ * Will wrap up exceptions in another exception which can be defined at runtime.
+ * @version $Revision: 1.2 $, $Date: 2003/09/29 18:12:33 $
+ * @author billhorsman
+ * @author $Author: billhorsman $ (current maintainer)
+ */
 class FatalSqlExceptionHelper {
 
     /**
@@ -75,3 +79,11 @@ class FatalSqlExceptionHelper {
         }
     }
 }
+
+/*
+ Revision history:
+ $Log: FatalSqlExceptionHelper.java,v $
+ Revision 1.2  2003/09/29 18:12:33  billhorsman
+ Doc
+
+*/
