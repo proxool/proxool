@@ -19,7 +19,7 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/28 12:42:45 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -89,14 +89,9 @@ class StatsRoller {
         TimerTask tt = new TimerTask() {
             public void run() {
                 roll();
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    // Oh well
-                }
             }
         };
-        timer.schedule(tt, 5000, 5000);
+        timer.schedule(tt, 1000, 5000);
     }
 
     /**
@@ -149,6 +144,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.2  2003/02/28 12:42:45  billhorsman
+ removed unnecessary sleep in timer
+
  Revision 1.1  2003/02/19 23:36:51  billhorsman
  renamed monitor package to admin
 
