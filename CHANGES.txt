@@ -1,20 +1,23 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.35 $
-$Date: 2004/04/22 07:11:06 $
+$Revision: 1.36 $
+$Date: 2004/06/02 21:13:40 $
 $Author: billhorsman $
 
 0.9.0 
 
 - New DataSource implementation. TODO more
 
-- All connections are now wrapped in disposable wrappers. TODO more 
+- All connections are now wrapped in disposable wrappers. This means that once you have closed
+  a connection (thereby returning it to the pool) you can no longer do anything to it that
+  might influence its behaviour for the next client that picks it up.
 
 - Connections, Statements, PreparedStatements, and CallableStatements now implement
   all the public intefaces that the delegate connection does. This means that you can,
   for instance, cast a Connection directly to the driver specific one. Or more precisely,
-  any of the interfaces that the driver object implements. 
+  any of the interfaces that the driver object implements. You can only cast your exception
+  into an interface - concrete classes aren't supported at this time.
 
 - ProxoolFacade now has killConnection that accepts the Connection object
   itself, so you don't have to know the pool alias and connection ID.
@@ -22,6 +25,13 @@ $Author: billhorsman $
 - ProxoolFacade now has getId() which will give you the ID for any connection.
 
 - ProxoolFacade now has getAlias() which will give you the pool alias for any connection.
+
+- ProxoolFacade now has a no-parameter overloaded version of shutdown() for ease of integration with
+  the Spring Framework.
+
+- ProxoolDriver no longer logs all SQLExceptions. It's up to the client to log exceptions as it
+  sees fit. (With some changes to the tests, this means that we no longer get any stack traces
+  output during testing when we encounter *expected* errors).
 
 0.8.3 - 14 December 2003
 
