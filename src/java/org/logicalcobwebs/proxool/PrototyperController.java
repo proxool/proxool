@@ -12,7 +12,7 @@ import java.util.Iterator;
 
 /**
  * Controls the {@link Prototyper prototypers}
- * @version $Revision: 1.8 $, $Date: 2004/03/26 15:58:56 $
+ * @version $Revision: 1.9 $, $Date: 2004/04/05 22:54:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -66,7 +66,9 @@ public class PrototyperController {
             // once more
             keepSweeping = true;
             // If we aren't already started then this will start a new sweep
-            prototyperThread.doNotify();
+            if (prototyperThread != null) {
+                prototyperThread.doNotify();
+            }
         } catch (IllegalMonitorStateException e) {
             LOG.debug("Hmm", e);
             if (Thread.activeCount() > 10 && LOG.isInfoEnabled()) {
@@ -107,6 +109,9 @@ public class PrototyperController {
 /*
  Revision history:
  $Log: PrototyperController.java,v $
+ Revision 1.9  2004/04/05 22:54:57  billhorsman
+ Check if notify thread has been shutdown before triggering it.
+
  Revision 1.8  2004/03/26 15:58:56  billhorsman
  Fixes to ensure that house keeper and prototyper threads finish after shutdown.
 
