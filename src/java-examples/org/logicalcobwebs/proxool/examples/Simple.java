@@ -14,7 +14,8 @@ import java.sql.SQLException;
 
 /**
  * The simplest example of all. Just gets a Connection.
- * @version $Revision: 1.2 $, $Date: 2002/09/19 10:01:37 $
+ * 
+ * @version $Revision: 1.3 $, $Date: 2002/12/03 10:54:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -40,7 +41,7 @@ public class Simple {
                  delegate-url = jdbc:mysql://localhost/test
             */
             try {
-                connection = DriverManager.getConnection("proxool:org.gjt.mm.mysql.Driver:jdbc:mysql://localhost/test");
+                connection = DriverManager.getConnection("proxool:org.hsqldb.jdbcDriver:jdbc:hsqldb:test");
             } catch (SQLException e) {
                 LOG.error("Problem getting connection", e);
             }
@@ -52,9 +53,11 @@ public class Simple {
             }
 
         } catch (ClassNotFoundException e) {
-            LOG.error("Couldm't find driver", e);
+            LOG.error("Couldn't find driver", e);
         } finally {
             try {
+                // Check to see we actually got a connection before we
+                // attempt to close it.
                 if (connection != null) {
                     // This doesn't really close the connection. It just makes it
                     // available in the pool again.
@@ -72,6 +75,9 @@ public class Simple {
 /*
  Revision history:
  $Log: Simple.java,v $
+ Revision 1.3  2002/12/03 10:54:04  billhorsman
+ use hypersonic driver
+
  Revision 1.2  2002/09/19 10:01:37  billhorsman
  improved error handling and logging
 
