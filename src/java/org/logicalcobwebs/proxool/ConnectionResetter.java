@@ -21,7 +21,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/12 20:24:12 $
+ * @version $Revision: 1.6 $, $Date: 2002/11/12 21:10:41 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -205,7 +205,30 @@ public class ConnectionResetter {
     protected boolean reset(Connection connection, String id) {
         boolean errorsEncountered = false;
 
-        // Now let's reset each property in turn
+        // Let's see the state of autoCommit. It will help us give better advice in the log messages
+         boolean autoCommit = true;
+         try {
+             autoCommit = connection.getAutoCommit();
+         } catch (Throwable t) {
+             errorsEncountered = true;
+             log.warn(id + " - Problem calling connection.getAutoCommit()", t);
+         }
+
+         // Finally. reset autoCommit.
+          if (!autoCommit) {
+              try {
+                  // This is the slightly scary bit. Should a connection commit
+                  // when it is closed. I can't find any documentation on this.
+                  connection.commit();
+                  connection.setAutoCommit(true);
+                  log.debug(id + " - Committed and autoCommit reset back to true");
+              } catch (Throwable t) {
+                  errorsEncountered = true;
+                  log.warn(id + " - Problem calling connection.commit() or connection.setAutoCommit(true)", t);
+              }
+          }
+
+         // Now let's reset each property in turn
         Iterator i = accessorMutatorMap.values().iterator();
         while (i.hasNext()) {
             Method mutator = (Method) i.next();
@@ -223,33 +246,13 @@ public class ConnectionResetter {
             }
         }
 
-        // Let's see the state of autoCommit. It will help us give better advice in the log messages
-        boolean autoCommit = true;
-        try {
-            autoCommit = connection.getAutoCommit();
-        } catch (Throwable t) {
-            errorsEncountered = true;
-            log.warn(id + " - Problem calling connection.getAutoCommit()", t);
-        }
-
-        if (errorsEncountered) {
+         if (errorsEncountered) {
 
             log.warn(id + " - There were some problems resetting the connection. It will not be used again (just in case). "
                     + "The thread that is responsible is named '" + Thread.currentThread().getName() + "'");
             if (!autoCommit) {
                 log.warn(id + " - The connection was closed with autoCommit=false. That is fine, but it might indicate that "
                         + "the problems that happened whilst trying to reset it were because a transaction is still in progress.");
-            }
-        }
-
-        // Finally. reset autoCommit.
-        if (!autoCommit) {
-            try {
-                connection.setAutoCommit(true);
-                log.debug(id + " - autoCommit reset back to true");
-            } catch (Throwable t) {
-                errorsEncountered = true;
-                log.warn(id + " - Problem calling connection.setAutoCommit(true)", t);
             }
         }
 
@@ -261,6 +264,13 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.6  2002/11/12 21:10:41  billhorsman
+ Hmm. Now commits any pending transactions automatically when
+ you close the connection. I'm still pondering whether this is
+ wise or not. The only other sensible option is to rollback
+ since I can't find a way of determining whether either is
+ necessary.
+
  Revision 1.5  2002/11/12 20:24:12  billhorsman
  checkstyle
 
