@@ -16,9 +16,9 @@ import org.logicalcobwebs.logging.LogFactory;
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.15 $, $Date: 2003/05/06 23:17:59 $
+ * @version $Revision: 1.16 $, $Date: 2003/09/07 22:10:17 $
  * @author bill
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class GlobalTest {
@@ -36,14 +36,14 @@ public class GlobalTest {
                 } catch (Exception e) {
                     LOG.debug("Can't configure logging using " + log4jPath);
                 }
+            } else {
+                // Well, at least switch on debugging
+                System.setProperty("org.apache.commons.logging.simplelog.defaultlog", "debug");
+                org.apache.log4j.BasicConfigurator.resetConfiguration();
+                org.apache.log4j.BasicConfigurator.configure();
             }
 
             Class.forName(ProxoolDriver.class.getName());
-
-            /* uncomment this if you want to turn on debug loggin to the console
-            org.apache.log4j.BasicConfigurator.resetConfiguration();
-            org.apache.log4j.BasicConfigurator.configure();
-            */
 
             initialised = true;
         }
@@ -84,6 +84,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.16  2003/09/07 22:10:17  billhorsman
+ Default behaviour of test classes, if Log4J is not configured, is now DEBUG output to console.
+
  Revision 1.15  2003/05/06 23:17:59  chr32
  Added JMX tests to GlobalTest.
 
