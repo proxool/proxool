@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.6 2003/09/11 08:31:11 chr32 Exp $
- * $Revision: 1.6 $
- * $Date: 2003/09/11 08:31:11 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.7 2003/09/11 23:00:23 billhorsman Exp $
+ * $Revision: 1.7 $
+ * $Date: 2003/09/11 23:00:23 $
  *
  * ====================================================================
  *
@@ -74,7 +74,7 @@ import org.logicalcobwebs.logging.Log;
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author <a href="mailto:bloritsch@apache.org">Berin Loritsch</a>
  * @author <a href="mailto:donaldp@apache.org">Peter Donald</a>
- * @version $Revision: 1.6 $ $Date: 2003/09/11 08:31:11 $
+ * @version $Revision: 1.7 $ $Date: 2003/09/11 23:00:23 $
  */
 
 public final class Jdk14Logger implements Log {
@@ -90,13 +90,13 @@ public final class Jdk14Logger implements Log {
     public Jdk14Logger (String name) {
         try {
             final Class loggerClass = Class.forName("java.util.logging.Logger");
+            final Class levelClass = Class.forName("java.util.logging.Level");
             final Method getLoggerMethod = loggerClass.getMethod("getLogger", new Class [] {String.class});
             logger = getLoggerMethod.invoke(null, new Object[]{name});
-            logpMethod = logger.getClass().getMethod("logp", new Class[] {Class.forName("java.util.logging.Logger"),
+            logpMethod = logger.getClass().getMethod("logp", new Class[] {levelClass,
                 String.class, String.class, String.class});
-            logpExMethod = logger.getClass().getMethod("logp", new Class[] {Class.forName("java.util.logging.Logger"),
+            logpExMethod = logger.getClass().getMethod("logp", new Class[] {levelClass,
                 String.class, String.class, String.class, Throwable.class});
-            final Class levelClass = Class.forName("java.util.logging.Level");
             isLoggableMethod = loggerClass.getMethod("isLoggable", new Class[] {levelClass});
             getStackTraceMethod = Throwable.class.getMethod("getStackTrace", null);
             final Class stackTraceClass = Class.forName("java.lang.StackTraceElement");
@@ -107,7 +107,8 @@ public final class Jdk14Logger implements Log {
             levelINFO = levelClass.getField("INFO").get(null);
             levelWARNING = levelClass.getField("WARNING").get(null);
             levelSEVERE = levelClass.getField("SEVERE").get(null);
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            e.printStackTrace();
             throw new RuntimeException("Could not create Jdk14Logger: " + e.getMessage());
         }
     }
