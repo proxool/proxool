@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.5 $, $Date: 2003/11/04 23:58:48 $
+ * @version $Revision: 1.6 $, $Date: 2004/03/23 21:16:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -48,8 +48,10 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
         ProxoolFacade.registerConnectionPool(url, info);
 
         Connection c1 = null;
+        long id1 = 0;
         try {
             c1 = DriverManager.getConnection(url);
+            id1 = ProxoolFacade.getId(c1);
         } finally {
             if (c1 != null) {
                 c1.close();
@@ -57,9 +59,11 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
         }
 
         Connection c2 = null;
+        long id2 = 0;
         try {
             c2 = DriverManager.getConnection(url);
-            assertTrue("Expected same connection back", c1.equals(c2));
+            id2 = ProxoolFacade.getId(c2);
+            assertTrue("Expected same connection back", id1 == id2);
             Statement s = c2.createStatement();
             // Doing it twice will guarantee a failure. Even if it exists
             s.execute("drop table Z");
@@ -75,9 +79,11 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
         }
 
         Connection c3 = null;
+        long id3 = 0;
         try {
             c3 = DriverManager.getConnection(url);
-            assertTrue("Expected a different connection", !c2.equals(c3));
+            id3 = ProxoolFacade.getId(c3);
+            assertTrue("Expected a different connection", id1 != id3);
         } finally {
             if (c3 != null) {
                 c3.close();
@@ -220,6 +226,9 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: FatalSqlExceptionTest.java,v $
+ Revision 1.6  2004/03/23 21:16:05  billhorsman
+ make use of new getId() to compare connections
+
  Revision 1.5  2003/11/04 23:58:48  billhorsman
  Made more robust (against existing database state)
 
