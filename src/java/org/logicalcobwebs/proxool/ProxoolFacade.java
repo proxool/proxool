@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.18 $, $Date: 2002/12/16 10:57:48 $
+ * @version $Revision: 1.19 $, $Date: 2002/12/16 11:15:19 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -553,14 +553,21 @@ public class ProxoolFacade {
      * specific methods then this is your only way.
      * @return delegate statement
      */
-    public static Statement getDelegateStatement(Statement statement) {
-        return ProxyFactory.getDelegateStatement(statement);
+    public static Statement getDelegateStatement(Statement statement) throws ProxoolException {
+        try {
+            return ProxyFactory.getDelegateStatement(statement);
+        } catch (IllegalArgumentException e) {
+            throw new ProxoolException("Statement argument is not one provided by Proxool (it's " + statement.getClass() + ")");
+        }
     }
 }
 
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.19  2002/12/16 11:15:19  billhorsman
+ fixed getDelegateStatement
+
  Revision 1.18  2002/12/16 10:57:48  billhorsman
  add getDelegateStatement to allow access to the
  delegate JDBC driver's Statement

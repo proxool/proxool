@@ -21,7 +21,7 @@ import java.sql.Statement;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.9 $, $Date: 2002/12/16 10:57:47 $
+ * @version $Revision: 1.10 $, $Date: 2002/12/16 11:15:19 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -62,11 +62,10 @@ class ProxyFactory {
      * @return delegate statement
      */
     protected static Statement getDelegateStatement(Statement statement) {
-        Statement delegateStatement = statement;
-        if (statement instanceof ProxyStatement) {
-            delegateStatement = ((ProxyStatement)statement).getDelegateStatement();
-        }
-        return delegateStatement;
+        Statement ds = statement;
+        ProxyStatement ps = (ProxyStatement) Proxy.getInvocationHandler(statement);
+        ds = ps.getDelegateStatement();
+        return ds;
     }
 
     protected static Statement createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnection proxyConnection,  String sqlStatement) {
@@ -94,6 +93,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.10  2002/12/16 11:15:19  billhorsman
+ fixed getDelegateStatement
+
  Revision 1.9  2002/12/16 10:57:47  billhorsman
  add getDelegateStatement to allow access to the
  delegate JDBC driver's Statement
