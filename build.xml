@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.40 $
-    $Date: 2003/03/03 01:29:26 $
+    $Revision: 1.41 $
+    $Date: 2003/03/03 01:50:06 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -63,7 +63,9 @@
     <target
         name="init"
         >
-        <tstamp/>
+        <tstamp>
+            <format property="TODAY_FULL" pattern="dd-MMM-yyyy HH:mm zzz"/>
+        </tstamp>
         <mkdir dir="${build-dir}/src/java" description="make source directory" />
         <mkdir dir="${build-dir}/etc"/>
         <mkdir dir="${build-dir}/deploy"/>
@@ -323,7 +325,7 @@
         <replace
             file="${build-dir}/reports/${junit-report-name}"
             token="Unit Test Results"
-            value="${junit-report-description} - ${TODAY}"
+            value="${junit-report-description} - ${TODAY_FULL}"
             />
 
     </target>
