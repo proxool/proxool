@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.10 $
-    $Date: 2002/11/02 12:50:26 $
+    $Revision: 1.11 $
+    $Date: 2002/11/02 12:52:11 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -175,7 +175,7 @@
         </copy>
     </target>
 
-    <target
+        <target
         name="build-src-jdk1.2"
         depends="init"
         if="build-jdk1.2"
