@@ -10,17 +10,18 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
  * TODO
- * @version $Revision: 1.1 $, $Date: 2003/07/23 06:54:48 $
+ * @version $Revision: 1.2 $, $Date: 2003/07/23 12:38:50 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since CLT 0.2
  */
-public class ProxoolDataSource implements DataSource {
+public class ProxoolDataSource implements DataSource, Serializable {
 
     private static final Log LOG = LogFactory.getLog(ProxoolDataSource.class);
 
@@ -67,6 +68,9 @@ public class ProxoolDataSource implements DataSource {
 /*
   Revision History
   $Log: ProxoolDataSource.java,v $
+  Revision 1.2  2003/07/23 12:38:50  billhorsman
+  some fixes, but more to come
+
   Revision 1.1  2003/07/23 06:54:48  billhorsman
   draft JNDI changes (shouldn't effect normal operation)
 

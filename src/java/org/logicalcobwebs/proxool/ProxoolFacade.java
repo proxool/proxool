@@ -32,7 +32,7 @@ import java.util.Hashtable;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.67 $, $Date: 2003/07/23 06:54:48 $
+ * @version $Revision: 1.68 $, $Date: 2003/07/23 12:38:50 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -44,7 +44,7 @@ public class ProxoolFacade {
 
     private static CompositeProxoolListener compositeProxoolListener = new CompositeProxoolListener();
 
-    private static boolean versionLogged =false;
+    private static boolean versionLogged = false;
 
     /**
      * Build a ConnectionPool based on this definition and then start it.
@@ -88,15 +88,26 @@ public class ProxoolFacade {
         if (connectionPoolDefinition.getJndiName() != null) {
             try {
                 Hashtable env = new Hashtable();
-                env.put(Context.INITIAL_CONTEXT_FACTORY, connectionPoolDefinition.getInitialContextFactory());
-                env.put(Context.PROVIDER_URL, connectionPoolDefinition.getProviderUrl());
-                env.put(Context.SECURITY_AUTHENTICATION, connectionPoolDefinition.getSecurityAuthentication());
-                env.put(Context.SECURITY_PRINCIPAL, connectionPoolDefinition.getSecurityPrincipal());
-                env.put(Context.SECURITY_CREDENTIALS, connectionPoolDefinition.getSecurityCredentials());
+                if (connectionPoolDefinition.getInitialContextFactory() != null) {
+                    env.put(Context.INITIAL_CONTEXT_FACTORY, connectionPoolDefinition.getInitialContextFactory());
+                }
+                if (connectionPoolDefinition.getProviderUrl() != null) {
+                    env.put(Context.PROVIDER_URL, connectionPoolDefinition.getProviderUrl());
+                }
+                if (connectionPoolDefinition.getSecurityAuthentication() != null) {
+                    env.put(Context.SECURITY_AUTHENTICATION, connectionPoolDefinition.getSecurityAuthentication());
+                }
+                if (connectionPoolDefinition.getSecurityPrincipal() != null) {
+                    env.put(Context.SECURITY_PRINCIPAL, connectionPoolDefinition.getSecurityPrincipal());
+                }
+                if (connectionPoolDefinition.getSecurityCredentials() != null) {
+                    env.put(Context.SECURITY_CREDENTIALS, connectionPoolDefinition.getSecurityCredentials());
+                }
                 Context context = new InitialContext(env);
                 ProxoolDataSource proxoolDataSource = new ProxoolDataSource(connectionPoolDefinition.getAlias());
                 context.bind(connectionPoolDefinition.getJndiName(), proxoolDataSource);
             } catch (NamingException e) {
+                LOG.error("Couldn't bind " + connectionPoolDefinition.getJndiName() + " to JNDI context", e);
                 throw new ProxoolException("Problem registering with JNDI", e);
             }
         }
@@ -410,7 +421,7 @@ public class ProxoolFacade {
     public static void addConfigurationListener(String alias, ConfigurationListenerIF configurationListener) throws ProxoolException {
         if (ConnectionPoolManager.getInstance().isPoolExists(alias)) {
             CompositeConfigurationListener compositeConfigurationListener = (CompositeConfigurationListener)
-                configurators.get(alias);
+                    configurators.get(alias);
             if (compositeConfigurationListener == null) {
                 compositeConfigurationListener = new CompositeConfigurationListener();
                 configurators.put(alias, compositeConfigurationListener);
@@ -430,7 +441,7 @@ public class ProxoolFacade {
      * time this method was called)
      */
     protected static void definitionUpdated(String alias, ConnectionPoolDefinitionIF connectionPoolDefinition,
-                                 Properties completeInfo, Properties changedInfo) {
+                                            Properties completeInfo, Properties changedInfo) {
         CompositeConfigurationListener ccl = (CompositeConfigurationListener) configurators.get(alias);
         if (ccl != null) {
             ccl.definitionUpdated(connectionPoolDefinition, completeInfo, changedInfo);
@@ -449,7 +460,7 @@ public class ProxoolFacade {
         boolean removed = false;
         if (ConnectionPoolManager.getInstance().isPoolExists(alias)) {
             CompositeConfigurationListener compositeConfigurationListener = (CompositeConfigurationListener)
-                configurators.get(alias);
+                    configurators.get(alias);
             if (compositeConfigurationListener != null) {
                 removed = compositeConfigurationListener.removeListener(configurationListener);
             }
@@ -602,6 +613,7 @@ public class ProxoolFacade {
     public static SnapshotIF getSnapshot(String alias) throws ProxoolException {
         return getSnapshot(alias, false);
     }
+
     // all jmx operations are done through reflection
     // to avoid making the facade dependant on the JMX classes
     private static boolean registerForJmx(String alias, Properties properties) {
@@ -635,6 +647,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.68  2003/07/23 12:38:50  billhorsman
+ some fixes, but more to come
+
  Revision 1.67  2003/07/23 06:54:48  billhorsman
  draft JNDI changes (shouldn't effect normal operation)
 
