@@ -14,7 +14,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 /**
  * Run all tests
  *
- * @version $Revision: 1.4 $, $Date: 2002/10/28 21:37:54 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/02 11:37:48 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -30,8 +30,8 @@ public class AllTests {
      */
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(Configurators.class);
-        suite.addTestSuite(Performance.class);
+        suite.addTestSuite(ConfiguratorTest.class);
+        suite.addTestSuite(PerformanceTest.class);
         suite.addTestSuite(GeneralTests.class);
 
         // create a wrapper for global initialization code.
@@ -63,6 +63,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.5  2002/11/02 11:37:48  billhorsman
+ New tests
+
  Revision 1.4  2002/10/28 21:37:54  billhorsman
  now allows for non-existent log4jPath
 
