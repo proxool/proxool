@@ -10,13 +10,11 @@ import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionResetter;
-import org.logicalcobwebs.proxool.ConnectionResetterTest;
 import org.logicalcobwebs.proxool.GlobalTest;
-import org.logicalcobwebs.proxool.ProxoolAdapter;
-import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.TestHelper;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -24,7 +22,7 @@ import java.util.Properties;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/07 15:10:37 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/07 15:11:33 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -122,6 +120,9 @@ public class StatisticsListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.2  2003/02/07 15:11:33  billhorsman
+ checkstyle
+
  Revision 1.1  2003/02/07 15:10:37  billhorsman
  new monitor tests
 
