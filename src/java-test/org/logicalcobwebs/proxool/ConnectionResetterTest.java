@@ -15,11 +15,12 @@ import org.logicalcobwebs.dbscript.CommandIF;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/12 20:24:12 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/13 20:53:30 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -56,28 +57,72 @@ public class ConnectionResetterTest extends TestCase {
      * returned to the pool.
      */
     public void testAutoCommit() {
-        String scriptLocation = System.getProperty("script");
-        if (scriptLocation != null) {
-            ScriptFacade.runScript(scriptLocation, new ProxoolAdapter(), new CommandFilterIF() {
 
-                public boolean beforeCommand(Connection connection, CommandIF command) throws SQLException {
-                    connection.setAutoCommit(false);
-                    return true;
-                }
+        String testName = "autoCommit";
+        ProxoolAdapter adapter = null;
+        try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            adapter = new ProxoolAdapter(alias);
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
 
-                public void afterCommand(Connection connection, CommandIF command) throws SQLException {
-                    // TODO
-                }
+            Connection c1 = adapter.getConnection();
+            Connection c2 = adapter.getConnection();
 
-                public boolean catchException(CommandIF command, SQLException e) {
-                    return true;
-                }
+            c1.setAutoCommit(false);
+            c1.close();
 
-            });
+            c1 = adapter.getConnection();
+            assertTrue("c1.getAutoCommit", c1.getAutoCommit());
 
-        } else {
-            LOG.info("Skipping autoCommit test because 'script' System Property was not set");
+            c2.close();
+            c1.close();
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
         }
+
+    }
+
+    /**
+     * Test whether autoCommit is correctly reset when a connection is
+     * returned to the pool.
+     */
+    public void testReadOnly() {
+
+        String testName = "readOnly";
+        ProxoolAdapter adapter = null;
+        try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            adapter = new ProxoolAdapter(alias);
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            Connection c1 = adapter.getConnection();
+            Connection c2 = adapter.getConnection();
+
+            boolean originalReadOnly = c1.isReadOnly();
+            c1.setReadOnly(true);
+            c1.close();
+
+            c1 = adapter.getConnection();
+            assertTrue("readOnly", c1.isReadOnly() == originalReadOnly);
+
+            c2.close();
+            c1.close();
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
+        }
+
     }
 
 }
@@ -85,6 +130,9 @@ public class ConnectionResetterTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.5  2002/11/13 20:53:30  billhorsman
+ new tests for autoCommit and readOnly
+
  Revision 1.4  2002/11/12 20:24:12  billhorsman
  checkstyle
 
