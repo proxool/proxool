@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.36 $
-    $Date: 2003/02/28 12:13:28 $
+    $Revision: 1.37 $
+    $Date: 2003/03/02 01:08:40 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -27,6 +27,12 @@
 
     <!-- Currect release, e.g. 0.6 -->
     <property name="release" value="0.7" />
+
+    <!-- Currect release, e.g. 0.6 -->
+    <property name="junit-report-description" value="Unit Test Report for CVS Snapshot" />
+
+    <!-- Currect release, e.g. 0.6 -->
+    <property name="junit-report-name" value="junit-cvs.html" />
 
     <!-- Log4J configuration to use for testing. See proxool-ant.properties
     file for more infomation. -->
@@ -65,7 +71,7 @@
         <mkdir dir="${build-dir}/api"/>
         <mkdir dir="${build-dir}/api-dev"/>
         <mkdir dir="${build-dir}/reports"/>
-        <tstamp/>
+        <available classname="junit.ui.TestRunner" property="junit.present"/>
     </target>
 
     <target
@@ -295,6 +301,7 @@
         description="Produce a report of the tests"
         depends="clean,init,build-test,deleteTestDb"
         >
+
         <junit fork="true" printsummary="yes" >
             <classpath refid="source"/>
             <sysproperty key="log4jPath" value="${log4jPath}" />
@@ -308,6 +315,16 @@
             </fileset>
             <report format="noframes" todir="${build-dir}/reports" />
         </junitreport>
+
+        <move
+            file="${build-dir}/reports/junit-noframes.html"
+            tofile="${build-dir}/reports/${junit-report-name}" />
+
+        <replace
+            file="${build-dir}/reports/junit-${junit-report-name}.html"
+            token="Unit Test Results"
+            value="${junit-report-description}"
+            />
 
     </target>
 
