@@ -10,10 +10,12 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.DriverManager;
+import java.util.Properties;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.7 $, $Date: 2003/09/30 18:39:08 $
+ * @version $Revision: 1.8 $, $Date: 2004/03/23 21:19:45 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -92,7 +94,7 @@ public class Prototyper {
                     if (!connectionPool.isConnectionPoolUp()) {
                         break;
                     }
-                    freshlyBuiltProxyConnection = buildConnection(ProxyConnection.STATUS_AVAILABLE, reason);
+                    freshlyBuiltProxyConnection = buildConnection(ConnectionInfoIF.STATUS_AVAILABLE, reason);
                     somethingDone = true;
                 } catch (Throwable e) {
                     log.error("Prototype", e);
@@ -124,7 +126,7 @@ public class Prototyper {
      * @param creator for log audit
      * @return the new connection
      */
-    protected ProxyConnectionIF buildConnection(int status, String creator) throws SQLException, ProxoolException {
+    protected ProxyConnection buildConnection(int status, String creator) throws SQLException, ProxoolException {
 
         long id = 0;
         synchronized (lock) {
@@ -147,8 +149,10 @@ public class Prototyper {
         Connection connection = null;
 
         try {
-            proxyConnection = ProxyFactory.buildProxyConnection(id, connectionPool, status);
-            connection = ProxyFactory.getConnection(proxyConnection);
+            Properties info = connectionPool.getDefinition().getDelegateProperties();
+            final String url = connectionPool.getDefinition().getUrl();
+            connection = DriverManager.getConnection(url, info);
+            proxyConnection = new ProxyConnection(connection, id, url, connectionPool, status);
 
             try {
                 connectionPool.onBirth(connection);
@@ -266,6 +270,9 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.8  2004/03/23 21:19:45  billhorsman
+ Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
+
  Revision 1.7  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 

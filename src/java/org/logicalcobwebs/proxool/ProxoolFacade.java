@@ -32,9 +32,9 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.76 $, $Date: 2004/03/15 02:45:19 $
+ * @version $Revision: 1.77 $, $Date: 2004/03/23 21:19:45 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public class ProxoolFacade {
 
@@ -337,6 +337,24 @@ public class ProxoolFacade {
     }
 
     /**
+     * Kill a single connection
+     * @param connection the connection to kill
+     * @param merciful if true will only kill connections that aren't active
+     * @return true if the connection was killed, or false if it couldn't be found.
+     * @throws ProxoolException if we didn't recognise the connection
+     */
+    public static boolean killConnecton(Connection connection, boolean merciful) throws ProxoolException {
+        WrappedConnection wrappedConnection = ProxyFactory.getWrappedConnection(connection);
+        if (wrappedConnection != null) {
+            long id = wrappedConnection.getId();
+            String alias = wrappedConnection.getAlias();
+            return killConnecton(alias, id, merciful);
+        } else {
+            throw new ProxoolException("Attempt to kill unrecognised exception " + connection);
+        }
+    }
+
+    /**
      * Add a listener that gets called everytime a global Proxool event ocours.
      * @param proxoolListener the listener to add.
      */
@@ -521,13 +539,9 @@ public class ProxoolFacade {
     }
 
     /**
-     * When you ask a connection for a {@link Statement  Statement} (or a
-     * {@link java.sql.PreparedStatement PreparedStatement} or a
-     * {@link java.sql.CallableStatement CallableStatement} then you
-     * don't actually  get the Statement passed to you from the delegate
-     * Driver. It isn't recommended, but if you need to use any driver
-     * specific methods then this is your only way.
+     * Returns the driver provided statement that Proxool wraps up before it gives it to you.
      * @return delegate statement
+     * @deprecated Just cast the statement that you are given into the driver specific one.
      */
     public static Statement getDelegateStatement(Statement statement) throws ProxoolException {
         try {
@@ -538,14 +552,29 @@ public class ProxoolFacade {
     }
 
     /**
-     * When you ask for a  connection then you don't actually get the Connection
-     * created by the delegate Driver. It isn't recommended, but if you need to
-     * use any driver specific methods then this is your only way.
+     * Returns the driver provided connection that Proxool wraps up before it gives it to you.
      * @return delegate connection
+     * @deprecated Just cast the connection that you are given into the driver specific one.
      */
     public static Connection getDelegateConnection(Connection connection) throws ProxoolException {
         try {
             return ProxyFactory.getDelegateConnection(connection);
+        } catch (IllegalArgumentException e) {
+            throw new ProxoolException("Connection argument is not one provided by Proxool (it's a " + connection.getClass() + ")");
+        }
+    }
+
+    /**
+     * Get the connection ID for a connection
+     * @param connection the connection that was served
+     * @return the ID
+     * @throws ProxoolException if the connection wasn't recognised or if it's been closed.
+     */
+    public static long getId(Connection connection) throws ProxoolException {
+        try {
+            return ProxyFactory.getWrappedConnection(connection).getId();
+        } catch (NullPointerException e) {
+            throw new ProxoolException("Connection argument is not one provided by Proxool (it's a " + connection.getClass() + ")");
         } catch (IllegalArgumentException e) {
             throw new ProxoolException("Connection argument is not one provided by Proxool (it's a " + connection.getClass() + ")");
         }
@@ -741,6 +770,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.77  2004/03/23 21:19:45  billhorsman
+ Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
+
  Revision 1.76  2004/03/15 02:45:19  chr32
  Added handling of Proxool managed JNDI DataSources.
 

@@ -5,221 +5,444 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import org.logicalcobwebs.cglib.proxy.MethodProxy;
-import org.logicalcobwebs.cglib.proxy.MethodInterceptor;
-import org.logicalcobwebs.cglib.proxy.InvocationHandler;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
+import java.util.Set;
+import java.util.HashSet;
+import java.text.DecimalFormat;
 
 /**
- * Delegates to a normal Coonection for everything but the close()
- * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.31 $, $Date: 2004/03/15 21:37:33 $
- * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * Manages a connection. This is wrapped up inside a...
+ *
+ * @version $Revision: 1.32 $, $Date: 2004/03/23 21:19:45 $
+ * @author bill
+ * @author $Author: billhorsman $ (current maintainer)
+ * @since Proxool 0.10
  */
-class ProxyConnection extends AbstractProxyConnection implements InvocationHandler, MethodInterceptor {
+public class ProxyConnection implements ProxyConnectionIF {
+
+    static final int STATUS_FORCE = -1;
+
+    private WriterPreferenceReadWriteLock statusReadWriteLock = new WriterPreferenceReadWriteLock();
 
     private static final Log LOG = LogFactory.getLog(ProxyConnection.class);
 
-    private static final String CLOSE_METHOD = "close";
+    private Connection connection;
 
-    private static final String IS_CLOSED_METHOD = "isClosed";
+    private String delegateUrl;
 
-    private static final String EQUALS_METHOD = "equals";
+    private int mark;
 
-    private static final String GET_META_DATA_METHOD = "getMetaData";
+    private String reasonForMark;
 
-    private static final String FINALIZE_METHOD = "finalize";
+    private int status;
 
-    public ProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool, int status) throws SQLException {
-        super(connection, id, delegateUrl, connectionPool, status);
-    }
+    private long id;
 
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-        return invoke(proxy, method, args);
-    }
+    private Date birthDate;
 
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Object result = null;
-        int argCount = args != null ? args.length : 0;
-        try {
-            if (method.getName().equals(CLOSE_METHOD)) {
-                close();
-            } else if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
-                result = equals(args[0]) ? Boolean.TRUE : Boolean.FALSE;
-            } else if (method.getName().equals(IS_CLOSED_METHOD) && argCount == 0) {
-                result = isClosed() ? Boolean.TRUE : Boolean.FALSE;
-            } else if (method.getName().equals(GET_META_DATA_METHOD) && argCount == 0) {
-                result = getMetaData();
-            } else if (method.getName().equals(FINALIZE_METHOD)) {
-                super.finalize();
-            } else {
-                if (method.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
-                    setNeedToReset(true);
-                }
-                    result = method.invoke(getConnection(), args);
-            }
+    private long timeLastStartActive;
 
-            // If we have just made some sort of Statement then we should rather return
-            // a proxy instead.
-            if (result instanceof Statement) {
-                // Work out whether we were passed the sql statement during the
-                // call to get the statement object. Sometimes you do, sometimes
-                // you don't:
-                // connection.prepareCall(sql);
-                // connection.createProxyStatement();
-                String sqlStatement = null;
-                if (argCount > 0 && args[0] instanceof String) {
-                    sqlStatement = (String) args[0];
-                }
+    private long timeLastStopActive;
 
-                // We keep a track of all open statements
-                addOpenStatement((Statement) result);
+    private ConnectionPool connectionPool;
 
-                result = ProxyFactory.createProxyStatement((Statement) result, getConnectionPool(), this, sqlStatement);
+    private String requester;
 
-            }
+    private Set openStatements = new HashSet();
 
-        } catch (InvocationTargetException e) {
-            // We might get a fatal exception here. Let's test for it.
-            if (FatalSqlExceptionHelper.testException(getConnectionPool().getDefinition(), e.getTargetException())) {
-                FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), e.getTargetException());
-            }
-            throw e.getTargetException();
-        } catch (Exception e) {
-            LOG.error("Unexpected invocation exception", e);
-            if (FatalSqlExceptionHelper.testException(getConnectionPool().getDefinition(), e)) {
-                FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), e);
-            }
-            throw new RuntimeException("Unexpected invocation exception: "
-                    + e.getMessage());
+    private DecimalFormat idFormat = new DecimalFormat("0000");
+
+    /**
+     * Whether we have invoked a method that requires us to reset
+     */
+    private boolean needToReset = false;
+
+    protected ProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool, int status) throws SQLException {
+        this.connection = connection;
+        this.delegateUrl = delegateUrl;
+        setId(id);
+        this.connectionPool = connectionPool;
+        setBirthTime(System.currentTimeMillis());
+
+        this.status = status;
+        if (status == STATUS_ACTIVE) {
+            setTimeLastStartActive(System.currentTimeMillis());
         }
 
-        return result;
+        // We only need to call this for the first connection we make. But it returns really
+        // quickly and we don't call it that often so we shouldn't worry.
+        connectionPool.initialiseConnectionResetter(connection);
+
+        if (connection == null) {
+            throw new SQLException("Unable to create new connection");
+        }
+    }
+
+    /**
+     * Whether the underlying connections are equal
+     * @param obj the object (probably another connection) that we
+     * are being compared to
+     * @return whether they are the same
+     */
+    public boolean equals(Object obj) {
+        if (obj != null) {
+            if (obj instanceof ProxyConnection) {
+                return connection.hashCode() == ((ProxyConnection) obj).getConnection().hashCode();
+            } else if (obj instanceof Connection) {
+                return connection.hashCode() == obj.hashCode();
+            } else {
+                return super.equals(obj);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Whether this connection is available. (When you close the connection
+     * it doesn't really close, it just becomes available for others to use).
+     * @return true if the connection is not active
+     */
+    public boolean isClosed() {
+        return (getStatus() != STATUS_ACTIVE);
+    }
+
+    /**
+     * The subclass should call this to indicate that a change has been made to
+     * the connection that might mean it needs to be reset (like setting autoCommit
+     * to false or something). We don't reset unless this has been called to avoid
+     * the overhead of unnecessary resetting.
+     *
+     * @param needToReset true if the connection might need resetting.
+     */
+    protected void setNeedToReset(boolean needToReset) {
+        this.needToReset = needToReset;
+    }
+
+    /**
+     * The ConnectionPool that was used to create this connection
+     * @return connectionPool
+     */
+    protected ConnectionPool getConnectionPool() {
+        return connectionPool;
+    }
+
+    /**
+     * By calling this we can keep track of any statements that are
+     * left open when this connection is returned to the pool.
+     * @param statement the statement that we have just opened/created.
+     * @see #registerClosedStatement
+     */
+    protected void addOpenStatement(Statement statement) {
+        openStatements.add(statement);
+    }
+
+    /**
+     * @see ProxyConnectionIF#registerClosedStatement
+     */
+    public void registerClosedStatement(Statement statement) {
+        if (openStatements.contains(statement)) {
+            openStatements.remove(statement);
+        } else {
+            connectionPool.getLog().warn(connectionPool.displayStatistics() + " - #" + getId() + " registered a statement as closed which wasn't known to be open.");
+        }
+    }
+
+    /**
+     * Close the connection for real
+     * @throws java.sql.SQLException if anything goes wrong
+     */
+    public void reallyClose() throws SQLException {
+        try {
+            connectionPool.registerRemovedConnection(getStatus());
+            // Clean up the actual connection
+            connection.close();
+        } catch (Throwable t) {
+            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during destruction: " + t);
+        }
+
+    }
+
+    /**
+     * @see ProxyConnectionIF#isReallyClosed
+     */
+    public boolean isReallyClosed() throws SQLException {
+        if (connection == null) {
+            return true;
+        } else {
+            return connection.isClosed();
+        }
+    }
+
+    /**
+     * @see ProxyConnectionIF#close
+     */
+    public void close() throws SQLException {
+        try {
+
+            if (isMarkedForExpiry()) {
+                if (connectionPool.getLog().isDebugEnabled()) {
+                    connectionPool.getLog().debug("Closing connection quickly (without reset) because it's marked for expiry anyway");
+                }
+            } else {
+                // Close any open statements, as specified in JDBC
+                Statement[] statements = (Statement[]) openStatements.toArray(new Statement[openStatements.size()]);
+                for (int j = 0; j < statements.length; j++) {
+                    Statement statement = statements[j];
+                    statement.close();
+                    if (connectionPool.getLog().isDebugEnabled()) {
+                        connectionPool.getLog().debug("Closing statement " + Integer.toHexString(statement.hashCode()) + " automatically");
+                    }
+                }
+                openStatements.clear();
+
+                if (needToReset) {
+                    // This call should be as quick as possible. Should we consider only
+                    // calling it if values have changed? The trouble with that is that it
+                    // means keeping track when they change and that might be even
+                    // slower
+                    if (!connectionPool.resetConnection(connection, "#" + getId())) {
+                        connectionPool.removeProxyConnection(this, "it couldn't be reset", true, true);
+                    }
+                    needToReset = false;
+                }
+            }
+            connectionPool.putConnection(this);
+        } catch (Throwable t) {
+            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during closure: ", t);
+        }
+
+    }
+
+    public int getMark() {
+        return mark;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    /**
+     * @see ProxyConnectionIF#setStatus(int)
+     */
+    public boolean setStatus(int newStatus) {
+        return setStatus(STATUS_FORCE, newStatus);
+    }
+
+    /**
+     * @see ProxyConnectionIF#setStatus(int, int)
+     */
+    public boolean setStatus(int oldStatus, int newStatus) {
+        boolean success = false;
+        try {
+            statusReadWriteLock.writeLock().acquire();
+            connectionPool.acquireConnectionStatusWriteLock();
+            if (this.status == oldStatus || oldStatus == STATUS_FORCE) {
+                connectionPool.changeStatus(this.status, newStatus);
+                this.status = newStatus;
+                success = true;
+
+                if (newStatus == oldStatus) {
+                    LOG.warn("Unexpected attempt to change status from " + oldStatus + " to " + newStatus
+                            + ". Why would you want to do that?");
+                } else if (newStatus == STATUS_ACTIVE) {
+                    setTimeLastStartActive(System.currentTimeMillis());
+                } else if (oldStatus == STATUS_ACTIVE) {
+                    setTimeLastStopActive(System.currentTimeMillis());
+                }
+            }
+        } catch (InterruptedException e) {
+            LOG.error("Unable to acquire write lock for status");
+        } finally {
+            connectionPool.releaseConnectionStatusWriteLock();
+            statusReadWriteLock.writeLock().release();
+        }
+        return success;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    /**
+     * @see ConnectionInfoIF#getBirthTime
+     */
+    public long getBirthTime() {
+        return birthDate.getTime();
+    }
+
+    /**
+     * @see ConnectionInfoIF#getBirthDate
+     */
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    /**
+     * @see ConnectionInfoIF#getAge
+     */
+    public long getAge() {
+        return System.currentTimeMillis() - getBirthTime();
+    }
+
+    /**
+     * @see ConnectionInfoIF#getBirthTime
+     */
+    public void setBirthTime(long birthTime) {
+        birthDate = new Date(birthTime);
+    }
+
+    /**
+     * @see ConnectionInfoIF#getTimeLastStartActive
+     */
+    public long getTimeLastStartActive() {
+        return timeLastStartActive;
+    }
+
+    /**
+     * @see ConnectionInfoIF#getTimeLastStartActive
+     */
+    public void setTimeLastStartActive(long timeLastStartActive) {
+        this.timeLastStartActive = timeLastStartActive;
+        setTimeLastStopActive(0);
+    }
+
+    /**
+     * @see ConnectionInfoIF#getTimeLastStopActive
+     */
+    public long getTimeLastStopActive() {
+        return timeLastStopActive;
+    }
+
+    /**
+     * @see ConnectionInfoIF#getTimeLastStopActive
+     */
+    public void setTimeLastStopActive(long timeLastStopActive) {
+        this.timeLastStopActive = timeLastStopActive;
+    }
+
+    /**
+     * @see ConnectionInfoIF#getRequester
+     */
+    public String getRequester() {
+        return requester;
+    }
+
+    /**
+     * @see ConnectionInfoIF#getRequester
+     */
+    public void setRequester(String requester) {
+        this.requester = requester;
+    }
+
+    /**
+     * @see ProxyConnectionIF#isNull
+     */
+    public boolean isNull() {
+        return getStatus() == STATUS_NULL;
+    }
+
+    /**
+     * @see ProxyConnectionIF#isAvailable
+     */
+    public boolean isAvailable() {
+        return getStatus() == STATUS_AVAILABLE;
+    }
+
+    /**
+     * @see ProxyConnectionIF#isActive
+     */
+    public boolean isActive() {
+        return getStatus() == STATUS_ACTIVE;
+    }
+
+    /**
+     * @see ProxyConnectionIF#isOffline
+     */
+    public boolean isOffline() {
+        return getStatus() == STATUS_OFFLINE;
+    }
+
+    /**
+     * @see ProxyConnectionIF#markForExpiry
+     */
+    public void markForExpiry(String reason) {
+        mark = MARK_FOR_EXPIRY;
+        reasonForMark = reason;
+    }
+
+    /**
+     * @see ProxyConnectionIF#isMarkedForExpiry
+     */
+    public boolean isMarkedForExpiry() {
+        return getMark() == MARK_FOR_EXPIRY;
+    }
+
+    /**
+     * @see ProxyConnectionIF#getReasonForMark
+     */
+    public String getReasonForMark() {
+        return reasonForMark;
+    }
+
+    /**
+     * @see ProxyConnectionIF#getConnection
+     */
+    public Connection getConnection() {
+        return connection;
+    }
+
+    /**
+     * @see Object#toString
+     */
+    public String toString() {
+        return getId() + " is " + ConnectionPool.getStatusDescription(getStatus());
+    }
+
+    /**
+     * @see ConnectionInfoIF#getDelegateUrl
+     */
+    public String getDelegateUrl() {
+        return delegateUrl;
+    }
+
+    /**
+     * @see ConnectionInfoIF#getProxyHashcode
+     */
+    public String getProxyHashcode() {
+        return Integer.toHexString(hashCode());
+    }
+
+    /**
+     * @see ConnectionInfoIF#getDelegateHashcode
+     */
+    public String getDelegateHashcode() {
+        if (connection != null) {
+            return Integer.toHexString(connection.hashCode());
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Compares using {@link #getId()}
+     * @param o must be another {@link ConnectionInfoIF} implementation
+     * @return the comparison
+     * @see Comparable#compareTo(Object)
+     */
+    public int compareTo(Object o) {
+        return new Long(((ConnectionInfoIF) o).getId()).compareTo(new Long(getId()));
     }
 
 }
-
-/*
- Revision history:
- $Log: ProxyConnection.java,v $
- Revision 1.31  2004/03/15 21:37:33  chr32
- Replaced usages of Boolean.valueOf(boolean). This method is not available in jdk 1.2.
-
- Revision 1.30  2004/03/14 21:52:38  brenuart
- Little improvement: don't create a new Boolean but reuse the Boolean.TRUE/FALSE static instances
-
- Revision 1.29  2003/12/12 19:29:47  billhorsman
- Now uses Cglib 2.0
-
- Revision 1.28  2003/09/30 18:39:08  billhorsman
- New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
-
- Revision 1.27  2003/09/10 22:21:04  chr32
- Removing > jdk 1.2 dependencies.
-
- Revision 1.26  2003/03/11 14:51:54  billhorsman
- more concurrency fixes relating to snapshots
-
- Revision 1.25  2003/03/03 11:11:58  billhorsman
- fixed licence
-
- Revision 1.24  2003/02/12 12:28:27  billhorsman
- added url, proxyHashcode and delegateHashcode to
- ConnectionInfoIF
-
- Revision 1.23  2003/02/06 17:41:04  billhorsman
- now uses imported logging
-
- Revision 1.22  2003/01/31 14:33:16  billhorsman
- fix for DatabaseMetaData
-
- Revision 1.21  2003/01/27 18:26:38  billhorsman
- refactoring of ProxyConnection and ProxyStatement to
- make it easier to write JDK 1.2 patch
-
- Revision 1.20  2002/12/19 00:08:36  billhorsman
- automatic closure of statements when a connection is closed
-
- Revision 1.19  2002/12/17 17:15:39  billhorsman
- Better synchronization of status stuff
-
- Revision 1.18  2002/12/03 12:24:00  billhorsman
- fixed fatal sql exception
-
- Revision 1.17  2002/11/12 20:24:12  billhorsman
- checkstyle
-
- Revision 1.16  2002/11/12 20:18:23  billhorsman
- Made connection resetter a bit more friendly. Now, if it encounters any problems
- during reset then that connection is thrown away. This is going to cause you
- problems if you always close connections in an unstable state (e.g. with transactions
- open. But then again, it's better to know about that as soon as possible, right?
-
- Revision 1.15  2002/11/07 18:56:22  billhorsman
- fixed NullPointerException introduced yesterday on isClose() method
-
- Revision 1.14  2002/11/07 12:38:04  billhorsman
- performance improvement - only reset when it might be necessary
-
- Revision 1.13  2002/11/06 20:26:49  billhorsman
- improved doc, added connection resetting, and made
- isClosed() work correctly
-
- Revision 1.12  2002/11/02 13:57:33  billhorsman
- checkstyle
-
- Revision 1.11  2002/10/30 21:25:09  billhorsman
- move createStatement into ProxyFactory
-
- Revision 1.10  2002/10/30 21:19:17  billhorsman
- make use of ProxyFactory
-
- Revision 1.9  2002/10/28 19:51:34  billhorsman
- Fixed NullPointerException when calling connection.createProxyStatement()
-
- Revision 1.8  2002/10/28 19:28:25  billhorsman
- checkstyle
-
- Revision 1.7  2002/10/28 08:20:23  billhorsman
- draft sql dump stuff
-
- Revision 1.6  2002/10/25 15:59:32  billhorsman
- made non-public where possible
-
- Revision 1.5  2002/10/24 18:15:09  billhorsman
- removed unnecessary debug
-
- Revision 1.4  2002/10/17 15:29:18  billhorsman
- fixes so that equals() works
-
- Revision 1.3  2002/09/19 10:33:57  billhorsman
- added ProxyConnection#toString
-
- Revision 1.2  2002/09/18 13:48:56  billhorsman
- checkstyle and doc
-
- Revision 1.1.1.1  2002/09/13 08:13:30  billhorsman
- new
-
- Revision 1.10  2002/08/24 19:57:15  billhorsman
- checkstyle changes
-
- Revision 1.9  2002/08/24 19:42:26  billhorsman
- new proxy stuff to work with JDK 1.4
-
- Revision 1.6  2002/07/02 11:19:08  billhorsman
- layout code and imports
-
- Revision 1.5  2002/06/28 11:19:47  billhorsman
- improved doc
-
-*/

@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.76 $, $Date: 2004/02/23 17:47:32 $
+ * @version $Revision: 1.77 $, $Date: 2004/03/23 21:19:44 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -174,7 +174,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             throw new SQLException(e.getMessage());
         }
 
-        ProxyConnectionIF proxyConnection = null;
+        ProxyConnection proxyConnection = null;
 
         try {
 
@@ -183,16 +183,16 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 // By doing this in a try/catch we avoid needing to synch on the size().  We need to do be
                 // able to cope with connections being removed whilst we are going round this loop
                 try {
-                    proxyConnection = (ProxyConnectionIF) proxyConnections.get(nextAvailableConnection);
+                    proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
                 } catch (ArrayIndexOutOfBoundsException e) {
                     // This is thrown by a Vector (which we no longer use), but is
                     // kept here for a while.
                     nextAvailableConnection = 0;
-                    proxyConnection = (ProxyConnectionIF) proxyConnections.get(nextAvailableConnection);
+                    proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
                 } catch (IndexOutOfBoundsException e) {
                     // This is thrown by a true List
                     nextAvailableConnection = 0;
-                    proxyConnection = (ProxyConnectionIF) proxyConnections.get(nextAvailableConnection);
+                    proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
                 }
                 // setActive() returns false if the ProxyConnection wasn't available.  You
                 // can't set it active twice (at least, not without making it available again
@@ -266,7 +266,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             log.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " served");
         }
 
-        return ProxyFactory.getConnection(proxyConnection);
+        return ProxyFactory.getWrappedConnection(proxyConnection);
     }
 
     private boolean testConnection(ProxyConnectionIF proxyConnection) {
@@ -593,7 +593,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * @see ConnectionPoolStatisticsIF#getAvailableConnectionCount
      */
     public int getAvailableConnectionCount() {
-        return connectionCountByState[ProxyConnection.STATUS_AVAILABLE];
+        return connectionCountByState[ConnectionInfoIF.STATUS_AVAILABLE];
     }
 
     /**
@@ -603,7 +603,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * @see ConnectionPoolStatisticsIF#getActiveConnectionCount
      */
     public int getActiveConnectionCount() {
-        return connectionCountByState[ProxyConnection.STATUS_ACTIVE];
+        return connectionCountByState[ConnectionInfoIF.STATUS_ACTIVE];
     }
 
     /**
@@ -613,7 +613,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * @see ConnectionPoolStatisticsIF#getOfflineConnectionCount
      */
     public int getOfflineConnectionCount() {
-        return connectionCountByState[ProxyConnection.STATUS_OFFLINE];
+        return connectionCountByState[ConnectionInfoIF.STATUS_OFFLINE];
     }
 
     protected String displayStatistics() {
@@ -985,7 +985,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * @throws InterruptedException if there was a problem.
      */
     protected void acquirePrimaryWriteLock() throws InterruptedException {
-        boolean success = false;
+//        boolean success = false;
 //        try {
 //            if (log.isDebugEnabled()) {
 //                try {
@@ -996,7 +996,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 //                //log.debug("About to acquire primary write lock");
 //            }
             primaryReadWriteLock.writeLock().acquire();
-            success = true;
+//            success = true;
 //            if (log.isDebugEnabled()) {
 //                try {
 //                    throw new RuntimeException("TRACE ONLY");
@@ -1101,6 +1101,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.77  2004/03/23 21:19:44  billhorsman
+ Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
+
  Revision 1.76  2004/02/23 17:47:32  billhorsman
  Improved message that gets logged if the state change of a connection fails.
 

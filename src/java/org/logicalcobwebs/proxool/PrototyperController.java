@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 /**
  * Controls the {@link Prototyper prototypers}
- * @version $Revision: 1.5 $, $Date: 2003/03/10 23:43:11 $
+ * @version $Revision: 1.6 $, $Date: 2004/03/23 21:19:45 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -56,7 +56,6 @@ public class PrototyperController {
             // If we are currently sweeping this will cause it to loop through
             // once more
             keepSweeping = true;
-            boolean alive = prototyperThread.isAlive();
             // If we aren't already started then this will start a new sweep
             prototyperThread.doNotify();
         } catch (IllegalMonitorStateException e) {
@@ -84,7 +83,7 @@ public class PrototyperController {
      * @throws SQLException if there was a problem building the connection
      * @throws ProxoolException if the alias doesn't exist
      */
-    protected static ProxyConnectionIF buildConnection(String alias, int state, String creator) throws SQLException, ProxoolException {
+    protected static ProxyConnection buildConnection(String alias, int state, String creator) throws SQLException, ProxoolException {
         return getConnectionPool(alias).getPrototyper().buildConnection(state, creator);
     }
 
@@ -135,6 +134,9 @@ public class PrototyperController {
 /*
  Revision history:
  $Log: PrototyperController.java,v $
+ Revision 1.6  2004/03/23 21:19:45  billhorsman
+ Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
+
  Revision 1.5  2003/03/10 23:43:11  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...

@@ -16,15 +16,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.DatabaseMetaData;
 
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.6 $, $Date: 2003/12/12 19:29:47 $
+ * @version $Revision: 1.7 $, $Date: 2004/03/23 21:19:45 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements MethodInterceptor, InvocationHandler {
+class ProxyDatabaseMetaData implements MethodInterceptor, InvocationHandler {
 
     private static final Log LOG = LogFactory.getLog(ProxyDatabaseMetaData.class);
 
@@ -34,8 +35,13 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements MethodIn
 
     private static final String FINALIZE_METHOD = "finalize";
 
-    public ProxyDatabaseMetaData(Connection connection, ProxyConnectionIF proxyConnection) throws SQLException {
-        super(connection,  proxyConnection);
+    private DatabaseMetaData databaseMetaData;
+
+    private Connection wrappedConnection;
+
+    public ProxyDatabaseMetaData(Connection connection, Connection wrappedConnection) throws SQLException {
+        databaseMetaData = connection.getMetaData();
+        this.wrappedConnection = wrappedConnection;
     }
 
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
@@ -66,11 +72,49 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements MethodIn
         return result;
     }
 
+    /**
+     * Whether the underlying databaseMetaData are equal
+     * @param obj the object (probably another databaseMetaData) that we
+     * are being compared to
+     * @return whether they are the same
+     */
+    public boolean equals(Object obj) {
+        return databaseMetaData.hashCode() == obj.hashCode();
+    }
+
+    /**
+     * We don't want to ask the DatabaseMetaData object for the
+     * connection or we will get the delegate instead of the Proxool
+     * one.
+     * @see DatabaseMetaData#getConnection
+     */
+    public Connection getConnection() {
+        return wrappedConnection;
+    }
+
+    /**
+     * Get the DatabaseMetaData from the connection
+     * @return databaseMetaData
+     */
+    protected DatabaseMetaData getDatabaseMetaData() {
+        return databaseMetaData;
+    }
+
+    /**
+     * @see Object#toString
+     */
+    public String toString() {
+        return databaseMetaData.toString();
+    }
+
 }
 
 /*
  Revision history:
  $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.7  2004/03/23 21:19:45  billhorsman
+ Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
+
  Revision 1.6  2003/12/12 19:29:47  billhorsman
  Now uses Cglib 2.0
 

@@ -5,67 +5,57 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.logicalcobwebs.cglib.proxy.Proxy;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import org.logicalcobwebs.cglib.proxy.Proxy;
-import org.logicalcobwebs.cglib.proxy.InvocationHandler;
-
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Properties;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.lang.reflect.Modifier;
 
 /**
- * A central place to build proxy objects ({@link ProxyConnection connections}
- * and {@link ProxyStatement statements}).
- * 
+ * A central place to build proxy objects. It will also provide the original
+ * object given a proxy.
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.25 $, $Date: 2003/12/12 19:29:47 $
+ * @version $Revision: 1.26 $, $Date: 2004/03/23 21:19:45 $
  * @since Proxool 0.5
  */
 class ProxyFactory {
 
     private static final Log LOG = LogFactory.getLog(ProxyFactory.class);
 
-    protected static ProxyConnection buildProxyConnection(long id, ConnectionPool connectionPool, int status) throws SQLException {
-        Connection realConnection = null;
-        final String url = connectionPool.getDefinition().getUrl();
-
-        Properties info = connectionPool.getDefinition().getDelegateProperties();
-        realConnection = DriverManager.getConnection(url, info);
-
-        Object delegate = Proxy.newProxyInstance(
-                realConnection.getClass().getClassLoader(),
-                realConnection.getClass().getInterfaces(),
-                new ProxyConnection(realConnection, id, url, connectionPool, status));
-
-        return (ProxyConnection) Proxy.getInvocationHandler(delegate);
-    }
+    private static Map interfaceMap = new HashMap();
 
     /**
-     * Get a Connection from the ProxyConnection
-     * 
-     * @param proxyConnection where to find the connection
-     * @return 
+     * Wraps up a proxyConnection inside a {@link WrappedConnection} and then proxies it as a
+     * simple {@link Connection}. You should call this immediately before the connection is served
+     * to the user. The WrappedConnection is disposable (it is thrown away when the connection
+     * is returned to the pool).
+     * @param proxyConnection the pooled connection we are wrapping up
+     * @return the Connection for use
      */
-    protected static Connection getConnection(ProxyConnectionIF proxyConnection) {
-        return (Connection) Proxy.newProxyInstance(
-                Connection.class.getClassLoader(),
-                new Class[]{Connection.class},
-                (InvocationHandler) proxyConnection);
+    protected static Connection getWrappedConnection(ProxyConnection proxyConnection) {
+        final WrappedConnection wrappedConnection = new WrappedConnection(proxyConnection);
+        Object delegate = Proxy.newProxyInstance(
+                proxyConnection.getConnection().getClass().getClassLoader(),
+                getInterfaces(proxyConnection.getConnection().getClass()),
+                wrappedConnection);
+        return (Connection) delegate;
     }
 
     /**
-     * Gets the real Statement that we got from the delegate driver
-     * 
+     * Gets the real Statement that we got from the delegate driver. This is no longer
+     * necessary and only provided for backwards compatability.
      * @param statement proxy statement
      * @return delegate statement
+     * @see ProxoolFacade#getDelegateStatement(java.sql.Statement)
      */
     protected static Statement getDelegateStatement(Statement statement) {
         Statement ds = statement;
@@ -75,58 +65,135 @@ class ProxyFactory {
     }
 
     /**
-     * Gets the real Connection that we got from the delegate driver
-     * 
+     * Gets the real Connection that we got from the delegate driver. This is no longer
+     * necessary and only provided for backwards compatability.
      * @param connection proxy connection
      * @return deletgate connection
+     * @see ProxoolFacade#getDelegateConnection(java.sql.Connection)
      */
-    public static Connection getDelegateConnection(Connection connection) {
-        Connection c = connection;
-        ProxyConnection pc = (ProxyConnection) Proxy.getInvocationHandler(connection);
-        c = pc.getConnection();
-        return c;
+    protected static Connection getDelegateConnection(Connection connection) {
+        WrappedConnection wc = (WrappedConnection) Proxy.getInvocationHandler(connection);
+        return wc.getProxyConnection().getConnection();
     }
 
-    protected static Statement createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection, String sqlStatement) {
-        // We can't use Class#getInterfaces since that doesn't take
-        // into account superclass interfaces. We could, laboriously,
-        // work our way up the hierarchy but it doesn't seem worth while -
-        // we only actually expect three options:
-        Class[] interfaces = new Class[1];
-        if (delegate instanceof CallableStatement) {
-            interfaces[0] = CallableStatement.class;
-        } else if (delegate instanceof PreparedStatement) {
-            interfaces[0] = PreparedStatement.class;
-        } else {
-            interfaces[0] = Statement.class;
-        }
+    protected static Statement getStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection, String sqlStatement) {
+        return (Statement) Proxy.newProxyInstance(
+                delegate.getClass().getClassLoader(),
+                getInterfaces(delegate.getClass()),
+                new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
+    }
+
+    /**
+     * Get all the interfaces that a class implements. Drills down into super interfaces too
+     * and super classes too.
+     * The results are cached so it's very fast second time round.
+     * @param clazz the class to examine.
+     * @return an array of classes (all interfaces) that this class implements.
+     */
+    private static Class[] getInterfaces(Class clazz) {
+        Class[] interfaceArray = (Class[]) interfaceMap.get(clazz);
+        if (interfaceArray == null) {
+            Set interfaces = new HashSet();
+            traverseInterfacesRecursively(interfaces, clazz);
+            interfaceArray = (Class[]) interfaces.toArray(new Class[interfaces.size()]);
 /*
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(delegate.getClass().getName() + " is being proxied using the " + interfaces[0]);
-        }
+            if (LOG.isDebugEnabled()) {
+                for (int i = 0; i < interfaceArray.length; i++) {
+                    Class aClass = interfaceArray[i];
+                    LOG.debug("Implementing " + aClass);
+                }
+            }
 */
-        return (Statement) Proxy.newProxyInstance(delegate.getClass().getClassLoader(), interfaces, new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
+            interfaceMap.put(clazz, interfaceArray);
+/*
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Reusing " + interfaceArray.length + " interfaces already looked up for " + clazz);
+            }
+*/
+        }
+        return interfaceArray;
+    }
+
+    /**
+     * Recursively looks at all interfaces for a class. Also looks at interfaces implemented
+     * by the super class (and its super class, etc.) Quite a lot of processing involved
+     * so you shouldn't call it too often.
+     * @param interfaces this set is populated with all interfaceMap it finds
+     * @param clazz the base class to analyze
+     */
+    private static void traverseInterfacesRecursively(Set interfaces, Class clazz) {
+        // Check for circular reference (avoid endless recursion)
+        if (interfaces.contains(clazz)) {
+            // Skip it, we've already been here.
+/*
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Skipping " + clazz + " because we've already traversed it");
+            }
+*/
+        } else {
+/*
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Analyzing " + clazz);
+            }
+*/
+            Class[] interfaceArray = clazz.getInterfaces();
+            for (int i = 0; i < interfaceArray.length; i++) {
+/*
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Adding " + interfaceArray[i]);
+                }
+*/
+                traverseInterfacesRecursively(interfaces, interfaceArray[i]);
+                // We're only interested in public interfaces. In fact, including
+                // non-public interfaces will give IllegalAccessExceptions.
+                if (Modifier.isPublic(interfaceArray[i].getModifiers())) {
+                    interfaces.add(interfaceArray[i]);
+                }
+            }
+            Class superClazz = clazz.getSuperclass();
+            if (superClazz != null) {
+                traverseInterfacesRecursively(interfaces, superClazz);
+            }
+/*
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Found " + interfaceArray.length + " interfaceMap for " + clazz);
+            }
+*/
+        }
     }
 
     /**
      * Create a new DatabaseMetaData from a connection
-     * 
      * @param connection the proxy connection we are using
      * @return databaseMetaData
      * @throws SQLException if the delegfate connection couldn't get the metaData
      */
-    protected static DatabaseMetaData getDatabaseMetaData(Connection connection, ProxyConnectionIF proxyConnection) throws SQLException {
+    protected static DatabaseMetaData getDatabaseMetaData(Connection connection, Connection wrappedConnection) throws SQLException {
         return (DatabaseMetaData) Proxy.newProxyInstance(
                 DatabaseMetaData.class.getClassLoader(),
                 new Class[]{DatabaseMetaData.class},
-                new ProxyDatabaseMetaData(connection, proxyConnection)
+                new ProxyDatabaseMetaData(connection, wrappedConnection)
         );
     }
+
+    /**
+     * Get the WrappedConnection behind this proxy connection.
+     * @param connection the connection that was served
+     * @return the wrapped connection or null if it couldn't be found
+     */
+    public static WrappedConnection getWrappedConnection(Connection connection) {
+        return (WrappedConnection) Proxy.getInvocationHandler(connection);
+    }
+
 }
 
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.26  2004/03/23 21:19:45  billhorsman
+ Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
+
  Revision 1.25  2003/12/12 19:29:47  billhorsman
  Now uses Cglib 2.0
 
