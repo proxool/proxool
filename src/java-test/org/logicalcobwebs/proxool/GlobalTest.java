@@ -1,7 +1,7 @@
-/**
- * Clever Little Trader
- *
- * Jubilee Group and Logical Cobwebs, 2002
+/*
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -13,11 +13,13 @@ import junit.framework.TestSuite;
 import junit.extensions.TestSetup;
 
 /**
- * TODO
- * @version $Revision: 1.3 $, $Date: 2002/12/18 03:15:03 $
+ * Provides a suite of all tests. And some utility methods for setting
+ * up the logging.
+ *
+ * @version $Revision: 1.4 $, $Date: 2003/01/31 16:38:05 $
  * @author bill
- * @author $Author: chr32 $ (current maintainer)
- * @since TODO
+ * @author $Author: billhorsman $ (current maintainer)
+ * @since Proxool 0.5
  */
 public class GlobalTest {
 
@@ -76,6 +78,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.4  2003/01/31 16:38:05  billhorsman
+ doc
+
  Revision 1.3  2002/12/18 03:15:03  chr32
  Added commented-out code that will make logging level DEBUG.
 
