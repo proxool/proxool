@@ -18,7 +18,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.10 $, $Date: 2002/12/12 10:49:43 $
+ * @version $Revision: 1.11 $, $Date: 2002/12/16 16:41:59 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -32,6 +32,10 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
     private String fullUrl;
 
     private ConnectionPoolDefinitionIF connectionPoolDefinition;
+
+    private Properties changedInfo;
+
+    private Properties completeInfo;
 
     /**
      * Use this constructor if you want to define the alias
@@ -49,6 +53,14 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
 
     public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
         setConnectionPoolDefinition(connectionPoolDefinition);
+        setCompleteInfo(completeInfo);
+        setChangedInfo(changedInfo);
+        LOG.debug("Definition updated " + connectionPoolDefinition.getCompleteUrl());
+        if (changedInfo != null && changedInfo.size() > 0) {
+            LOG.debug(changedInfo.size() + " properties updated");
+        } else {
+            LOG.debug("No properties updated");
+        }
     }
 
     public ConnectionPoolDefinitionIF getConnectionPoolDefinition() {
@@ -60,12 +72,32 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
         LOG.debug("Setting cpd to " + this.connectionPoolDefinition);
     }
 
+    public Properties getChangedInfo() {
+        return changedInfo;
+    }
+
+    public void setChangedInfo(Properties changedInfo) {
+        this.changedInfo = changedInfo;
+    }
+
+    public Properties getCompleteInfo() {
+        return completeInfo;
+    }
+
+    public void setCompleteInfo(Properties completeInfo) {
+        this.completeInfo = completeInfo;
+    }
+
     public String getName() {
         return "proxool";
     }
 
     public void update(Properties info) throws SQLException {
-        ProxoolFacade.updateConnectionPool(alias, info);
+        ProxoolFacade.updateConnectionPool(getFullUrl(), info);
+    }
+
+    public void update(String url) throws SQLException {
+        ProxoolFacade.updateConnectionPool(url, null);
     }
 
     public void setup(String driver, String url, Properties info) throws SQLException {
@@ -105,6 +137,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.11  2002/12/16 16:41:59  billhorsman
+ allow URL updates to pool
+
  Revision 1.10  2002/12/12 10:49:43  billhorsman
  now includes properties in definitionChanged event
 

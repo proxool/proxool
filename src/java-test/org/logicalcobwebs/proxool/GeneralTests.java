@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.23 $, $Date: 2002/12/16 11:51:28 $
+ * @version $Revision: 1.24 $, $Date: 2002/12/16 16:42:19 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -91,6 +91,36 @@ public class GeneralTests extends TestCase {
             Properties info = TestHelper.buildProperties();
             adapter = new ProxoolAdapter(alias);
             adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
+        }
+
+    }
+
+    /**
+     * Test the {@link ConfiguratorIF#defintionUpdated} event.
+     */
+    public void templateDefintionUpdated() {
+
+        String testName = "defintionUpdated";
+        ProxoolAdapter adapter = null;
+        try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            Properties newInfo = new Properties();
+            newInfo.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "3");
+            adapter.update(newInfo);
+            assertEquals("Wrong number of properties updated", adapter.getChangedInfo().size(), 1);
+            adapter.update(adapter.getFullUrl() + "zzz");
+            assertTrue("Mp properties should have been updated", adapter.getChangedInfo() == null);
+            assertTrue("URL has not been updated", (adapter.getConnectionPoolDefinition().getCompleteUrl().indexOf("zzz") > -1));
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -467,11 +497,29 @@ public class GeneralTests extends TestCase {
     }
 
 
+    class MyConfigurator implements ConfiguratorIF {
+
+        private Properties completeInfo;
+
+        private Properties changedInfo;
+
+        private ConnectionPoolDefinitionIF connectionPoolDefinition;
+
+        public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
+            this.connectionPoolDefinition = connectionPoolDefinition;
+            this.completeInfo = completeInfo;
+            this.changedInfo = changedInfo;
+        }
+
+    }
 }
 
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.24  2002/12/16 16:42:19  billhorsman
+ allow URL updates to pool
+
  Revision 1.23  2002/12/16 11:51:28  billhorsman
  doc
 

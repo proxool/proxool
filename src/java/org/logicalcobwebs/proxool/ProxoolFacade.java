@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.21 $, $Date: 2002/12/16 11:46:00 $
+ * @version $Revision: 1.22 $, $Date: 2002/12/16 16:42:30 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -55,17 +55,6 @@ public class ProxoolFacade {
         if (connectionPool == null) {
             ConnectionPoolDefinition cpd = new ConnectionPoolDefinition();
             cpd.setName(getAlias(url));
-            cpd.setCompleteUrl(url);
-
-            try {
-                int endOfPrefix = url.indexOf(':');
-                int endOfDriver = url.indexOf(':', endOfPrefix + 1);
-                cpd.setDriver(url.substring(endOfPrefix + 1, endOfDriver));
-                cpd.setUrl(url.substring(endOfDriver + 1));
-            } catch (IndexOutOfBoundsException e) {
-                throw new SQLException("Invalid URL format.");
-            }
-
             definePool(null, url, cpd, info, null);
             connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
             connectionPool.start();
@@ -156,9 +145,35 @@ public class ProxoolFacade {
             completeInfos.put(rememberedKey, completeInfo);
         }
 
-        if (info != null && (rememberedInfo == null || !info.equals(rememberedInfo))) {
+        cpd.setCompleteUrl(url);
 
-            Log earlyLog = LogFactory.getLog("org.logicalcobwebs.proxool." + getAlias(url));
+        final String alias = getAlias(url);
+        Log earlyLog = LogFactory.getLog("org.logicalcobwebs.proxool." + alias);
+
+        try {
+            int endOfPrefix = url.indexOf(':');
+            int endOfDriver = url.indexOf(':', endOfPrefix + 1);
+            final String driver = url.substring(endOfPrefix + 1, endOfDriver);
+            if (cpd.getDriver() == null) {
+                cpd.setDriver(driver);
+                earlyLog.debug("Setting driver for " + alias + " pool to " + driver);
+            } else if (cpd.getDriver() != null && !cpd.getDriver().equals(driver)) {
+                cpd.setDriver(driver);
+                earlyLog.debug("Updating driver for " + alias + " pool to " + driver);
+            }
+            final String delegateUrl = url.substring(endOfDriver + 1);
+            if (cpd.getUrl() == null) {
+                cpd.setUrl(delegateUrl);
+                earlyLog.debug("Setting url for " + alias + " pool to " + delegateUrl);
+            } else if (cpd.getUrl() != null && !cpd.getUrl().equals(delegateUrl)) {
+                cpd.setUrl(delegateUrl);
+                earlyLog.debug("Updating url for " + alias + " pool to " + delegateUrl);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            throw new SQLException("Invalid URL format.");
+        }
+
+        if (info != null && (rememberedInfo == null || !info.equals(rememberedInfo))) {
 
             if (earlyLog.isDebugEnabled()) {
                 if (rememberedInfo == null) {
@@ -575,6 +590,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.22  2002/12/16 16:42:30  billhorsman
+ allow URL updates to pool
+
  Revision 1.21  2002/12/16 11:46:00  billhorsman
  send properties to definitionUpdated
 
