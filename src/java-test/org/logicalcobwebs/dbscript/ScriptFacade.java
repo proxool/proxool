@@ -25,7 +25,7 @@ import java.sql.SQLException;
  *
  * Allows you to run scripts from file.
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/06 21:06:21 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -40,6 +40,16 @@ public class ScriptFacade {
      * @param adapter so we know where to get {@link java.sql.Connection connections} from.
      */
     public static void runScript(String scriptLocation, ConnectionAdapterIF adapter) {
+        runScript(scriptLocation, adapter, null);
+    }
+
+    /**
+     * Run the script using the appropriate handler
+     * @param scriptLocation the path to the file that contains the script XML
+     * @param adapter so we know where to get {@link java.sql.Connection connections} from.
+     * @param commandFilter allows you to filter which commands get run and do things to the {@link java.sql.Connection}
+     */
+    public static void runScript(String scriptLocation, ConnectionAdapterIF adapter, CommandFilterIF commandFilter) {
 
         File scriptFile = new File(scriptLocation);
         if (!scriptFile.canRead()) {
@@ -73,7 +83,7 @@ public class ScriptFacade {
             saxParser.parse(scriptFile, scriptBuilder);
             Script script = scriptBuilder.getScript();
 
-            ScriptRunner.runScript(script, adapter);
+            ScriptRunner.runScript(script, adapter, commandFilter);
 
         } catch (FactoryConfigurationError factoryConfigurationError) {
             LOG.error(factoryConfigurationError);
@@ -94,6 +104,9 @@ public class ScriptFacade {
 /*
  Revision history:
  $Log: ScriptFacade.java,v $
+ Revision 1.4  2002/11/06 21:06:21  billhorsman
+ Support for CommandFilterIF
+
  Revision 1.3  2002/11/02 14:22:16  billhorsman
  Documentation
 

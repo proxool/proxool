@@ -18,12 +18,12 @@ import java.sql.Statement;
  *
  * Run a {@link Script script}.
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/02 14:22:16 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/06 21:07:14 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
-class ScriptRunner {
+public class ScriptRunner {
 
     private static final Log LOG = LogFactory.getLog(ScriptRunner.class);
 
@@ -34,7 +34,7 @@ class ScriptRunner {
      * @param adapter so we know where to connections from
      * @throws SQLException if anything goes wrong
      */
-    protected static void runScript(Script script, ConnectionAdapterIF adapter) throws SQLException {
+    protected static final void runScript(Script script, ConnectionAdapterIF adapter, CommandFilterIF commandFilter) throws SQLException {
         adapter.setup(script.getDriver(), script.getUrl(), script.getInfo());
 
         try {
@@ -58,8 +58,15 @@ class ScriptRunner {
 
                 // Execute the SQL
                 for (int load = 0; load < command.getLoad(); load++) {
+
+                    boolean executeCommand = true;
+                    if (commandFilter != null) {
+                            executeCommand = commandFilter.beforeCommand(connections[load], command);
+                    }
                     try {
-                        execute(connections[load], command.getSql());
+                        if (executeCommand) {
+                            execute(connections[load], command.getSql());
+                        }
                     } catch (SQLException e) {
                         if (command.isIgnoreException()) {
                             LOG.debug("Ignoring exception in " + command.getName(), e);
@@ -67,6 +74,10 @@ class ScriptRunner {
                             throw e;
                         }
                     }
+                    if (commandFilter != null) {
+                            commandFilter.afterCommand(connections[load], command);
+                    }
+
                 }
 
                 // Close the connections again
@@ -88,13 +99,13 @@ class ScriptRunner {
         }
     }
 
-    /**
+    /**s
      * Execute and SQL statement
      * @param connection used to execute statement
      * @param sql the SQL to perform
      * @throws SQLException if anything goes wrong
      */
-    private static void execute(Connection connection, String sql) throws SQLException {
+    private static final void execute(Connection connection, String sql) throws SQLException {
         Statement statement = null;
         try {
             statement = connection.createStatement();
@@ -117,6 +128,9 @@ class ScriptRunner {
 /*
  Revision history:
  $Log: ScriptRunner.java,v $
+ Revision 1.5  2002/11/06 21:07:14  billhorsman
+ Support for CommandFilterIF
+
  Revision 1.4  2002/11/02 14:22:16  billhorsman
  Documentation
 
