@@ -5,21 +5,19 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import org.logicalcobwebs.proxool.AbstractProxoolTest;
-import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.*;
 import org.xml.sax.InputSource;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.sql.DriverManager;
 
 /**
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.14 $, $Date: 2003/03/04 10:58:45 $
+ * @version $Revision: 1.15 $, $Date: 2003/04/29 11:51:49 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -94,6 +92,22 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
     }
 
     /**
+     * Test that we can retrieve a conncetion using the alias after registration
+     * @throws ProxoolException if the configuration fails.
+     * @throws SQLException if ProxoolFacade operation fails.
+     * @throws FileNotFoundException if the xml file is not found.
+     */
+    public void testWithAlias() throws ProxoolException, SQLException, FileNotFoundException {
+        final String xmlFile = "src/java-test/org/logicalcobwebs/proxool/configuration/test-valid.xml";
+        final InputSource inputSource = new InputSource(new FileInputStream(xmlFile));
+        inputSource.setSystemId(getWorkingDirectoryUrl());
+        JAXPConfigurator.configure(inputSource, true);
+
+        final String alias = "xml-test-validating";
+        DriverManager.getConnection(ProxoolConstants.PROXOOL + "." + alias).close();
+    }
+
+    /**
      * Test that the confguration fails when validiation is turned on and the given xml is not valid.
      * @throws SQLException if ProxoolFacade operation fails.
      * @throws FileNotFoundException if the xml file is not found.
@@ -140,6 +154,9 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.15  2003/04/29 11:51:49  billhorsman
+ added new "with-alias" test
+
  Revision 1.14  2003/03/04 10:58:45  billhorsman
  checkstyle
 
