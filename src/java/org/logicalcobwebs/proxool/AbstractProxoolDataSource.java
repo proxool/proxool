@@ -12,7 +12,7 @@ import java.sql.Connection;
 
 /**
  * Base class for all Proxool DataSource implementations.
- * @version $Revision: 1.1 $, $Date: 2004/03/15 02:47:02 $
+ * @version $Revision: 1.2 $, $Date: 2004/03/16 00:06:45 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.9
@@ -38,13 +38,16 @@ public abstract class AbstractProxoolDataSource implements DataSource {
     }
 
     public Connection getConnection(String s, String s1) throws SQLException {
-        throw new UnsupportedOperationException("Proxool datasources does not support setting username and"
-            + "password at runtime.");
+        throw new UnsupportedOperationException("You should configure the username and password "
+                + "within the proxool configuration and just call getConnection() instead.");
     }
 }
 /*
  Revision history:
  $Log: AbstractProxoolDataSource.java,v $
+ Revision 1.2  2004/03/16 00:06:45  chr32
+ Changed erromessage for unsupported exception.
+
  Revision 1.1  2004/03/15 02:47:02  chr32
  Added initial DataSource support.
 
