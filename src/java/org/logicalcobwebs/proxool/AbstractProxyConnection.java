@@ -23,7 +23,7 @@ import java.util.Set;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.22 $, $Date: 2003/08/27 18:19:07 $
+ * @version $Revision: 1.23 $, $Date: 2003/10/30 00:05:49 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -441,12 +441,25 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
             return null;
         }
     }
+
+    /**
+     * Compares using {@link #getId()}
+     * @param o must be another {@link ConnectionInfoIF} implementation
+     * @return the comparison
+     * @see Comparable#compareTo(Object)
+     */
+    public int compareTo(Object o) {
+        return new Long(((ConnectionInfoIF) o).getId()).compareTo(new Long(getId()));
+    }
 }
 
 
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.23  2003/10/30 00:05:49  billhorsman
+ now implements Comparable (using ID)
+
  Revision 1.22  2003/08/27 18:19:07  billhorsman
  whoops
 

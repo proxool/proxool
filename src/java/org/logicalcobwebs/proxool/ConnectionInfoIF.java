@@ -22,11 +22,11 @@ import java.util.Date;
  * }
  * </pre>
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/03 11:11:57 $
+ * @version $Revision: 1.10 $, $Date: 2003/10/30 00:05:50 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public interface ConnectionInfoIF {
+public interface ConnectionInfoIF extends Comparable {
 
     /**
      * Default - treat as normal
@@ -151,6 +151,9 @@ public interface ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.10  2003/10/30 00:05:50  billhorsman
+ now implements Comparable (using ID)
+
  Revision 1.9  2003/03/03 11:11:57  billhorsman
  fixed licence
 
