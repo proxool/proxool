@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.60 $, $Date: 2003/02/26 16:05:53 $
+ * @version $Revision: 1.61 $, $Date: 2003/02/27 17:19:18 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -539,6 +539,7 @@ public class ProxoolFacade {
     /**
      * Gives a snapshot of what the pool is doing
      * @param alias identifies the pool
+     * @param detail if true then include detail of each connection
      * @return the current status of the pool
      * @throws ProxoolException if we couldn't find the pool
      */
@@ -590,6 +591,14 @@ public class ProxoolFacade {
         return snapshot;
     }
 
+    /**
+     * Calls {@link #getSnapshot(java.lang.String, boolean) getSnapshot}
+     * using false for the detail parameter.
+     * @see #getSnapshot(java.lang.String, boolean)
+     */
+    public static SnapshotIF getSnapshot(String alias) throws ProxoolException {
+        return getSnapshot(alias, false);
+    }
     // all jmx operations are done through reflection
     // to avoid making the facade dependant on the JMX classes
     private static boolean registerForJmx(String alias, Properties properties) {
@@ -623,6 +632,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.61  2003/02/27 17:19:18  billhorsman
+ new overloaded getSnapshot method
+
  Revision 1.60  2003/02/26 16:05:53  billhorsman
  widespread changes caused by refactoring the way we
  update and redefine pool definitions.
