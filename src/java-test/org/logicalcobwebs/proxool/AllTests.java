@@ -12,7 +12,7 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.18 $, $Date: 2003/03/11 14:58:30 $
+ * @version $Revision: 1.19 $, $Date: 2003/04/19 13:01:01 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -30,6 +30,7 @@ public class AllTests {
         suite.addTestSuite(ConnectionInfoTest.class);
         suite.addTestSuite(ConnectionListenerTest.class);
         suite.addTestSuite(ConnectionResetterTest.class);
+        suite.addTestSuite(DataSourceTest.class);
         suite.addTestSuite(DriverTest.class);
         suite.addTestSuite(ConnectionPoolTests.class);
         suite.addTestSuite(HouseKeeperTest.class);
@@ -58,6 +59,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.19  2003/04/19 13:01:01  billhorsman
+ improve tests
+
  Revision 1.18  2003/03/11 14:58:30  billhorsman
  put PerformanceTest back in the global test
 
