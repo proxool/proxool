@@ -28,7 +28,7 @@ import java.io.PrintWriter;
  * </ul>
  *
  * TODO - expand
- * @version $Revision: 1.3 $, $Date: 2004/03/18 17:16:58 $
+ * @version $Revision: 1.4 $, $Date: 2004/08/19 12:28:28 $
  * @author bill
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.9
@@ -140,10 +140,12 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
             return null;
         }
         Reference reference = (Reference) refObject;
+/* Removed because JNDI implementations can not be trusted to implement reference.getFactoryClassName() correctly.
         // check if this is relevant for us
         if (!ProxoolDataSource.class.getName().equals(reference.getFactoryClassName())) {
             return null;
         }
+*/
         // check if we've allready parsed the properties.
         if (!ConnectionPoolManager.getInstance().isPoolExists(reference.get(ProxoolConstants.ALIAS_PROPERTY).toString())) {
             populatePropertiesFromReference(reference);
@@ -643,6 +645,9 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.4  2004/08/19 12:28:28  chr32
+ Removed factory type test.
+
  Revision 1.3  2004/03/18 17:16:58  chr32
  Added a timy bit of doc.
 
