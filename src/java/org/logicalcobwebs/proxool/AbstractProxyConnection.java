@@ -23,7 +23,7 @@ import java.util.Date;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/07 10:58:22 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/11 00:30:45 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -83,7 +83,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
      */
     public boolean equals(Object obj) {
         if (obj != null) {
-            if (obj instanceof Connection) {
+            if (obj instanceof ProxyConnection) {
+                return connection.hashCode() == ((ProxyConnection)obj).getConnection().hashCode();
+            } else if (obj instanceof Connection) {
                 return connection.hashCode() == obj.hashCode();
             } else {
                 return super.equals(obj);
@@ -482,6 +484,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.8  2003/02/11 00:30:45  billhorsman
+ fixed equals for jdk1.2
+
  Revision 1.7  2003/02/07 10:58:22  billhorsman
  fixed equals method so that connections are actually
  removed (they were just being marked as status null)
