@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.3 $, $Date: 2003/03/10 23:43:10 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/11 14:51:52 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -113,13 +113,13 @@ public class Prototyper {
 
     /**
      * Build a new connection
-     * @param state the initial state it will be created as (this allows us
+     * @param status the initial status it will be created as (this allows us
      * to create it as {@link ConnectionInfoIF#STATUS_ACTIVE ACTIVE} and avoid
      * another thread grabbing it before we can)
      * @param creator for log audit
      * @return the new connection
      */
-    protected ProxyConnectionIF buildConnection(int state, String creator) throws SQLException, ProxoolException {
+    protected ProxyConnectionIF buildConnection(int status, String creator) throws SQLException, ProxoolException {
 
         long id = 0;
         synchronized (lock) {
@@ -142,7 +142,7 @@ public class Prototyper {
         Connection connection = null;
 
         try {
-            proxyConnection = ProxyFactory.buildProxyConnection(id, connectionPool);
+            proxyConnection = ProxyFactory.buildProxyConnection(id, connectionPool, status);
             connection = ProxyFactory.getConnection(proxyConnection);
 
             try {
@@ -150,51 +150,30 @@ public class Prototyper {
             } catch (Exception e) {
                 log.error("Problem during onBirth (ignored)", e);
             }
-            switch (state) {
-                case ProxyConnection.STATUS_ACTIVE:
-                    proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_ACTIVE);
-                    break;
+            connectionPool.addProxyConnection(proxyConnection);
 
-                case ProxyConnection.STATUS_AVAILABLE:
-                    proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_AVAILABLE);
-                    break;
-
-                default:
-                    /* Not quite sure what we should do here. oh well, leave it offline*/
-                    log.error(connectionPool.displayStatistics() + " - Didn't expect to set new connection to state " + state);
-            }
-
-            if (proxyConnection.getStatus() != state) {
-                throw new SQLException("Unable to set connection #" + proxyConnection.getId() + " to "
-                        + ConnectionPool.getStatusDescription(state));
-
-            } else {
-
-                connectionPool.addProxyConnection(proxyConnection);
-
-                if (log.isDebugEnabled()) {
-                    StringBuffer out = new StringBuffer(connectionPool.displayStatistics());
-                    out.append(" - Connection #");
-                    out.append(proxyConnection.getId());
-                    if (getDefinition().isVerbose()) {
-                        out.append(" (");
-                        out.append(Integer.toHexString(proxyConnection.hashCode()));
-                        out.append(")");
-                    }
-                    out.append(" created ");
-                    out.append(creator);
-                    out.append(" = ");
-                    out.append(ConnectionPool.getStatusDescription(proxyConnection.getStatus()));
-                    if (getDefinition().isVerbose()) {
-                        out.append(" -> ");
-                        out.append(getDefinition().getUrl());
-                        out.append(" (");
-                        out.append(Integer.toHexString(proxyConnection.getConnection().hashCode()));
-                        out.append(") by thread ");
-                        out.append(Thread.currentThread().getName());
-                    }
-                    log.debug(out);
+            if (log.isDebugEnabled()) {
+                StringBuffer out = new StringBuffer(connectionPool.displayStatistics());
+                out.append(" - Connection #");
+                out.append(proxyConnection.getId());
+                if (getDefinition().isVerbose()) {
+                    out.append(" (");
+                    out.append(Integer.toHexString(proxyConnection.hashCode()));
+                    out.append(")");
                 }
+                out.append(" created ");
+                out.append(creator);
+                out.append(" = ");
+                out.append(ConnectionPool.getStatusDescription(proxyConnection.getStatus()));
+                if (getDefinition().isVerbose()) {
+                    out.append(" -> ");
+                    out.append(getDefinition().getUrl());
+                    out.append(" (");
+                    out.append(Integer.toHexString(proxyConnection.getConnection().hashCode()));
+                    out.append(") by thread ");
+                    out.append(Thread.currentThread().getName());
+                }
+                log.debug(out);
             }
         } catch (SQLException e) {
             // log.error(displayStatistics() + " - Couldn't initialise connection #" + proxyConnection.getId() + ": " + e);
@@ -209,7 +188,6 @@ public class Prototyper {
                 log.debug(t);
             }
         } finally {
-
             synchronized (lock) {
                 if (proxyConnection == null) {
                     // If there has been an exception then we won't be using this one and
@@ -282,6 +260,9 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.4  2003/03/11 14:51:52  billhorsman
+ more concurrency fixes relating to snapshots
+
  Revision 1.3  2003/03/10 23:43:10  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...

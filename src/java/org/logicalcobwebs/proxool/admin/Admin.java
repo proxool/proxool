@@ -10,6 +10,8 @@ import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
 import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.Prototyper;
+import org.logicalcobwebs.proxool.ConnectionInfoIF;
 
 import java.util.Collection;
 import java.util.Date;
@@ -23,12 +25,14 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/10 23:43:14 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/11 14:51:55 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class Admin {
+
+    private static final Log LOG = LogFactory.getLog(Admin.class);
 
     private Log log;
 
@@ -126,26 +130,50 @@ public class Admin {
      * @return snapshot
      */
     public static SnapshotIF getSnapshot(ConnectionPoolStatisticsIF cps, ConnectionPoolDefinitionIF cpd, Collection connectionInfos) {
-        Snapshot snapshot = new Snapshot(new Date());
+        Snapshot s = new Snapshot(new Date());
 
-        snapshot.setDateStarted(cps.getDateStarted());
-        snapshot.setActiveConnectionCount(cps.getActiveConnectionCount());
-        snapshot.setAvailableConnectionCount(cps.getAvailableConnectionCount());
-        snapshot.setOfflineConnectionCount(cps.getOfflineConnectionCount());
-        snapshot.setMaximumConnectionCount(cpd.getMaximumConnectionCount());
-        snapshot.setServedCount(cps.getConnectionsServedCount());
-        snapshot.setRefusedCount(cps.getConnectionsRefusedCount());
-        snapshot.setConnectionInfos(connectionInfos);
+        s.setDateStarted(cps.getDateStarted());
+        s.setActiveConnectionCount(cps.getActiveConnectionCount());
+        s.setAvailableConnectionCount(cps.getAvailableConnectionCount());
+        s.setOfflineConnectionCount(cps.getOfflineConnectionCount());
+        s.setMaximumConnectionCount(cpd.getMaximumConnectionCount());
+        s.setServedCount(cps.getConnectionsServedCount());
+        s.setRefusedCount(cps.getConnectionsRefusedCount());
+        s.setConnectionInfos(connectionInfos);
 
-        return snapshot;
+        /*
+        if (s.getActiveConnectionCount() != getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_ACTIVE)) {
+            LOG.error("activeCount disparity: " + s.getActiveConnectionCount() + " != " + getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_ACTIVE));
+        }
+        if (s.getAvailableConnectionCount() != getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_AVAILABLE)) {
+            LOG.error("activeCount disparity: " + s.getAvailableConnectionCount() + " != " + getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_AVAILABLE));
+        }
+        if (s.getOfflineConnectionCount() != getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_OFFLINE)) {
+            LOG.error("offlineCount disparity: " + s.getOfflineConnectionCount() + " != " + getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_OFFLINE));
+        }
+        */
+
+        return s;
     }
 
+    private static int getCount(ConnectionInfoIF[] connectionInfos, int status) {
+        int count = 0;
+        for (int i = 0; i < connectionInfos.length; i++) {
+            if (connectionInfos[i].getStatus() == status) {
+                count++;
+            }
+        }
+        return count;
+    }
 }
 
 
 /*
  Revision history:
  $Log: Admin.java,v $
+ Revision 1.5  2003/03/11 14:51:55  billhorsman
+ more concurrency fixes relating to snapshots
+
  Revision 1.4  2003/03/10 23:43:14  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...

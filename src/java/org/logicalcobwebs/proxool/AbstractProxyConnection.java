@@ -24,7 +24,7 @@ import java.util.Set;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.16 $, $Date: 2003/03/10 23:43:07 $
+ * @version $Revision: 1.17 $, $Date: 2003/03/11 14:51:47 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -68,15 +68,17 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
      */
     private boolean needToReset = false;
 
-    protected AbstractProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool) throws SQLException {
+    protected AbstractProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool, int status) throws SQLException {
         this.connection = connection;
         this.delegateUrl = delegateUrl;
         setId(id);
         this.connectionPool = connectionPool;
         setBirthTime(System.currentTimeMillis());
 
-        // initialise the connection as offline for now
-        setStatus(STATUS_OFFLINE);
+        this.status = status;
+        if (status == STATUS_ACTIVE) {
+            setTimeLastStartActive(System.currentTimeMillis());
+        }
 
         // We only need to call this for the first connection we make. But it returns really
         // quickly and we don't call it that often so we shouldn't worry.
@@ -243,6 +245,7 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
         boolean success = false;
         try {
             statusReadWriteLock.writeLock().acquire();
+            connectionPool.acquireConnectionStatusWriteLock();
             if (this.status == oldStatus || oldStatus == STATUS_FORCE) {
                 connectionPool.changeStatus(this.status, newStatus);
                 this.status = newStatus;
@@ -260,6 +263,7 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
         } catch (InterruptedException e) {
             LOG.error("Unable to acquire write lock for status");
         } finally {
+            connectionPool.releaseConnectionStatusWriteLock();
             statusReadWriteLock.writeLock().release();
         }
         return success;
@@ -438,6 +442,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.17  2003/03/11 14:51:47  billhorsman
+ more concurrency fixes relating to snapshots
+
  Revision 1.16  2003/03/10 23:43:07  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...

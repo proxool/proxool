@@ -28,7 +28,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.64 $, $Date: 2003/03/10 15:26:49 $
+ * @version $Revision: 1.65 $, $Date: 2003/03/11 14:51:53 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -40,6 +40,8 @@ public class ProxoolFacade {
 
     private static CompositeProxoolListener compositeProxoolListener = new CompositeProxoolListener();
 
+    private static boolean versionLogged =false;
+
     /**
      * Build a ConnectionPool based on this definition and then start it.
      * @param url defines the delegate driver and delegate url.
@@ -49,6 +51,11 @@ public class ProxoolFacade {
      */
     public static synchronized String registerConnectionPool(String url, Properties info) throws ProxoolException {
         String alias = getAlias(url);
+
+        if (!versionLogged) {
+            versionLogged = true;
+            LOG.info("Proxool " + Version.getVersion());
+        }
 
         try {
             Class.forName(ProxoolDriver.class.getName());
@@ -221,6 +228,7 @@ public class ProxoolFacade {
      * @param alias identifies the pool
      * @return a collection of {@link ConnectionInfoIF ConnectionInfoIFs}
      * @throws ProxoolException if we couldn't find the pool
+     * @deprecated use {@link #getSnapshot(java.lang.String, boolean) snapshot} instead.
      */
     public static Collection getConnectionInfos(String alias) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias).getConnectionInfos();
@@ -533,7 +541,11 @@ public class ProxoolFacade {
     /**
      * Gives a snapshot of what the pool is doing
      * @param alias identifies the pool
-     * @param detail if true then include detail of each connection
+     * @param detail if true then include detail of each connection. Note it you ask for
+     * detail then the pool must necessarily be locked for the duration it takes to gather
+     * the information (which isn't very long). You probably shouldn't do it that often (like
+     * not every second or something). Being locked means that connections cannot be
+     * served or returned (it doesn't mean that they can't be active).
      * @return the current status of the pool
      * @throws ProxoolException if we couldn't find the pool
      */
@@ -542,7 +554,14 @@ public class ProxoolFacade {
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
 
         if (detail) {
-            snapshot = Admin.getSnapshot(cp, cp.getDefinition(), getConnectionInfos(alias));
+            try {
+                cp.acquireConnectionStatusReadLock();
+                LOG.debug("Starting snapshot");
+                snapshot = Admin.getSnapshot(cp, cp.getDefinition(), cp.getConnectionInfos());
+                LOG.debug("Finishing snapshot");
+            } finally {
+                cp.releaseConnectionStatusReadLock();
+            }
         } else {
             snapshot = Admin.getSnapshot(cp, cp.getDefinition(), null);
         }
@@ -591,6 +610,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.65  2003/03/11 14:51:53  billhorsman
+ more concurrency fixes relating to snapshots
+
  Revision 1.64  2003/03/10 15:26:49  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

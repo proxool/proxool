@@ -7,6 +7,7 @@ package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -20,14 +21,14 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.14 $, $Date: 2003/03/10 23:43:09 $
+ * @version $Revision: 1.15 $, $Date: 2003/03/11 14:51:49 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
-    // TODO  add synch to avoid definition being read during update
-
+    // TODO Should we check for defintion reads whilst updating?
+    
     private static final Log LOG = LogFactory.getLog(ConnectionPoolDefinition.class);
 
     /**
@@ -102,7 +103,6 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     protected ConnectionPoolDefinition(String url, Properties info) throws ProxoolException {
         this.alias = ProxoolFacade.getAlias(url);
         poolLog = LogFactory.getLog("org.logicalcobwebs.proxool." + alias);
-        poolLog.info("Proxool " + Version.getVersion());
         reset();
         doChange(url, info);
     }
@@ -192,6 +192,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
         ProxoolFacade.definitionUpdated(getAlias(), this, completeInfo, changedInfo);
 
+        if (getDriver() == null || getUrl() == null) {
+            throw new ProxoolException("Attempt to use a pool with incomplete definition");
+        }
     }
 
     private void logChange(boolean proxoolProperty, String key, String value) {
@@ -796,6 +799,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.15  2003/03/11 14:51:49  billhorsman
+ more concurrency fixes relating to snapshots
+
  Revision 1.14  2003/03/10 23:43:09  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...

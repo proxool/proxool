@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.63 $, $Date: 2003/03/11 01:16:29 $
+ * @version $Revision: 1.64 $, $Date: 2003/03/11 14:51:49 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -111,7 +111,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      */
     private ConnectionResetter connectionResetter;
 
-    protected ConnectionPool(ConnectionPoolDefinition definition) {
+    protected ConnectionPool(ConnectionPoolDefinition definition) throws ProxoolException {
 
         // Use the FastArrayList for performance and thread safe
         // behaviour. We set its behaviour to "fast"  (meaning reads are
@@ -150,7 +150,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         String requester = Thread.currentThread().getName();
 
-        /* If we're busy, we need to return as quickly as possible. */
+        /*
+         *If we're busy, we need to return as quickly as possible. Because this is unsynchronized
+         * we run the risk of refusing a connection when we might actually be able to. But that will
+         * only happen when we're right at or near maximum connections anyway.
+         */
 
         if (connectionCount >= getDefinition().getMaximumConnectionCount() && getAvailableConnectionCount() < 1) {
             connectionsRefusedCount++;
@@ -254,7 +258,13 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * @param proxyConnection new connection
      */
     protected void addProxyConnection(ProxyConnectionIF proxyConnection) {
-        proxyConnections.add(proxyConnection);
+        try {
+            acquireConnectionStatusWriteLock();
+            proxyConnections.add(proxyConnection);
+            connectionCountByState[proxyConnection.getStatus()]++;
+        } finally {
+            releaseConnectionStatusWriteLock();
+        }
     }
 
     protected static String getStatusDescription(int status) {
@@ -272,7 +282,14 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     protected void putConnection(ProxyConnectionIF proxyConnection) {
 
         if (admin != null) {
-            admin.connectionReturned(System.currentTimeMillis() - proxyConnection.getTimeLastStartActive());
+            long now = System.currentTimeMillis();
+            long start = proxyConnection.getTimeLastStartActive();
+            if (now - start < 0) {
+                log.warn("Future start time detected. #" + proxyConnection.getId() + " start = " + new Date(start));
+            } else if (now - start > 1000000) {
+                log.warn("Suspiciously long active time. #" + proxyConnection.getId() + " start = " + new Date(start));
+            }
+            admin.connectionReturned(now - start);
         }
 
         // It's possible that this connection is due for expiry
@@ -322,7 +339,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         // Just check that it is null
         if (forceExpiry || proxyConnection.isNull()) {
 
-            proxyConnection.setStatus(ProxyConnectionIF.STATUS_NULL);
+            proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE);
 
             /* Run some code everytime we destroy a connection */
 
@@ -339,7 +356,18 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 log.error(e);
             }
 
-            proxyConnections.remove(proxyConnection);
+            try {
+                // If we're shutting down then getting a write lock will cause a deadlock
+                if (isConnectionPoolUp()) {
+                    acquireConnectionStatusWriteLock();
+                }
+                proxyConnection.setStatus(ProxyConnectionIF.STATUS_NULL);
+                proxyConnections.remove(proxyConnection);
+            } finally {
+                if (isConnectionPoolUp()) {
+                    releaseConnectionStatusWriteLock();
+                }
+            }
 
             if (log.isDebugEnabled()) {
                 log.debug(displayStatistics() + " - #" + FormatHelper.formatMediumNumber(proxyConnection.getId())
@@ -407,35 +435,35 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     /* Patience, patience. */
 
                     if (connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE] != 0) {
-                        LOG.info("Waiting for all connections to become inactive (active count is "
+                        long endWait = startFinalize + delay;
+                        LOG.info("Waiting until " + new Date(endWait) + " for all connections to become inactive (active count is "
                                 + connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE] + ").");
-                        try {
-                            long endWait = startFinalize + delay;
-                            while (true) {
-                                long timeout = endWait - System.currentTimeMillis();
-                                if (timeout > 0) {
-                                    synchronized (Thread.currentThread()) {
+                        while (true) {
+                            long timeout = endWait - System.currentTimeMillis();
+                            if (timeout > 0) {
+                                synchronized (Thread.currentThread()) {
+                                    try {
                                         Thread.currentThread().wait(timeout);
+                                    } catch (InterruptedException e) {
+                                        log.debug("Interrupted whilst sleeping.");
                                     }
                                 }
-                                int activeCount = connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE];
-                                if (activeCount == 0) {
-                                    break;
-                                }
-                                if (System.currentTimeMillis() < endWait) {
-                                    LOG.debug("Still waiting for active count to reach zero (currently " + activeCount + ").");
-                                } else {
-                                    // There are still connections active. Oh well, we're not _that_ patient
-                                    LOG.warn("Shutdown waited for "
-                                            + (System.currentTimeMillis() - startFinalize) + " milliseconds for all "
-                                            + "the connections to become inactive but the active count is still "
-                                            + activeCount + ". Shutting down anyway.");
-                                    break;
-                                }
-                                Thread.sleep(100);
                             }
-                        } catch (InterruptedException e1) {
-                            log.debug("Interrupted whilst sleeping.");
+                            int activeCount = connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE];
+                            if (activeCount == 0) {
+                                break;
+                            }
+                            if (System.currentTimeMillis() < endWait) {
+                                LOG.info("Still waiting for active count to reach zero (currently " + activeCount + ").");
+                            } else {
+                                // There are still connections active. Oh well, we're not _that_ patient
+                                LOG.warn("Shutdown waited for "
+                                        + (System.currentTimeMillis() - startFinalize) + " milliseconds for all "
+                                        + "the connections to become inactive but the active count is still "
+                                        + activeCount + ". Shutting down anyway.");
+                                break;
+                            }
+                            Thread.sleep(100);
                         }
                     }
 
@@ -471,7 +499,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     ConnectionPoolManager.getInstance().removeConnectionPool(alias);
 
                     if (log.isDebugEnabled()) {
-                        log.debug("'" + alias + "' pool has been closed down by " + finalizerName
+                        log.info("'" + alias + "' pool has been closed down by " + finalizerName
                                 + " in " + (System.currentTimeMillis() - startFinalize) + " milliseconds.");
                         if (!connectionClosedManually) {
                             log.debug("No connections required manual removal.");
@@ -491,14 +519,32 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         }
     }
 
+    /**
+     * You should {@link #acquireConnectionStatusReadLock acquire}
+     * a read lock if you want this to be accurate (but that might have
+     * an impact on the performance of your pool).
+     * @see ConnectionPoolStatisticsIF#getAvailableConnectionCount
+     */
     public int getAvailableConnectionCount() {
         return connectionCountByState[ProxyConnection.STATUS_AVAILABLE];
     }
 
+    /**
+     * You should {@link #acquireConnectionStatusReadLock acquire}
+     * a read lock if you want this to be accurate (but that might have
+     * an impact on the performance of your pool).
+     * @see ConnectionPoolStatisticsIF#getActiveConnectionCount
+     */
     public int getActiveConnectionCount() {
         return connectionCountByState[ProxyConnection.STATUS_ACTIVE];
     }
 
+    /**
+     * You should {@link #acquireConnectionStatusReadLock acquire}
+     * a read lock if you want this to be accurate (but that might have
+     * an impact on the performance of your pool).
+     * @see ConnectionPoolStatisticsIF#getOfflineConnectionCount
+     */
     public int getOfflineConnectionCount() {
         return connectionCountByState[ProxyConnection.STATUS_OFFLINE];
     }
@@ -589,10 +635,17 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         connectionCountByState[status]--;
     }
 
+    /**
+     * You should {@link #acquireConnectionStatusWriteLock acquire} a write lock
+     * before calling this method
+     * @param oldStatus so we know which count to decrement
+     * @param newStatus so we know which count to increment
+     */
     protected void changeStatus(int oldStatus, int newStatus) {
+        LOG.debug("About to change status");
         connectionCountByState[oldStatus]--;
         connectionCountByState[newStatus]++;
-
+        LOG.debug("Changing status from " + oldStatus + " to " + newStatus);
         // Check to see if shutdown is waiting for all connections to become
         // non-active
         if (shutdownThread != null && connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE] == 0) {
@@ -619,13 +672,17 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * Changes both the way that any new connections will be made, and the behaviour of the pool. Consider
      * calling expireAllConnections() if you're in a hurry.
      */
-    protected synchronized void setDefinition(ConnectionPoolDefinition definition) {
+    protected synchronized void setDefinition(ConnectionPoolDefinition definition) throws ProxoolException {
         this.definition = definition;
 
         try {
             Class.forName(definition.getDriver());
         } catch (ClassNotFoundException e) {
-            log.error(e);
+            log.error("Couldn't load class " + definition.getDriver(), e);
+            throw new ProxoolException("Couldn't load class " + definition.getDriver());
+        } catch (NullPointerException e) {
+            log.error("Definition did not contain driver", e);
+            throw new ProxoolException("Definition did not contain driver");
         }
 
     }
@@ -704,50 +761,36 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     protected Collection getConnectionInfos() {
-        return getConnectionInfos(false);
-    }
-
-    protected Collection getConnectionInfos(boolean lock) {
         Collection cis = null;
-        try {
-            if (lock) {
-                connectionStatusReadWriteLock.readLock().acquire();
-            }
-
-            cis = new TreeSet(new Comparator() {
-                public int compare(Object o1, Object o2) {
-                    try {
-                        Date birth1 = ((ConnectionInfoIF) o1).getBirthDate();
-                        Date birth2 = ((ConnectionInfoIF) o2).getBirthDate();
-                        return birth1.compareTo(birth2);
-                    } catch (ClassCastException e) {
-                        log.error("Unexpected contents of connectionInfos Set: " + o1.getClass() + " and " + o2.getClass(), e);
-                        return String.valueOf(o1.hashCode()).compareTo(String.valueOf(o2.hashCode()));
-                    }
+        cis = new TreeSet(new Comparator() {
+            public int compare(Object o1, Object o2) {
+                try {
+                    Date birth1 = ((ConnectionInfoIF) o1).getBirthDate();
+                    Date birth2 = ((ConnectionInfoIF) o2).getBirthDate();
+                    return birth1.compareTo(birth2);
+                } catch (ClassCastException e) {
+                    log.error("Unexpected contents of connectionInfos Set: " + o1.getClass() + " and " + o2.getClass(), e);
+                    return String.valueOf(o1.hashCode()).compareTo(String.valueOf(o2.hashCode()));
                 }
-            });
-
-            Iterator i = proxyConnections.iterator();
-            while (i.hasNext()) {
-                ConnectionInfoIF connectionInfo = (ConnectionInfoIF) i.next();
-                ConnectionInfo ci = new ConnectionInfo();
-                ci.setAge(connectionInfo.getAge());
-                ci.setBirthDate(connectionInfo.getBirthDate());
-                ci.setId(connectionInfo.getId());
-                ci.setMark(connectionInfo.getMark());
-                ci.setRequester(connectionInfo.getRequester());
-                ci.setStatus(connectionInfo.getStatus());
-                ci.setTimeLastStartActive(connectionInfo.getTimeLastStartActive());
-                ci.setTimeLastStopActive(connectionInfo.getTimeLastStopActive());
-                ci.setDelegateUrl(connectionInfo.getDelegateUrl());
-                ci.setProxyHashcode(connectionInfo.getProxyHashcode());
-                ci.setDelegateHashcode(connectionInfo.getDelegateHashcode());
-                cis.add(ci);
             }
-        } catch (InterruptedException e) {
-            log.error("Couldn't acquire readLock for connectionStatus", e);
-        } finally {
-            connectionStatusReadWriteLock.readLock().release();
+        });
+
+        Iterator i = proxyConnections.iterator();
+        while (i.hasNext()) {
+            ConnectionInfoIF connectionInfo = (ConnectionInfoIF) i.next();
+            ConnectionInfo ci = new ConnectionInfo();
+            ci.setAge(connectionInfo.getAge());
+            ci.setBirthDate(connectionInfo.getBirthDate());
+            ci.setId(connectionInfo.getId());
+            ci.setMark(connectionInfo.getMark());
+            ci.setRequester(connectionInfo.getRequester());
+            ci.setStatus(connectionInfo.getStatus());
+            ci.setTimeLastStartActive(connectionInfo.getTimeLastStartActive());
+            ci.setTimeLastStopActive(connectionInfo.getTimeLastStopActive());
+            ci.setDelegateUrl(connectionInfo.getDelegateUrl());
+            ci.setProxyHashcode(connectionInfo.getProxyHashcode());
+            ci.setDelegateHashcode(connectionInfo.getDelegateHashcode());
+            cis.add(ci);
         }
         return cis;
     }
@@ -966,16 +1009,46 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         return timeOfLastRefusal;
     }
 
-    protected void aquireWriteLockForConnectionStatus() {
+    protected void acquireConnectionStatusWriteLock() {
         try {
+            try {
+                throw new RuntimeException("TRACE ONLY");
+            } catch (RuntimeException e) {
+                LOG.debug("About to acquire connectionStatus write lock", e);
+            }
             connectionStatusReadWriteLock.writeLock().acquire();
+            try {
+                throw new RuntimeException("TRACE ONLY");
+            } catch (RuntimeException e) {
+                LOG.debug("Acquired connectionStatus write lock", e);
+            }
         } catch (InterruptedException e) {
-            log.error("Couldn't acquire writeLock for connectionStatus", e);
+            log.error("Couldn't acquire connectionStatus write lock", e);
         }
     }
 
-    protected void releaseWriteLockForConnectionStatus() {
+    protected void releaseConnectionStatusWriteLock() {
         connectionStatusReadWriteLock.writeLock().release();
+        try {
+            throw new RuntimeException("TRACE ONLY");
+        } catch (RuntimeException e) {
+            LOG.debug("Released connectionStatus write lock", e);
+        }
+    }
+
+    protected void acquireConnectionStatusReadLock() {
+        try {
+            LOG.debug("About to acquire connectionStatus read lock");
+            connectionStatusReadWriteLock.readLock().acquire();
+            LOG.debug("Acquired connectionStatus read lock");
+        } catch (InterruptedException e) {
+            log.error("Couldn't acquire connectionStatus read lock", e);
+        }
+    }
+
+    protected void releaseConnectionStatusReadLock() {
+        connectionStatusReadWriteLock.readLock().release();
+        LOG.debug("Released connectionStatus read lock");
     }
 
     protected Prototyper getPrototyper() {
@@ -986,6 +1059,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.64  2003/03/11 14:51:49  billhorsman
+ more concurrency fixes relating to snapshots
+
  Revision 1.63  2003/03/11 01:16:29  billhorsman
  removed misleasing debug
 

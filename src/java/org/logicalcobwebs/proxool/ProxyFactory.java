@@ -23,7 +23,7 @@ import java.util.Properties;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.19 $, $Date: 2003/03/10 23:43:13 $
+ * @version $Revision: 1.20 $, $Date: 2003/03/11 14:51:54 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -32,7 +32,7 @@ class ProxyFactory {
 
     private static final Log LOG = LogFactory.getLog(ProxyFactory.class);
 
-    protected static ProxyConnection buildProxyConnection(long id, ConnectionPool connectionPool) throws SQLException {
+    protected static ProxyConnection buildProxyConnection(long id, ConnectionPool connectionPool, int status) throws SQLException {
         Connection realConnection = null;
         final String url = connectionPool.getDefinition().getUrl();
 
@@ -42,7 +42,7 @@ class ProxyFactory {
         Object delegate = Proxy.newProxyInstance(
                         realConnection.getClass().getClassLoader(),
                         realConnection.getClass().getInterfaces(),
-                        new ProxyConnection(realConnection, id, url, connectionPool));
+                        new ProxyConnection(realConnection, id, url, connectionPool, status));
 
         return (ProxyConnection) Proxy.getInvocationHandler(delegate);
     }
@@ -110,6 +110,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.20  2003/03/11 14:51:54  billhorsman
+ more concurrency fixes relating to snapshots
+
  Revision 1.19  2003/03/10 23:43:13  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...

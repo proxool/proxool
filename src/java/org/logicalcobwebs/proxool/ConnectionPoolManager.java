@@ -16,7 +16,7 @@ import java.util.Set;
 
 /**
  *
- * @version $Revision: 1.14 $, $Date: 2003/03/10 23:43:09 $
+ * @version $Revision: 1.15 $, $Date: 2003/03/11 14:51:51 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -89,7 +89,7 @@ class ConnectionPoolManager {
         return (ConnectionPool[]) connectionPools.toArray(new ConnectionPool[connectionPools.size()]);
     }
 
-    protected ConnectionPool createConnectionPool(ConnectionPoolDefinition connectionPoolDefinition) {
+    protected ConnectionPool createConnectionPool(ConnectionPoolDefinition connectionPoolDefinition) throws ProxoolException {
         ConnectionPool connectionPool = new ConnectionPool(connectionPoolDefinition);
         connectionPools.add(connectionPool);
         connectionPoolMap.put(connectionPoolDefinition.getAlias(), connectionPool);
@@ -114,6 +114,9 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.15  2003/03/11 14:51:51  billhorsman
+ more concurrency fixes relating to snapshots
+
  Revision 1.14  2003/03/10 23:43:09  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...

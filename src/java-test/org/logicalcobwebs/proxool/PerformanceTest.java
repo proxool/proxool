@@ -14,14 +14,13 @@ import org.logicalcobwebs.proxool.admin.SnapshotIF;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 import java.text.DecimalFormat;
 
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.14 $, $Date: 2003/03/10 23:49:04 $
+ * @version $Revision: 1.15 $, $Date: 2003/03/11 14:51:43 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -36,7 +35,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 
     private StatisticsIF statistics;
     private static final int PERIOD = 10;
-    private static final int COUNT = 1;
+    private static final int COUNT = 20;
 
     public PerformanceTest(String s) {
         super(s);
@@ -118,6 +117,7 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
         info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, String.valueOf(threadCount));
         info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, String.valueOf(PERIOD) + "s");
         info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_INFO);
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, String.valueOf(Boolean.TRUE));
         ProxoolFacade.registerConnectionPool(url, info);
         ProxoolFacade.addStatisticsListener(alias, this);
         DisagreeableSnapshotter disagreeableSnapshotter = new DisagreeableSnapshotter(alias);
@@ -132,8 +132,11 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 
         doWait();
 
+        int servedCount = 0;
         for (int i = 0; i < COUNT; i++) {
             doWait();
+            servedCount += statistics.getServedCount();
+            assertTrue("disparityNoticed", !disagreeableSnapshotter.isDisparityNoticed());
         }
 
         for (int i = 0; i < annoyingConnectors.length; i++) {
@@ -141,8 +144,27 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
         }
         disagreeableSnapshotter.cancel();
 
-        LOG.info("Served " + statistics.getServedCount()
-            + " at " + millisecondsFormat.format((double) (1000 * PERIOD * COUNT) / (double) statistics.getServedCount()) + " ms per connection");
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < 30000) {
+            int threadsRunning = 0;
+            for (int i = 0; i < annoyingConnectors.length; i++) {
+                if (annoyingConnectors[i].isRunning()) {
+                    threadsRunning++;
+                }
+            }
+            if (disagreeableSnapshotter.isRunning()) {
+                threadsRunning++;
+            }
+            if (threadsRunning == 0) {
+                break;
+            }
+        }
+
+
+        assertTrue("disparityNoticed", !disagreeableSnapshotter.isDisparityNoticed());
+
+        LOG.info("Served " + servedCount
+            + " at " + millisecondsFormat.format((double) (1000 * PERIOD * COUNT) / (double) servedCount) + " ms per connection");
 
     }
 
@@ -152,27 +174,70 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 
         private boolean cancelled;
 
+        private boolean disparityNoticed;
+
+        private boolean running;
+
         public DisagreeableSnapshotter(String alias) {
             this.alias = alias;
         }
 
         public void run() {
 
+            running = true;
+            int snapshotCount = 0;
             while (!cancelled) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     LOG.error("Awoken", e);
                 }
                 try {
                     SnapshotIF s = ProxoolFacade.getSnapshot(alias, true);
-                    if (LOG.isInfoEnabled()) {
-                        LOG.info("Snapshot: served=" + s.getServedCount() + ", active=" + s.getActiveConnectionCount());
+                    int c1 = s.getActiveConnectionCount();
+                    int c2 = getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_ACTIVE);
+                    int v1 = s.getAvailableConnectionCount();
+                    int v2 = getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_AVAILABLE);
+                    int o1 = s.getOfflineConnectionCount();
+                    int o2 = getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_OFFLINE);
+                    if (c1 != c2 || v1 != v2 || o1 != o2) {
+                        LOG.error("Disparity noticed. Active: " + c1 + (c1 == c2 ? " == " : " != ") + c2
+                            + ", available: " + v1 + (v1 == v2 ? " == " : " != ") + v2
+                            + ", offline: " + o1 + (o1 == o2 ? " == " : " != ") + o2);
+                        disparityNoticed = true;
                     }
+                    snapshotCount++;
                 } catch (ProxoolException e) {
                     LOG.error("Couldn't get snapshot", e);
                 }
             }
+            LOG.info(snapshotCount + " snapshots taken");
+            running = false;
+        }
+
+        public boolean isRunning() {
+            return running;
+        }
+
+        private void checkForDisparity(int count1, int count2, String description) {
+            if (count1 != count2) {
+                LOG.error(description + " disparity: " + count1 + " != " + count2);
+                disparityNoticed = true;
+            }
+        }
+
+        private int getCount(ConnectionInfoIF[] connectionInfos, int status) {
+            int count = 0;
+            for (int i = 0; i < connectionInfos.length; i++) {
+                if (connectionInfos[i].getStatus() == status) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public boolean isDisparityNoticed() {
+            return disparityNoticed;
         }
 
         public void cancel() {
@@ -189,17 +254,20 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 
         private int exceptionCount;
 
+        private boolean running = false;
+
         public AnnoyingConnector(String alias) {
             this.alias = alias;
         }
 
         public void run() {
+            running = true;
                 while (!cancelled) {
                     try {
                         Connection connection = null;
                         try {
                             connection = DriverManager.getConnection(TestHelper.buildProxoolUrl(alias));
-                            Statement s = connection.createStatement();
+                            connection.createStatement();
                             Thread.yield();
                         } finally {
                             if (connection != null) {
@@ -211,6 +279,11 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
                         exceptionCount++;
                     }
                 }
+            running = false;
+        }
+
+        public boolean isRunning() {
+            return running;
         }
 
         public void cancel() {
@@ -228,6 +301,9 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.15  2003/03/11 14:51:43  billhorsman
+ more concurrency fixes relating to snapshots
+
  Revision 1.14  2003/03/10 23:49:04  billhorsman
  new test to measure the impact of taking snapshots
 
