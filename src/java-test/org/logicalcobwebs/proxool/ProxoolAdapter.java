@@ -16,12 +16,12 @@ import java.sql.DriverManager;
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
  *
- * TODO
+ * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/02 12:46:42 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 public class ProxoolAdapter implements ConnectionAdapterIF {
 
@@ -62,6 +62,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.3  2002/11/02 14:22:16  billhorsman
+ Documentation
+
  Revision 1.2  2002/11/02 12:46:42  billhorsman
  improved debug
 

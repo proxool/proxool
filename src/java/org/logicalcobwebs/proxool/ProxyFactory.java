@@ -15,12 +15,13 @@ import java.lang.reflect.Proxy;
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
  *
- * TODO
+ * A central place to build proxy objects ({@link ProxyConnection connections}
+ * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.2 $, $Date: 2002/10/30 21:25:08 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:15 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 class ProxyFactory {
 
@@ -61,6 +62,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.3  2002/11/02 14:22:15  billhorsman
+ Documentation
+
  Revision 1.2  2002/10/30 21:25:08  billhorsman
  move createStatement into ProxyFactory
 

@@ -38,10 +38,10 @@ import java.util.Properties;
  *<p>Note that there is nothing Proxool specific about this configurator. You can
  * configure any JDBC connection with it.</p>
  *
- * @version $Revision: 1.2 $, $Date: 2002/10/27 13:05:01 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 public class PropertyConfigurator {
 
@@ -115,6 +115,9 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.3  2002/11/02 14:22:16  billhorsman
+ Documentation
+
  Revision 1.2  2002/10/27 13:05:01  billhorsman
  checkstyle
 

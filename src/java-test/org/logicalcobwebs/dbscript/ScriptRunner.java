@@ -16,17 +16,24 @@ import java.sql.Statement;
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
  *
- * TODO
+ * Run a {@link Script script}.
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/02 13:57:34 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/02 14:22:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 class ScriptRunner {
 
     private static final Log LOG = LogFactory.getLog(ScriptRunner.class);
 
+    /**
+     * Run the script.
+     *
+     * @param script to run
+     * @param adapter so we know where to connections from
+     * @throws SQLException if anything goes wrong
+     */
     protected static void runScript(Script script, ConnectionAdapterIF adapter) throws SQLException {
         adapter.setup(script.getDriver(), script.getUrl(), script.getInfo());
 
@@ -81,6 +88,12 @@ class ScriptRunner {
         }
     }
 
+    /**
+     * Execute and SQL statement
+     * @param connection used to execute statement
+     * @param sql the SQL to perform
+     * @throws SQLException if anything goes wrong
+     */
     private static void execute(Connection connection, String sql) throws SQLException {
         Statement statement = null;
         try {
@@ -104,6 +117,9 @@ class ScriptRunner {
 /*
  Revision history:
  $Log: ScriptRunner.java,v $
+ Revision 1.4  2002/11/02 14:22:16  billhorsman
+ Documentation
+
  Revision 1.3  2002/11/02 13:57:34  billhorsman
  checkstyle
 

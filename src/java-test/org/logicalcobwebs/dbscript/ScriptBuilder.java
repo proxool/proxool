@@ -17,10 +17,10 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * Parser to get {@link org.logicalcobwebs.dbscript.Script} from XML source
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/02 13:57:34 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 class ScriptBuilder extends DefaultHandler {
 
@@ -28,6 +28,9 @@ class ScriptBuilder extends DefaultHandler {
 
     private Script script = null;
 
+    /**
+     * @see DefaultHandler#startElement
+     */
     public void startElement(String uri, String localName,
                              String qName, Attributes attributes)
             throws SAXException {
@@ -64,14 +67,22 @@ class ScriptBuilder extends DefaultHandler {
 
     }
 
+    /**
+     * Get the script we just built. Call *after* {@link javax.xml.parsers.SAXParser#parse parsing}
+     * @return the new script
+     */
     protected Script getScript() {
         return script;
     }
+    
 }
 
 /*
  Revision history:
  $Log: ScriptBuilder.java,v $
+ Revision 1.3  2002/11/02 14:22:16  billhorsman
+ Documentation
+
  Revision 1.2  2002/11/02 13:57:34  billhorsman
  checkstyle
 

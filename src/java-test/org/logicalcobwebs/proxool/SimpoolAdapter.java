@@ -22,10 +22,12 @@ import java.util.Properties;
  * But it is fast. We use it as our bench mark on how could we should strive
  * to be.
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/02 12:46:42 $
+ * Provides Simpool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
+ *
+ * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 public class SimpoolAdapter implements ConnectionAdapterIF {
 
@@ -79,6 +81,9 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: SimpoolAdapter.java,v $
+ Revision 1.3  2002/11/02 14:22:16  billhorsman
+ Documentation
+
  Revision 1.2  2002/11/02 12:46:42  billhorsman
  improved debug
 

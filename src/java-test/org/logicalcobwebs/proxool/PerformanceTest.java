@@ -21,10 +21,10 @@ import java.sql.SQLException;
  *
  * TODO
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/02 13:57:34 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/02 14:22:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 public class PerformanceTest extends TestCase {
 
@@ -57,6 +57,9 @@ public class PerformanceTest extends TestCase {
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.4  2002/11/02 14:22:16  billhorsman
+ Documentation
+
  Revision 1.3  2002/11/02 13:57:34  billhorsman
  checkstyle
 

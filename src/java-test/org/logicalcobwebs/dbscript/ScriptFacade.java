@@ -23,17 +23,22 @@ import java.sql.SQLException;
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
  *
- * TODO
+ * Allows you to run scripts from file.
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/02 13:57:34 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 public class ScriptFacade {
 
     private static final Log LOG = LogFactory.getLog(ScriptFacade.class);
 
+    /**
+     * Run the script using the appropriate handler
+     * @param scriptLocation the path to the file that contains the script XML
+     * @param adapter so we know where to get {@link java.sql.Connection connections} from.
+     */
     public static void runScript(String scriptLocation, ConnectionAdapterIF adapter) {
 
         File scriptFile = new File(scriptLocation);
@@ -89,6 +94,9 @@ public class ScriptFacade {
 /*
  Revision history:
  $Log: ScriptFacade.java,v $
+ Revision 1.3  2002/11/02 14:22:16  billhorsman
+ Documentation
+
  Revision 1.2  2002/11/02 13:57:34  billhorsman
  checkstyle
 
