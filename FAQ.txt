@@ -30,3 +30,11 @@ A. Intellij started shipping there own JRE just before they released version 3.0
   This JRE includes javac but not javadoc. The solution is to copy javadoc from
   a full JDK (preferably a similar version to the one shipped with IDEA) into
   the JRE's bin directory.
+
+Q. When I run the tests I get an SQLException: "The database is already in use by
+  another process".
+
+A. This is a message from Hypersonic, the Java database we use for testing. It
+  could either mean you are running two instances of the test or that you don't
+  have permission to create the database on the file system (Hypersonic will
+  try and save files to the Proxool directory).
