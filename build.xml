@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.43 $
-    $Date: 2003/03/04 10:26:46 $
+    $Revision: 1.44 $
+    $Date: 2003/03/05 18:53:06 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -26,20 +26,20 @@
     <property name="version" value="0.7.*"/>
 
     <!-- Currect release, e.g. 0.6 -->
-    <property name="release" value="0.7" />
+    <property name="release" value="0.7"/>
 
     <!-- Currect release, e.g. 0.6 -->
-    <property name="junit-report-description" value="Unit Test Report for CVS Snapshot" />
+    <property name="junit-report-description" value="Unit Test Report for CVS Snapshot"/>
 
     <!-- Currect release, e.g. 0.6 -->
-    <property name="junit-report-name" value="junit-cvs.html" />
+    <property name="junit-report-name" value="junit-cvs.html"/>
 
     <!-- Log4J configuration to use for testing. See proxool-ant.properties
     file for more infomation. -->
     <property name="log4jPath" value="src/java-test/org/logicalcobwebs/proxool/log4j-test.xml"/>
 
     <!-- Classpath -->
-    <path id="source" path="${build-dir}/classes" >
+    <path id="source" path="${build-dir}/classes">
         <fileset dir="lib">
             <include name="**/*.jar"/>
         </fileset>
@@ -66,7 +66,7 @@
         <tstamp>
             <format property="TODAY_FULL" pattern="dd-MMM-yyyy HH:mm zzz"/>
         </tstamp>
-        <mkdir dir="${build-dir}/src/java" description="make source directory" />
+        <mkdir dir="${build-dir}/src/java" description="make source directory"/>
         <mkdir dir="${build-dir}/etc"/>
         <mkdir dir="${build-dir}/deploy"/>
         <mkdir dir="${build-dir}/classes"/>
@@ -195,7 +195,7 @@
         >
         <javac srcdir="${build-dir}/src/java" destdir="${build-dir}/classes" debug="${debug}">
             <classpath refid="source"/>
-		</javac>
+        </javac>
         <!-- Copy dtd's and properties into the compiled classes directory. -->
         <copy todir="${build-dir}/classes">
             <fileset dir="src/java" includes="**/*.dtd"/>
@@ -208,7 +208,7 @@
         description="Compiles and builds the JAR file"
         depends="init,build-src,compile"
         >
-        <manifest file="${build-dir}/etc/MANIFEST.MF" >
+        <manifest file="${build-dir}/etc/MANIFEST.MF">
             <attribute name="Proxool-Version" value="${version}"/>
             <attribute name="Date" value="${TODAY}"/>
         </manifest>
@@ -225,11 +225,21 @@
         if="build-jdk1.2"
         >
         <echo level="verbose" message="Using JDK1.2"/>
-        <copy todir="${build-dir}/src/java" preservelastmodified="yes">
-            <fileset dir="src/java" includes="**/*.java" excludes="**/Jdk14Logger.java"/>
-        </copy>
+        <antcall target="build-src-common"/>
         <copy todir="${build-dir}/src/java" overwrite="yes">
             <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
+        </copy>
+    </target>
+
+    <target
+        name="build-src-common"
+        depends="init"
+        >
+        <copy todir="${build-dir}/src/java" preservelastmodified="yes">
+            <fileset
+                dir="src/java"
+                includes="**/*.java"
+                excludes="**/Jdk14Logger.java,**/ProxyCallableStatement.java,**/ProxyConnection.java,**/ProxyDatabaseMetData.java,**/ProxyFactory.java,**/ProxyPreparedStatement.java,**/ShutdownHook.java,**/StatsRoller.java"/>
         </copy>
     </target>
 
@@ -292,9 +302,9 @@
         description="Runs the JUnit tests"
         depends="clean,init,build-test,deleteTestDb"
         >
-        <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
-            <sysproperty key="log4jPath" value="${log4jPath}" />
-            <arg value="org.logicalcobwebs.proxool.GlobalTest" />
+        <java fork="yes" classpathref="source" classname="junit.textui.TestRunner">
+            <sysproperty key="log4jPath" value="${log4jPath}"/>
+            <arg value="org.logicalcobwebs.proxool.GlobalTest"/>
         </java>
     </target>
 
@@ -304,29 +314,29 @@
         depends="clean,init,build-test,deleteTestDb"
         >
 
-        <junit fork="true" printsummary="yes" >
+        <junit fork="true" printsummary="yes">
             <classpath refid="source"/>
-            <sysproperty key="log4jPath" value="${log4jPath}" />
+            <sysproperty key="log4jPath" value="${log4jPath}"/>
             <batchtest todir="${build-dir}/reports">
                 <fileset dir="src/java-test"
                     includes="**/*Test.java"
                     excludes="**/ThreadTest.java,**/PerformanceTest.java,**/GlobalTest.java,**/AbstractProxoolTest.java"
                     />
             </batchtest>
-            <formatter type="xml" />
+            <formatter type="xml"/>
         </junit>
 
 
         <junitreport>
-            <fileset dir="${build-dir}/reports" >
-                <include name="TEST-*.xml" />
+            <fileset dir="${build-dir}/reports">
+                <include name="TEST-*.xml"/>
             </fileset>
-            <report format="noframes" todir="${build-dir}/reports" />
+            <report format="noframes" todir="${build-dir}/reports"/>
         </junitreport>
 
         <move
             file="${build-dir}/reports/junit-noframes.html"
-            tofile="${build-dir}/reports/${junit-report-name}" />
+            tofile="${build-dir}/reports/${junit-report-name}"/>
 
         <replace
             file="${build-dir}/reports/${junit-report-name}"
@@ -348,10 +358,10 @@
             doctitle="Proxool Developer's API}"
             windowtitle="Proxool Developer's API}"
             private="true"
-        >
-            <sourcepath path="src/java" />
-            <sourcepath path="src/java-test" />
-            <sourcepath path="src/java-sandbox" />
+            >
+            <sourcepath path="src/java"/>
+            <sourcepath path="src/java-test"/>
+            <sourcepath path="src/java-sandbox"/>
         </javadoc>
 
         <!-- Simple documentation for use by users -->
@@ -362,10 +372,14 @@
             doctitle="Proxool API}"
             windowtitle="Proxool API}"
             public="true"
-        />
+            />
         <!-- Copy dtd's over to the doc. -->
-        <copy todir="${build-dir}/api"><fileset dir="src/java" includes="**/*.dtd" /></copy>
-        <copy todir="${build-dir}/api-dev"><fileset dir="src/java" includes="**/*.dtd" /></copy>
+        <copy todir="${build-dir}/api">
+            <fileset dir="src/java" includes="**/*.dtd"/>
+        </copy>
+        <copy todir="${build-dir}/api-dev">
+            <fileset dir="src/java" includes="**/*.dtd"/>
+        </copy>
     </target>
 
     <target
@@ -373,7 +387,7 @@
         description="Outputs the source version"
         depends="init,compile"
         >
-        <java classpathref="source" classname="org.logicalcobwebs.proxool.Version" />
+        <java classpathref="source" classname="org.logicalcobwebs.proxool.Version"/>
     </target>
 
     <target
@@ -381,7 +395,7 @@
         description="Outputs the source version"
         depends="init"
         >
-        <java classpathref="binary" classname="org.logicalcobwebs.proxool.Version" />
+        <java classpathref="binary" classname="org.logicalcobwebs.proxool.Version"/>
     </target>
 
 </project>
