@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.4 2003/09/10 22:21:04 chr32 Exp $
- * $Revision: 1.4 $
- * $Date: 2003/09/10 22:21:04 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.5 2003/09/10 23:05:40 billhorsman Exp $
+ * $Revision: 1.5 $
+ * $Date: 2003/09/10 23:05:40 $
  *
  * ====================================================================
  *
@@ -62,6 +62,7 @@
 package org.logicalcobwebs.logging.impl;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import org.logicalcobwebs.logging.Log;
 
@@ -73,7 +74,7 @@ import org.logicalcobwebs.logging.Log;
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author <a href="mailto:bloritsch@apache.org">Berin Loritsch</a>
  * @author <a href="mailto:donaldp@apache.org">Peter Donald</a>
- * @version $Revision: 1.4 $ $Date: 2003/09/10 22:21:04 $
+ * @version $Revision: 1.5 $ $Date: 2003/09/10 23:05:40 $
  */
 
 public final class Jdk14Logger implements Log {
@@ -97,6 +98,10 @@ public final class Jdk14Logger implements Log {
                 String.class, String.class, String.class, Throwable.class});
             final Class levelClass = Class.forName("java.util.logging.Level");
             isLoggableMethod = loggerClass.getMethod("isLoggable", new Class[] {levelClass});
+            getStackTraceMethod = Throwable.class.getMethod("getStackTrace", null);
+            final Class stackTraceClass = Class.forName("java.lang.StackTraceElement");
+            getClassNameMethod = stackTraceClass.getMethod("getClassName", null);
+            getMethodNameMethod = stackTraceClass.getMethod("getMethodName", null);
             levelFINEST = levelClass.getField("FINEST").get(null);
             levelFINE = levelClass.getField("FINE").get(null);
             levelINFO = levelClass.getField("INFO").get(null);
@@ -120,6 +125,9 @@ public final class Jdk14Logger implements Log {
     private Method logpMethod = null;
     private Method logpExMethod = null;
     private Method isLoggableMethod = null;
+    private Method getStackTraceMethod = null;
+    private Method getClassNameMethod = null;
+    private Method getMethodNameMethod = null;
 
     private Object levelFINEST = null;
     private Object levelFINE = null;
@@ -138,14 +146,22 @@ public final class Jdk14Logger implements Log {
     private void log (Object level, String msg, Throwable ex) {
         // Hack (?) to get the stack trace.
         Throwable dummyException = new Throwable ();
-        StackTraceElement locations[] = dummyException.getStackTrace ();
-        // Caller will be the third element
         String cname = "unknown";
         String method = "unknown";
-        if (locations != null && locations.length > 2) {
-            StackTraceElement caller = locations[2];
-            cname = caller.getClassName ();
-            method = caller.getMethodName ();
+        // Use reflection instead of JDK1.4 code.
+        try {
+            Object locations[] = (Object[]) getStackTraceMethod.invoke(dummyException, null);
+            // Caller will be the third element
+            if (locations != null && locations.length > 2) {
+                cname = (String) getClassNameMethod.invoke(locations[2], null);
+                method = (String) getMethodNameMethod.invoke(locations[2], null);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
 
         try {
