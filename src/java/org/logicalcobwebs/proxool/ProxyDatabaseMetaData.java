@@ -8,7 +8,10 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import net.sf.cglib.InvocationHandler;
+import org.logicalcobwebs.cglib.proxy.MethodInterceptor;
+import org.logicalcobwebs.cglib.proxy.MethodProxy;
+import org.logicalcobwebs.cglib.proxy.InvocationHandler;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -17,11 +20,11 @@ import java.sql.SQLException;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.5 $, $Date: 2003/09/10 22:21:04 $
+ * @version $Revision: 1.6 $, $Date: 2003/12/12 19:29:47 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
-class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements InvocationHandler {
+class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements MethodInterceptor, InvocationHandler {
 
     private static final Log LOG = LogFactory.getLog(ProxyDatabaseMetaData.class);
 
@@ -35,19 +38,22 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements Invocati
         super(connection,  proxyConnection);
     }
 
-    public Object invoke(Object proxy, Method m, Object[] args)
-            throws Throwable {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+        return invoke(proxy, method, args);
+    }
+
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Object result = null;
         int argCount = args != null ? args.length : 0;
         try {
-            if (m.getName().equals(GET_CONNECTION_METHOD)) {
+            if (method.getName().equals(GET_CONNECTION_METHOD)) {
                 result = getConnection();
-            } else if (m.getName().equals(EQUALS_METHOD) && argCount == 1) {
+            } else if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = new Boolean(equals(args[0]));
-            } else if (m.getName().equals(FINALIZE_METHOD)) {
+            } else if (method.getName().equals(FINALIZE_METHOD)) {
                 super.finalize();
             } else {
-                result = m.invoke(getDatabaseMetaData(), args);
+                result = method.invoke(getDatabaseMetaData(), args);
             }
         } catch (InvocationTargetException e) {
             throw e.getTargetException();
@@ -65,6 +71,9 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements Invocati
 /*
  Revision history:
  $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.6  2003/12/12 19:29:47  billhorsman
+ Now uses Cglib 2.0
+
  Revision 1.5  2003/09/10 22:21:04  chr32
  Removing > jdk 1.2 dependencies.
 

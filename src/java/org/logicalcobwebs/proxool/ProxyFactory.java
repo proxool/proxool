@@ -8,8 +8,9 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import net.sf.cglib.InvocationHandler;
-import net.sf.cglib.Proxy;
+import org.logicalcobwebs.cglib.proxy.Proxy;
+import org.logicalcobwebs.cglib.proxy.InvocationHandler;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -22,10 +23,10 @@ import java.util.Properties;
 /**
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
- *
- * @version $Revision: 1.24 $, $Date: 2003/09/30 18:39:08 $
+ * 
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
+ * @version $Revision: 1.25 $, $Date: 2003/12/12 19:29:47 $
  * @since Proxool 0.5
  */
 class ProxyFactory {
@@ -40,28 +41,29 @@ class ProxyFactory {
         realConnection = DriverManager.getConnection(url, info);
 
         Object delegate = Proxy.newProxyInstance(
-                        null,
-                        realConnection.getClass().getInterfaces(),
-                        new ProxyConnection(realConnection, id, url, connectionPool, status));
+                realConnection.getClass().getClassLoader(),
+                realConnection.getClass().getInterfaces(),
+                new ProxyConnection(realConnection, id, url, connectionPool, status));
 
         return (ProxyConnection) Proxy.getInvocationHandler(delegate);
     }
 
     /**
      * Get a Connection from the ProxyConnection
-     *
+     * 
      * @param proxyConnection where to find the connection
-     * @return
+     * @return 
      */
     protected static Connection getConnection(ProxyConnectionIF proxyConnection) {
         return (Connection) Proxy.newProxyInstance(
-                null,
+                Connection.class.getClassLoader(),
                 new Class[]{Connection.class},
                 (InvocationHandler) proxyConnection);
     }
 
     /**
      * Gets the real Statement that we got from the delegate driver
+     * 
      * @param statement proxy statement
      * @return delegate statement
      */
@@ -74,6 +76,7 @@ class ProxyFactory {
 
     /**
      * Gets the real Connection that we got from the delegate driver
+     * 
      * @param connection proxy connection
      * @return deletgate connection
      */
@@ -84,7 +87,7 @@ class ProxyFactory {
         return c;
     }
 
-    protected static Statement createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection,  String sqlStatement) {
+    protected static Statement createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection, String sqlStatement) {
         // We can't use Class#getInterfaces since that doesn't take
         // into account superclass interfaces. We could, laboriously,
         // work our way up the hierarchy but it doesn't seem worth while -
@@ -102,29 +105,31 @@ class ProxyFactory {
             LOG.debug(delegate.getClass().getName() + " is being proxied using the " + interfaces[0]);
         }
 */
-        return (Statement) Proxy.newProxyInstance(null, interfaces, new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
+        return (Statement) Proxy.newProxyInstance(delegate.getClass().getClassLoader(), interfaces, new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
     }
 
     /**
      * Create a new DatabaseMetaData from a connection
+     * 
      * @param connection the proxy connection we are using
      * @return databaseMetaData
      * @throws SQLException if the delegfate connection couldn't get the metaData
      */
     protected static DatabaseMetaData getDatabaseMetaData(Connection connection, ProxyConnectionIF proxyConnection) throws SQLException {
         return (DatabaseMetaData) Proxy.newProxyInstance(
-                null,
+                DatabaseMetaData.class.getClassLoader(),
                 new Class[]{DatabaseMetaData.class},
                 new ProxyDatabaseMetaData(connection, proxyConnection)
         );
     }
-
-
 }
 
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.25  2003/12/12 19:29:47  billhorsman
+ Now uses Cglib 2.0
+
  Revision 1.24  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 

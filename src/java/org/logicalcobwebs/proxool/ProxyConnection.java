@@ -8,7 +8,10 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import net.sf.cglib.InvocationHandler;
+import org.logicalcobwebs.cglib.proxy.MethodProxy;
+import org.logicalcobwebs.cglib.proxy.MethodInterceptor;
+import org.logicalcobwebs.cglib.proxy.InvocationHandler;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -18,11 +21,11 @@ import java.sql.Statement;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.28 $, $Date: 2003/09/30 18:39:08 $
+ * @version $Revision: 1.29 $, $Date: 2003/12/12 19:29:47 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-class ProxyConnection extends AbstractProxyConnection implements InvocationHandler {
+class ProxyConnection extends AbstractProxyConnection implements InvocationHandler, MethodInterceptor {
 
     private static final Log LOG = LogFactory.getLog(ProxyConnection.class);
 
@@ -40,26 +43,29 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
         super(connection, id, delegateUrl, connectionPool, status);
     }
 
-    public Object invoke(Object proxy, Method m, Object[] args)
-            throws Throwable {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+        return invoke(proxy, method, args);
+    }
+
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Object result = null;
         int argCount = args != null ? args.length : 0;
         try {
-            if (m.getName().equals(CLOSE_METHOD)) {
+            if (method.getName().equals(CLOSE_METHOD)) {
                 close();
-            } else if (m.getName().equals(EQUALS_METHOD) && argCount == 1) {
+            } else if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = new Boolean(equals(args[0]));
-            } else if (m.getName().equals(IS_CLOSED_METHOD) && argCount == 0) {
+            } else if (method.getName().equals(IS_CLOSED_METHOD) && argCount == 0) {
                 result = new Boolean(isClosed());
-            } else if (m.getName().equals(GET_META_DATA_METHOD) && argCount == 0) {
+            } else if (method.getName().equals(GET_META_DATA_METHOD) && argCount == 0) {
                 result = getMetaData();
-            } else if (m.getName().equals(FINALIZE_METHOD)) {
+            } else if (method.getName().equals(FINALIZE_METHOD)) {
                 super.finalize();
             } else {
-                if (m.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
+                if (method.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
                     setNeedToReset(true);
                 }
-                    result = m.invoke(getConnection(), args);
+                    result = method.invoke(getConnection(), args);
             }
 
             // If we have just made some sort of Statement then we should rather return
@@ -105,6 +111,9 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.29  2003/12/12 19:29:47  billhorsman
+ Now uses Cglib 2.0
+
  Revision 1.28  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 

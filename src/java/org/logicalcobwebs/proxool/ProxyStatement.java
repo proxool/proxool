@@ -8,7 +8,10 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import net.sf.cglib.InvocationHandler;
+import org.logicalcobwebs.cglib.proxy.MethodInterceptor;
+import org.logicalcobwebs.cglib.proxy.MethodProxy;
+import org.logicalcobwebs.cglib.proxy.InvocationHandler;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Statement;
@@ -18,11 +21,11 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.24 $, $Date: 2003/10/19 09:50:33 $
+ * @version $Revision: 1.25 $, $Date: 2003/12/12 19:29:47 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-class ProxyStatement extends AbstractProxyStatement implements InvocationHandler {
+class ProxyStatement extends AbstractProxyStatement implements InvocationHandler, MethodInterceptor {
 
     private static final Log LOG = LogFactory.getLog(ProxyStatement.class);
 
@@ -44,8 +47,11 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
         super(statement, connectionPool, proxyConnection, sqlStatement);
     }
 
-    public Object invoke(Object proxy, Method method, Object[] args)
-            throws Throwable {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+        return invoke(proxy, method, args);
+    }
+
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Object result = null;
         long startTime = System.currentTimeMillis();
         final int argCount = args != null ? args.length : 0;
@@ -129,6 +135,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.25  2003/12/12 19:29:47  billhorsman
+ Now uses Cglib 2.0
+
  Revision 1.24  2003/10/19 09:50:33  billhorsman
  Drill down into InvocationTargetException during execution debug.
 
