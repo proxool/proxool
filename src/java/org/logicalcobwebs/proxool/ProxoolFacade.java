@@ -32,9 +32,9 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.45 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.46 $, $Date: 2003/02/07 01:48:15 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public class ProxoolFacade {
 
@@ -44,9 +44,6 @@ public class ProxoolFacade {
 
     private static Map completeInfos = new HashMap();
 
-    /*
-        TODO we only allow one configurationListener at a time. Need to rethink whole listener code
-     */
     private static Map configurators = new HashMap();
 
     /**
@@ -536,36 +533,63 @@ public class ProxoolFacade {
     }
 
     /**
-     * Monitors the change of state of the pool (quiet, busy, overloaded, or down)
+     * @deprecated  use {@link #addStateListener(String, StateListenerIF)} instead.
+     */
+    public static void setStateListener(String alias, StateListenerIF stateListener) throws ProxoolException {
+        addStateListener(alias, stateListener);
+    }
+
+    /**
+     * Add a listener that monitors the change of state of the pool (quiet, busy, overloaded, or down)
      * @param alias identifies the pool
      * @param stateListener the new listener
      * @throws ProxoolException if we couldn't find the pool
      */
-    public static void setStateListener(String alias, StateListenerIF stateListener) throws ProxoolException {
+    public static void addStateListener(String alias, StateListenerIF stateListener) throws ProxoolException {
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
-        cp.setStateListener(stateListener);
+        cp.addStateListener(stateListener);
     }
 
     /**
-     * Monitors each time a connection is made or destroyed
+     * @deprecated use {@link #addConnectionListener(String, ConnectionListenerIF)} instead.
+     */
+    public static void setConnectionListener(String alias, ConnectionListenerIF connectionListener) throws ProxoolException {
+        addConnectionListener(alias, connectionListener);
+    }
+
+    /**
+     * Add a listener that monitors each time a connection is made or destroyed.
      * @param alias identifies the pool
      * @param connectionListener the new listener
      * @throws ProxoolException if we couldn't find the pool
      */
-    public static void setConnectionListener(String alias, ConnectionListenerIF connectionListener) throws ProxoolException {
+    public static void addConnectionListener(String alias, ConnectionListenerIF connectionListener) throws ProxoolException {
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
-        cp.setConnectionListener(connectionListener);
+        cp.addConnectionListener(connectionListener);
     }
 
     /**
-     * Adds a listener that gets called everytime the configuration changes
+     * @deprecated use {@link #addConfigurationListener(String, ConfigurationListenerIF)} instead.
+     */
+    public static void setConfigurationListener(String alias, ConfigurationListenerIF configurationListener) throws ProxoolException {
+        addConfigurationListener(alias, configurationListener);
+    }
+
+    /**
+     * Adds a listener that gets called everytime the configuration changes.
      * @param alias identifies the pool
      * @param configurationListener the new listener
      * @throws ProxoolException if we couldn't find the pool
      */
-    public static void setConfigurationListener(String alias, ConfigurationListenerIF configurationListener) throws ProxoolException {
+    public static void addConfigurationListener(String alias, ConfigurationListenerIF configurationListener) throws ProxoolException {
         if (ConnectionPoolManager.getInstance().isPoolExists(alias)) {
-            configurators.put(alias, configurationListener);
+            CompositeConfigurationListener compositeConfigurationListener = (CompositeConfigurationListener)
+                configurators.get(alias);
+            if (compositeConfigurationListener == null) {
+                compositeConfigurationListener = new CompositeConfigurationListener();
+                configurators.put(alias, compositeConfigurationListener);
+            }
+            compositeConfigurationListener.addListener(configurationListener);
         } else {
             throw new ProxoolException(ConnectionPoolManager.getInstance().getKnownPools(alias));
         }
@@ -707,6 +731,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.46  2003/02/07 01:48:15  chr32
+ Started using new composite listeners.
+
  Revision 1.45  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 

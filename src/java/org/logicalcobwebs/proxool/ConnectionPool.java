@@ -8,6 +8,7 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.monitor.Monitor;
+import org.logicalcobwebs.proxool.util.FastArrayList;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,9 +21,9 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.41 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.42 $, $Date: 2003/02/07 01:48:15 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 class ConnectionPool implements ConnectionPoolStatisticsIF {
 
@@ -83,9 +84,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private DecimalFormat bigCountFormat = new DecimalFormat("###000000");
 
-    private ConnectionListenerIF connectionListener;
+    private CompositeConnectionListener compositeConnectionListener = new CompositeConnectionListener();
 
-    private StateListenerIF stateListener;
+    private CompositeStateListener compositeStateListener = new CompositeStateListener();
 
     private boolean lastCreateWasSuccessful = true;
 
@@ -965,37 +966,44 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     }
 
+    /**
+     * @deprecated use {@link #addStateListener(StateListenerIF)} instead.
+     */
     public void setStateListener(StateListenerIF stateListener) {
-        this.stateListener = stateListener;
+        addStateListener(stateListener);
     }
 
+    public void addStateListener(StateListenerIF stateListener) {
+        this.compositeStateListener.addListener(stateListener);
+    }
+
+    /**
+     * @deprecated use {@link #addConnectionListener(ConnectionListenerIF)} instead.
+     */
     public void setConnectionListener(ConnectionListenerIF connectionListener) {
-        this.connectionListener = connectionListener;
+        addConnectionListener(connectionListener);
+    }
+
+    public void addConnectionListener(ConnectionListenerIF connectionListener) {
+        this.compositeConnectionListener.addListener(connectionListener);
     }
 
     /** Call the onBirth() method on each StateListenerIF . */
     private void onBirth(Connection connection) throws SQLException {
-        if (connectionListener != null) {
-            connectionListener.onBirth(connection);
-        }
+        this.compositeConnectionListener.onBirth(connection);
     }
 
     /** Call the onDeath() method on each StateListenerIF . */
     protected void onDeath(Connection connection) throws SQLException {
-        if (connectionListener != null) {
-            connectionListener.onDeath(connection);
-        }
+        this.compositeConnectionListener.onDeath(connection);
     }
 
     /** Call the onExecute() method on each StateListenerIF . */
     protected void onExecute(String command, long elapsedTime, Exception exception) throws SQLException {
-        if (connectionListener != null) {
-            if (exception == null) {
-                connectionListener.onExecute(command, elapsedTime);
-            } else {
-                connectionListener.onFail(command, exception);
-            }
-
+        if (exception == null) {
+            this.compositeConnectionListener.onExecute(command, elapsedTime);
+        } else {
+            this.compositeConnectionListener.onFail(command, exception);
         }
     }
 
@@ -1004,7 +1012,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * @return true if there is a listener registered.
      */
     protected boolean isConnectionListenedTo() {
-        return (connectionListener != null);
+        return !compositeConnectionListener.isEmpty();
     }
 
     public String toString() {
@@ -1060,15 +1068,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     public void setUpState(int upState) {
-
         if (this.upState != upState) {
-
-            if (stateListener != null) {
-                stateListener.upStateChanged(upState);
-            }
-
+            compositeStateListener.upStateChanged(upState);
             this.upState = upState;
-
         }
     }
 
@@ -1185,6 +1187,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.42  2003/02/07 01:48:15  chr32
+ Started using new composite listeners.
+
  Revision 1.41  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 
