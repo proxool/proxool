@@ -24,7 +24,7 @@ import java.text.DecimalFormat;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/27 18:01:49 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/28 12:23:59 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -88,9 +88,9 @@ public class StatisticsTest extends TestCase {
 
             Thread.sleep(1000);
             Connection c = DriverManager.getConnection(url);
-            Thread.sleep(1000);
+            // Ensure that active time is non-zero (due to rounding)
+            Thread.sleep(20);
             c.close();
-            Thread.sleep(1000);
 
             statistics = waitForNextStatistics(alias, "10s", statistics, 20000);
 
@@ -164,23 +164,14 @@ public class StatisticsTest extends TestCase {
         return statistics;
     }
 
-    class TestListener implements StatisticsListenerIF {
-
-        private StatisticsIF statistics;;
-
-        public void statistics(String alias, StatisticsIF statistics) {
-            this.statistics = statistics;
-        }
-
-        public StatisticsIF getStatistics() {
-            return statistics;
-        }
-    }
 }
 
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.6  2003/02/28 12:23:59  billhorsman
+ more robust waiting for statistics
+
  Revision 1.5  2003/02/27 18:01:49  billhorsman
  completely rethought the test structure. it's now
  more obvious. no new tests yet though.
