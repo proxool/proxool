@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.51 $
-    $Date: 2003/03/12 16:46:03 $
+    $Revision: 1.52 $
+    $Date: 2003/03/12 22:27:20 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -392,7 +392,7 @@
     <target
         name="javadoc"
         description="Produce Javadoc API for users"
-        depends="init,build-src,compile">
+        depends="init">
 
         <javadoc
             sourcepath="src/java"
@@ -413,7 +413,7 @@
     <target
         name="javadoc-dev"
         description="Produce Javadoc API for developers"
-        depends="init,build-src,compile">
+        depends="init">
 
         <javadoc
             destdir="${build-dir}/api-dev"
