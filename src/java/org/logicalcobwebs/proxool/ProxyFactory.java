@@ -26,7 +26,7 @@ import java.lang.reflect.Modifier;
  * object given a proxy.
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.28 $, $Date: 2004/06/17 21:58:36 $
+ * @version $Revision: 1.29 $, $Date: 2004/07/27 21:44:15 $
  * @since Proxool 0.5
  */
 class ProxyFactory {
@@ -124,9 +124,6 @@ class ProxyFactory {
      * @return an array of classes (all interfaces) that this class implements.
      */
     private static Class[] getInterfaces(Class clazz, ConnectionPool connectionPool) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Looking up injectable interfaces for " + clazz);
-        }
         Class[] interfaceArray = (Class[]) interfaceMap.get(clazz);
         if (interfaceArray == null) {
             Set interfaces = new HashSet();
@@ -289,6 +286,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.29  2004/07/27 21:44:15  billhorsman
+ Remove insane amount of debug logging.
+
  Revision 1.28  2004/06/17 21:58:36  billhorsman
  Injectable interface fixes.
 
