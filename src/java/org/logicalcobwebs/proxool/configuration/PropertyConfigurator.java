@@ -14,7 +14,6 @@ import org.logicalcobwebs.proxool.ProxoolConstants;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -72,7 +71,7 @@ import java.util.Properties;
  * delegate JDBC driver.
  * </p>
  *
- * @version $Revision: 1.3 $, $Date: 2003/01/18 15:13:12 $
+ * @version $Revision: 1.4 $, $Date: 2003/01/22 17:35:01 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -172,6 +171,9 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.4  2003/01/22 17:35:01  billhorsman
+ checkstyle
+
  Revision 1.3  2003/01/18 15:13:12  billhorsman
  Signature changes (new ProxoolException
  thrown) on the ProxoolFacade API.

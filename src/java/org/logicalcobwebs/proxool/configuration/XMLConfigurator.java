@@ -15,7 +15,6 @@ import org.logicalcobwebs.proxool.ProxoolException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.sql.SQLException;
 import java.util.Properties;
 
 /**
@@ -86,7 +85,7 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.10 $, $Date: 2003/01/18 15:13:12 $
+ * @version $Revision: 1.11 $, $Date: 2003/01/22 17:35:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
