@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.5 2003/09/10 23:05:40 billhorsman Exp $
- * $Revision: 1.5 $
- * $Date: 2003/09/10 23:05:40 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Jdk14Logger.java,v 1.6 2003/09/11 08:31:11 chr32 Exp $
+ * $Revision: 1.6 $
+ * $Date: 2003/09/11 08:31:11 $
  *
  * ====================================================================
  *
@@ -74,7 +74,7 @@ import org.logicalcobwebs.logging.Log;
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author <a href="mailto:bloritsch@apache.org">Berin Loritsch</a>
  * @author <a href="mailto:donaldp@apache.org">Peter Donald</a>
- * @version $Revision: 1.5 $ $Date: 2003/09/10 23:05:40 $
+ * @version $Revision: 1.6 $ $Date: 2003/09/11 08:31:11 $
  */
 
 public final class Jdk14Logger implements Log {
@@ -108,8 +108,7 @@ public final class Jdk14Logger implements Log {
             levelWARNING = levelClass.getField("WARNING").get(null);
             levelSEVERE = levelClass.getField("SEVERE").get(null);
         } catch (Exception e) {
-            System.err.println("Could not create Jdk14Logger.");
-            e.printStackTrace();
+            throw new RuntimeException("Could not create Jdk14Logger: " + e.getMessage());
         }
     }
 
