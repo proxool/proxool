@@ -18,24 +18,20 @@ import java.sql.Statement;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.22 $, $Date: 2003/01/31 14:33:16 $
+ * @version $Revision: 1.1 $, $Date: 2003/01/31 14:33:18 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-class ProxyConnection extends AbstractProxyConnection implements InvocationHandler {
+class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements InvocationHandler {
 
-    private static final Log LOG = LogFactory.getLog(ProxyConnection.class);
+    private static final Log LOG = LogFactory.getLog(ProxyDatabaseMetaData.class);
 
-    private static final String CLOSE_METHOD = "close";
-
-    private static final String IS_CLOSED_METHOD = "isClosed";
+    private static final String GET_CONNECTION_METHOD = "getConnection";
 
     private static final String EQUALS_METHOD = "equals";
 
-    private static final String GET_META_DATA_METHOD = "getMetaData";
-
-    public ProxyConnection(Connection connection, long id, ConnectionPool connectionPool) throws SQLException {
-        super(connection, id, connectionPool);
+    public ProxyDatabaseMetaData(Connection connection, ProxyConnectionIF proxyConnection) throws SQLException {
+        super(connection,  proxyConnection);
     }
 
     public Object invoke(Object proxy, Method m, Object[] args)
@@ -43,41 +39,13 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
         Object result = null;
         int argCount = args != null ? args.length : 0;
         try {
-            if (m.getName().equals(CLOSE_METHOD)) {
-                close();
+            if (m.getName().equals(GET_CONNECTION_METHOD)) {
+                result = getConnection();
             } else if (m.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = new Boolean(equals(args[0]));
-            } else if (m.getName().equals(IS_CLOSED_METHOD) && argCount == 0) {
-                result = new Boolean(isClosed());
-            } else if (m.getName().equals(GET_META_DATA_METHOD) && argCount == 0) {
-                result = getMetaData();
             } else {
-                if (m.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
-                    setNeedToReset(true);
-                }
-                result = m.invoke(getConnection(), args);
+                result = m.invoke(getDatabaseMetaData(), args);
             }
-
-            // If we have just made some sort of Statement then we should rather return
-            // a proxy instead.
-            if (result instanceof Statement) {
-                // Work out whether we were passed the sql statement during the
-                // call to get the statement object. Sometimes you do, sometimes
-                // you don't:
-                // connection.prepareCall(sql);
-                // connection.createProxyStatement();
-                String sqlStatement = null;
-                if (argCount > 0 && args[0] instanceof String) {
-                    sqlStatement = (String) args[0];
-                }
-
-                // We keep a track of all open statements
-                addOpenStatement((Statement) result);
-
-                result = ProxyFactory.createProxyStatement((Statement) result, getConnectionPool(), this, sqlStatement);
-
-            }
-
         } catch (InvocationTargetException e) {
             throw e.getTargetException();
         } catch (Exception e) {
@@ -93,8 +61,8 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
 
 /*
  Revision history:
- $Log: ProxyConnection.java,v $
- Revision 1.22  2003/01/31 14:33:16  billhorsman
+ $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.1  2003/01/31 14:33:18  billhorsman
  fix for DatabaseMetaData
 
  Revision 1.21  2003/01/27 18:26:38  billhorsman

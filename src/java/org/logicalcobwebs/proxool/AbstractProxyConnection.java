@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.DatabaseMetaData;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,7 +23,7 @@ import java.util.Date;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.3 $, $Date: 2003/01/31 11:38:57 $
+ * @version $Revision: 1.4 $, $Date: 2003/01/31 14:33:14 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -81,7 +82,11 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
      * @return whether they are the same
      */
     public boolean equals(Object obj) {
-        return connection.hashCode() == obj.hashCode();
+        if (obj != null) {
+            return connection.hashCode() == obj.hashCode();
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -91,6 +96,10 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
      */
     public boolean isClosed() {
         return (getStatus() != STATUS_ACTIVE);
+    }
+
+    public DatabaseMetaData getMetaData() throws SQLException {
+        return ProxyFactory.getDatabaseMetaData(connection, this);
     }
 
     /**
@@ -469,6 +478,9 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.4  2003/01/31 14:33:14  billhorsman
+ fix for DatabaseMetaData
+
  Revision 1.3  2003/01/31 11:38:57  billhorsman
  birthDate now stored as Date not long
 

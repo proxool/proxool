@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * TODO
- * @version $Revision: 1.1 $, $Date: 2003/01/31 11:35:57 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 14:33:19 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -87,6 +87,11 @@ public class StatsRoller {
         TimerTask tt = new TimerTask() {
             public void run() {
                 roll();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    // Oh well
+                }
             }
         };
         Timer t = new Timer(true);
@@ -163,6 +168,9 @@ public class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.2  2003/01/31 14:33:19  billhorsman
+ fix for DatabaseMetaData
+
  Revision 1.1  2003/01/31 11:35:57  billhorsman
  improvements to servlet (including connection details)
 

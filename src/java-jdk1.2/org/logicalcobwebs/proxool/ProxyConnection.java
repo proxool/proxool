@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.3 $, $Date: 2003/01/28 11:55:03 $
+ * @version $Revision: 1.4 $, $Date: 2003/01/31 14:33:19 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -89,13 +89,6 @@ public class ProxyConnection extends AbstractProxyConnection  implements Connect
      */
     public void rollback() throws SQLException {
         getConnection().rollback();
-    }
-
-    /**
-     * Delegates to {@link Connection#getMetaData}
-     */
-    public DatabaseMetaData getMetaData() throws SQLException {
-        return getConnection().getMetaData();
     }
 
     /**
@@ -208,6 +201,9 @@ public class ProxyConnection extends AbstractProxyConnection  implements Connect
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.4  2003/01/31 14:33:19  billhorsman
+ fix for DatabaseMetaData
+
  Revision 1.3  2003/01/28 11:55:03  billhorsman
  new JDK 1.2 patches (functioning but not complete)
 

@@ -13,13 +13,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.sql.DatabaseMetaData;
 import java.util.Properties;
 import java.util.Iterator;
 
 /**
  * Various tests
  *
- * @version $Revision: 1.32 $, $Date: 2003/01/31 11:51:41 $
+ * @version $Revision: 1.33 $, $Date: 2003/01/31 14:33:09 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -148,6 +149,36 @@ public class GeneralTests extends TestCase {
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
             fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Can we change the delegate URL of a pool
+     */
+    public void testDatabaseMetaData() {
+
+        String testName = "databaseMetaData";
+
+        ProxoolAdapter adapter = null;
+        try {
+            String alias = testName;
+
+            Properties info = TestHelper.buildProperties();
+            adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            Connection proxoolConnection = adapter.getConnection();
+            DatabaseMetaData dmd = proxoolConnection.getMetaData();
+            Connection retrievedConnection = dmd.getConnection();
+
+            assertEquals("Retrieved connection not the same", proxoolConnection, retrievedConnection);
+            assertEquals("Retrieved connection not the same", proxoolConnection.getClass(), retrievedConnection.getClass());
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
         }
     }
 
@@ -708,6 +739,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.33  2003/01/31 14:33:09  billhorsman
+ fix for DatabaseMetaData
+
  Revision 1.32  2003/01/31 11:51:41  billhorsman
  improved changeUrl
 

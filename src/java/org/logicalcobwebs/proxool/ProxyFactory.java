@@ -17,12 +17,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.DatabaseMetaData;
 
 /**
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.11 $, $Date: 2003/01/27 18:26:39 $
+ * @version $Revision: 1.12 $, $Date: 2003/01/31 14:33:18 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -88,12 +89,29 @@ class ProxyFactory {
         return (Statement) Proxy.newProxyInstance(delegate.getClass().getClassLoader(), interfaces, new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
     }
 
+    /**
+     * Create a new DatabaseMetaData from a connection
+     * @param connection the proxy connection we are using
+     * @return databaseMetaData
+     * @throws SQLException if the delegfate connection couldn't get the metaData
+     */
+    protected static DatabaseMetaData getDatabaseMetaData(Connection connection, ProxyConnectionIF proxyConnection) throws SQLException {
+        return (DatabaseMetaData) Proxy.newProxyInstance(
+          DatabaseMetaData.class.getClassLoader(),
+                new Class[]{DatabaseMetaData.class},
+                new ProxyDatabaseMetaData(connection, proxyConnection)
+        );
+    }
+
 
 }
 
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.12  2003/01/31 14:33:18  billhorsman
+ fix for DatabaseMetaData
+
  Revision 1.11  2003/01/27 18:26:39  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch

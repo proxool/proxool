@@ -13,12 +13,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.DatabaseMetaData;
 
 /**
  * A central place to build proxy objects ({@link org.logicalcobwebs.proxool.ProxyConnection connections}
  * and {@link org.logicalcobwebs.proxool.ProxyStatement statements}).
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/28 11:55:04 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 14:33:19 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -63,12 +64,25 @@ class ProxyFactory {
         return new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement);
     }
 
+    /**
+     * Create a new DatabaseMetaData from a connection
+     * @param connection the proxy connection we are using
+     * @return databaseMetaData
+     * @throws SQLException if the delegfate connection couldn't get the metaData
+     */
+    protected static DatabaseMetaData getDatabaseMetaData(Connection connection, ProxyConnectionIF proxyConnection) throws SQLException {
+        return new ProxyDatabaseMetaData(connection, proxyConnection);
+    }
+
 
 }
 
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.2  2003/01/31 14:33:19  billhorsman
+ fix for DatabaseMetaData
+
  Revision 1.1  2003/01/28 11:55:04  billhorsman
  new JDK 1.2 patches (functioning but not complete)
 
