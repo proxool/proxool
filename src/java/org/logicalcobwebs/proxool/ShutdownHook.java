@@ -13,11 +13,10 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * This is instantiated statically by ProxoolFacade. It will automatically
- * close down all the connections when teh JVM stops.
- *
- * @version $Revision: 1.10 $, $Date: 2003/11/16 18:19:14 $
+ * close down all the connections when the JVM stops.
+ * @version $Revision: 1.11 $, $Date: 2003/12/16 09:09:32 $
  * @author bill
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 class ShutdownHook implements Runnable {
@@ -48,18 +47,13 @@ class ShutdownHook implements Runnable {
         } catch (IllegalAccessException e) {
             LOG.error("Problem removing shutdownHook", e);
         } catch (InvocationTargetException e) {
-            final Object o;
-            try {
-                final Method getCauseMethod = Runtime.class.getMethod("getCause", null);
-                o = getCauseMethod.invoke(e, null);
-                if (o != null && o instanceof IllegalStateException) {
-                    // This is probably because a shutdown is in progress. We can
-                    // safely ignore that.
-                } else {
-                    LOG.error("Problem removing shutdownHook", e);
-                }
-            } catch (Exception ex) {
-                LOG.error("Problem calling \"get cause\" on IllegalStateException.", e);
+            // Use getTargetException() because getCause() is only supported in JDK 1.4 and later
+            Throwable cause = ((InvocationTargetException) e).getTargetException();
+            if (cause instanceof IllegalStateException) {
+                // This is probably because a shutdown is in progress. We can
+                // safely ignore that.
+            } else {
+                LOG.error("Problem removing shutdownHook", e);
             }
         }
     }
@@ -105,6 +99,9 @@ class ShutdownHook implements Runnable {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.11  2003/12/16 09:09:32  billhorsman
+ Switched from getCause() to getTargetException() so that we can trap the IllegalStateException in all JDKs.
+
  Revision 1.10  2003/11/16 18:19:14  chr32
  Started calling to Exception.getCause() via refletion to maintain compilability with < jdk 1.4 compilers.
 
