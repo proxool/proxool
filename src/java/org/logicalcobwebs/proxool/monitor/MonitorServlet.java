@@ -11,6 +11,7 @@ import org.logicalcobwebs.proxool.ConnectionInfoIF;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.Version;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -42,7 +43,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/06 17:41:05 $
+ * @version $Revision: 1.9 $, $Date: 2003/02/11 00:30:28 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -115,12 +116,11 @@ public class MonitorServlet extends HttpServlet {
         }
 
 
+        openHtml(response.getOutputStream());
         try {
             if (action.equals(ACTION_LIST)) {
                 response.setContentType("text/html");
-                openHtml(response.getOutputStream());
                 doList(response.getOutputStream(), alias, link, level);
-                closeHtml(response.getOutputStream());
             } else if (action.equals(ACTION_STATS)) {
                 response.setContentType("text/html");
                 doStats(response.getOutputStream(), alias, link, level);
@@ -130,17 +130,17 @@ public class MonitorServlet extends HttpServlet {
         } catch (ProxoolException e) {
             LOG.error("Problem", e);
         }
+        response.getOutputStream().println("<div style=\"text-align: right; width: 550px; color: #333333;\">Proxool " + Version.getVersion() + "</div>");
+        closeHtml(response.getOutputStream());
 
 
     }
 
     private void doStats(ServletOutputStream out, String alias, String link, String level) throws ProxoolException, IOException {
-        openHtml(out);
         doList(out, alias, link, level);
         doDefinition(out, alias, link);
         doSnapshot(out, alias, link, level);
         doStatistics(out, alias, link);
-        closeHtml(out);
     }
 
     private void doStatistics(ServletOutputStream out, String alias, String link) throws ProxoolException, IOException {
@@ -483,6 +483,9 @@ public class MonitorServlet extends HttpServlet {
 /*
  Revision history:
  $Log: MonitorServlet.java,v $
+ Revision 1.9  2003/02/11 00:30:28  billhorsman
+ add version
+
  Revision 1.8  2003/02/06 17:41:05  billhorsman
  now uses imported logging
 
