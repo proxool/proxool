@@ -1,15 +1,14 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.dbscript;
 
 /**
  * An SQL command to run.
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/09 15:58:54 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/19 15:14:19 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -61,6 +60,10 @@ public interface CommandIF {
 /*
  Revision history:
  $Log: CommandIF.java,v $
+ Revision 1.4  2003/02/19 15:14:19  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.3  2002/11/09 15:58:54  billhorsman
  fix and added doc
 

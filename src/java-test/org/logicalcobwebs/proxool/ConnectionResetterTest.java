@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
@@ -16,7 +15,7 @@ import java.util.Properties;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/06 17:41:02 $
+ * @version $Revision: 1.9 $, $Date: 2003/02/19 15:14:22 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -126,6 +125,10 @@ public class ConnectionResetterTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.9  2003/02/19 15:14:22  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.8  2003/02/06 17:41:02  billhorsman
  now uses imported logging
 

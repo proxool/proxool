@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
@@ -15,9 +14,9 @@ import java.util.Properties;
  * Test that registering a {@link org.logicalcobwebs.proxool.ConfigurationListenerIF} with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/19 13:47:31 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/19 15:14:22 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class ConfigurationListenerTest extends TestCase {
@@ -140,6 +139,10 @@ public class ConfigurationListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.2  2003/02/19 15:14:22  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.1  2003/02/19 13:47:31  chr32
  Added configuration listener test.
 

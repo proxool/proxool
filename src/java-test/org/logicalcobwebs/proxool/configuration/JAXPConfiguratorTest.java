@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
@@ -22,7 +21,7 @@ import org.xml.sax.InputSource;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.6 $, $Date: 2003/01/18 15:13:14 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/19 15:14:27 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -186,6 +185,10 @@ public class JAXPConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.7  2003/02/19 15:14:27  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.6  2003/01/18 15:13:14  billhorsman
  Signature changes (new ProxoolException
  thrown) on the ProxoolFacade API.

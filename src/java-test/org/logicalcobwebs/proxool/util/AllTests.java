@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool.util;
 
 import junit.extensions.TestSetup;
@@ -14,9 +13,9 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Run all tests in the util package.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/10 00:14:33 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/19 15:14:32 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class AllTests {
@@ -43,6 +42,10 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.2  2003/02/19 15:14:32  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.1  2003/02/10 00:14:33  chr32
  Added tests for AbstractListenerContainer.
 

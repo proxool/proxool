@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.dbscript;
 
 import org.xml.sax.ErrorHandler;
@@ -24,7 +23,7 @@ import java.sql.SQLException;
 /**
  * Allows you to run scripts from file.
  *
- * @version $Revision: 1.9 $, $Date: 2003/02/06 17:41:02 $
+ * @version $Revision: 1.10 $, $Date: 2003/02/19 15:14:21 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -105,6 +104,10 @@ public class ScriptFacade {
 /*
  Revision history:
  $Log: ScriptFacade.java,v $
+ Revision 1.10  2003/02/19 15:14:21  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.9  2003/02/06 17:41:02  billhorsman
  now uses imported logging
 

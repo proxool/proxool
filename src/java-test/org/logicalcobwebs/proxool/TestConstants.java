@@ -1,15 +1,14 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool;
 
 /**
  * Some useful constants for testing
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/13 20:23:58 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/19 15:14:26 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -31,6 +30,10 @@ public interface TestConstants {
 /*
  Revision history:
  $Log: TestConstants.java,v $
+ Revision 1.2  2003/02/19 15:14:26  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.1  2002/11/13 20:23:58  billhorsman
  improved tests
 

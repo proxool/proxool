@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.dbscript.ConnectionAdapterIF;
@@ -18,7 +17,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.16 $, $Date: 2003/02/07 10:09:58 $
+ * @version $Revision: 1.17 $, $Date: 2003/02/19 15:14:24 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -130,6 +129,10 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.17  2003/02/19 15:14:24  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.16  2003/02/07 10:09:58  billhorsman
  removed connectionPoolDefinition property. not needed.
 

@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
@@ -18,7 +17,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Tests that the PropertyConfigurator works.
  *
- * @version $Revision: 1.1 $, $Date: 2002/12/26 11:34:15 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/19 15:14:27 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -73,6 +72,10 @@ public class PropertyConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: PropertyConfiguratorTest.java,v $
+ Revision 1.2  2003/02/19 15:14:27  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.1  2002/12/26 11:34:15  billhorsman
  Init rev.
 

@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
@@ -22,7 +21,7 @@ import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 /**
  * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.10 $, $Date: 2003/02/07 10:11:35 $
+ * @version $Revision: 1.11 $, $Date: 2003/02/19 15:14:26 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -87,6 +86,10 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.11  2003/02/19 15:14:26  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.10  2003/02/07 10:11:35  billhorsman
  fix
 

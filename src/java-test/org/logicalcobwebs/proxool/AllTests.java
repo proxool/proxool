@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool;
 
 import junit.extensions.TestSetup;
@@ -13,9 +12,9 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.13 $, $Date: 2003/02/19 13:47:32 $
+ * @version $Revision: 1.14 $, $Date: 2003/02/19 15:14:22 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class AllTests {
@@ -48,6 +47,10 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.14  2003/02/19 15:14:22  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.13  2003/02/19 13:47:32  chr32
  Added configuration listener test.
 

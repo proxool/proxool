@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.logging.Log;
@@ -23,7 +22,7 @@ import java.sql.DatabaseMetaData;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.14 $, $Date: 2003/02/12 12:28:27 $
+ * @version $Revision: 1.15 $, $Date: 2003/02/19 15:14:32 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -110,6 +109,10 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.15  2003/02/19 15:14:32  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.14  2003/02/12 12:28:27  billhorsman
  added url, proxyHashcode and delegateHashcode to
  ConnectionInfoIF

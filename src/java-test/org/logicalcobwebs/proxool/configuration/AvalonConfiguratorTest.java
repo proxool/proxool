@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
@@ -27,9 +26,9 @@ import org.apache.log.Priority;
 /**
  * Tests that the AvalonConfgiuration works.
  *
- * @version $Revision: 1.2 $, $Date: 2002/12/23 02:48:07 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/19 15:14:26 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class AvalonConfiguratorTest extends TestCase {
@@ -134,6 +133,10 @@ public class AvalonConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: AvalonConfiguratorTest.java,v $
+ Revision 1.3  2003/02/19 15:14:26  billhorsman
+ fixed copyright (copy and paste error,
+ not copyright change)
+
  Revision 1.2  2002/12/23 02:48:07  chr32
  Checkstyle.
 
