@@ -24,7 +24,7 @@ import java.util.Set;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:13:30 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/17 15:29:18 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -41,6 +41,8 @@ public class ProxyStatement implements InvocationHandler {
     private static final String EXECUTE_FRAGMENT = "execute";
 
     private static final String NOT_IMPLEMENTED = "not implemented";
+
+    private static final String EQUALS_METHOD = "equals";
 
     public ProxyStatement(Statement statement, ConnectionPool connectionPool) {
         this.statement = statement;
@@ -73,7 +75,11 @@ public class ProxyStatement implements InvocationHandler {
         // pass them to the onExecute() call below
         Exception exception = null;
         try {
-            result = method.invoke(statement, args);
+            if (method.getName().equals(EQUALS_METHOD) && args.length == 1) {
+                result = new Boolean(statement.hashCode() == args[0].hashCode());
+            } else {
+                result = method.invoke(statement, args);
+            }
         } catch (InvocationTargetException e) {
             exception = e;
             throw e.getTargetException();
@@ -110,8 +116,11 @@ public class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
- Revision 1.1  2002/09/13 08:13:30  billhorsman
- Initial revision
+ Revision 1.2  2002/10/17 15:29:18  billhorsman
+ fixes so that equals() works
+
+ Revision 1.1.1.1  2002/09/13 08:13:30  billhorsman
+ new
 
  Revision 1.8  2002/08/24 19:57:15  billhorsman
  checkstyle changes

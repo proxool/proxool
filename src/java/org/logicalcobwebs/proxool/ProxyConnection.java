@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.3 $, $Date: 2002/09/19 10:33:57 $
+ * @version $Revision: 1.4 $, $Date: 2002/10/17 15:29:18 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -45,6 +45,8 @@ public class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
     private DecimalFormat idFormat = new DecimalFormat("0000");
 
     private static final String CLOSE_METHOD = "close";
+
+    private static final String EQUALS_METHOD = "equals";
 
     public static Object newInstance(long id, ConnectionPoolDefinitionIF connectionPoolDefinition) throws SQLException {
 
@@ -81,6 +83,8 @@ public class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
         try {
             if (m.getName().equals(CLOSE_METHOD)) {
                 close();
+            } else if (m.getName().equals(EQUALS_METHOD) && args.length == 1) {
+                result = new Boolean(connection.hashCode() == args[0].hashCode());
             } else {
                 result = m.invoke(connection, args);
             }
@@ -337,11 +341,15 @@ public class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
     public String toString() {
         return getId() + " is " + ConnectionPool.getStatusDescription(getStatus());
     }
+
 }
 
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.4  2002/10/17 15:29:18  billhorsman
+ fixes so that equals() works
+
  Revision 1.3  2002/09/19 10:33:57  billhorsman
  added ProxyConnection#toString
 
