@@ -33,7 +33,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.55 $, $Date: 2003/02/18 16:50:00 $
+ * @version $Revision: 1.56 $, $Date: 2003/02/19 13:48:28 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -648,6 +648,28 @@ public class ProxoolFacade {
     }
 
     /**
+     * Remove a listener that gets called everytime the configuration changes.
+     * @param alias identifies the pool.
+     * @param configurationListener the listener to be removed.
+     * @throws ProxoolException if we couldn't find the pool
+     * @return wether the listnener was found and removed or not.
+     *
+     */
+    public static boolean removeConfigurationListener(String alias, ConfigurationListenerIF configurationListener) throws ProxoolException {
+        boolean removed = false;
+        if (ConnectionPoolManager.getInstance().isPoolExists(alias)) {
+            CompositeConfigurationListener compositeConfigurationListener = (CompositeConfigurationListener)
+                configurators.get(alias);
+            if (compositeConfigurationListener != null) {
+                removed = compositeConfigurationListener.removeListener(configurationListener);
+            }
+        } else {
+            throw new ProxoolException(ConnectionPoolManager.getInstance().getKnownPools(alias));
+        }
+        return removed;
+    }
+
+    /**
      * @see #killAllConnections(java.lang.String)
      */
     private static final boolean MERCIFUL = true;
@@ -796,6 +818,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.56  2003/02/19 13:48:28  chr32
+ Added 'removeConfigurationListener' method.
+
  Revision 1.55  2003/02/18 16:50:00  chr32
  Added possibility to remove connection and state listeners.
 
