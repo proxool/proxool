@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
@@ -22,7 +21,7 @@ import java.util.Properties;
 /**
  * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/04 10:58:44 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -32,7 +31,7 @@ public class SnapshotTest extends AbstractProxoolTest {
     private static final Log LOG = LogFactory.getLog(SnapshotTest.class);
 
     /**
-     * @see TestCase#TestCase
+     * @see junit.framework.TestCase#TestCase
      */
     public SnapshotTest(String s) {
         super(s);
@@ -107,6 +106,9 @@ public class SnapshotTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: SnapshotTest.java,v $
+ Revision 1.8  2003/03/04 10:58:44  billhorsman
+ checkstyle
+
  Revision 1.7  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 

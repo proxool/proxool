@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Test whether we can register and remove a pool in various ways
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/04 10:58:44 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -153,10 +153,12 @@ public class RegistrationTest extends AbstractProxoolTest {
 
 }
 
-
 /*
  Revision history:
  $Log: RegistrationTest.java,v $
+ Revision 1.6  2003/03/04 10:58:44  billhorsman
+ checkstyle
+
  Revision 1.5  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 

@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
@@ -20,7 +19,7 @@ import java.sql.SQLException;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.13 $, $Date: 2003/03/04 10:24:41 $
+ * @version $Revision: 1.14 $, $Date: 2003/03/04 10:58:45 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -28,7 +27,7 @@ import java.sql.SQLException;
 public class JAXPConfiguratorTest extends AbstractProxoolTest {
 
     /**
-     * @see TestCase#TestCase
+     * @see junit.framework.TestCase#TestCase
      */
     public JAXPConfiguratorTest(String name) {
         super(name);
@@ -141,6 +140,9 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.14  2003/03/04 10:58:45  billhorsman
+ checkstyle
+
  Revision 1.13  2003/03/04 10:24:41  billhorsman
  removed try blocks around each test
 

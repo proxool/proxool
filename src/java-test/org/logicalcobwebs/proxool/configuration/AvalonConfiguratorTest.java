@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import junit.framework.TestCase;
 import org.apache.avalon.excalibur.component.DefaultRoleManager;
 import org.apache.avalon.excalibur.component.ExcaliburComponentManager;
 import org.apache.avalon.framework.configuration.Configuration;
@@ -25,7 +24,7 @@ import java.io.File;
 /**
  * Tests that the AvalonConfgiuration works.
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/04 10:24:41 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/04 10:58:45 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -34,7 +33,7 @@ public class AvalonConfiguratorTest extends AbstractProxoolTest {
     private ExcaliburComponentManager componentManager;
 
     /**
-     * @see TestCase#TestCase
+     * @see junit.framework.TestCase#TestCase
      */
     public AvalonConfiguratorTest(String name) {
         super(name);
@@ -164,6 +163,9 @@ public class AvalonConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: AvalonConfiguratorTest.java,v $
+ Revision 1.10  2003/03/04 10:58:45  billhorsman
+ checkstyle
+
  Revision 1.9  2003/03/04 10:24:41  billhorsman
  removed try blocks around each test
 

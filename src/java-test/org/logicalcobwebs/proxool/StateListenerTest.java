@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -18,7 +17,7 @@ import java.util.Properties;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.10 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.11 $, $Date: 2003/03/04 10:58:44 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -28,7 +27,7 @@ public class StateListenerTest extends AbstractProxoolTest {
     private static final Log LOG = LogFactory.getLog(StateListenerTest.class);
 
     /**
-     * @see TestCase#TestCase
+     * @see junit.framework.TestCase#TestCase
      */
     public StateListenerTest(String s) {
         super(s);
@@ -156,6 +155,9 @@ public class StateListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.11  2003/03/04 10:58:44  billhorsman
+ checkstyle
+
  Revision 1.10  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 

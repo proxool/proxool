@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
@@ -23,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.17 $, $Date: 2003/03/04 10:24:41 $
+ * @version $Revision: 1.18 $, $Date: 2003/03/04 10:58:44 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -35,7 +34,7 @@ public class StatisticsTest extends AbstractProxoolTest {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
 
     /**
-     * @see TestCase#TestCase
+     * @see junit.framework.TestCase#TestCase
      */
     public StatisticsTest(String s) {
         super(s);
@@ -118,6 +117,9 @@ public class StatisticsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.18  2003/03/04 10:58:44  billhorsman
+ checkstyle
+
  Revision 1.17  2003/03/04 10:24:41  billhorsman
  removed try blocks around each test
 

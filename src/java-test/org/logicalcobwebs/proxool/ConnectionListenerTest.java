@@ -5,8 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -16,7 +14,7 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/04 10:58:43 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -29,7 +27,7 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
     private int onFailCalls;
 
     /**
-     * @see TestCase#TestCase
+     * @see junit.framework.TestCase#TestCase
      */
     public ConnectionListenerTest(String s) {
         super(s);
@@ -156,6 +154,9 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.10  2003/03/04 10:58:43  billhorsman
+ checkstyle
+
  Revision 1.9  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 

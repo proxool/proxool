@@ -5,46 +5,19 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
-/*
- * Created by IntelliJ IDEA.
- * User: bill
- * Date: 19-Oct-2002
- * Time: 16:58:04
- * To change this template use Options | File Templates.
+/**
+ * Helper for all tests
+ *
+ * @version $Revision: 1.19 $, $Date: 2003/03/04 10:58:44 $
+ * @author bill
+ * @author $Author: billhorsman $ (current maintainer)
  */
-
 public class TestHelper {
 
     private static final Log LOG = LogFactory.getLog(TestHelper.class);
-
-    private static final String USER = "sa";
-
-    private static final String PASSWORD = "";
-
-    public static final String PROXOOL_DRIVER = "org.logicalcobwebs.proxool.ProxoolDriver";
-
-    public static final String HYPERSONIC_DRIVER = "org.hsqldb.jdbcDriver";
-
-    public static final String HYPERSONIC_URL_PREFIX = "jdbc:hsqldb:db/";
-
-    public static final String HYPERSONIC_URL = HYPERSONIC_URL_PREFIX + "test";
-
-    public static final String SQL_INSERT_INTO_TEST = "INSERT INTO TEST VALUES(1);";
-
-    public static final String SQL_CHECK_TEST = "SELECT COUNT(*) FROM TEST;";
-
-    public static Properties buildProperties() {
-        Properties info = new Properties();
-        info.setProperty("user", USER);
-        info.setProperty("password", PASSWORD);
-        info.setProperty("proxool.verbose", "true");
-        return info;
-    }
 
     /**
      * Builds a complete set of proxool properties, with all values set to
@@ -122,13 +95,6 @@ public class TestHelper {
         checkProperty(name, String.valueOf(correctValue), String.valueOf(candidateValue));
     }
 
-    public static String getSimpleUrl(String alias) {
-        String url = ProxoolConstants.PROXOOL
-                + ProxoolConstants.ALIAS_DELIMITER
-                + alias;
-        return url;
-    }
-
     /**
      * Build a valid Proxool URL
      * @param alias identifies the pool
@@ -161,60 +127,20 @@ public class TestHelper {
 
     public static Connection getDirectConnection() throws ClassNotFoundException, SQLException {
         Connection connection = null;
-        Class.forName(HYPERSONIC_DRIVER);
-        connection = DriverManager.getConnection(HYPERSONIC_URL, buildProperties());
+        Class.forName(TestConstants.HYPERSONIC_DRIVER);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        connection = DriverManager.getConnection(TestConstants.HYPERSONIC_TEST_URL, info);
         return connection;
     }
 
-    public static int getCount(Connection connection, String table) throws SQLException {
-        Statement statement = null;
-        ResultSet resultSet = null;
-        int count = -1;
-        try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT COUNT(*) FROM " + table);
-            if (resultSet.next()) {
-                count = resultSet.getInt(1);
-            } else {
-                LOG.warn("No rows returned from " + table);
-            }
-        } finally {
-            if (statement != null) {
-                try {
-                    if (resultSet != null) {
-                        resultSet.close();
-                    }
-                    if (statement != null) {
-                        statement.close();
-                    }
-                } catch (SQLException e) {
-                    LOG.error("Couldn't close statement", e);
-                }
-            }
-        }
-        return count;
-    }
-
-    public static void execute(Connection connection, String sql) throws SQLException {
-        Statement statement = null;
-        try {
-            statement = connection.createStatement();
-            statement.execute(sql);
-        } finally {
-            if (statement != null) {
-                try {
-                    if (statement != null) {
-                        statement.close();
-                    }
-                } catch (SQLException e) {
-                    LOG.error("Couldn't close statement", e);
-                }
-            }
-        }
-    }
-
-    public static void testConnection(Connection connection) throws SQLException {
-        execute(connection, "SELECT SYSDATE FROM DUAL");
-    }
-
 }
+
+/*
+ Revision history:
+ $Log: TestHelper.java,v $
+ Revision 1.19  2003/03/04 10:58:44  billhorsman
+ checkstyle
+
+  */

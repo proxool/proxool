@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -16,7 +15,7 @@ import java.util.Properties;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.13 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.14 $, $Date: 2003/03/04 10:58:43 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -26,7 +25,7 @@ public class ConnectionResetterTest extends AbstractProxoolTest {
     private static final Log LOG = LogFactory.getLog(ConnectionResetterTest.class);
 
     /**
-     * @see TestCase#TestCase
+     * @see junit.framework.TestCase#TestCase
      */
     public ConnectionResetterTest(String s) {
         super(s);
@@ -106,6 +105,9 @@ public class ConnectionResetterTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.14  2003/03/04 10:58:43  billhorsman
+ checkstyle
+
  Revision 1.13  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 

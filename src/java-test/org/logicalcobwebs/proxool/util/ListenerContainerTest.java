@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool.util;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.util.Iterator;
@@ -13,7 +12,7 @@ import java.util.Iterator;
 /**
  * Test {@link AbstractListenerContainer}.
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/04 10:24:41 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/04 10:58:45 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -21,7 +20,7 @@ import java.util.Iterator;
 public class ListenerContainerTest extends AbstractProxoolTest {
 
     /**
-     * @see TestCase#TestCase
+     * @see junit.framework.TestCase#TestCase
      */
     public ListenerContainerTest(String name) {
         super(name);
@@ -107,6 +106,9 @@ class TestListener implements TestListenerIF {
 /*
  Revision history:
  $Log: ListenerContainerTest.java,v $
+ Revision 1.5  2003/03/04 10:58:45  billhorsman
+ checkstyle
+
  Revision 1.4  2003/03/04 10:24:41  billhorsman
  removed try blocks around each test
 

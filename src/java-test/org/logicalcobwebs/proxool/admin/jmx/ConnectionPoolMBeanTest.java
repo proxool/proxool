@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool.admin.jmx;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolDriver;
@@ -32,7 +31,7 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPoolMBean}.
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/04 10:24:41 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/04 10:58:45 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -42,7 +41,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
     private boolean notified;
 
     /**
-     * @see TestCase#TestCase(String)
+     * @see junit.framework.TestCase#TestCase(String)
      */
     public ConnectionPoolMBeanTest(String s) {
         super(s);
@@ -244,6 +243,9 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionPoolMBeanTest.java,v $
+ Revision 1.7  2003/03/04 10:58:45  billhorsman
+ checkstyle
+
  Revision 1.6  2003/03/04 10:24:41  billhorsman
  removed try blocks around each test
 
