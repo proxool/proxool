@@ -12,15 +12,12 @@ import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -45,7 +42,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.4 $, $Date: 2003/01/31 16:53:21 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/05 15:06:16 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -96,82 +93,45 @@ public class MonitorServlet extends HttpServlet {
         }
         String level = request.getParameter(LEVEL);
 
-        if (action.equals(ACTION_CHART)) {
-            response.setContentType("image/png");
-            String[] c = request.getParameterValues("c");
-            String[] l = request.getParameterValues("l");
-            String d = request.getParameter("d");
-            drawBarChart(response.getOutputStream(), c, l, d);
-        } else {
-
-            // Check the alias and if not defined and there is only one
-            // then use that. Otherwise show the list.
-            String alias = request.getParameter(ALIAS);
-            String[] aliases = ProxoolFacade.getAliases();
-            if (alias == null) {
-                if (aliases.length == 1) {
-                    alias = aliases[0];
-                } else {
-                    action = ACTION_LIST;
-                }
+        // Check the alias and if not defined and there is only one
+        // then use that. Otherwise show the list.
+        String alias = request.getParameter(ALIAS);
+        String[] aliases = ProxoolFacade.getAliases();
+        if (alias == null) {
+            if (aliases.length == 1) {
+                alias = aliases[0];
+            } else {
+                action = ACTION_LIST;
             }
+        }
 
-            // Check we can find the pool. If not, show the list
-            if (alias != null) {
-                try {
-                    ProxoolFacade.getConnectionPoolDefinition(alias);
-                } catch (ProxoolException e) {
-                    action = ACTION_LIST;
-                }
-            }
-
-
+        // Check we can find the pool. If not, show the list
+        if (alias != null) {
             try {
-                if (action.equals(ACTION_LIST)) {
-                    response.setContentType("text/html");
-                    openHtml(response.getOutputStream());
-                    doList(response.getOutputStream(), alias, link, level);
-                    closeHtml(response.getOutputStream());
-                } else if (action.equals(ACTION_STATS)) {
-                    response.setContentType("text/html");
-                    doStats(response.getOutputStream(), alias, link, level);
-                } else {
-                    LOG.error("Unrecognised action '" + action + "'");
-                }
+                ProxoolFacade.getConnectionPoolDefinition(alias);
             } catch (ProxoolException e) {
-                LOG.error("Problem", e);
+                action = ACTION_LIST;
             }
-
-        }
-    }
-
-    private void drawBarChart(ServletOutputStream out, String[] colors, String[] lengths, String divisions) throws IOException {
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-        Graphics2D g2d = bufferedImage.createGraphics();
-        g2d.setColor(Color.decode("#" + colors[0]));
-        g2d.fillRect(0, 0, width, height);
-
-        int fullLength = Integer.parseInt(lengths[0]);
-        int left = 0;
-        int pixels = 0;
-        for (int i = 1; i < colors.length; i++) {
-            int length = Integer.parseInt(lengths[i]);
-            pixels = width * length / fullLength;
-            g2d.setColor(Color.decode("#" + colors[i]));
-            g2d.fillRect(left, 0, pixels, height - 1);
-            left += pixels;
         }
 
-        g2d.setColor(Color.decode("#666666"));
-        int d = Integer.parseInt(divisions);
-        for (int i = 0; i < d; i++) {
-            int x = i * width / d;
-            g2d.drawLine(x, 0, x, height - 1);
+
+        try {
+            if (action.equals(ACTION_LIST)) {
+                response.setContentType("text/html");
+                openHtml(response.getOutputStream());
+                doList(response.getOutputStream(), alias, link, level);
+                closeHtml(response.getOutputStream());
+            } else if (action.equals(ACTION_STATS)) {
+                response.setContentType("text/html");
+                doStats(response.getOutputStream(), alias, link, level);
+            } else {
+                LOG.error("Unrecognised action '" + action + "'");
+            }
+        } catch (ProxoolException e) {
+            LOG.error("Problem", e);
         }
 
-        g2d.dispose();
-        ImageIO.write(bufferedImage, "png", out);
+
     }
 
     private void doStats(ServletOutputStream out, String alias, String link, String level) throws ProxoolException, IOException {
@@ -208,17 +168,40 @@ public class MonitorServlet extends HttpServlet {
 
             // activityLevel
             StringBuffer activityLevelBuffer = new StringBuffer();
-            activityLevelBuffer.append((int) (100 * statistics.getAverageActiveCount() / snapshot.getMaximumConnectionCount()));
+            int activityLevel = (int) (100 * statistics.getAverageActiveCount() / cpd.getMaximumConnectionCount());
+            activityLevelBuffer.append(activityLevel);
             activityLevelBuffer.append("%<br/>");
-            activityLevelBuffer.append("<img style=\"margin: 4px;\" src=\"");
-            activityLevelBuffer.append(link);
-            activityLevelBuffer.append("?action=chart&c=eeeeee&c=0000ff&l=100&l=");
-            activityLevelBuffer.append((int) (100 * statistics.getAverageActiveCount() / cpd.getMaximumConnectionCount()));
-            activityLevelBuffer.append("&d=10\" width=\"300\" height=\"5\" alt=\"...\">");
+            String[] colours = {"0000ff", "eeeeee"};
+            int[] lengths = {activityLevel, 100 - activityLevel};
+            drawBarChart(activityLevelBuffer, colours, lengths);
             printDefintionEntry(out, "Activity level", activityLevelBuffer.toString());
 
             closeTable(out);
         }
+    }
+
+    private void drawBarChart(StringBuffer out, String[] colours, int[] lengths) throws IOException {
+        out.append("<table style=\"margin: 8px;\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr>");
+
+        // Calculate total length
+        int totalLength = 0;
+        for (int i = 0; i < colours.length; i++) {
+            totalLength += lengths[i];
+        }
+
+        // Draw segments
+        for (int j = 0; j < colours.length; j++) {
+            String colour = colours[j];
+            int length = lengths[j];
+            if (length > 0) {
+                out.append("<td style=\"font-size: 50%;\" bgcolor=\"#");
+                out.append(colour);
+                out.append("\" width=\"");
+                out.append(100 * length / totalLength);
+                out.append("%\">&nbsp;</td>");
+            }
+        }
+        out.append("</tr></table>");
     }
 
     private void doDefinition(ServletOutputStream out, String alias, String link) throws ProxoolException, IOException {
@@ -276,93 +259,89 @@ public class MonitorServlet extends HttpServlet {
         SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, detail);
         ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
 
-        out.print("<b>Snapshot</b> at ");
-        out.println(TIME_FORMAT.format(snapshot.getSnapshotDate()));
-        openTable(out);
+        if (snapshot != null) {
 
-        // dateStarted
-        printDefintionEntry(out, "Start date", DATE_FORMAT.format(snapshot.getDateStarted()));
+            out.print("<b>Snapshot</b> at ");
+            out.println(TIME_FORMAT.format(snapshot.getSnapshotDate()));
+            openTable(out);
 
-        // connections
-        StringBuffer connectionsBuffer = new StringBuffer();
-        connectionsBuffer.append(snapshot.getActiveConnectionCount());
-        connectionsBuffer.append(" (<font color=\"");
-        connectionsBuffer.append(COLOR_ACTIVE);
-        connectionsBuffer.append("\">active</font>), ");
-        connectionsBuffer.append(snapshot.getAvailableConnectionCount());
-        connectionsBuffer.append(" (<font color=\"");
-        connectionsBuffer.append(COLOR_AVAILABLE);
-        connectionsBuffer.append("\">available</font>), ");
-        if (snapshot.getOfflineConnectionCount() > 0) {
-            connectionsBuffer.append(snapshot.getOfflineConnectionCount());
-            connectionsBuffer.append(" (offline), ");
+            // dateStarted
+            printDefintionEntry(out, "Start date", DATE_FORMAT.format(snapshot.getDateStarted()));
+
+            // connections
+            StringBuffer connectionsBuffer = new StringBuffer();
+            connectionsBuffer.append(snapshot.getActiveConnectionCount());
+            connectionsBuffer.append(" (<font color=\"");
+            connectionsBuffer.append(COLOR_ACTIVE);
+            connectionsBuffer.append("\">active</font>), ");
+            connectionsBuffer.append(snapshot.getAvailableConnectionCount());
+            connectionsBuffer.append(" (<font color=\"");
+            connectionsBuffer.append(COLOR_AVAILABLE);
+            connectionsBuffer.append("\">available</font>), ");
+            if (snapshot.getOfflineConnectionCount() > 0) {
+                connectionsBuffer.append(snapshot.getOfflineConnectionCount());
+                connectionsBuffer.append(" (offline), ");
+            }
+            connectionsBuffer.append(snapshot.getMaximumConnectionCount());
+            connectionsBuffer.append(" (<font color=\"");
+            connectionsBuffer.append(COLOR_SPARE);
+            connectionsBuffer.append("\">max</font>)<br/>");
+            String[] colours = {"ff0000", "00ff00", "eeeeee"};
+            int[] lengths = {snapshot.getActiveConnectionCount(), snapshot.getAvailableConnectionCount(),
+                             snapshot.getMaximumConnectionCount() - snapshot.getActiveConnectionCount() - snapshot.getAvailableConnectionCount()};
+            drawBarChart(connectionsBuffer, colours, lengths);
+            printDefintionEntry(out, "Connections", connectionsBuffer.toString());
+
+            // servedCount
+            printDefintionEntry(out, "Served", String.valueOf(snapshot.getServedCount()));
+
+            // refusedCount
+            printDefintionEntry(out, "Refused", String.valueOf(snapshot.getRefusedCount()));
+
+            if (!detail) {
+                out.println("    <tr>");
+                out.print("<td colspan=\"2\" align=\"right\"><a href=\"");
+                out.print(link);
+                out.print("?");
+                out.print(ALIAS);
+                out.print("=");
+                out.print(alias);
+                out.print("&");
+                out.print(LEVEL);
+                out.print("=");
+                out.print(LEVEL_MORE);
+                out.println("\">more information</a></td>");
+                out.println("    </tr>");
+            } else {
+
+                out.println("    <tr>");
+                out.print("      <td width=\"200\" valign=\"top\" style=\"" + STYLE_CAPTION + "\">");
+                out.print("Details");
+                out.println("</td>");
+                out.print("      <td style=\"" + STYLE_NO_DATA + "\">");
+
+                doSnapshotDetails(out, snapshot, link);
+
+                out.println("</td>");
+                out.println("    </tr>");
+
+                out.println("    <tr>");
+                out.print("<td colspan=\"2\" align=\"right\"><a href=\"");
+                out.print(link);
+                out.print("?");
+                out.print(ALIAS);
+                out.print("=");
+                out.print(alias);
+                out.print("&");
+                out.print(LEVEL);
+                out.print("=");
+                out.print(LEVEL_LESS);
+                out.println("\">less information</a></td>");
+                out.println("    </tr>");
+            }
+
+            closeTable(out);
         }
-        connectionsBuffer.append(snapshot.getMaximumConnectionCount());
-        connectionsBuffer.append(" (<font color=\"");
-        connectionsBuffer.append(COLOR_SPARE);
-        connectionsBuffer.append("\">max</font>)<br/>");
-        connectionsBuffer.append("<img style=\"margin: 4px;\" src=\"");
-        connectionsBuffer.append(link);
-        connectionsBuffer.append("?action=chart&c=eeeeee&c=ff0000&c=00ff00&l=");
-        connectionsBuffer.append(cpd.getMaximumConnectionCount());
-        connectionsBuffer.append("&l=");
-        connectionsBuffer.append(snapshot.getActiveConnectionCount());
-        connectionsBuffer.append("&l=");
-        connectionsBuffer.append(snapshot.getAvailableConnectionCount());
-        connectionsBuffer.append("&d=");
-        connectionsBuffer.append(cpd.getMaximumConnectionCount());
-        connectionsBuffer.append("\" width=\"300\" height=\"5\" alt=\"...\">");
-        printDefintionEntry(out, "Connections", connectionsBuffer.toString());
-
-        // servedCount
-        printDefintionEntry(out, "Served", String.valueOf(snapshot.getServedCount()));
-
-        // refusedCount
-        printDefintionEntry(out, "Refused", String.valueOf(snapshot.getRefusedCount()));
-
-        if (!detail) {
-            out.println("    <tr>");
-            out.print("<td colspan=\"2\" align=\"right\"><a href=\"");
-            out.print(link);
-            out.print("?");
-            out.print(ALIAS);
-            out.print("=");
-            out.print(alias);
-            out.print("&");
-            out.print(LEVEL);
-            out.print("=");
-            out.print(LEVEL_MORE);
-            out.println("\">more information</a></td>");
-            out.println("    </tr>");
-        } else {
-
-            out.println("    <tr>");
-            out.print("      <td width=\"200\" valign=\"top\" style=\"" + STYLE_CAPTION + "\">");
-            out.print("Details");
-            out.println("</td>");
-            out.print("      <td style=\"" + STYLE_NO_DATA + "\">");
-
-            doSnapshotDetails(out, snapshot, link);
-
-            out.println("</td>");
-            out.println("    </tr>");
-
-            out.println("    <tr>");
-            out.print("<td colspan=\"2\" align=\"right\"><a href=\"");
-            out.print(link);
-            out.print("?");
-            out.print(ALIAS);
-            out.print("=");
-            out.print(alias);
-            out.print("&");
-            out.print(LEVEL);
-            out.print("=");
-            out.print(LEVEL_LESS);
-            out.println("\">less information</a></td>");
-            out.println("    </tr>");
-        }
-
-        closeTable(out);
     }
 
     private void doSnapshotDetails(ServletOutputStream out, SnapshotIF snapshot, String link) throws IOException {
@@ -383,50 +362,53 @@ public class MonitorServlet extends HttpServlet {
             for (int i = 0; i < connectionInfos.length; i++) {
                 ConnectionInfoIF connectionInfo = connectionInfos[i];
 
-                out.print("<tr>");
+                if (connectionInfo.getStatus() != ConnectionInfoIF.STATUS_NULL) {
 
-                // id
-                out.print("<td bgcolor=\"#");
-                if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_ACTIVE) {
-                    out.print("ffcccc");
-                } else if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_AVAILABLE) {
-                    out.print("ccffcc");
-                } else if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_OFFLINE) {
-                    out.print("ccccff");
+                    out.print("<tr>");
+
+                    // id
+                    out.print("<td bgcolor=\"#");
+                    if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_ACTIVE) {
+                        out.print("ffcccc");
+                    } else if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_AVAILABLE) {
+                        out.print("ccffcc");
+                    } else if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_OFFLINE) {
+                        out.print("ccccff");
+                    }
+                    out.print("\">");
+                    out.print(connectionInfo.getId());
+                    out.print("</td>");
+
+                    // birth
+                    out.print("<td>&nbsp;");
+                    out.print(TIME_FORMAT.format(connectionInfo.getBirthDate()));
+                    out.print("</td>");
+
+                    // started
+                    out.print("<td>&nbsp;");
+                    out.print(connectionInfo.getTimeLastStartActive() > 0 ? TIME_FORMAT.format(new Date(connectionInfo.getTimeLastStartActive())) : "-");
+                    out.print("</td>");
+
+                    // active
+                    out.print("<td align=\"right\">");
+                    if (connectionInfo.getTimeLastStopActive() > 0) {
+                        out.print((int) (connectionInfo.getTimeLastStopActive() - connectionInfo.getTimeLastStartActive()));
+                    } else if (connectionInfo.getTimeLastStartActive() > 0) {
+                        out.print("<font color=\"red\">");
+                        out.print((int) (snapshot.getSnapshotDate().getTime() - connectionInfo.getTimeLastStartActive()));
+                        out.print("</font>");
+                    } else {
+                        out.print("&nbsp;");
+                    }
+                    out.print("&nbsp;&nbsp;</td>");
+
+                    // requester
+                    out.print("<td>&nbsp;");
+                    out.print(connectionInfo.getRequester() != null ? connectionInfo.getRequester() : "-");
+                    out.print("</td>");
+
+                    out.println("</tr>");
                 }
-                out.print("\">");
-                out.print(connectionInfo.getId());
-                out.print("</td>");
-
-                // birth
-                out.print("<td>&nbsp;");
-                out.print(TIME_FORMAT.format(connectionInfo.getBirthDate()));
-                out.print("</td>");
-
-                // started
-                out.print("<td>&nbsp;");
-                out.print(TIME_FORMAT.format(new Date(connectionInfo.getTimeLastStartActive())));
-                out.print("</td>");
-
-                // active
-                out.print("<td align=\"right\">");
-                if (connectionInfo.getTimeLastStopActive() > 0) {
-                    out.print((int) (connectionInfo.getTimeLastStopActive() - connectionInfo.getTimeLastStartActive()));
-                } else if (connectionInfo.getTimeLastStartActive() > 0) {
-                    out.print("<font color=\"red\">");
-                    out.print((int) (snapshot.getSnapshotDate().getTime() - connectionInfo.getTimeLastStartActive()));
-                    out.print("</font>");
-                } else {
-                    out.print("&nbsp;");
-                }
-                out.print("&nbsp;&nbsp;</td>");
-
-                // requester
-                out.print("<td>&nbsp;");
-                out.print(connectionInfo.getRequester());
-                out.print("</td>");
-
-                out.println("</tr>");
             }
             out.println("  </tbody>");
             out.println("</table>");
@@ -507,6 +489,9 @@ public class MonitorServlet extends HttpServlet {
 /*
  Revision history:
  $Log: MonitorServlet.java,v $
+ Revision 1.5  2003/02/05 15:06:16  billhorsman
+ removed dependency on JDK1.4 imaging.
+
  Revision 1.4  2003/01/31 16:53:21  billhorsman
  checkstyle
 
