@@ -21,7 +21,7 @@ import org.logicalcobwebs.proxool.ProxoolException;
 /**
  * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.5 $, $Date: 2003/01/17 00:38:12 $
+ * @version $Revision: 1.6 $, $Date: 2003/01/18 15:13:14 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -85,6 +85,10 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.6  2003/01/18 15:13:14  billhorsman
+ Signature changes (new ProxoolException
+ thrown) on the ProxoolFacade API.
+
  Revision 1.5  2003/01/17 00:38:12  billhorsman
  wide ranging changes to clarify use of alias and url -
  this has led to some signature changes (new exceptions
@@ -103,7 +107,7 @@ public class ConfiguratorTest extends TestCase {
  Init rev.
 
  Revision 1.4  2002/12/04 13:20:11  billhorsman
- ConfiguratorIF test
+ ConfigurationListenerIF test
 
  Revision 1.3  2002/11/09 16:00:45  billhorsman
  fix doc

@@ -72,7 +72,7 @@ import java.util.Properties;
  * delegate JDBC driver.
  * </p>
  *
- * @version $Revision: 1.2 $, $Date: 2002/12/26 11:32:59 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/18 15:13:12 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -163,11 +163,7 @@ public class PropertyConfigurator {
                 LOG.debug("Created url: " + url);
             }
 
-            try {
-                ProxoolFacade.registerConnectionPool(url.toString(), proxoolProperties);
-            } catch (SQLException e) {
-                throw new ProxoolException(e);
-            }
+            ProxoolFacade.registerConnectionPool(url.toString(), proxoolProperties);
         }
     }
 
@@ -176,6 +172,10 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.3  2003/01/18 15:13:12  billhorsman
+ Signature changes (new ProxoolException
+ thrown) on the ProxoolFacade API.
+
  Revision 1.2  2002/12/26 11:32:59  billhorsman
  Rewrote to support new format.
 

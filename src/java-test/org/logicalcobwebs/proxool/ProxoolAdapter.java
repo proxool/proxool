@@ -18,12 +18,12 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.12 $, $Date: 2003/01/17 00:38:12 $
+ * @version $Revision: 1.13 $, $Date: 2003/01/18 15:13:13 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
-public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
+public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListenerIF {
 
     private static final Log LOG = LogFactory.getLog(ProxoolAdapter.class);
 
@@ -141,6 +141,10 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.13  2003/01/18 15:13:13  billhorsman
+ Signature changes (new ProxoolException
+ thrown) on the ProxoolFacade API.
+
  Revision 1.12  2003/01/17 00:38:12  billhorsman
  wide ranging changes to clarify use of alias and url -
  this has led to some signature changes (new exceptions
@@ -153,7 +157,7 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
  now includes properties in definitionChanged event
 
  Revision 1.9  2002/12/04 13:20:10  billhorsman
- ConfiguratorIF test
+ ConfigurationListenerIF test
 
  Revision 1.8  2002/11/13 20:23:38  billhorsman
  change method name, throw exceptions differently, trivial changes

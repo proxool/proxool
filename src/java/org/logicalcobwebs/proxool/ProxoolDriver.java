@@ -17,7 +17,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.10 $, $Date: 2003/01/17 00:38:12 $
+ * @version $Revision: 1.11 $, $Date: 2003/01/18 15:13:11 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -196,6 +196,10 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.11  2003/01/18 15:13:11  billhorsman
+ Signature changes (new ProxoolException
+ thrown) on the ProxoolFacade API.
+
  Revision 1.10  2003/01/17 00:38:12  billhorsman
  wide ranging changes to clarify use of alias and url -
  this has led to some signature changes (new exceptions
@@ -205,7 +209,7 @@ public class ProxoolDriver implements Driver {
  added default values for property info documentation
 
  Revision 1.8  2002/12/04 13:19:43  billhorsman
- draft ConfiguratorIF stuff for persistent configuration
+ draft ConfigurationListenerIF stuff for persistent configuration
 
  Revision 1.7  2002/12/03 00:41:56  billhorsman
  fixed getPropertyInfo() for TRACE property and better explanation of FATAL_SQL_EXCEPTION

@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.28 $, $Date: 2003/01/17 00:38:12 $
+ * @version $Revision: 1.29 $, $Date: 2003/01/18 15:13:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -117,7 +117,7 @@ public class GeneralTests extends TestCase {
 
             ProxoolFacade.updateConnectionPool(urlPrefix + "2", null);
             ProxoolFacade.killAllConnections(alias);
-            
+
             // Get another connection
             {
                 Connection c = TestHelper.getProxoolConnection(urlPrefix + "2");
@@ -188,7 +188,7 @@ public class GeneralTests extends TestCase {
     }
 
     /**
-     * Test the {@link ConfiguratorIF#defintionUpdated} event.
+     * Test the {@link ConfigurationListenerIF#defintionUpdated} event.
      */
     public void testDefintionUpdated() {
 
@@ -586,7 +586,7 @@ public class GeneralTests extends TestCase {
     }
 
 
-    class MyConfigurator implements ConfiguratorIF {
+    class MyConfigurator implements ConfigurationListenerIF {
 
         private Properties completeInfo;
 
@@ -606,6 +606,10 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.29  2003/01/18 15:13:12  billhorsman
+ Signature changes (new ProxoolException
+ thrown) on the ProxoolFacade API.
+
  Revision 1.28  2003/01/17 00:38:12  billhorsman
  wide ranging changes to clarify use of alias and url -
  this has led to some signature changes (new exceptions

@@ -22,9 +22,9 @@ import org.xml.sax.InputSource;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.5 $, $Date: 2002/12/18 03:13:00 $
+ * @version $Revision: 1.6 $, $Date: 2003/01/18 15:13:14 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class JAXPConfiguratorTest extends TestCase {
@@ -48,7 +48,7 @@ public class JAXPConfiguratorTest extends TestCase {
         JAXPConfigurator.configure(xmlFile, false);
         try {
             assertNotNull("2nd (deeply nested) pool was not configured.", ProxoolFacade.getConnectionPoolDefinition("xml-test-2"));
-        } catch (SQLException e) {
+        } catch (ProxoolException e) {
             fail("2nd (deeply nested) pool was not configured.");
         }
         try {
@@ -77,7 +77,7 @@ public class JAXPConfiguratorTest extends TestCase {
         JAXPConfigurator.configure(xmlFile, false);
         try {
             assertNotNull("2nd (deeply nested) pool was not configured.", ProxoolFacade.getConnectionPoolDefinition("xml-test-ns-2"));
-        } catch (SQLException e) {
+        } catch (ProxoolException e) {
             fail("2nd (deeply nested) pool was not configured.");
         }
         try {
@@ -109,7 +109,7 @@ public class JAXPConfiguratorTest extends TestCase {
         JAXPConfigurator.configure(inputSource, true);
         try {
             assertNotNull("2nd (deeply nested) pool was not configured.", ProxoolFacade.getConnectionPoolDefinition("xml-test-validating-2"));
-        } catch (SQLException e) {
+        } catch (ProxoolException e) {
             fail("2nd (deeply nested) pool was not configured.");
         }
         try {
@@ -186,6 +186,10 @@ public class JAXPConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.6  2003/01/18 15:13:14  billhorsman
+ Signature changes (new ProxoolException
+ thrown) on the ProxoolFacade API.
+
  Revision 1.5  2002/12/18 03:13:00  chr32
  Added tests for xml validation.
 

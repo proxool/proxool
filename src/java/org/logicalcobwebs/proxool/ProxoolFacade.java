@@ -8,7 +8,6 @@ package org.logicalcobwebs.proxool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.28 $, $Date: 2003/01/17 00:38:12 $
+ * @version $Revision: 1.29 $, $Date: 2003/01/18 15:13:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -38,6 +37,9 @@ public class ProxoolFacade {
 
     private static Map completeInfos = new HashMap();
 
+    /*
+        TODO we only allow one configurationListener at a time. Need to rethink whole listener code
+     */
     private static Map configurators = new HashMap();
 
     /**
@@ -46,9 +48,9 @@ public class ProxoolFacade {
      * @param info the properties used to configure Proxool (and any for the delegate driver too) - optional
      * @param configurator used to configure this pool, it will be notified if any changes occur to the definition - optional
      * @return the alias for this pool (or the full url if no alias is specified)
-     * @throws SQLException if anything goes wrong
+     * @throws ProxoolException if anything goes wrong
      */
-    public static String registerConnectionPool(String url, Properties info, ConfiguratorIF configurator) throws SQLException, ProxoolException {
+    public static String registerConnectionPool(String url, Properties info, ConfigurationListenerIF configurator) throws ProxoolException {
         String alias = getAlias(url);
 
         if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
@@ -64,7 +66,7 @@ public class ProxoolFacade {
             }
 
         } else {
-            throw new SQLException("Attempt to register duplicate pool");
+            throw new ProxoolException("Attempt to register duplicate pool called '" + alias + "'");
         }
 
         return alias;
@@ -72,17 +74,17 @@ public class ProxoolFacade {
 
     /**
      * With no configurator
-     * @see #registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfiguratorIF)
+     * @see #registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfigurationListenerIF)
      */
-    public static String registerConnectionPool(String url, Properties info) throws SQLException, ProxoolException {
+    public static String registerConnectionPool(String url, Properties info) throws ProxoolException {
         return registerConnectionPool(url, info, null);
     }
 
     /**
      * With no configurator or properties (using default values)
-     * @see #registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfiguratorIF)
+     * @see #registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfigurationListenerIF)
      */
-    public static void registerConnectionPool(String url) throws SQLException, ProxoolException {
+    public static void registerConnectionPool(String url) throws ProxoolException {
         registerConnectionPool(url, null, null);
     }
 
@@ -93,9 +95,9 @@ public class ProxoolFacade {
      *    proxool.alias -> alias
      *
      * @return the alias defined within the url
-     * @throws SQLException if we couldn't find the alias
+     * @throws ProxoolException if we couldn't find the alias
      */
-    protected static String getAlias(String url) throws SQLException, ProxoolException {
+    protected static String getAlias(String url) throws ProxoolException {
         String alias = null;
         final String prefix = ProxoolConstants.PROXOOL + ProxoolConstants.ALIAS_DELIMITER;
 
@@ -125,11 +127,11 @@ public class ProxoolFacade {
      *
      * @param cpd The defintion to populate (can have existing settings)
      * @param info the properties object to read from
-     * @return the name of the pool
-     * @throws SQLException if there were any validation errors.
+     * @return the alias
+     * @throws ProxoolException if there were any validation errors.
      */
     protected static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd,
-                                       Properties info, ConfiguratorIF configurator) throws SQLException, ProxoolException {
+                                       Properties info, ConfigurationListenerIF configurator) throws ProxoolException {
 
         Properties rememberedInfo = null;
         Properties changedProperties = null;
@@ -182,7 +184,7 @@ public class ProxoolFacade {
             }
         } catch (IndexOutOfBoundsException e) {
             LOG.error("Invalid URL " + url, e);
-            throw new SQLException("Invalid URL format.");
+            throw new ProxoolException("Invalid URL format.");
         }
 
         if (info != null && (rememberedInfo == null || !info.equals(rememberedInfo))) {
@@ -238,10 +240,10 @@ public class ProxoolFacade {
             configurator.defintionUpdated(cpd, completeInfo, changedProperties);
         }
 
-        return cpd.getName();
+        return cpd.getAlias();
     }
 
-    private static boolean setProperty(String key, ConnectionPoolDefinition cpd, String value, Properties changedProperties, Log earlyLog) throws SQLException {
+    private static boolean setProperty(String key, ConnectionPoolDefinition cpd, String value, Properties changedProperties, Log earlyLog) throws ProxoolException {
         boolean isProxoolProperty = true;
         if (key.equals(ProxoolConstants.USER_PROPERTY)) {
             isProxoolProperty = false;
@@ -263,7 +265,7 @@ public class ProxoolFacade {
                     cpd.setHouseKeepingSleepTime(valueAsInt);
                 }
             } catch (NumberFormatException e) {
-                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
             }
         } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
             if (isChanged(cpd.getHouseKeepingTestSql(), value)) {
@@ -278,7 +280,7 @@ public class ProxoolFacade {
                     cpd.setMaximumConnectionCount(valueAsInt);
                 }
             } catch (NumberFormatException e) {
-                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY)) {
             try {
@@ -288,7 +290,7 @@ public class ProxoolFacade {
                     cpd.setMaximumConnectionLifetime(valueAsInt);
                 }
             } catch (NumberFormatException e) {
-                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY)) {
             try {
@@ -298,7 +300,7 @@ public class ProxoolFacade {
                     cpd.setMaximumNewConnections(valueAsInt);
                 }
             } catch (NumberFormatException e) {
-                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
             }
         } else if (key.equals(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY)) {
             try {
@@ -308,7 +310,7 @@ public class ProxoolFacade {
                     cpd.setMinimumConnectionCount(valueAsInt);
                 }
             } catch (NumberFormatException e) {
-                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
             }
         } else if (key.equals(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY)) {
             try {
@@ -318,7 +320,7 @@ public class ProxoolFacade {
                     cpd.setPrototypeCount(valueAsInt);
                 }
             } catch (NumberFormatException e) {
-                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
             }
         } else if (key.equals(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY)) {
             try {
@@ -328,7 +330,7 @@ public class ProxoolFacade {
                     cpd.setRecentlyStartedThreshold(valueAsInt);
                 }
             } catch (NumberFormatException e) {
-                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
             }
         } else if (key.equals(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY)) {
             try {
@@ -338,7 +340,7 @@ public class ProxoolFacade {
                     cpd.setOverloadWithoutRefusalLifetime(valueAsInt);
                 }
             } catch (NumberFormatException e) {
-                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY)) {
             try {
@@ -348,7 +350,7 @@ public class ProxoolFacade {
                     cpd.setMaximumActiveTime(valueAsInt);
                 }
             } catch (NumberFormatException e) {
-                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+                throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
             }
         } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
             if (value != null && value.equals("1")) {
@@ -405,20 +407,20 @@ public class ProxoolFacade {
             try {
                 connectionPool.finalize(delay, finalizer);
             } catch (Throwable t) {
-                LOG.error("Problem trying to remove " + connectionPool.getDefinition().getName() + " connection pool", t);
+                LOG.error("Problem trying to remove " + connectionPool.getDefinition().getAlias() + " connection pool", t);
             }
-            ConnectionPoolManager.getInstance().removeConnectionPool(connectionPool.getDefinition().getName());
+            ConnectionPoolManager.getInstance().removeConnectionPool(connectionPool.getDefinition().getAlias());
         }
         connectionPool = null;
     }
 
     /**
      * Remove a connection pool. Kills all the connections. Resets everything.
-     * @param name the pool to remove
+     * @param alias the pool to remove
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
      */
-    public static void removeConnectionPool(String name, int delay) throws ProxoolException {
-        removeConnectionPool(Thread.currentThread().getName(), ConnectionPoolManager.getInstance().getConnectionPool(name), delay);
+    public static void removeConnectionPool(String alias, int delay) throws ProxoolException {
+        removeConnectionPool(Thread.currentThread().getName(), ConnectionPoolManager.getInstance().getConnectionPool(alias), delay);
     }
 
     /**
@@ -446,33 +448,40 @@ public class ProxoolFacade {
     /**
      * Like {@link #removeConnectionPool(java.lang.String, int)} but uses no delay. (Kills
      * everything as quickly as possible).
-     * @param name the pool to remove
+     * @param alias the pool to remove
      */
-    public static void removeConnectionPool(String name) throws ProxoolException {
-        removeConnectionPool(name, 0);
+    public static void removeConnectionPool(String alias) throws ProxoolException {
+        removeConnectionPool(alias, 0);
     }
 
     /**
      * Get real-time statistical information about how a pool is performing.
+     * @param alias to identify the pool
+     * @return the statistics
+     * @throws ProxoolException if we couldn't find the pool
      */
-    public static ConnectionPoolStatisticsIF getConnectionPoolStatistics(String alias) throws SQLException, ProxoolException {
+    public static ConnectionPoolStatisticsIF getConnectionPoolStatistics(String alias) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias);
     }
 
     /**
      * Get real-time statistical information about how a pool is performing.
-     * @deprecated this will not be present in version 1.0. Better to use {@link #getConnectionPoolStatistics}
      * and extract the information piece by piece.
+     * @param alias to identify the pool
+     * @return a horrible string describing the statistics
+     * @throws ProxoolException if we couldn't find the pool
+     * @deprecated this will not be present in version 1.0. Better to use {@link #getConnectionPoolStatistics}
      */
-    public static String getConnectionPoolStatisticsDump(String alias) throws SQLException, ProxoolException {
+    public static String getConnectionPoolStatisticsDump(String alias) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias).displayStatistics();
     }
 
     /**
      * Get the definition of a pool.
      * @param alias identifies the pool
+     * @throws ProxoolException if we couldn't find the pool
      */
-    public static ConnectionPoolDefinitionIF getConnectionPoolDefinition(String alias) throws SQLException, ProxoolException {
+    public static ConnectionPoolDefinitionIF getConnectionPoolDefinition(String alias) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias).getDefinition();
     }
 
@@ -481,6 +490,7 @@ public class ProxoolFacade {
      * been active, etc.
      * @param alias identifies the pool
      * @return a collection of {@link ConnectionInfoIF ConnectionInfoIFs}
+     * @throws ProxoolException if we couldn't find the pool
      */
     public static Collection getConnectionInfos(String alias) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias).getConnectionInfos();
@@ -489,46 +499,47 @@ public class ProxoolFacade {
     /**
      * Kill all connections in a pool. The pool continues to work however, and new connections will be
      * made as required.
-     * @param connectionPoolName the pool containing the connection
+     * @param alias the pool containing the connection
      * @param merciful if true will only kill connections that aren't active
+     * @throws ProxoolException if we couldn't find the pool
      */
-    public static void killAllConnections(String connectionPoolName, boolean merciful) throws ProxoolException {
-        ConnectionPoolManager.getInstance().getConnectionPool(connectionPoolName).expireAllConnections(merciful);
+    public static void killAllConnections(String alias, boolean merciful) throws ProxoolException {
+        ConnectionPoolManager.getInstance().getConnectionPool(alias).expireAllConnections(merciful);
     }
 
     /**
      * Like {@link #killAllConnections} but defaults to merciful.
      */
-    public static void killAllConnections(String connectionPoolName) throws ProxoolException {
-        killAllConnections(connectionPoolName, MERCIFUL);
+    public static void killAllConnections(String alias) throws ProxoolException {
+        killAllConnections(alias, MERCIFUL);
     }
 
     /**
      * Kill a single connection
-     * @param connectionPoolName the pool containing the connection
+     * @param alias the pool containing the connection
      * @param id the id of the specific connection
      * @param merciful if true will only kill connections that aren't active
      * @return true if the connection was killed, or false if it couldn't be found or killed.
      */
-    public static boolean killConnecton(String connectionPoolName, long id, boolean merciful) throws ProxoolException {
-        return ConnectionPoolManager.getInstance().getConnectionPool(connectionPoolName).expireConnection(id, merciful);
+    public static boolean killConnecton(String alias, long id, boolean merciful) throws ProxoolException {
+        return ConnectionPoolManager.getInstance().getConnectionPool(alias).expireConnection(id, merciful);
     }
 
     /**
      * Monitors the change of state of the pool (quiet, busy, overloaded, or down)
-     * @param connectionPoolName identifies the pool
+     * @param alias identifies the pool
      */
-    public static void setStateListener(String connectionPoolName, StateListenerIF stateListener) throws ProxoolException {
-        ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(connectionPoolName);
+    public static void setStateListener(String alias, StateListenerIF stateListener) throws ProxoolException {
+        ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
         cp.setStateListener(stateListener);
     }
 
     /**
      * Monitors each time a connection is made or destroyed
-     * @param connectionPoolName identifies the pool
+     * @param alias identifies the pool
      */
-    public static void setConnectionListener(String connectionPoolName, ConnectionListenerIF connectionListener) throws ProxoolException {
-        ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(connectionPoolName);
+    public static void setConnectionListener(String alias, ConnectionListenerIF connectionListener) throws ProxoolException {
+        ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
         cp.setConnectionListener(connectionListener);
     }
 
@@ -541,14 +552,14 @@ public class ProxoolFacade {
      * Update the behaviour of the pool. Only properties that are defined here are overwritten. That is, properties
      * that were defined before but are not mentioned here are retained.
      *
-     * @param url the url that defines the pool (or the abbreviated ""proxool.name")
+     * @param url the url that defines the pool (or the abbreviated ""proxool.alias")
      * @param info the new properties
      */
-    public static void updateConnectionPool(String url, Properties info) throws SQLException, ProxoolException {
+    public static void updateConnectionPool(String url, Properties info) throws ProxoolException {
         String alias = getAlias(url);
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
         ConnectionPoolDefinition cpd = cp.getDefinition();
-        ConfiguratorIF configurator = (ConfiguratorIF) configurators.get(cpd.getName());
+        ConfigurationListenerIF configurator = (ConfigurationListenerIF) configurators.get(cpd.getAlias());
         definePool(cp, url, cpd, info, configurator);
 
     }
@@ -558,8 +569,8 @@ public class ProxoolFacade {
         LOG.debug("Finalising");
     }
 
-    protected static void updatePoolByDriver(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException, ProxoolException {
-        ConfiguratorIF configurator = (ConfiguratorIF) configurators.get(cpd.getName());
+    protected static void updatePoolByDriver(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws ProxoolException {
+        ConfigurationListenerIF configurator = (ConfigurationListenerIF) configurators.get(cpd.getAlias());
         definePool(cp, url, cpd, info, configurator);
     }
 
@@ -584,6 +595,10 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.29  2003/01/18 15:13:12  billhorsman
+ Signature changes (new ProxoolException
+ thrown) on the ProxoolFacade API.
+
  Revision 1.28  2003/01/17 00:38:12  billhorsman
  wide ranging changes to clarify use of alias and url -
  this has led to some signature changes (new exceptions
@@ -624,7 +639,7 @@ public class ProxoolFacade {
  now includes properties in definitionChanged event
 
  Revision 1.16  2002/12/04 13:19:43  billhorsman
- draft ConfiguratorIF stuff for persistent configuration
+ draft ConfigurationListenerIF stuff for persistent configuration
 
  Revision 1.15  2002/11/13 19:12:24  billhorsman
  fix where update properties weren't being recognised
