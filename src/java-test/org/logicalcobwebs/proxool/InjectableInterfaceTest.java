@@ -5,6 +5,9 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
+
 import java.util.Properties;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,12 +17,14 @@ import java.sql.CallableStatement;
 
 /**
  * Tests whether we can inject a new interface into one of the proxy objects
- * @version $Revision: 1.1 $, $Date: 2004/06/02 20:59:52 $
+ * @version $Revision: 1.2 $, $Date: 2004/06/17 21:36:39 $
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
  */
 public class InjectableInterfaceTest extends AbstractProxoolTest {
+
+    private static final Log LOG = LogFactory.getLog(InjectableInterfaceTest.class);
 
     /**
      * @see AbstractProxoolTest
@@ -43,8 +48,7 @@ public class InjectableInterfaceTest extends AbstractProxoolTest {
         Connection c1 = DriverManager.getConnection(url, info);
         // Can we cast it?
         HsqlConnectionIF hc = (HsqlConnectionIF) c1;
-        // Can we call one of vendor specific methods?
-        hc.checkClosed();
+        // TODO - need to test a vendor specific method?
         // Does close() still work?
         hc.close();
         assertTrue("c1.isClosed()", c1.isClosed());
@@ -61,13 +65,13 @@ public class InjectableInterfaceTest extends AbstractProxoolTest {
         Properties info = new Properties();
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-        info.setProperty(ProxoolConstants.INJECTABLE_STATEMENT_INTERFACE_NAME_PROPERTY, HsqlConnectionIF.class.getName());
+        info.setProperty(ProxoolConstants.INJECTABLE_STATEMENT_INTERFACE_NAME_PROPERTY, HsqlStatementIF.class.getName());
         Connection c1 = DriverManager.getConnection(url, info);
         Statement s = c1.createStatement();
         // Can we cast it?
         HsqlStatementIF hs = (HsqlStatementIF) s;
-        // Can we call one of vendor specific methods?
-        hs.checkClosed();
+        // TODO : call a vendor specific method?
+        // hs.checkClosed();
         // Does close() still work?
         hs.close();
         c1.close();
@@ -84,13 +88,13 @@ public class InjectableInterfaceTest extends AbstractProxoolTest {
         Properties info = new Properties();
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-        info.setProperty(ProxoolConstants.INJECTABLE_STATEMENT_INTERFACE_NAME_PROPERTY, HsqlConnectionIF.class.getName());
+        info.setProperty(ProxoolConstants.INJECTABLE_PREPARED_STATEMENT_INTERFACE_NAME_PROPERTY, HsqlPreparedStatementIF.class.getName());
         Connection c1 = DriverManager.getConnection(url, info);
         PreparedStatement ps = c1.prepareStatement(TestConstants.HYPERSONIC_TEST_SQL);
         // Can we cast it?
         HsqlPreparedStatementIF hps = (HsqlPreparedStatementIF) ps;
-        // Can we call one of vendor specific methods?
-        hps.build();
+        // TODO : call a vendor specific method?
+        // hps.build();
         // Does close() still work?
         hps.close();
         c1.close();
@@ -107,13 +111,12 @@ public class InjectableInterfaceTest extends AbstractProxoolTest {
         Properties info = new Properties();
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-        info.setProperty(ProxoolConstants.INJECTABLE_STATEMENT_INTERFACE_NAME_PROPERTY, HsqlConnectionIF.class.getName());
+        info.setProperty(ProxoolConstants.INJECTABLE_CALLABLE_STATEMENT_INTERFACE_NAME_PROPERTY, HsqlPreparedStatementIF.class.getName());
         Connection c1 = DriverManager.getConnection(url, info);
         CallableStatement cs = c1.prepareCall(TestConstants.HYPERSONIC_TEST_SQL);
         // Can we cast it? (Note: HSQLDB uses the same class for  both Prepared and Callable statements)
         HsqlPreparedStatementIF hps = (HsqlPreparedStatementIF) cs;
-        // Can we call one of vendor specific methods?
-        hps.build();
+        // TODO - call a vendor specific method?
         // Does close() still work?
         hps.close();
         c1.close();
@@ -123,6 +126,9 @@ public class InjectableInterfaceTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: InjectableInterfaceTest.java,v $
+ Revision 1.2  2004/06/17 21:36:39  billhorsman
+ Removed call to private methods. They're going to fail anyway.
+
  Revision 1.1  2004/06/02 20:59:52  billhorsman
  New injectable interface tests
 
