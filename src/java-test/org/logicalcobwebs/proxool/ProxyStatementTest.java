@@ -18,9 +18,9 @@ import org.logicalcobwebs.logging.LogFactory;
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.10 $, $Date: 2004/05/26 17:19:09 $
+ * @version $Revision: 1.11 $, $Date: 2004/07/13 21:32:41 $
  * @author bill
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ProxyStatementTest extends AbstractProxoolTest {
@@ -79,13 +79,14 @@ public class ProxyStatementTest extends AbstractProxoolTest {
         Statement delegateStatement = ProxoolFacade.getDelegateStatement(s);
         Class delegateStatementClass = delegateStatement.getClass();
         s.close();
-        
+        c.close();
+
         LOG.debug("Statement " + s.getClass() + " is delegating to " + delegateStatementClass);
         
         // get a *real* connection directly from the native driver (bypassing the pool)
         Connection realConnection = TestHelper.getDirectConnection();
-        Statement  realStatement  = realConnection.prepareStatement(TestConstants.HYPERSONIC_TEST_SQL);
-        Class	   realStatementClass = realStatement.getClass();
+        Statement realStatement  = realConnection.prepareStatement(TestConstants.HYPERSONIC_TEST_SQL);
+        Class realStatementClass = realStatement.getClass();
         
         realStatement.close();
         realConnection.close();
@@ -177,6 +178,9 @@ public class ProxyStatementTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ProxyStatementTest.java,v $
+ Revision 1.11  2004/07/13 21:32:41  billhorsman
+ Close the first connection first before opening the real connection (directly) otherwise you get a "database already in use"error on Windows.
+
  Revision 1.10  2004/05/26 17:19:09  brenuart
  Allow JUnit tests to be executed against another database.
  By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
