@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.50 $
-    $Date: 2003/03/12 15:59:34 $
+    $Revision: 1.51 $
+    $Date: 2003/03/12 16:46:03 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -397,7 +397,7 @@
         <javadoc
             sourcepath="src/java"
             destdir="${build-dir}/api"
-            packagenames="org.logicalcobwebs.*"
+            packagenames="org.logicalcobwebs.proxool,org.logicalcobwebs.proxool.configuration"
             doctitle="Proxool API}"
             windowtitle="Proxool API}"
             public="true"
