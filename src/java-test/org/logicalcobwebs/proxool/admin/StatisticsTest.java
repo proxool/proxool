@@ -25,7 +25,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.10 $, $Date: 2003/03/01 16:14:32 $
+ * @version $Revision: 1.11 $, $Date: 2003/03/01 16:46:08 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -101,6 +101,11 @@ public class StatisticsTest extends TestCase {
             assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
             StatisticsIF statistics2 = srm.getStatistics();
 
+            if (statistics2.getServedCount() != 1) {
+                LOG.error("Waiting for another set of statistics");
+                statistics2 = srm.getStatistics();
+            }
+
             LOG.error("statistics1: " + statistics1.getStartDate() + " to " + statistics1.getStopDate());
             LOG.error("statistics2: " + statistics2.getStartDate() + " to " + statistics2.getStopDate());
             assertEquals("servedCount", 1L, statistics2.getServedCount());
@@ -160,6 +165,9 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.11  2003/03/01 16:46:08  billhorsman
+ debug
+
  Revision 1.10  2003/03/01 16:14:32  billhorsman
  debug
 
