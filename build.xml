@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.58 $
-    $Date: 2003/08/30 11:45:08 $
+    $Revision: 1.59 $
+    $Date: 2003/08/30 15:39:56 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -45,11 +45,13 @@
     <path id="source" path="${build-dir}/classes">
         <fileset dir="lib">
             <include name="**/*.jar"/>
+	    <include name="**/*.zip"/>
         </fileset>
     </path>
     <path id="binary">
         <fileset dir="lib">
             <include name="**/*.jar"/>
+	    <include name="**/*.zip"/>
         </fileset>
         <fileset dir="jar">
             <include name="**/*.jar"/>
@@ -337,7 +339,6 @@
         depends="init"
         >
         <property name="build-test" value="true"/>
-        <property name="build-sandbox" value="true"/>
         <antcall target="build-src"/>
         <antcall target="compile"/>
     </target>
