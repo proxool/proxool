@@ -16,9 +16,9 @@ import org.logicalcobwebs.logging.LogFactory;
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.14 $, $Date: 2003/03/11 14:51:47 $
+ * @version $Revision: 1.15 $, $Date: 2003/05/06 23:17:59 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
  */
 public class GlobalTest {
@@ -63,6 +63,7 @@ public class GlobalTest {
         suite.addTest(org.logicalcobwebs.proxool.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.configuration.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.admin.AllTests.suite());
+        suite.addTest(org.logicalcobwebs.proxool.admin.jmx.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.util.AllTests.suite());
 
         // create a wrapper for global initialization code.
@@ -83,6 +84,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.15  2003/05/06 23:17:59  chr32
+ Added JMX tests to GlobalTest.
+
  Revision 1.14  2003/03/11 14:51:47  billhorsman
  more concurrency fixes relating to snapshots
 
