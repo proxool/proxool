@@ -21,9 +21,9 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.47 $, $Date: 2003/02/12 12:27:16 $
+ * @version $Revision: 1.48 $, $Date: 2003/02/18 16:49:59 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 class ConnectionPool implements ConnectionPoolStatisticsIF {
 
@@ -980,6 +980,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         this.compositeStateListener.addListener(stateListener);
     }
 
+    public boolean removeStateListener(StateListenerIF stateListener) {
+        return this.compositeStateListener.removeListener(stateListener);
+    }
+
     /**
      * @deprecated use {@link #addConnectionListener(ConnectionListenerIF)} instead.
      */
@@ -989,6 +993,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     public void addConnectionListener(ConnectionListenerIF connectionListener) {
         this.compositeConnectionListener.addListener(connectionListener);
+    }
+
+    public boolean removeConnectionListener(ConnectionListenerIF connectionListener) {
+        return this.compositeConnectionListener.removeListener(connectionListener);
     }
 
     /** Call the onBirth() method on each StateListenerIF . */
@@ -1190,6 +1198,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.48  2003/02/18 16:49:59  chr32
+ Added possibility to remove connection and state listeners.
+
  Revision 1.47  2003/02/12 12:27:16  billhorsman
  log proxy hashcode too
 

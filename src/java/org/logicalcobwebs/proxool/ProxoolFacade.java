@@ -33,9 +33,9 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.54 $, $Date: 2003/02/14 14:19:42 $
+ * @version $Revision: 1.55 $, $Date: 2003/02/18 16:50:00 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public class ProxoolFacade {
 
@@ -579,6 +579,18 @@ public class ProxoolFacade {
     }
 
     /**
+     * Remove a listener that monitors the change of state of the pool (quiet, busy, overloaded, or down)
+     * @param alias identifies the pool
+     * @param stateListener the listener to be removed.
+     * @throws ProxoolException if we couldn't find the pool
+     * @return wether the listnener was found and removed or not.
+     */
+    public boolean removeStateListener(String alias, StateListenerIF stateListener) throws ProxoolException {
+        ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
+        return cp.removeStateListener(stateListener);
+    }
+
+    /**
      * @deprecated use {@link #addConnectionListener(String, ConnectionListenerIF)} instead.
      */
     public static void setConnectionListener(String alias, ConnectionListenerIF connectionListener) throws ProxoolException {
@@ -594,6 +606,18 @@ public class ProxoolFacade {
     public static void addConnectionListener(String alias, ConnectionListenerIF connectionListener) throws ProxoolException {
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
         cp.addConnectionListener(connectionListener);
+    }
+
+    /**
+     * Remove a listener that monitors each time a connection is made or destroyed.
+     * @param alias identifies the pool
+     * @param connectionListener the listener to be removed
+     * @throws ProxoolException if we couldn't find the pool
+     * @return wether the listnener was found and removed or not.
+     */
+    public static boolean removeConnectionListener(String alias, ConnectionListenerIF connectionListener) throws ProxoolException {
+        ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
+        return cp.removeConnectionListener(connectionListener);
     }
 
     /**
@@ -772,6 +796,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.55  2003/02/18 16:50:00  chr32
+ Added possibility to remove connection and state listeners.
+
  Revision 1.54  2003/02/14 14:19:42  billhorsman
  automatically load ProxoolDriver
 
