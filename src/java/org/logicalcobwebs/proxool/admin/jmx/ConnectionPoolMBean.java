@@ -83,7 +83,7 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.12 $, $Date: 2003/09/29 17:48:08 $
+ * @version $Revision: 1.13 $, $Date: 2003/09/30 18:38:27 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -200,6 +200,12 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.HOUSE_KEEPING_TEST_SQL)) {
                     resultList.add (new Attribute (attributeNames[i],
                         getValueOrEmpty(poolDefinition.getHouseKeepingTestSql ())));
+                } else if (equalsProperty(attributeNames[i], ProxoolConstants.TEST_BEFORE_USE)) {
+                    resultList.add (new Attribute (attributeNames[i],
+                            new Boolean (this.poolDefinition.isTestBeforeUse ())));
+                } else if (equalsProperty(attributeNames[i], ProxoolConstants.TEST_AFTER_USE)) {
+                    resultList.add (new Attribute (attributeNames[i],
+                            new Boolean (this.poolDefinition.isTestAfterUse ())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_ACTIVE_TIME)) {
                     resultList.add (new Attribute (attributeNames[i],
                         new Integer (this.poolDefinition.getMaximumActiveTime ())));
@@ -310,6 +316,14 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                     } else {
                         newProperties.remove(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY);
                     }
+                    resultList.add (new Attribute (name, value));
+                } else if (equalsProperty(name, ProxoolConstants.TEST_BEFORE_USE)) {
+                    checkAssignable (name, Boolean.class, value.getClass ());
+                    newProperties.setProperty(ProxoolConstants.TEST_BEFORE_USE_PROPERTY, value.toString());
+                    resultList.add (new Attribute (name, value));
+                } else if (equalsProperty(name, ProxoolConstants.TEST_AFTER_USE)) {
+                    checkAssignable (name, Boolean.class, value.getClass ());
+                    newProperties.setProperty(ProxoolConstants.TEST_AFTER_USE_PROPERTY, value.toString());
                     resultList.add (new Attribute (name, value));
                 } else if (equalsProperty(name, ProxoolConstants.MAXIMUM_ACTIVE_TIME)) {
                     setIntegerAttribute(name, ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY, value,
@@ -424,6 +438,8 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
             createProxoolAttribute (ProxoolConstants.FATAL_SQL_EXCEPTION, String.class),
             createProxoolAttribute (ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME, Integer.class),
             createProxoolAttribute (ProxoolConstants.HOUSE_KEEPING_TEST_SQL, String.class),
+            createProxoolAttribute (ProxoolConstants.TEST_BEFORE_USE, Boolean.class),
+            createProxoolAttribute (ProxoolConstants.TEST_AFTER_USE, Boolean.class),
             createProxoolAttribute (ProxoolConstants.MAXIMUM_ACTIVE_TIME, Integer.class),
             createProxoolAttribute (ProxoolConstants.MAXIMUM_CONNECTION_COUNT, Integer.class),
             createProxoolAttribute (ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME, Integer.class),
@@ -681,6 +697,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.13  2003/09/30 18:38:27  billhorsman
+ New properties
+
  Revision 1.12  2003/09/29 17:48:08  billhorsman
  New fatal-sql-exception-wrapper-class allows you to define what exception is used as a wrapper. This means that you
  can make it a RuntimeException if you need to.
