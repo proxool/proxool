@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.30 $, $Date: 2003/01/28 11:52:01 $
+ * @version $Revision: 1.31 $, $Date: 2003/01/30 17:48:28 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -106,7 +106,13 @@ public class GeneralTests extends TestCase {
                     + ProxoolConstants.URL_DELIMITER
                     + "jdbc:hsqldb:db/";
 
-            // Register pool and get one connection
+            Properties info = TestHelper.buildProperties();
+            info.setProperty("proxool.minimum-connection-count", "2");
+
+            // register pool
+            ProxoolFacade.registerConnectionPool(urlPrefix + "1", info);
+
+            // Get one connection
             {
                 Connection c = TestHelper.getProxoolConnection(urlPrefix + "1");
                 c.close();
@@ -126,6 +132,65 @@ public class GeneralTests extends TestCase {
 
             // If the above calls all used the same pool then it should have served exactly 3 connections.s
             assertEquals("connectionsServedCount", 2L, ProxoolFacade.getConnectionPoolStatistics(alias).getConnectionsServedCount());
+
+            ProxoolFacade.updateConnectionPool(urlPrefix + "1", null);
+            ProxoolFacade.killAllConnections(alias);
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Can we change the delegate URL of a pool
+     */
+    public void testConfigurationListener() {
+
+        String testName = "configurationListener";
+
+        try {
+            String alias = testName;
+
+            String urlPrefix = ProxoolConstants.PROXOOL
+                    + ProxoolConstants.ALIAS_DELIMITER
+                    + alias
+                    + ProxoolConstants.URL_DELIMITER
+                    + TestHelper.HYPERSONIC_DRIVER
+                    + ProxoolConstants.URL_DELIMITER
+                    + "jdbc:hsqldb:db/";
+
+            Properties info = TestHelper.buildProperties();
+            info.setProperty("proxool.minimum-connection-count", "2");
+
+            // register pool
+            ProxoolFacade.registerConnectionPool(urlPrefix + "1", info);
+            int propertyCount = info.size();
+
+            // listen to the configuration
+            MyConfigurationListener mcl = new MyConfigurationListener();
+            ProxoolFacade.setConfigurationListener(alias, mcl);
+
+            // Update the URL
+            ProxoolFacade.updateConnectionPool(urlPrefix + "2", null);
+            LOG.debug("changed: " + mcl.getChangedInfo());
+            LOG.debug("complete: " + mcl.getCompleteInfo());
+
+            // Update the URL again
+            ProxoolFacade.updateConnectionPool(urlPrefix + "1", null);
+            LOG.debug("changed: " + mcl.getChangedInfo());
+            LOG.debug("complete: " + mcl.getCompleteInfo());
+            assertEquals("completeInfo size", propertyCount, mcl.getCompleteInfo().size());
+
+            // Update the verbose property
+            info.setProperty("proxool.verbose", "false");
+            ProxoolFacade.updateConnectionPool(urlPrefix + "1", info);
+            LOG.debug("changed: " + mcl.getChangedInfo());
+            LOG.debug("complete: " + mcl.getCompleteInfo());
+            assertEquals("completeInfo size", propertyCount, mcl.getCompleteInfo().size());
+            assertNotNull("changedInfo", mcl.getChangedInfo());
+            assertEquals("changedInfo size", 1, mcl.getChangedInfo().size());
+
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -602,7 +667,7 @@ public class GeneralTests extends TestCase {
     }
 
 
-    class MyConfigurator implements ConfigurationListenerIF {
+    class MyConfigurationListener implements ConfigurationListenerIF {
 
         private Properties completeInfo;
 
@@ -616,12 +681,27 @@ public class GeneralTests extends TestCase {
             this.changedInfo = changedInfo;
         }
 
+        public Properties getCompleteInfo() {
+            return completeInfo;
+        }
+
+        public Properties getChangedInfo() {
+            return changedInfo;
+        }
+
+        public ConnectionPoolDefinitionIF getConnectionPoolDefinition() {
+            return connectionPoolDefinition;
+        }
+
     }
 }
 
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.31  2003/01/30 17:48:28  billhorsman
+ new configuration listener test
+
  Revision 1.30  2003/01/28 11:52:01  billhorsman
  move db files into db directory - and more doc
 
