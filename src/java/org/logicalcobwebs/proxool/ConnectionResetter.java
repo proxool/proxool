@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,7 +22,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.6 $, $Date: 2002/11/12 21:10:41 $
+ * @version $Revision: 1.7 $, $Date: 2002/11/12 21:12:21 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -205,13 +206,20 @@ public class ConnectionResetter {
     protected boolean reset(Connection connection, String id) {
         boolean errorsEncountered = false;
 
+        try {
+            connection.clearWarnings();
+        } catch (SQLException e) {
+            errorsEncountered = true;
+            log.warn(id + " - Problem calling connection.clearWarnings()", e);
+        }
+
         // Let's see the state of autoCommit. It will help us give better advice in the log messages
          boolean autoCommit = true;
          try {
              autoCommit = connection.getAutoCommit();
-         } catch (Throwable t) {
+         } catch (SQLException e) {
              errorsEncountered = true;
-             log.warn(id + " - Problem calling connection.getAutoCommit()", t);
+             log.warn(id + " - Problem calling connection.getAutoCommit()", e);
          }
 
          // Finally. reset autoCommit.
@@ -264,6 +272,9 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.7  2002/11/12 21:12:21  billhorsman
+ automatically calls clearWarnings too
+
  Revision 1.6  2002/11/12 21:10:41  billhorsman
  Hmm. Now commits any pending transactions automatically when
  you close the connection. I'm still pondering whether this is
