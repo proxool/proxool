@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.26 $, $Date: 2002/12/12 12:28:34 $
+ * @version $Revision: 1.27 $, $Date: 2002/12/17 16:52:51 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -401,7 +401,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         // Just check that it is null
         if (forceExpiry || proxyConnection.isNull()) {
 
-            proxyConnection.setStatus(ProxyConnection.STATUS_NULL);
+            synchronized (this) {
+                proxyConnection.setStatus(ProxyConnection.STATUS_NULL);
+            }
 
             /* Run some code everytime we destroy a connection */
 
@@ -1069,6 +1071,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.27  2002/12/17 16:52:51  billhorsman
+ synchronize part of removeProxyConnection to avoid
+ possible bug where connection by status count drifts.
+
  Revision 1.26  2002/12/12 12:28:34  billhorsman
  just in case: changed == 0 to < 1
 
