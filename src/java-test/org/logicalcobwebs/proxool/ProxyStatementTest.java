@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.6 $, $Date: 2003/08/27 18:03:20 $
+ * @version $Revision: 1.7 $, $Date: 2003/11/05 00:00:52 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -81,42 +81,15 @@ public class ProxyStatementTest extends AbstractProxoolTest {
 
     }
 
-    public void testFatalSqlException() throws Exception {
-
-        String testName = "fatalSqlException";
-        String alias = testName;
-
-        String url = TestHelper.buildProxoolUrl(alias,
-                TestConstants.HYPERSONIC_DRIVER,
-                TestConstants.HYPERSONIC_TEST_URL);
-        Properties info = new Properties();
-        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "not found");
-        ProxoolFacade.registerConnectionPool(url, info);
-
-        Connection c = DriverManager.getConnection(url);
-        ;
-        Statement s = c.createStatement();
-        try {
-            s.execute("drop table foo");
-        } catch (SQLException e) {
-            // Expected exception (foo doesn't exist)
-            LOG.debug("Excepted exception", e);
-        }
-
-        c.close();
-
-        assertEquals("availableConnectionCount", 0L, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
-
-    }
-
 }
 
 
 /*
  Revision history:
  $Log: ProxyStatementTest.java,v $
+ Revision 1.7  2003/11/05 00:00:52  billhorsman
+ Remove redundant test (already in FatalSqlExceptionTest)
+
  Revision 1.6  2003/08/27 18:03:20  billhorsman
  added new getDelegateConnection() method
 
