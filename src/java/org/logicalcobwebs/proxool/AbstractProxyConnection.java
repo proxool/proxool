@@ -21,7 +21,7 @@ import java.util.Set;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/27 18:26:33 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/28 11:50:35 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -171,7 +171,7 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
                 Statement statement = (Statement) i.next();
                 statement.close();
                 if (connectionPool.getLog().isDebugEnabled()) {
-                    connectionPool.getLog().debug("Closing statement automatically");
+                    connectionPool.getLog().debug("Closing statement " + statement.hashCode() + " automatically");
                 }
             }
             openStatements.clear();
@@ -461,6 +461,9 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.2  2003/01/28 11:50:35  billhorsman
+ more verbose debug
+
  Revision 1.1  2003/01/27 18:26:33  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch
