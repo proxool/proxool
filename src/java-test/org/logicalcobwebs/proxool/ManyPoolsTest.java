@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Test whether Proxool is happy to run lots of pools. Is it scalable?
  *
- * @version $Revision: 1.1 $, $Date: 2003/03/05 18:42:33 $
+ * @version $Revision: 1.1 $, $Date: 2003/03/05 18:49:27 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -73,6 +73,9 @@ public class ManyPoolsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ManyPoolsTest.java,v $
+ Revision 1.1  2003/03/05 18:49:27  billhorsman
+ moved test to right tree
+
  Revision 1.1  2003/03/05 18:42:33  billhorsman
  big refactor of prototyping and house keeping to
  drastically reduce the number of threads when using
