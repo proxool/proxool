@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.45 $, $Date: 2003/02/07 14:19:01 $
+ * @version $Revision: 1.46 $, $Date: 2003/02/07 17:26:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -488,7 +488,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * Call this to shutdown gracefully.
      *  @param delay how long to wait for connections to become free before forcing them to close anyway
      */
-    protected void finalize(int delay, String finalizerName) throws Throwable {
+    protected void shutdown(int delay, String finalizerName) throws Throwable {
 
         /* This will stop us giving out any more connections and may
         cause some of the threads to die. */
@@ -592,12 +592,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 log.debug("Ignoring duplicate attempt to shutdown '" + alias + "' pool by " + finalizerName);
             }
         }
-    }
-
-    // In theory, this gets called by the JVM.  Never actually does though.
-    protected void finalize() throws Throwable {
-        /* No delay! */
-        finalize(0, "JVM");
     }
 
     private void wakeThread(Thread thread) {
@@ -1191,6 +1185,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.46  2003/02/07 17:26:04  billhorsman
+ deprecated removeAllConnectionPools in favour of
+ shutdown (and dropped unreliable finalize() method)
+
  Revision 1.45  2003/02/07 14:19:01  billhorsman
  fixed deprecated use of debugLevel property
 

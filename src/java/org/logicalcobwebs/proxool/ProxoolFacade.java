@@ -33,7 +33,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.50 $, $Date: 2003/02/07 15:12:41 $
+ * @version $Revision: 1.51 $, $Date: 2003/02/07 17:26:05 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -395,6 +395,7 @@ public class ProxoolFacade {
 
     /**
      * Remove a connection pool. Kills all the connections. Resets everything.
+     * @param finalizer the name of the thread requesting shutdown (for logging)
      * @param connectionPool the pool to remove
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
      */
@@ -402,7 +403,7 @@ public class ProxoolFacade {
         final String alias = connectionPool.getDefinition().getAlias();
         if (connectionPool != null) {
             try {
-                connectionPool.finalize(delay, finalizer);
+                connectionPool.shutdown(delay, finalizer);
             } catch (Throwable t) {
                 LOG.error("Problem trying to shutdown '" + alias + "' connection pool", t);
             }
@@ -433,9 +434,18 @@ public class ProxoolFacade {
     /**
      * Removes all connection pools. Kills all the connections. Resets everything.
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
+     * @deprecated use the better named {@link #shutdown(int) shutdown()} instead.
      */
     public static void removeAllConnectionPools(int delay) {
-        removeAllConnectionPools(Thread.currentThread().getName(), delay);
+        shutdown(Thread.currentThread().getName(), delay);
+    }
+
+    /**
+     * Removes all connection pools. Kills all the connections. Resets everything.
+     * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
+     */
+    public static void shutdown(int delay) {
+        shutdown(Thread.currentThread().getName(), delay);
     }
 
     /**
@@ -443,7 +453,7 @@ public class ProxoolFacade {
      * @param finalizer used to identify who is causing the pools to be removed (helps logging)
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
      */
-    protected static void removeAllConnectionPools(String finalizer, int delay) {
+    protected static void shutdown(String finalizer, int delay) {
 
         Iterator connectionPools = ConnectionPoolManager.getInstance().getConnectionPoolMap().iterator();
         while (connectionPools.hasNext()) {
@@ -747,6 +757,10 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.51  2003/02/07 17:26:05  billhorsman
+ deprecated removeAllConnectionPools in favour of
+ shutdown (and dropped unreliable finalize() method)
+
  Revision 1.50  2003/02/07 15:12:41  billhorsman
  fix statisticsLogLevel property recognition again
 
