@@ -6,19 +6,19 @@
 package org.logicalcobwebs.logging;
 
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
-import org.logicalcobwebs.proxool.ConnectionPoolTests;
+import org.logicalcobwebs.proxool.ConnectionPoolTest;
 
 /**
  * Test {@link org.logicalcobwebs.logging.impl.Jdk14Logger}
  *
- * @version $Revision: 1.1 $, $Date: 2003/09/11 23:00:53 $
+ * @version $Revision: 1.2 $, $Date: 2003/10/26 16:11:35 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class Jdk14LoggerTest extends AbstractProxoolTest {
 
-    private static final Log LOG = LogFactory.getLog(ConnectionPoolTests.class);
+    private static final Log LOG = LogFactory.getLog(Jdk14LoggerTest.class);
 
     public Jdk14LoggerTest(String alias) {
         super(alias);
