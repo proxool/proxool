@@ -19,9 +19,9 @@ package org.logicalcobwebs.proxool;
  * }
  * </pre>
  *
- * @version $Revision: 1.4 $, $Date: 2002/12/15 19:21:42 $
+ * @version $Revision: 1.5 $, $Date: 2003/01/15 00:12:13 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ConnectionInfoIF {
 
@@ -63,7 +63,8 @@ public interface ConnectionInfoIF {
 
     /**
      * The time that this connection was created.
-     * @see System#currentTimeMillis
+     * The number of milliseconds
+     * since midnight, January 1, 1970 UTC.
      */
     long getBirthTime();
 
@@ -98,12 +99,15 @@ public interface ConnectionInfoIF {
     int getStatus();
 
     /**
-     * When this connection was last given out.
+     * When this connection was last given out.  The number of milliseconds
+     * since midnight, January 1, 1970 UTC.
      */
     long getTimeLastStartActive();
 
     /**
      * When this connection was last given back (or zero if it is still active).
+     * The number of milliseconds
+     * since midnight, January 1, 1970 UTC.
      */
     long getTimeLastStopActive();
 
@@ -117,6 +121,9 @@ public interface ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.5  2003/01/15 00:12:13  billhorsman
+ doc
+
  Revision 1.4  2002/12/15 19:21:42  chr32
  Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
 
