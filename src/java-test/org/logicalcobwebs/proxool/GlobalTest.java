@@ -16,7 +16,7 @@ import junit.extensions.TestSetup;
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/06 17:41:03 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/07 15:10:11 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -59,6 +59,7 @@ public class GlobalTest {
         TestSuite suite = new TestSuite();
         suite.addTest(org.logicalcobwebs.proxool.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.configuration.AllTests.suite());
+        suite.addTest(org.logicalcobwebs.proxool.monitor.AllTests.suite());
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -78,6 +79,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.6  2003/02/07 15:10:11  billhorsman
+ add monitor tests
+
  Revision 1.5  2003/02/06 17:41:03  billhorsman
  now uses imported logging
 
