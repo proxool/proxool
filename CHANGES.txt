@@ -1,11 +1,25 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.29 $
-$Date: 2003/10/27 13:13:58 $
+$Revision: 1.30 $
+$Date: 2003/11/05 00:19:48 $
 $Author: billhorsman $
 
-0.8.1 - October 27, 2003
+0.8.2 - 4 November 2003
+
+- Fixed bug where delegate properties weren't being passed onto the delegate driver. If you weren't
+  passing any properties other than username and password to the delegate driver then this didn't
+  cause a problem anyway. (Note that Proxool properties were being recognised correctly.) Added a
+  new unit test specifically for this problem.
+
+- Throw a friendlier exception if you try and add a statistics listener to a pool with
+  no statistics
+
+- Statistics now creates write locks less often. This was causing a problem during heavy loads
+  even though the process of collecting statistics itself was very fast. If you had statistics
+  turned off (the default) then this wasn't a problem anyway.
+
+0.8.1 - 27 October 2003
 
 - NullPointerException that occured during SQL logging for certain methods
   of excecuting statements has been fixed. Also, logging is optimised to
@@ -15,7 +29,7 @@ $Author: billhorsman $
 - Fixed typos in ShutdownHook. And now silently ignore IllegalStateException
   during removal of shutdownHook that occurs during JVM shut down.
 
-0.8.0 - October 26, 2003
+0.8.0 - 26 October 2003
 
 - We now use Cglib's proxy library. Together with dropping the use of Timer
   and only referencing ShutdownHooks at runtime we are now able to support
@@ -82,7 +96,7 @@ $Author: billhorsman $
 
 - Batched statements are now correctly reported with the trace feature.
 
-0.7.2 - April 28, 2003
+0.7.2 - 28 April 2003
 
 - Moved DataSourceTest into Sandbox so that the Ant test target
   runs correctly.
@@ -92,7 +106,7 @@ $Author: billhorsman $
   existing pool it incorrectly called ConfigurationListenerIF.definitionUpdated
   when there was no change, and didn't call it when there was.
 
-0.7.1 - April 19, 2003
+0.7.1 - 19 April 2003
 
 - Added a lot of concurrency code - mainly using concurrent package
   written by Doug Lea. 
@@ -133,7 +147,7 @@ $Author: billhorsman $
   when you passed a Properties object to the Driver regardless if whether the
   definition had changed.
 
-0.7 - February 21, 2003
+0.7 - 21 February 2003
 
 - We have dropped the dependency on commons-logging.jar
   by copying the code into our own project (retaining credit to
@@ -180,7 +194,7 @@ $Author: billhorsman $
   so other connections are tested as soon as possible (with the
   house-keeper-test-sql) rather than waiting for the next scheduled sweep.
 
-0.6 (January 23, 2003)
+0.6 - 23 January 2003
 
 - ProxoolFacade API has changed slightly. Some of the methods no
   longer throw an SQLException but a ProxoolException instead.
@@ -225,7 +239,7 @@ $Author: billhorsman $
 - You can now update the URL for a pool, not just the properties.
   See ProxoolFacade#updateConnectionPool.
 
-0.5 (December 3, 2002)
+0.5 - 3 December 2002)
 
 - Fix finalisation of old instances. If you deploy to some environments in
   a certain way then it is possible for the class to be reloaded without the
@@ -280,7 +294,7 @@ $Author: billhorsman $
 - Fix for catching fatal SQL exceptions. This is a feature that throws away connections
   that encounter certain types of exception.
 
-0.4 - September 19, 2002
+0.4 - 19 September 2002
 
 - Rethink of how we organise our source code so that we can easily build
   to include different optional components.
