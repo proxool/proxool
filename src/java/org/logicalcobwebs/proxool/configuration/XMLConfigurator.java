@@ -20,7 +20,9 @@ import java.util.Properties;
 /**
  * <p>A SAX ContentHandler that can configure Proxool from an XML source.</p>
  *
- * <p>This is just a <a href="http://www.saxproject.org/apidoc/org/xml/sax/ContentHandler.html" target="_new">ContentHandler</a>, so you must associate it with a SAX parser for it to actually do anything.
+ * <p>This is just a <a
+ * href="http://www.saxproject.org/apidoc/org/xml/sax/ContentHandler.html" target="_new"
+ * >ContentHandler</a>, so you must associate it with a SAX parser for it to actually do anything.
  * If you have JAXP available {@link JAXPConfigurator} will do this for you.</p>
  *
  * <p>Properties that you pass on to the delegate driver have to be treated specially. They
@@ -65,9 +67,9 @@ import java.util.Properties;
  *
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.3 $, $Date: 2002/12/16 02:36:04 $
+ * @version $Revision: 1.4 $, $Date: 2002/12/16 11:47:00 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public class XMLConfigurator extends DefaultHandler {
     private static final Log LOG = LogFactory.getLog(XMLConfigurator.class);
@@ -185,7 +187,7 @@ public class XMLConfigurator extends DefaultHandler {
         if (insideProxool && !lname.equals(PROXOOL)) {
             if (lname.equals(DRIVER_PROPERTIES)) {
                 insideDelegateProperties = false;
-            } else if (!insideDelegateProperties){
+            } else if (!insideDelegateProperties) {
                 setProxoolProperty(lname, content.toString().trim());
             }
         }
@@ -200,7 +202,7 @@ public class XMLConfigurator extends DefaultHandler {
             driverUrl = value;
         } else {
             if (LOG.isDebugEnabled()) {
-                        LOG.debug("Setting property '" + ProxoolConstants.PROPERTY_PREFIX + localName + "' to value '" + value + "'.");
+                LOG.debug("Setting property '" + ProxoolConstants.PROPERTY_PREFIX + localName + "' to value '" + value + "'.");
             }
             properties.put(ProxoolConstants.PROPERTY_PREFIX + localName, value);
         }

@@ -26,9 +26,9 @@ import java.io.IOException;
  * Configurator that uses JAXP to get a parser for Proxool configuration xml. The parser relies on JAXP version 1.1 or higher
  * and is namespace aware.<br>
  * See {@link XMLConfigurator} for the Proxool xml configuration format.
- * @version $Revision: 1.3 $, $Date: 2002/12/16 02:38:47 $
+ * @version $Revision: 1.4 $, $Date: 2002/12/16 11:46:59 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class JAXPConfigurator {
@@ -61,12 +61,18 @@ public class JAXPConfigurator {
     public static void configure(InputSource inputSource, boolean validate) throws ProxoolException {
         try {
             SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-            if (LOG.isDebugEnabled()) { LOG.debug("SAXParserFactory class: " + saxParserFactory.getClass().getName());}
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("SAXParserFactory class: " + saxParserFactory.getClass().getName());
+            }
             saxParserFactory.setValidating(validate);
             final SAXParser saxParser = saxParserFactory.newSAXParser();
-            if (LOG.isDebugEnabled()) { LOG.debug("sax parser class" + saxParser.getClass().getName());}
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("sax parser class" + saxParser.getClass().getName());
+            }
             final XMLReader xmlReader = saxParser.getXMLReader();
-            if (LOG.isDebugEnabled()) { LOG.debug("XML reader class: " + xmlReader.getClass().getName());}
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("XML reader class: " + xmlReader.getClass().getName());
+            }
             final XMLConfigurator xmlConfigurator = new XMLConfigurator();
             xmlReader.setErrorHandler(xmlConfigurator);
             setSAXFeauture(xmlReader, "http://xml.org/sax/features/namespaces", NAMESPACE_AWARE);
@@ -109,9 +115,13 @@ public class JAXPConfigurator {
         }
     }
 }
+
 /*
  Revision history:
  $Log: JAXPConfigurator.java,v $
+ Revision 1.4  2002/12/16 11:46:59  billhorsman
+ checkstyle
+
  Revision 1.3  2002/12/16 02:38:47  chr32
  Updated to new driver-properties xml format.
 

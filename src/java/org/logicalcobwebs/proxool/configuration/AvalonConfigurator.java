@@ -20,9 +20,9 @@ import org.xml.sax.helpers.AttributesImpl;
  * are delegated to {@link XMLConfigurator},
  * and have exactly the same format as is documented in that class.
  *
- * @version $Revision: 1.3 $, $Date: 2002/12/16 02:37:14 $
+ * @version $Revision: 1.4 $, $Date: 2002/12/16 11:47:00 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public class AvalonConfigurator implements Configurable, ThreadSafe {
 
@@ -38,7 +38,7 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
         for (int i = 0; i < children.length; ++i) {
             if (!children[i].getNamespace().equals(ProxoolConstants.PROXOOL)) {
                 throw new ConfigurationException("Found element named " + children[i].getName() + ". Only "
-                    + ProxoolConstants.PROXOOL + " top level elements are alowed.");
+                        + ProxoolConstants.PROXOOL + " top level elements are alowed.");
             }
         }
         try {
@@ -52,7 +52,7 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
 
     // Parse the properties recursively, and report found properties to the given XMLConfigurator
     private void reportProperties(XMLConfigurator xmlConfigurator, Configuration[] properties)
-        throws ConfigurationException, SAXException {
+            throws ConfigurationException, SAXException {
         Configuration[] children = null;
         String value = null;
         String namespace = null;
@@ -80,13 +80,13 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
 
     // create a SAX attributes instance from
     // Avalon configuration attributes
-    private Attributes getAttributes(Configuration configuration) throws ConfigurationException{
+    private Attributes getAttributes(Configuration configuration) throws ConfigurationException {
         final AttributesImpl attributes = new AttributesImpl();
         final String[] avalonAttributeNames = configuration.getAttributeNames();
         if (avalonAttributeNames != null && avalonAttributeNames.length > 0) {
             for (int i = 0; i < avalonAttributeNames.length; ++i) {
                 attributes.addAttribute("", avalonAttributeNames[i], "", "CDATA",
-                    configuration.getAttribute(avalonAttributeNames[i]));
+                        configuration.getAttribute(avalonAttributeNames[i]));
             }
         }
         return attributes;
@@ -96,6 +96,9 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.4  2002/12/16 11:47:00  billhorsman
+ checkstyle
+
  Revision 1.3  2002/12/16 02:37:14  chr32
  Updated to new driver-properties xml format.
 
