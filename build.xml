@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.42 $
-    $Date: 2003/03/03 12:41:03 $
+    $Revision: 1.43 $
+    $Date: 2003/03/04 10:26:46 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -307,9 +307,15 @@
         <junit fork="true" printsummary="yes" >
             <classpath refid="source"/>
             <sysproperty key="log4jPath" value="${log4jPath}" />
-            <test name="org.logicalcobwebs.proxool.GlobalTest" todir="${build-dir}/reports" />
+            <batchtest todir="${build-dir}/reports">
+                <fileset dir="src/java-test"
+                    includes="**/*Test.java"
+                    excludes="**/ThreadTest.java,**/PerformanceTest.java,**/GlobalTest.java,**/AbstractProxoolTest.java"
+                    />
+            </batchtest>
             <formatter type="xml" />
         </junit>
+
 
         <junitreport>
             <fileset dir="${build-dir}/reports" >
@@ -324,7 +330,7 @@
 
         <replace
             file="${build-dir}/reports/${junit-report-name}"
-            token="Unit Test Results"
+            token="&lt;h1&gt;Unit Test Results&lt;/h1&gt;"
             value='&lt;div style="font-size: 110%;"&gt;&lt;div style="float: right; font-weight: bold;"&gt;${TODAY_FULL}&lt;/div&gt;&lt;a href="../index.html">Proxool&lt;/a&gt; - ${junit-report-description}&lt;/div&gt;'
             />
 
