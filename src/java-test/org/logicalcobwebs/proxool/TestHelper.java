@@ -30,7 +30,7 @@ public class TestHelper {
 
     public static final String HYPERSONIC_DRIVER = "org.hsqldb.jdbcDriver";
 
-    public static final String HYPERSONIC_URL = "jdbc:hsqldb:test";
+    public static final String HYPERSONIC_URL = "jdbc:hsqldb:db/test";
 
     private static final String ORACLE_DRIVER = "oracle.jdbc.driver.OracleDriver";
 
