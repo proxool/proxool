@@ -24,7 +24,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.9 $, $Date: 2002/10/28 19:43:30 $
+ * @version $Revision: 1.10 $, $Date: 2002/10/29 08:54:45 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -69,17 +69,22 @@ public class ProxoolFacade {
      * Extracts the pool alias from the url:
      *
      *    proxool.alias:driver:url -> alias
+     *    proxool:alias -> alias
      *    proxool:driver:url -> proxool:driver:url
      *
      */
     private static String getAlias(String url) throws SQLException {
         String name = url;
-
+        final String PREFIX = ProxoolConstants.PROXOOL + ProxoolConstants.ALIAS_DELIMITER;
         try {
             int endOfPrefix = url.indexOf(':');
 
-            if (endOfPrefix > "proxool.".length()) {
-                name = url.substring("proxool.".length(), endOfPrefix);
+            if (endOfPrefix > PREFIX.length()) {
+                name = url.substring(PREFIX.length(), endOfPrefix);
+            } else if (endOfPrefix == -1) {
+                if (url.startsWith(PREFIX)) {
+                    name = url.substring(PREFIX.length());
+                }
             }
 
         } catch (IndexOutOfBoundsException e) {
@@ -415,6 +420,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.10  2002/10/29 08:54:45  billhorsman
+ fix to getAlias so that it correctly extracts alias from "proxool.alias" form
+
  Revision 1.9  2002/10/28 19:43:30  billhorsman
  configuring of pool now gets logged to that pool's logger (rather than general log)
 
