@@ -22,7 +22,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.7 $, $Date: 2002/11/12 21:12:21 $
+ * @version $Revision: 1.8 $, $Date: 2002/11/13 18:27:59 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -214,29 +214,20 @@ public class ConnectionResetter {
         }
 
         // Let's see the state of autoCommit. It will help us give better advice in the log messages
-         boolean autoCommit = true;
-         try {
-             autoCommit = connection.getAutoCommit();
-         } catch (SQLException e) {
-             errorsEncountered = true;
-             log.warn(id + " - Problem calling connection.getAutoCommit()", e);
-         }
+        boolean autoCommit = true;
+        try {
+            autoCommit = connection.getAutoCommit();
+        } catch (SQLException e) {
+            errorsEncountered = true;
+            log.warn(id + " - Problem calling connection.getAutoCommit()", e);
+        }
 
-         // Finally. reset autoCommit.
-          if (!autoCommit) {
-              try {
-                  // This is the slightly scary bit. Should a connection commit
-                  // when it is closed. I can't find any documentation on this.
-                  connection.commit();
-                  connection.setAutoCommit(true);
-                  log.debug(id + " - Committed and autoCommit reset back to true");
-              } catch (Throwable t) {
-                  errorsEncountered = true;
-                  log.warn(id + " - Problem calling connection.commit() or connection.setAutoCommit(true)", t);
-              }
-          }
-
-         // Now let's reset each property in turn
+        // Now let's reset each property in turn. With a bit of luck, if there is a
+        // transaction pending then setting one of these properties will throw an
+        // exception (e.g. "operation not possible when transaction is in progress"
+        // or something). We want to know about transactions that are pending.
+        // It doesn't seem like a very good idea to close a connection with
+        // pending transactions.
         Iterator i = accessorMutatorMap.values().iterator();
         while (i.hasNext()) {
             Method mutator = (Method) i.next();
@@ -254,10 +245,23 @@ public class ConnectionResetter {
             }
         }
 
-         if (errorsEncountered) {
+        // Finally. reset autoCommit.
+        if (!autoCommit) {
+            try {
+                // Setting autoCommit to true might well commit all pending
+                // transactions. But that's beyond our control.
+                connection.setAutoCommit(true);
+                log.debug(id + " - Committed and autoCommit reset back to true");
+            } catch (Throwable t) {
+                errorsEncountered = true;
+                log.warn(id + " - Problem calling connection.commit() or connection.setAutoCommit(true)", t);
+            }
+        }
 
-            log.warn(id + " - There were some problems resetting the connection. It will not be used again (just in case). "
-                    + "The thread that is responsible is named '" + Thread.currentThread().getName() + "'");
+        if (errorsEncountered) {
+
+            log.warn(id + " - There were some problems resetting the connection (see debug output for details). It will not be used again "
+                    + "(just in case). The thread that is responsible is named '" + Thread.currentThread().getName() + "'");
             if (!autoCommit) {
                 log.warn(id + " - The connection was closed with autoCommit=false. That is fine, but it might indicate that "
                         + "the problems that happened whilst trying to reset it were because a transaction is still in progress.");
@@ -272,6 +276,14 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.8  2002/11/13 18:27:59  billhorsman
+ rethink. committing automatically is bad. so now we just
+ set autoCommit back to true (which might commit anyway but
+ that's down to the driver). we do the autoCommit last so
+ that some of the other resets might throw an exception if
+ there was a pending transaction. (Throwing an exception is
+ good - pending transactions are bad.)
+
  Revision 1.7  2002/11/12 21:12:21  billhorsman
  automatically calls clearWarnings too
 
