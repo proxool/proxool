@@ -28,7 +28,7 @@ import java.util.TreeMap;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.6 $, $Date: 2002/10/29 23:20:55 $
+ * @version $Revision: 1.7 $, $Date: 2002/11/09 15:57:33 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -79,12 +79,13 @@ class ProxyStatement implements InvocationHandler {
             throws Throwable {
         Object result = null;
         long startTime = System.currentTimeMillis();
+        final int argCount = args != null ? args.length : 0;
 
         // We need to remember an exceptions that get thrown so that we can optionally
         // pass them to the onExecute() call below
         Exception exception = null;
         try {
-            if (method.getName().equals(EQUALS_METHOD) && args.length == 1) {
+            if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = new Boolean(statement.hashCode() == args[0].hashCode());
             } else {
                 result = method.invoke(statement, args);
@@ -110,7 +111,7 @@ class ProxyStatement implements InvocationHandler {
                     }
 
                     // What sort of method is it
-                    if (method.getName().startsWith("set") && args.length == 2) {
+                    if (method.getName().startsWith("set") && argCount == 2) {
                         // Okay, we're probably setting a parameter
                         if (method.getName().equals("setNull")) {
                             // Treat setNull as a special case
@@ -130,24 +131,6 @@ class ProxyStatement implements InvocationHandler {
                                 }
                                 parameters.put(args[0], className);
                             }
-                        }
-                    } else if (method.getName().startsWith("execute")) {
-                        // Looks like we are executing the method now. Time to dump.
-
-                        // TODO we were optionally passed the sqlStatement during
-                        // instantiation (from the connections's prepareCall() method)
-                        // but it's also possible to be passed it in the execute statement
-                        // itself. So check for it here too.
-
-                        if (sqlStatement != null) {
-                            // TODO it would be nice to format this a bit more nicely.
-                            // Maybe replace the ? in the sql with the real values. I think
-                            // the goal should be that this dump should be executable
-                            // sql. At least, it should be when we call the onExecute()
-                            // method below. That is supposed to contain performance
-                            // information and the sql that was executed.
-                            this.connectionPool.getLog().debug(parameters + " -> " + sqlStatement);
-                            parameters.clear();
                         }
                     }
                 } catch (Exception e) {
@@ -171,10 +154,35 @@ class ProxyStatement implements InvocationHandler {
 
             // If we executed something then we should tell the listener.
             if (method.getName().startsWith(EXECUTE_FRAGMENT)) {
-                if (connectionPool.getLog().isDebugEnabled() && connectionPool.getDefinition().isVerbose()) {
-                    connectionPool.getLog().debug("Execute time: " + (System.currentTimeMillis() - startTime) + " milliseconds");
+
+                if (connectionPool.isConnectionListenedTo() || connectionPool.getDefinition().isTrace()) {
+
+                    if (sqlStatement == null && argCount > 0 && args[0] instanceof String) {
+                        sqlStatement = (String) args[0];
+                    }
+
+                    if (sqlStatement != null) {
+                        // TODO it would be nice to format this a bit more nicely.
+                        // Maybe replace the ? in the sql with the real values. I think
+                        // the goal should be that this dump should be executable
+                        // sql. At least, it should be when we call the onExecute()
+                        // method below. That is supposed to contain performance
+                        // information and the sql that was executed.
+                    }
+
+                    // Log if configured to
+                    if (connectionPool.getLog().isDebugEnabled() && connectionPool.getDefinition().isTrace()) {
+                        connectionPool.getLog().debug(parameters + " -> " + sqlStatement + " (" + (System.currentTimeMillis() - startTime) + " milliseconds)");
+                    }
+
+                    // Send to any listener
+                    connectionPool.onExecute(parameters + " -> " + sqlStatement, (System.currentTimeMillis() - startTime), exception);
+
+                    // Clear parameters for next time
+                    parameters.clear();
+                    sqlStatement = null;
+
                 }
-                connectionPool.onExecute(NOT_IMPLEMENTED, (System.currentTimeMillis() - startTime), exception);
             }
 
         }
@@ -194,6 +202,9 @@ class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.7  2002/11/09 15:57:33  billhorsman
+ finished off execute logging and listening
+
  Revision 1.6  2002/10/29 23:20:55  billhorsman
  logs execute time when debug is enabled and verbose is true
 
