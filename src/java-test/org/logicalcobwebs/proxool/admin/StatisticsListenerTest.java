@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/01 15:38:38 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/01 15:49:33 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -77,17 +77,18 @@ public class StatisticsListenerTest extends TestCase {
             // Add listener
             TestListener testListener = new TestListener();
             ProxoolFacade.addStatisticsListener(alias, testListener);
+            long lap0 = System.currentTimeMillis();
 
             // Wait for next statistics so we can guarantee that next set won't
             // be produced whilst we are building connection
             testListener.getNextStatistics();
-            long lap0 = System.currentTimeMillis();
+            long lap1 = System.currentTimeMillis();
 
             DriverManager.getConnection(url).close();
             StatisticsIF statistics = testListener.getNextStatistics();
-            long lap1 = System.currentTimeMillis();
+            long lap2 = System.currentTimeMillis();
 
-            assertEquals("servedCount (" + (lap1 - lap0) + " ms)", 1L, statistics.getServedCount());
+            assertEquals("servedCount (" + (lap1 - lap0) + ", " + (lap2 - lap1) + " ms)", 1L, statistics.getServedCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -135,8 +136,8 @@ public class StatisticsListenerTest extends TestCase {
         }
 
         StatisticsIF getNextStatistics() {
-            waitForSomethingToHappen();
             somethingHappened = false;
+            waitForSomethingToHappen();
             return statistics;
         }
 
@@ -146,6 +147,9 @@ public class StatisticsListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.7  2003/03/01 15:49:33  billhorsman
+ fix
+
  Revision 1.6  2003/03/01 15:38:38  billhorsman
  better assert msg
 
