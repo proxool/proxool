@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.29 $, $Date: 2003/01/18 15:13:12 $
+ * @version $Revision: 1.30 $, $Date: 2003/01/28 11:52:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -104,7 +104,7 @@ public class GeneralTests extends TestCase {
                     + ProxoolConstants.URL_DELIMITER
                     + TestHelper.HYPERSONIC_DRIVER
                     + ProxoolConstants.URL_DELIMITER
-                    + "jdbc:hsqldb:db";
+                    + "jdbc:hsqldb:db/";
 
             // Register pool and get one connection
             {
@@ -156,8 +156,24 @@ public class GeneralTests extends TestCase {
                 // Expected exception (foo doesn't exist)
                 LOG.debug("Excepted exception", e);
             } finally {
-                // this should trigger an automatic close of the statement
+                // this should trigger an automatic close of the statement.
+                // Unfortunately, I can't find a way of asserting that this
+                // really happens. Hypersonic seems to let me continue
+                // to use all the methods on the Statement despite it being
+                // closed.
                 c.close();
+
+                /*
+                try {
+                    s.getResultSet();
+                    fail("Statement " + s.hashCode() + " not closed as expected");
+                } catch (SQLException e) {
+                    // Actually, we expect an exception. The statement
+                    // is supposed to be closed.
+                    LOG.debug("Expected exception", e);
+                }
+                */
+
             }
 
             Connection c2 = adapter.getConnection();
@@ -204,7 +220,7 @@ public class GeneralTests extends TestCase {
             newInfo.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "3");
             adapter.update(newInfo);
             assertEquals("Wrong number of properties updated", adapter.getChangedInfo().size(), 1);
-            final String newUrl = "proxool.defintionUpdated:org.hsqldb.jdbcDriver:jdbc:hsqldb:different";
+            final String newUrl = "proxool.defintionUpdated:org.hsqldb.jdbcDriver:jdbc:hsqldb:db/different";
             adapter.update(newUrl);
             assertTrue("Mp properties should have been updated", adapter.getChangedInfo() == null);
             assertTrue("URL has not been updated", (adapter.getConnectionPoolDefinition().getCompleteUrl().equals(newUrl)));
@@ -606,6 +622,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.30  2003/01/28 11:52:01  billhorsman
+ move db files into db directory - and more doc
+
  Revision 1.29  2003/01/18 15:13:12  billhorsman
  Signature changes (new ProxoolException
  thrown) on the ProxoolFacade API.
