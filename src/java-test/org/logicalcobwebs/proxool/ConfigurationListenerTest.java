@@ -14,9 +14,9 @@ import java.util.Properties;
  * Test that registering a {@link org.logicalcobwebs.proxool.ConfigurationListenerIF} with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/19 15:14:22 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/19 17:00:51 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
  */
 public class ConfigurationListenerTest extends TestCase {
@@ -37,7 +37,7 @@ public class ConfigurationListenerTest extends TestCase {
      * and that they get the expected events.
      * @throws java.lang.Exception if the test fails.
      */
-    public void testAddConnectionListener() throws Exception {
+    public void testAddConfigurationListener() throws Exception {
         clear();
         Properties info = new Properties();
         info.setProperty("proxool.maximum-connection-count", "2");
@@ -69,7 +69,7 @@ public class ConfigurationListenerTest extends TestCase {
      * and then removed, and that they do not receive events after they have been removed.
      * @throws java.lang.Exception if the test fails.
      */
-    public void testRemoveConnectionListener() throws Exception {
+    public void testRemoveConfigurationListener() throws Exception {
         clear();
         Properties info = new Properties();
         info.setProperty("proxool.maximum-connection-count", "2");
@@ -139,6 +139,9 @@ public class ConfigurationListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.3  2003/02/19 17:00:51  chr32
+ Fixed eroneous method names.
+
  Revision 1.2  2003/02/19 15:14:22  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)
