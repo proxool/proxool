@@ -32,9 +32,9 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.46 $, $Date: 2003/02/07 01:48:15 $
+ * @version $Revision: 1.47 $, $Date: 2003/02/07 10:27:47 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public class ProxoolFacade {
 
@@ -59,7 +59,7 @@ public class ProxoolFacade {
         if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
             ConnectionPoolDefinition cpd = new ConnectionPoolDefinition();
             cpd.setAlias(alias);
-            definePool(null, url, cpd, info);
+            definePool(url, cpd, info);
             ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
             connectionPool.start();
         } else {
@@ -114,33 +114,28 @@ public class ProxoolFacade {
     /**
      *  Translates from properties to definition
      *
+     * @param url the connection we are defining
      * @param cpd The defintion to populate (can have existing settings)
      * @param info the properties object to read from
      * @return the alias
      * @throws ProxoolException if there were any validation errors.
      */
-    protected static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd,
+    protected static String definePool(String url, ConnectionPoolDefinition cpd,
                                        Properties info) throws ProxoolException {
 
         Properties rememberedInfo = null;
         Properties changedProperties = null;
-        String rememberedKey = null;
-        if (cpd != null) {
-            rememberedKey = cpd.getAlias();
-        } else {
-            rememberedKey = getAlias(url);
-        }
-        rememberedInfo = (Properties) infos.get(rememberedKey);
+        final String alias = getAlias(url);
+        rememberedInfo = (Properties) infos.get(alias);
 
-        Properties completeInfo = (Properties) completeInfos.get(rememberedKey);
+        Properties completeInfo = (Properties) completeInfos.get(alias);
         if (completeInfo == null) {
             completeInfo = new Properties();
-            completeInfos.put(rememberedKey, completeInfo);
+            completeInfos.put(alias, completeInfo);
         }
 
         cpd.setCompleteUrl(url);
 
-        final String alias = getAlias(url);
         Log earlyLog = LogFactory.getLog("org.logicalcobwebs.proxool." + alias);
 
         if (cpd.getDriver() == null) {
@@ -222,7 +217,7 @@ public class ProxoolFacade {
                 clone.setProperty(key, value);
             }
 
-            infos.put(rememberedKey, clone);
+            infos.put(alias, clone);
         }
 
         ConfigurationListenerIF configurationListener = (ConfigurationListenerIF) configurators.get(alias);
@@ -403,15 +398,25 @@ public class ProxoolFacade {
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
      */
     private static void removeConnectionPool(String finalizer, ConnectionPool connectionPool, int delay) {
+        final String alias = connectionPool.getDefinition().getAlias();
         if (connectionPool != null) {
             try {
                 connectionPool.finalize(delay, finalizer);
             } catch (Throwable t) {
-                LOG.error("Problem trying to remove " + connectionPool.getDefinition().getAlias() + " connection pool", t);
+                LOG.error("Problem trying to shutdown '" + alias + "' connection pool", t);
             }
-            ConnectionPoolManager.getInstance().removeConnectionPool(connectionPool.getDefinition().getAlias());
         }
         connectionPool = null;
+    }
+
+    /**
+     * When a connection pool is removed then we need to forget the cached information
+     * we hold for that alias: namely, the properties that get reused for each connection.
+     * @param alias to identify the pool we are removing
+     */
+    protected static void forgetAlias(String alias) {
+        infos.remove(alias);
+        completeInfos.remove(alias);
     }
 
     /**
@@ -611,7 +616,7 @@ public class ProxoolFacade {
         String alias = getAlias(url);
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
         ConnectionPoolDefinition cpd = cp.getDefinition();
-        definePool(cp, url, cpd, info);
+        definePool(url, cpd, info);
 
     }
 
@@ -620,8 +625,8 @@ public class ProxoolFacade {
         LOG.debug("Finalising");
     }
 
-    protected static void updatePoolByDriver(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws ProxoolException {
-        definePool(cp, url, cpd, info);
+    protected static void updatePoolByDriver(String url, ConnectionPoolDefinition cpd, Properties info) throws ProxoolException {
+        definePool(url, cpd, info);
     }
 
     /**
@@ -731,6 +736,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.47  2003/02/07 10:27:47  billhorsman
+ change in shutdown procedure to allow re-registration
+
  Revision 1.46  2003/02/07 01:48:15  chr32
  Started using new composite listeners.
 

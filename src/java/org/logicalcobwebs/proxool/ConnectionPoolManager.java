@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.9 $, $Date: 2003/02/07 10:27:47 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -102,7 +102,7 @@ class ConnectionPoolManager {
         if (cp != null) {
             connectionPoolMap.remove(cp.getDefinition().getAlias());
         } else {
-            LOG.error("Ignored attempt to remove non-existent connection pool " + name);
+            LOG.info("Ignored attempt to remove either non-existent or already removed connection pool " + name);
         }
     }
 
@@ -114,6 +114,9 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.9  2003/02/07 10:27:47  billhorsman
+ change in shutdown procedure to allow re-registration
+
  Revision 1.8  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 

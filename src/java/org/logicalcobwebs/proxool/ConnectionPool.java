@@ -21,9 +21,9 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.42 $, $Date: 2003/02/07 01:48:15 $
+ * @version $Revision: 1.43 $, $Date: 2003/02/07 10:27:47 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPool implements ConnectionPoolStatisticsIF {
 
@@ -464,7 +464,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 log.error(e);
             }
 
+            int size = proxyConnections.size();
             proxyConnections.remove(proxyConnection);
+            log.debug("proxyConnections.size() changed from " + size + " to " + proxyConnections.size());
 
             if (log.isDebugEnabled()) {
                 log.debug(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId())
@@ -491,18 +493,19 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         /* This will stop us giving out any more connections and may
         cause some of the threads to die. */
 
+        final String alias = getDefinition().getAlias();
         if (connectionPoolUp == true) {
 
             connectionPoolUp = false;
             long startFinalize = System.currentTimeMillis();
 
             if (delay > 0) {
-                log.info("Closing down instance started at "
+                log.info("Shutting down '" + alias + "' pool started at "
                         + dateStarted + " - waiting for " + delay
                         + " milliseconds for everything to stop.  [ "
                         + finalizerName + "]");
             } else {
-                log.info("Closing down connection pool immediately [" + finalizerName + "]");
+                log.info("Shutting down '" + alias + "' pool immediately [" + finalizerName + "]");
             }
 
             /* Interrupt the threads (in case they're sleeping) */
@@ -556,9 +559,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     long id = getProxyConnection(i).getId();
                     try {
                         connectionClosedManually = true;
-                        getProxyConnection(i).close();
+                        getProxyConnection(i).reallyClose();;
                         if (log.isDebugEnabled()) {
-                            log.debug("Connection #" + id + " closed manually");
+                            log.debug("Connection #" + id + " closed");
                         }
                     } catch (Throwable t) {
                         if (log.isDebugEnabled()) {
@@ -567,11 +570,16 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
                     }
                 }
+
             } catch (Throwable t) {
                 log.error("Unknown problem finalizing pool", t);
             } finally {
+
+                ConnectionPoolManager.getInstance().removeConnectionPool(alias);
+                ProxoolFacade.forgetAlias(alias);
+
                 if (log.isDebugEnabled()) {
-                    log.debug("Connection pool has been closed down by " + finalizerName
+                    log.debug("'" + alias + "' pool has been closed down by " + finalizerName
                             + " in " + (System.currentTimeMillis() - startFinalize) + " milliseconds.");
                     if (!connectionClosedManually) {
                         log.debug("No connections required manual removal.");
@@ -581,7 +589,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             }
         } else {
             if (log.isDebugEnabled()) {
-                log.debug("Ignoring duplicate attempt to finalize connection pool by " + finalizerName);
+                log.debug("Ignoring duplicate attempt to shutdown '" + alias + "' pool by " + finalizerName);
             }
         }
     }
@@ -921,10 +929,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     protected void registerRemovedConnection(int status) {
-        if (log.isDebugEnabled()) {
-            log.debug("Decrementing connectionCount, connectedConnectionCount and connectionCountByState[" + status + "]");
-        }
-
         connectionCount--;
         connectedConnectionCount--;
         connectionCountByState[status]--;
@@ -1187,6 +1191,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.43  2003/02/07 10:27:47  billhorsman
+ change in shutdown procedure to allow re-registration
+
  Revision 1.42  2003/02/07 01:48:15  chr32
  Started using new composite listeners.
 
