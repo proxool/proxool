@@ -9,6 +9,7 @@ import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.admin.SnapshotIF;
+import org.logicalcobwebs.proxool.admin.SnapshotResultMonitor;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,7 +18,7 @@ import java.util.Properties;
 /**
  * Test the prototyper in ConnectionPool
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/01 00:39:23 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/01 15:14:15 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -43,8 +44,8 @@ public class PrototyperTest extends TestCase {
      */
     public void testPrototypeCount() throws Exception {
 
-        String testName = "prototypeCount";
-        String alias = testName;
+        final String testName = "prototypeCount";
+        final String alias = testName;
         try {
             Properties info = new Properties();
             info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
@@ -65,17 +66,44 @@ public class PrototyperTest extends TestCase {
 
             Connection[] connections = new Connection[6];
 
-            waitForSnapshotState(alias, 0, 2);
+            SnapshotResultMonitor srm = new SnapshotResultMonitor(alias) {
+                            public boolean check(SnapshotIF snapshot) throws Exception {
+                                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
+                                return (s.getActiveConnectionCount() == 0
+                                        && s.getAvailableConnectionCount() == 2);
+                            }
+                        };
+            srm.getResult();
+            assertEquals("activeConnectionCount", 0, srm.getSnapshot().getActiveConnectionCount());
+            assertEquals("availableConnectionCount", 2, srm.getSnapshot().getAvailableConnectionCount());
 
             connections[0] = DriverManager.getConnection(url);
 
-            waitForSnapshotState(alias, 1, 2);
+            srm = new SnapshotResultMonitor(alias) {
+                            public boolean check(SnapshotIF snapshot) throws Exception {
+                                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
+                                return (s.getActiveConnectionCount() == 1
+                                        && s.getAvailableConnectionCount() == 2);
+                            }
+                        };
+            srm.getResult();
+            assertEquals("activeConnectionCount", 1, srm.getSnapshot().getActiveConnectionCount());
+            assertEquals("availableConnectionCount", 2, srm.getSnapshot().getAvailableConnectionCount());
 
             connections[1] = DriverManager.getConnection(url);
             connections[2] = DriverManager.getConnection(url);
             connections[3] = DriverManager.getConnection(url);
 
-            waitForSnapshotState(alias, 4, 1);
+            srm = new SnapshotResultMonitor(alias) {
+                            public boolean check(SnapshotIF snapshot) throws Exception {
+                                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
+                                return (s.getActiveConnectionCount() == 4
+                                        && s.getAvailableConnectionCount() == 1);
+                            }
+                        };
+            srm.getResult();
+            assertEquals("activeConnectionCount", 4, srm.getSnapshot().getActiveConnectionCount());
+            assertEquals("availableConnectionCount", 1, srm.getSnapshot().getAvailableConnectionCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -85,25 +113,6 @@ public class PrototyperTest extends TestCase {
         }
 
     }
-
-    private void waitForSnapshotState(String alias, int active, int available) throws ProxoolException {
-        SnapshotIF s = ProxoolFacade.getSnapshot(alias);
-        long start = System.currentTimeMillis();
-        while (System.currentTimeMillis() - start < 10000) {
-            if (s.getActiveConnectionCount() == active && s.getAvailableConnectionCount() == available) {
-                break;
-            }
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                LOG.error("Awoken", e);
-            }
-            s = ProxoolFacade.getSnapshot(alias);
-        }
-        assertEquals("activeConnectionCount", active, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
-        assertEquals("availableConnectionCount", available, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
-    }
-
 
     /**
      * Test that the minimum number of connections is maintained
@@ -142,6 +151,9 @@ public class PrototyperTest extends TestCase {
 /*
  Revision history:
  $Log: PrototyperTest.java,v $
+ Revision 1.3  2003/03/01 15:14:15  billhorsman
+ new ResultMonitor to help cope with test threads
+
  Revision 1.2  2003/03/01 00:39:23  billhorsman
  made more robust
 
