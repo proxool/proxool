@@ -20,8 +20,15 @@ import java.util.Hashtable;
 import java.io.PrintWriter;
 
 /**
- * A DataSource that is configurable via bean properties. Typically used in a J2EE environment.
- * @version $Revision: 1.2 $, $Date: 2004/03/18 17:07:25 $
+ * The Proxool DataSource implementation. Supports three modes of configuration:
+ * <ul>
+ *   <li>pre-configured</li>
+ *   <li>bean-configured</li>
+ *   <li>factory-configured</li>
+ * </ul>
+ *
+ * TODO - expand
+ * @version $Revision: 1.3 $, $Date: 2004/03/18 17:16:58 $
  * @author bill
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.9
@@ -636,6 +643,9 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.3  2004/03/18 17:16:58  chr32
+ Added a timy bit of doc.
+
  Revision 1.2  2004/03/18 17:07:25  chr32
  Now supports all three modes: pre-configured, bean-configured and factory-configured.
 
