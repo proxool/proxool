@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Test the house keeper in ConnectionPool
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.7 $, $Date: 2003/09/11 23:58:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -82,8 +82,25 @@ public class HouseKeeperTest extends AbstractProxoolTest {
         String testName = "houseKeeperTestSql";
         String alias = testName;
 
-        // TODO complete this test
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, "SELECT NOW");
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
+        ProxoolFacade.registerConnectionPool(url, info);
 
+        DriverManager.getConnection(url).close();
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            LOG.debug("Awoken.");
+        }
+
+        DriverManager.getConnection(url).close();
     }
 
 }
@@ -92,6 +109,9 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: HouseKeeperTest.java,v $
+ Revision 1.7  2003/09/11 23:58:05  billhorsman
+ New test for house-keeper-test-sql
+
  Revision 1.6  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 
