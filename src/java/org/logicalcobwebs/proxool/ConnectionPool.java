@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.68 $, $Date: 2003/09/20 17:04:06 $
+ * @version $Revision: 1.69 $, $Date: 2003/09/30 07:50:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -211,6 +211,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     // No!  Let's see if we can create one
                     proxyConnection = PrototyperController.buildConnection(
                             getDefinition().getAlias(), ProxyConnection.STATUS_ACTIVE, "on demand");
+                } catch (SQLException e) {
+                    log.debug("Couldn't get connection", e);
+                    throw e;
                 } catch (ProxoolException e) {
                     log.debug("Couldn't get connection", e);
                     throw new SQLException(e.toString());
@@ -1045,6 +1048,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.69  2003/09/30 07:50:04  billhorsman
+ Smarter throwing of caught SQLExceptions without wrapping them up inside another (and losing the stack trace)
+
  Revision 1.68  2003/09/20 17:04:06  billhorsman
  Fix for incorrect OFFLINE count when house keeper removed a connection if the test SQL failed. This
  meant that the offline count went negative. The only consequence of that is that the logs look funny.
