@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.11 $
-$Date: 2002/12/19 00:27:00 $
+$Revision: 1.12 $
+$Date: 2003/01/15 00:15:53 $
 $Author: billhorsman $
 
 0.6 (scheduled for December 12, 2002)
@@ -19,6 +19,12 @@ $Author: billhorsman $
 
 - Unclosed Statements are now automatically closed when the
   Connection is closed, in accordance with the JDBC spec.
+
+- Rollback is called on all connections when they are closed (that is,
+  returned to the pool). This has no effect if autoCommit it true (default)
+  or any pending transactions have been committed or already rolled back.
+  This will only have an effect if you currently close connections with
+  pending transactions. 
 
 - New ProxoolFacade#getDelegateStatement allows you to get to
   the underlying JDBC Driver's original Statement if you really need
