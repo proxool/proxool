@@ -16,7 +16,7 @@ import java.util.Set;
 
 /**
  *
- * @version $Revision: 1.2 $, $Date: 2002/10/13 13:39:03 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/09 15:49:36 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -77,11 +77,18 @@ class ConnectionPoolManager {
             LOG.error("Ignored attempt to remove non-existent connection pool " + name);
         }
     }
+
+    public String[] getConnectionPoolNames() {
+        return (String[]) connectionPoolMap.keySet().toArray(new String[connectionPoolMap.size()]);
+    }
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.3  2002/11/09 15:49:36  billhorsman
+ add method to get the name of every pool
+
  Revision 1.2  2002/10/13 13:39:03  billhorsman
  fix when removing pools (credit to Dan Milstein)
 
