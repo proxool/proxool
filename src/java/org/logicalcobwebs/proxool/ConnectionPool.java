@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.37 $, $Date: 2003/01/31 16:53:16 $
+ * @version $Revision: 1.38 $, $Date: 2003/02/02 23:35:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -32,8 +32,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * each pool to different places. So we have to instantiate the log later.
      */
     private Log log;
-
-    private ReloadMonitor reloadMonitor;
 
     private static final String[] STATUS_DESCRIPTIONS = {"NULL", "AVAILABLE", "ACTIVE", "OFFLINE"};
 
@@ -103,6 +101,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private boolean locked = false;
 
+    private Date dateStarted = new Date();
+
     /**
      * Initialised in {@link ConnectionPool#ConnectionPool constructor}.
      */
@@ -117,7 +117,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         fal.setFast(true);
         proxyConnections = fal;
 
-        reloadMonitor = new ReloadMonitor(definition.getAlias());
         log = LogFactory.getLog("org.logicalcobwebs.proxool." + definition.getAlias());
         connectionResetter = new ConnectionResetter(log, definition.getDriver());
         setDefinition(definition);
@@ -496,7 +495,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
             if (delay > 0) {
                 log.info("Closing down instance started at "
-                        + reloadMonitor.getLoadDate() + " - waiting for " + delay
+                        + dateStarted + " - waiting for " + delay
                         + " milliseconds for everything to stop.  [ "
                         + finalizerName + "]");
             } else {
@@ -649,10 +648,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     try {
                         Thread.sleep(getDefinition().getHouseKeepingSleepTime());
                     } catch (InterruptedException e) {
-                        return;
-                    }
-
-                    if (reloadMonitor.isProxoolReloaded()) {
                         return;
                     }
 
@@ -1151,7 +1146,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * @see ConnectionPoolStatisticsIF#getDateStarted
      */
     public Date getDateStarted() {
-        return reloadMonitor.getLoadDate();
+        return dateStarted;
     }
 
     /**
@@ -1183,6 +1178,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.38  2003/02/02 23:35:48  billhorsman
+ removed ReloadMonitor to remove use of System properties
+
  Revision 1.37  2003/01/31 16:53:16  billhorsman
  checkstyle
 
