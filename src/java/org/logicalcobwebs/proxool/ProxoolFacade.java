@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.monitor.StatisticsIF;
 import org.logicalcobwebs.proxool.monitor.SnapshotIF;
+import org.logicalcobwebs.proxool.monitor.Monitor;
 
 import java.sql.Statement;
 import java.util.Collection;
@@ -31,7 +32,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.40 $, $Date: 2003/02/04 17:18:29 $
+ * @version $Revision: 1.41 $, $Date: 2003/02/05 00:20:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -634,11 +635,16 @@ public class ProxoolFacade {
     /**
      * Get all the lastest performance statistics for this pool
      * @param alias identifies the pool
-     * @return a sample containing the statistics
+     * @return a sample containing the statistics, or a zero length array if there none
      * @throws ProxoolException if we couldn't find the pool
      */
     public static StatisticsIF[] getStatistics(String alias) throws ProxoolException {
-        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor().getStatistics();
+        final Monitor monitor = ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor();
+        if (monitor != null) {
+            return monitor.getStatistics();
+        } else {
+            return new StatisticsIF[0];
+        }
     }
 
     /**
@@ -683,7 +689,7 @@ public class ProxoolFacade {
             }
         }
 
-        snapshot = ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor().getSnapshot(cp, cp.getDefinition(), connectionInfos);
+        snapshot = Monitor.getSnapshot(cp, cp.getDefinition(), connectionInfos);
 
         if (detail) {
             cp.unlock();
@@ -696,6 +702,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.41  2003/02/05 00:20:01  billhorsman
+ copes with pools with no statistics
+
  Revision 1.40  2003/02/04 17:18:29  billhorsman
  move ShutdownHook init code
 
