@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/LogFactoryImpl.java,v 1.2 2003/02/08 14:27:51 chr32 Exp $
- * $Revision: 1.2 $
- * $Date: 2003/02/08 14:27:51 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/LogFactoryImpl.java,v 1.3 2003/02/10 15:15:00 billhorsman Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/02/10 15:15:00 $
  *
  * ====================================================================
  *
@@ -58,10 +58,21 @@
  * <http://www.apache.org/>.
  *
  */
-package org.logicalcobwebs.logging.impl;
-import org.logicalcobwebs.logging.Log;import org.logicalcobwebs.logging.LogConfigurationException;import org.logicalcobwebs.logging.LogFactory;
-import java.lang.reflect.Constructor;import java.lang.reflect.Method;import java.security.AccessController;import java.security.PrivilegedAction;import java.util.Enumeration;import java.util.Hashtable;import java.util.Vector;
-/**
+
+package org.logicalcobwebs.logging.impl;
+
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogConfigurationException;
+import org.logicalcobwebs.logging.LogFactory;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
+/**
  * <p>Concrete subclass of {@link org.logicalcobwebs.logging.LogFactory} that implements the
  * following algorithm to dynamically select a logging implementation
  * class to instantiate a wrapper for.</p>
@@ -92,10 +103,12 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
  *
  * @author Rod Waldhoff
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2003/02/08 14:27:51 $
+ * @version $Revision: 1.3 $ $Date: 2003/02/10 15:15:00 $
  */
-public class LogFactoryImpl extends LogFactory {
-    // ----------------------------------------------------------- Constructors
+
+public class LogFactoryImpl extends LogFactory {
+
+    // ----------------------------------------------------------- Constructors
 
 
     /**
@@ -118,13 +131,15 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      */
     public static final String LOG_DEFAULT =
             "org.logicalcobwebs.logging.impl.SimpleLog";
-    /**
+
+    /**
      * The name of the system property identifying our {@link org.logicalcobwebs.logging.Log}
      * implementation class.
      */
     public static final String LOG_PROPERTY =
             "org.logicalcobwebs.logging.Log";
-    /**
+
+    /**
      * The deprecated system property used for backwards compatibility with
      * the old {@link org.logicalcobwebs.logging.LogSource} class.
      */
@@ -139,12 +154,14 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      * Configuration attributes
      */
     private Hashtable attributes = new Hashtable ();
-    /**
+
+    /**
      * The {@link org.logicalcobwebs.logging.Log} instances that have
      * already been created, keyed by logger name.
      */
     private Hashtable instances = new Hashtable ();
-    /**
+
+    /**
      * The one-argument constructor of the
      * {@link org.logicalcobwebs.logging.Log}
      * implementation class that will be used to create new instances.
@@ -152,18 +169,22 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      * and then returned repeatedly.
      */
     private Constructor logConstructor = null;
-    private LogFactory proxyFactory = null;
-    /**
+
+    private LogFactory proxyFactory = null;
+
+    /**
      * The signature of the Constructor to be used.
      */
     private Class logConstructorSignature[] =
             {java.lang.String.class};
-    /**
+
+    /**
      * The one-argument <code>setLogFactory</code> method of the selected
      * {@link org.logicalcobwebs.logging.Log} method, if it exists.
      */
     private Method logMethod = null;
-    /**
+
+    /**
      * The signature of the <code>setLogFactory</code> method to be used.
      */
     private Class logMethodSignature[] =
@@ -180,16 +201,23 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      * @param name Name of the attribute to return
      */
     public Object getAttribute (String name) {
-        if (proxyFactory != null) {            return proxyFactory.getAttribute (name);        }
-        return (attributes.get (name));
-    }
-    /**
+        if (proxyFactory != null) {
+            return proxyFactory.getAttribute (name);
+        }
+
+        return (attributes.get (name));
+
+    }
+
+    /**
      * Return an array containing the names of all currently defined
      * configuration attributes.  If there are no such attributes, a zero
      * length array is returned.
      */
     public String[] getAttributeNames () {
-        if (proxyFactory != null) {            return proxyFactory.getAttributeNames ();        }
+        if (proxyFactory != null) {
+            return proxyFactory.getAttributeNames ();
+        }
 
         Vector names = new Vector ();
         Enumeration keys = attributes.keys ();
@@ -201,8 +229,10 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
             results[i] = (String) names.elementAt (i);
         }
         return (results);
-    }
-    /**
+
+    }
+
+    /**
      * Convenience method to derive a name from the specified class and
      * call <code>getInstance(String)</code> with it.
      *
@@ -213,11 +243,15 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      */
     public Log getInstance (Class clazz)
             throws LogConfigurationException {
-        if (proxyFactory != null) {            return proxyFactory.getInstance (clazz);        }
+        if (proxyFactory != null) {
+            return proxyFactory.getInstance (clazz);
+        }
 
         return (getInstance (clazz.getName ()));
-    }
-    /**
+
+    }
+
+    /**
      * <p>Construct (if necessary) and return a <code>Log</code> instance,
      * using the factory's current set of configuration attributes.</p>
      *
@@ -236,7 +270,9 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      */
     public Log getInstance (String name)
             throws LogConfigurationException {
-        if (proxyFactory != null) {            return proxyFactory.getInstance (name);        }
+        if (proxyFactory != null) {
+            return proxyFactory.getInstance (name);
+        }
 
         Log instance = (Log) instances.get (name);
         if (instance == null) {
@@ -244,8 +280,10 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
             instances.put (name, instance);
         }
         return (instance);
-    }
-    /**
+
+    }
+
+    /**
      * Release any internal references to previously created
      * {@link org.logicalcobwebs.logging.Log}
      * instances returned by this factory.  This is useful environments
@@ -254,22 +292,29 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      * class loader would prevent garbage collection.
      */
     public void release () {
-        if (proxyFactory != null) {            proxyFactory.release ();        }
+        if (proxyFactory != null) {
+            proxyFactory.release ();
+        }
 
         instances.clear ();
-    }
-    /**
+
+    }
+
+    /**
      * Remove any configuration attribute associated with the specified name.
      * If there is no such attribute, no action is taken.
      *
      * @param name Name of the attribute to remove
      */
     public void removeAttribute (String name) {
-        if (proxyFactory != null) {            proxyFactory.removeAttribute (name);        }
+        if (proxyFactory != null) {
+            proxyFactory.removeAttribute (name);
+        }
 
         attributes.remove (name);
     }
-    /**
+
+    /**
      * Set the configuration attribute with the specified name.  Calling
      * this with a <code>null</code> value is equivalent to calling
      * <code>removeAttribute(name)</code>.
@@ -279,14 +324,17 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      *  to remove any setting for this attribute
      */
     public void setAttribute (String name, Object value) {
-        if (proxyFactory != null) {            proxyFactory.setAttribute (name, value);        }
+        if (proxyFactory != null) {
+            proxyFactory.setAttribute (name, value);
+        }
 
         if (value == null) {
             attributes.remove (name);
         } else {
             attributes.put (name, value);
         }
-    }
+
+    }
 
 
     // ------------------------------------------------------ Protected Methods
@@ -306,7 +354,8 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      */
     protected Constructor getLogConstructor ()
             throws LogConfigurationException {
-        // Return the previously identified Constructor (if any)
+
+        // Return the previously identified Constructor (if any)
         if (logConstructor != null) {
             return (logConstructor);
         }
@@ -374,9 +423,13 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
             logConstructor = logClass.getConstructor (logConstructorSignature);
             return (logConstructor);
         } catch (Throwable t) {
-            throw new LogConfigurationException ("No suitable Log constructor "                + logConstructorSignature + " for " + logClassName, t);        }
-    }
-    /**
+            throw new LogConfigurationException ("No suitable Log constructor "
+                + logConstructorSignature + " for " + logClassName, t);
+        }
+
+    }
+
+    /**
      * MUST KEEP THIS METHOD PRIVATE
      *
      * <p>Exposing this method establishes a security violation.
@@ -388,29 +441,18 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      */
     private static Class loadClass (final String name)
             throws ClassNotFoundException {
+        ClassLoader threadCL = LogFactoryImpl.getContextClassLoader ();
         Object result = AccessController.doPrivileged (
-                new PrivilegedAction () {
-                    public Object run () {
-                        ClassLoader threadCL = getContextClassLoader ();
-                        if (threadCL != null) {
-                            try {
-                                return threadCL.loadClass (name);
-                            } catch (ClassNotFoundException ex) {
-                                // ignore
-                            }
-                        }
-                        try {
-                            return Class.forName (name);
-                        } catch (ClassNotFoundException e) {
-                            return e;
-                        }
-                    }
-                });
-        if (result instanceof Class) {            return (Class) result;        }
+                new MyPrivilegedAction (threadCL, name));
+
+        if (result instanceof Class) {
+            return (Class) result;
+        }
 
         throw (ClassNotFoundException) result;
     }
-    protected void guessConfig () {
+
+    protected void guessConfig () {
         if (isLog4JAvailable ()) {
             proxyFactory = null;
             try {
@@ -426,31 +468,38 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
         // other logger specific initialization
         // ...
     }
-    /**
+
+    /**
      * Is <em>JDK 1.4 or later</em> logging available?
      */
     protected boolean isJdk14Available () {
-        try {
+
+        try {
             loadClass ("java.util.logging.Logger");
             loadClass ("org.logicalcobwebs.logging.impl.Jdk14Logger");
             return (true);
         } catch (Throwable t) {
             return (false);
         }
-    }
-    /**
+
+    }
+
+    /**
      * Is a <em>Log4J</em> implementation available?
      */
     protected boolean isLog4JAvailable () {
-        try {
+
+        try {
             loadClass ("org.apache.log4j.Category");
             loadClass ("org.logicalcobwebs.logging.impl.Log4JCategoryLog");
             return (true);
         } catch (Throwable t) {
             return (false);
         }
-    }
-    /**
+
+    }
+
+    /**
      * Create and return a new {@link org.logicalcobwebs.logging.Log}
      * instance for the specified name.
      *
@@ -461,8 +510,10 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
      */
     protected Log newInstance (String name)
             throws LogConfigurationException {
-        Log instance = null;
-        try {
+
+        Log instance = null;
+
+        try {
             Object params[] = new Object[1];
             params[0] = name;
             instance = (Log) getLogConstructor ().newInstance (params);
@@ -474,6 +525,7 @@ import java.lang.reflect.Constructor;import java.lang.reflect.Method;import ja
         } catch (Throwable t) {
             throw new LogConfigurationException (t);
         }
-    }
+
+    }
 }
-
+
