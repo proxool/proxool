@@ -83,7 +83,7 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.10 $, $Date: 2003/09/10 22:21:04 $
+ * @version $Revision: 1.11 $, $Date: 2003/09/14 21:29:31 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.8
@@ -227,12 +227,21 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.RECENTLY_STARTED_THRESHOLD)) {
                     resultList.add (new Attribute (attributeNames[i],
                         new Integer (this.poolDefinition.getRecentlyStartedThreshold ())));
+                } else if (equalsProperty(attributeNames[i], ProxoolConstants.STATISTICS)) {
+                    resultList.add (new Attribute (attributeNames[i],
+                        getValueOrEmpty(this.poolDefinition.getStatistics ())));
+                } else if (equalsProperty(attributeNames[i], ProxoolConstants.STATISTICS_LOG_LEVEL)) {
+                    resultList.add (new Attribute (attributeNames[i],
+                        getValueOrEmpty(this.poolDefinition.getStatisticsLogLevel ())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.TRACE)) {
                     resultList.add (new Attribute (attributeNames[i],
                         new Boolean (this.poolDefinition.isTrace ())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.VERBOSE)) {
                     resultList.add (new Attribute (attributeNames[i],
                         new Boolean (this.poolDefinition.isVerbose ())));
+                } else if (equalsProperty(attributeNames[i], ProxoolConstants.WRAP_FATAL_SQL_EXCEPTIONS)) {
+                    resultList.add (new Attribute (attributeNames[i],
+                        new Boolean (this.poolDefinition.isWrapFatalSqlExceptions ())));
                 } else {
                     final String message = "Unknown attribute: " + attributeNames[i];
                     LOG.error(message);
@@ -279,12 +288,16 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                     checkAssignable (name, String.class, value.getClass ());
                     if (notEmpty(value.toString())) {
                         newProperties.setProperty(ProxoolConstants.DRIVER_URL_PROPERTY, value.toString());
+                    } else {
+                        newProperties.remove(ProxoolConstants.DRIVER_URL_PROPERTY);
                     }
                     resultList.add (new Attribute (name, value));
                 } else if (equalsProperty(name, ProxoolConstants.FATAL_SQL_EXCEPTION)) {
                     checkAssignable (name, String.class, value.getClass ());
                     if (notEmpty(value.toString())) {
                         newProperties.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, value.toString());
+                    } else {
+                        newProperties.remove(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY);
                     }
                     resultList.add (new Attribute (name, value));
                 } else if (equalsProperty(name, ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME)) {
@@ -294,6 +307,8 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                     checkAssignable (name, String.class, value.getClass ());
                     if (notEmpty(value.toString())) {
                         newProperties.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, value.toString());
+                    } else {
+                        newProperties.remove(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY);
                     }
                     resultList.add (new Attribute (name, value));
                 } else if (equalsProperty(name, ProxoolConstants.MAXIMUM_ACTIVE_TIME)) {
@@ -325,6 +340,22 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                 } else if (equalsProperty(name, ProxoolConstants.RECENTLY_STARTED_THRESHOLD)) {
                     setIntegerAttribute(name, ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY, value,
                             ConnectionPoolDefinitionIF.DEFAULT_RECENTLY_STARTED_THRESHOLD, newProperties, resultList);
+                } else if (equalsProperty(name, ProxoolConstants.STATISTICS)) {
+                    checkAssignable (name, String.class, value.getClass ());
+                    if (notEmpty(value.toString())) {
+                        newProperties.setProperty(ProxoolConstants.STATISTICS_PROPERTY, value.toString());
+                    } else {
+                        newProperties.remove(ProxoolConstants.STATISTICS_PROPERTY);
+                    }
+                    resultList.add (new Attribute (name, value));
+                } else if (equalsProperty(name, ProxoolConstants.STATISTICS_LOG_LEVEL)) {
+                    checkAssignable (name, String.class, value.getClass ());
+                    if (notEmpty(value.toString())) {
+                        newProperties.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, value.toString());
+                    } else {
+                        newProperties.remove(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY);
+                    }
+                    resultList.add (new Attribute (name, value));
                 } else if (equalsProperty(name, ProxoolConstants.TRACE)) {
                     checkAssignable (name, Boolean.class, value.getClass ());
                     newProperties.setProperty(ProxoolConstants.TRACE_PROPERTY, value.toString());
@@ -332,6 +363,10 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                 } else if (equalsProperty(name, ProxoolConstants.VERBOSE)) {
                     checkAssignable (name, Boolean.class, value.getClass ());
                     newProperties.setProperty(ProxoolConstants.VERBOSE_PROPERTY, value.toString());
+                    resultList.add (new Attribute (name, value));
+                } else if (equalsProperty(name, ProxoolConstants.WRAP_FATAL_SQL_EXCEPTIONS)) {
+                    checkAssignable (name, Boolean.class, value.getClass ());
+                    newProperties.setProperty(ProxoolConstants.WRAP_FATAL_SQL_EXCEPTIONS_PROPERTY, value.toString());
                     resultList.add (new Attribute (name, value));
                 } else {
                     final String message = "Unknown attribute: " + name;
@@ -397,8 +432,11 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
             createProxoolAttribute (ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME, Integer.class),
             createProxoolAttribute (ProxoolConstants.PROTOTYPE_COUNT, Integer.class),
             createProxoolAttribute (ProxoolConstants.RECENTLY_STARTED_THRESHOLD, Integer.class),
+            createProxoolAttribute (ProxoolConstants.STATISTICS, String.class),
+            createProxoolAttribute (ProxoolConstants.STATISTICS_LOG_LEVEL, String.class),
             createProxoolAttribute (ProxoolConstants.TRACE, Boolean.class),
-            createProxoolAttribute (ProxoolConstants.VERBOSE, Boolean.class)
+            createProxoolAttribute (ProxoolConstants.VERBOSE, Boolean.class),
+            createProxoolAttribute (ProxoolConstants.WRAP_FATAL_SQL_EXCEPTIONS, Boolean.class),
         };
 
         final MBeanConstructorInfo[] constructorInfos = new MBeanConstructorInfo[]{
@@ -643,6 +681,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.11  2003/09/14 21:29:31  chr32
+ Added support for wrap-fatal-sql-exceptions,statistics and statistics-log-level properties.
+
  Revision 1.10  2003/09/10 22:21:04  chr32
  Removing > jdk 1.2 dependencies.
 
