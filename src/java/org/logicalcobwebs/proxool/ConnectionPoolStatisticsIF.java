@@ -5,6 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
+import java.util.Date;
+
 /**
  * This provides real time information about the pool. You can get this from
  * {@link ProxoolFacade#getConnectionPoolStatistics ProxoolFacade}.
@@ -14,36 +16,60 @@ package org.logicalcobwebs.proxool;
  * ConnectionPoolStatisticsIF cps = ProxoolFacade.getConnectionPoolStatistics(alias);
  * </pre>
  *
- * @version $Revision: 1.3 $, $Date: 2002/12/15 19:21:42 $
+ * @version $Revision: 1.4 $, $Date: 2003/01/15 12:01:21 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ConnectionPoolStatisticsIF {
 
-    /* The number of connections provided. */
+    /**
+     * The number of connections provided.
+     * @return connectionsServedCount
+     */
     long getConnectionsServedCount();
 
-    /* The number of connections refused. Either because there was a problem
-    connecting to the database, or perhaps because the maximumConnectionCount
-    was reached. */
+    /**
+     * The number of connections refused. Either because there was a problem
+    * connecting to the database, or perhaps because the maximumConnectionCount
+    * was reached.
+     * @return connectionsRefusedCount
+     */
     long getConnectionsRefusedCount();
 
-    /* The number of connections currently in use. */
+    /**
+     * The number of connections currently in use.
+     * @return activeConnectionCount
+     */
     int getActiveConnectionCount();
 
-    /* The number of connections that are available for use (doesn't include
-    active connections).*/
+    /**
+     * The number of connections that are available for use (doesn't include
+    * active connections).
+     * @return availableConnectionCount
+     */
     int getAvailableConnectionCount();
 
-    /* The number of connections that are neither active or available. Probably
-    because the house keeping thread is checking them. */
+    /**
+     * The number of connections that are neither active or available. Probably
+     * because the house keeping thread is checking them.
+     * @return offlineConnectionCount
+     */
     int getOfflineConnectionCount();
+
+    /**
+     * When this pool was started
+     * @return dateStarted
+     */
+    Date getDateStarted();
 
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolStatisticsIF.java,v $
+ Revision 1.4  2003/01/15 12:01:21  billhorsman
+ added getDateStarted() plus better doc
+
  Revision 1.3  2002/12/15 19:21:42  chr32
  Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
 
