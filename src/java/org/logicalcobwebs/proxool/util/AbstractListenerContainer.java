@@ -38,9 +38,9 @@ import java.util.Iterator;
  </pre>
   </code>
  * </p>
- * @version $Revision: 1.1 $, $Date: 2003/02/07 01:46:31 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/07 15:06:43 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public abstract class AbstractListenerContainer implements ListenerContainerIF{
@@ -115,13 +115,16 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF{
      * @see ListenerContainerIF#isEmpty() 
      */
     public boolean isEmpty() {
-        return  this.listeners == null || this.listeners.size() > 1;
+        return  this.listeners == null || this.listeners.size() < 1;
     }
 }
 
 /*
  Revision history:
  $Log: AbstractListenerContainer.java,v $
+ Revision 1.2  2003/02/07 15:06:43  billhorsman
+ fixed isEmpty bug
+
  Revision 1.1  2003/02/07 01:46:31  chr32
  Initial revition.
 
