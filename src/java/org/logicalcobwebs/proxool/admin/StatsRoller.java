@@ -8,6 +8,7 @@ package org.logicalcobwebs.proxool.admin;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.util.ReadWriteLock;
 
 import java.util.Calendar;
 import java.util.Timer;
@@ -19,7 +20,7 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/03 11:11:59 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/06 12:44:02 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -27,6 +28,8 @@ import java.util.TimerTask;
 class StatsRoller {
 
     private static final Log LOG = LogFactory.getLog(StatsRoller.class);
+
+    private ReadWriteLock readWriteLock = new ReadWriteLock();
 
     private Statistics completeStatistics;
 
@@ -101,13 +104,20 @@ class StatsRoller {
         timer.cancel();
     }
 
-    private synchronized void roll() {
-        if (!isCurrent()) {
-            currentStatistics.setStopDate(nextRollDate.getTime());
-            completeStatistics = currentStatistics;
-            currentStatistics = new Statistics(nextRollDate.getTime());
-            nextRollDate.add(units, period);
-            compositeStatisticsListener.statistics(alias, completeStatistics);
+    private void roll() {
+        try {
+            readWriteLock.aquireWrite();
+            if (!isCurrent()) {
+                currentStatistics.setStopDate(nextRollDate.getTime());
+                completeStatistics = currentStatistics;
+                currentStatistics = new Statistics(nextRollDate.getTime());
+                nextRollDate.add(units, period);
+                compositeStatisticsListener.statistics(alias, completeStatistics);
+            }
+        } catch (InterruptedException e) {
+            LOG.error("Unable to roll statistics log", e);
+        } finally {
+            readWriteLock.release();
         }
     }
 
@@ -122,7 +132,15 @@ class StatsRoller {
         if (!isCurrent()) {
             roll();
         }
-        currentStatistics.connectionReturned(activeTime);
+        try {
+            readWriteLock.aquireRead();
+            currentStatistics.connectionReturned(activeTime);
+            LOG.debug("Logging connectionReturned to stats starting at " + currentStatistics.getStartDate());
+        } catch (InterruptedException e) {
+            LOG.error("Unable to log connectionReturned", e);
+        } finally {
+            readWriteLock.release();
+        }
     }
 
     /**
@@ -132,11 +150,30 @@ class StatsRoller {
         if (!isCurrent()) {
             roll();
         }
-        currentStatistics.connectionRefused();
+        try {
+            readWriteLock.aquireRead();
+            currentStatistics.connectionRefused();
+        } catch (InterruptedException e) {
+            LOG.error("Unable to log connectionRefused", e);
+        } finally {
+            readWriteLock.release();
+        }
     }
 
+    /**
+     *
+     * @return
+     */
     public Statistics getCompleteStatistics() {
-        return completeStatistics;
+        try {
+            readWriteLock.aquireRead();
+            return completeStatistics;
+        } catch (InterruptedException e) {
+            LOG.error("Couldn't read statistics", e);
+            return null;
+        } finally {
+            readWriteLock.release();
+        }
     }
 }
 
@@ -144,6 +181,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.4  2003/03/06 12:44:02  billhorsman
+ add readWriteLock
+
  Revision 1.3  2003/03/03 11:11:59  billhorsman
  fixed licence
 
