@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.79 $, $Date: 2004/03/26 15:58:56 $
+ * @version $Revision: 1.80 $, $Date: 2004/06/02 20:47:05 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -191,6 +191,16 @@ public class ProxoolFacade {
 
     /**
      * Removes all connection pools. Kills all the connections. Resets everything.
+     * Like {@link #shutdown(java.lang.String, int)} but passes the current thread name
+     * and a delay of zero.
+     */
+    public static void shutdown() {
+        shutdown(Thread.currentThread().getName(), 0);
+    }
+
+    /**
+     * Removes all connection pools. Kills all the connections. Resets everything.
+     * Like {@link #shutdown(java.lang.String, int)} but passes the current thread name.
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
      */
     public static void shutdown(int delay) {
@@ -790,6 +800,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.80  2004/06/02 20:47:05  billhorsman
+ Override shutdown with a zero-parameter version for Spring integration.
+
  Revision 1.79  2004/03/26 15:58:56  billhorsman
  Fixes to ensure that house keeper and prototyper threads finish after shutdown.
 
