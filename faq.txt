@@ -11,3 +11,22 @@ A. Checkstyle changed the way it is configured between versions 2.2 and
    doesn't break anything else); edit the build.xml so it works
    with the old format.
 
+Q. Why is all the logging done to stdout.
+
+A.. TODO
+
+Q. I wish the logs had more/less information in them
+
+A. TODO
+
+Q. I want to know exactly how fast my pool is performing. How can I find out?
+
+A. TODO
+
+Q. I'm running Intellij IDEA and I get an error when I try to build the javadoc
+  using Ant.
+
+A. Intellij started shipping there own JRE just before they released version 3.0.
+  This JRE includes javac but not javadoc. The solution is to copy javadoc from
+  a full JDK (preferably a similar version to the one shipped with IDEA) into
+  the JRE's bin directory.
