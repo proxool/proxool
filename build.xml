@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.45 $
-    $Date: 2003/03/06 11:33:03 $
+    $Revision: 1.46 $
+    $Date: 2003/03/07 14:43:59 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -37,6 +37,9 @@
     <!-- Log4J configuration to use for testing. See proxool-ant.properties
     file for more infomation. -->
     <property name="log4jPath" value="src/java-test/org/logicalcobwebs/proxool/log4j-test.xml"/>
+
+    <!-- Passed to JVM when running tests -->
+    <property name="jvmargs" value=""/>
 
     <!-- Classpath -->
     <path id="source" path="${build-dir}/classes">
@@ -302,9 +305,10 @@
         description="Runs the JUnit tests"
         depends="clean,init,build-test,deleteTestDb"
         >
-        <java fork="yes" classpathref="source" classname="junit.textui.TestRunner">
+        <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}"/>
             <arg value="org.logicalcobwebs.proxool.GlobalTest"/>
+            <jvmarg line="${jvmargs}"/>
         </java>
     </target>
 
@@ -326,7 +330,6 @@
             <formatter type="xml"/>
         </junit>
 
-
         <junitreport>
             <fileset dir="${build-dir}/reports">
                 <include name="TEST-*.xml"/>
@@ -341,7 +344,13 @@
         <replace
             file="${build-dir}/reports/${junit-report-name}"
             token="&lt;h1&gt;Unit Test Results&lt;/h1&gt;"
-            value='&lt;div style="font-size: 110%;"&gt;&lt;div style="float: right; font-weight: bold;"&gt;${TODAY_FULL}&lt;/div&gt;&lt;a href="../index.html">Proxool&lt;/a&gt; - ${junit-report-description}&lt;/div&gt;'
+            value=""
+            />
+
+        <replace
+            file="${build-dir}/reports/${junit-report-name}"
+            token='Designed for use with &lt;a href="http://www.junit.org">JUnit&lt;/a&gt; and &lt;a href="http://jakarta.apache.org/ant"&gt;Ant&lt;/a&gt;.'
+            value='${TODAY_FULL}'
             />
 
     </target>
