@@ -14,9 +14,20 @@ import java.util.Properties;
 
 /**
  * This class acts as a virtual pool. When you ask it for a connection it
- * delegates to one of the designated real pools.
+ * delegates to one of the designated real pools. Some assumptions:
  *
- * @version $Revision: 1.2 $, $Date: 2002/10/27 13:05:01 $
+ * Getting a connection needs to be very fast.
+ *
+ * Switching pools can be relatively slow (but just to get that in perspective,
+ * > 100ms)
+ *
+ * We should detect pools that don't respond (timeout), throw certain
+ * SQLExceptions, or are unacceptably slow.
+ *
+ * We should also allow simple load balancing between pools that are
+ * up.
+ *
+ * @version $Revision: 1.3 $, $Date: 2002/11/12 20:19:18 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -74,6 +85,9 @@ public class VirtoolDriver implements Driver {
 /*
  Revision history:
  $Log: VirtoolDriver.java,v $
+ Revision 1.3  2002/11/12 20:19:18  billhorsman
+ added some doc
+
  Revision 1.2  2002/10/27 13:05:01  billhorsman
  checkstyle
 
