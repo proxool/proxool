@@ -21,7 +21,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.8 $, $Date: 2002/10/28 19:28:25 $
+ * @version $Revision: 1.9 $, $Date: 2002/10/28 19:51:34 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -100,7 +100,7 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
                 // connection.prepareCall(sql);
                 // connection.createStatement();
                 String sqlStatement = null;
-                if (args.length > 0 && args[0] instanceof String) {
+                if (args != null && args.length > 0 && args[0] instanceof String) {
                     sqlStatement = (String) args[0];
                 }
                 result = Proxy.newProxyInstance(result.getClass().getClassLoader(), types, new ProxyStatement((Statement) result, connectionPool, sqlStatement));
@@ -109,7 +109,8 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
         } catch (InvocationTargetException e) {
             throw e.getTargetException();
         } catch (Exception e) {
-            throw new RuntimeException("unexpected invocation exception: "
+            LOG.error("Unexpected invocation exception", e);
+            throw new RuntimeException("Unexpected invocation exception: "
                     + e.getMessage());
         }
 
@@ -359,6 +360,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.9  2002/10/28 19:51:34  billhorsman
+ Fixed NullPointerException when calling connection.createStatement()
+
  Revision 1.8  2002/10/28 19:28:25  billhorsman
  checkstyle
 
