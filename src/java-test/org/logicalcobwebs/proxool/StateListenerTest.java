@@ -18,7 +18,7 @@ import java.util.Properties;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/01 15:27:24 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/02 00:37:23 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -57,15 +57,16 @@ public class StateListenerTest extends TestCase {
 
             assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
 
-            TestStateListener stateListener = new TestStateListener();
-            ProxoolFacade.addStateListener(alias, stateListener);
+            StateResultMonitor srm = new StateResultMonitor();
+            ProxoolFacade.addStateListener(alias, srm);
 
             assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
 
             Connection c1 = DriverManager.getConnection(url);
 
             // Test BUSY
-            assertEquals("upState", StateListenerIF.STATE_BUSY, stateListener.getNextState(StateListenerIF.STATE_BUSY));
+            srm.setExpectedUpState(StateListenerIF.STATE_BUSY);
+            assertEquals("Timeout waiting for BUSY", ResultMonitor.SUCCESS,srm.getResult());
 
             assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
 
@@ -78,18 +79,22 @@ public class StateListenerTest extends TestCase {
             }
 
             // Test Overloaded
-            assertEquals("upState", StateListenerIF.STATE_OVERLOADED, stateListener.getNextState(StateListenerIF.STATE_OVERLOADED));
+            srm.setExpectedUpState(StateListenerIF.STATE_OVERLOADED);
+            assertEquals("Timeout waiting for OVERLOADED", ResultMonitor.SUCCESS,srm.getResult());
 
             // Test Busy again
-            assertEquals("upState", StateListenerIF.STATE_BUSY, stateListener.getNextState(StateListenerIF.STATE_BUSY));
+            srm.setExpectedUpState(StateListenerIF.STATE_BUSY);
+            assertEquals("Timeout waiting for BUSY", ResultMonitor.SUCCESS,srm.getResult());
 
             // Test Quiet again
             c1.close();
-            assertEquals("upState", StateListenerIF.STATE_QUIET, stateListener.getNextState(StateListenerIF.STATE_QUIET));
+            srm.setExpectedUpState(StateListenerIF.STATE_QUIET);
+            assertEquals("Timeout waiting for QUIET", ResultMonitor.SUCCESS,srm.getResult());
 
             // Bogus definition -> should be down
             ProxoolFacade.updateConnectionPool("proxool." + alias + ":blah:foo", null);
-            assertEquals("upState", StateListenerIF.STATE_DOWN, stateListener.getNextState(StateListenerIF.STATE_DOWN));
+            srm.setExpectedUpState(StateListenerIF.STATE_DOWN);
+            assertEquals("Timeout waiting for DOWN", ResultMonitor.SUCCESS,srm.getResult());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -165,7 +170,7 @@ public class StateListenerTest extends TestCase {
 
         }
 
-        int getNextState(int stateToWaitFor) {
+        int zgetNextState(int stateToWaitFor) {
             waitForSomethingToHappen(stateToWaitFor);
             somethingHappened = false;
             return upState;
@@ -176,6 +181,9 @@ public class StateListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.7  2003/03/02 00:37:23  billhorsman
+ more robust
+
  Revision 1.6  2003/03/01 15:27:24  billhorsman
  checkstyle
 
