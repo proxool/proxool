@@ -13,14 +13,15 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 /**
  * Responsbile for a single set of statistics. It rolls over to a new set
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.10 $, $Date: 2003/02/07 14:16:46 $
+ * @version $Revision: 1.11 $, $Date: 2003/02/08 14:27:51 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
  */
 class StatsRoller {
@@ -148,6 +149,10 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.11  2003/02/08 14:27:51  chr32
+ Style fixes.
+ Also tried to fix the dublicate linebreaks in the logging classes.
+
  Revision 1.10  2003/02/07 14:16:46  billhorsman
  support for StatisticsListenerIF
 

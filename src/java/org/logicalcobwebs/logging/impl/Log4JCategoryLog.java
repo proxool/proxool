@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Log4JCategoryLog.java,v 1.1 2003/02/06 17:37:39 billhorsman Exp $
- * $Revision: 1.1 $
- * $Date: 2003/02/06 17:37:39 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Log4JCategoryLog.java,v 1.2 2003/02/08 14:27:51 chr32 Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/02/08 14:27:51 $
  *
  * ====================================================================
  *
@@ -58,15 +58,10 @@
  * <http://www.apache.org/>.
  *
  */
-
-
-package org.logicalcobwebs.logging.impl;
-
-import org.apache.log4j.*;
-import org.logicalcobwebs.logging.Log;
+package org.logicalcobwebs.logging.impl;
+import org.apache.log4j.Category;import org.apache.log4j.ConsoleAppender;import org.apache.log4j.PatternLayout;import org.apache.log4j.Priority;import org.logicalcobwebs.logging.Log;
 import java.util.Enumeration;
-
-/**
+/**
  * <p>Implementation of {@link org.logicalcobwebs.logging.Log} that maps directly to a Log4J
  * <strong>Category</strong>.  Initial configuration of the corresponding
  * Category instances should be done in the usual manner, as outlined in
@@ -75,212 +70,171 @@ import java.util.Enumeration;
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author Rod Waldhoff
  * @author Robert Burrell Donkin
- * @version $Id: Log4JCategoryLog.java,v 1.1 2003/02/06 17:37:39 billhorsman Exp $
+ * @version $Id: Log4JCategoryLog.java,v 1.2 2003/02/08 14:27:51 chr32 Exp $
  */
 public final class Log4JCategoryLog implements Log {
-
-
-    // ------------------------------------------------------------- Attributes
+    // ------------------------------------------------------------- Attributes
 
     /** The fully qualified name of the Log4JCategoryLog class. */
-    private static final String FQCN = Log4JCategoryLog.class.getName();
-    
-    private static boolean initialized=false;
-    private static String LAYOUT="%r [%t] %p %c{2} %x - %m%n";
-
-    /** Log to this category */
+    private static final String FQCN = Log4JCategoryLog.class.getName ();
+    private static boolean initialized = false;
+    private static final String LAYOUT = "%r [%t] %p %c{2} %x - %m%n";
+    /** Log to this category */
     private Category category = null;
 
 
     // ------------------------------------------------------------ Constructor
 
-    public Log4JCategoryLog() {
-        if( ! initialized ) {
-            initialize();
+    public Log4JCategoryLog () {
+        if (!initialized) {
+            initialize ();
         }
     }
-
-
-    /**
+    /**
      * Base constructor
      */
-    public Log4JCategoryLog(String name) {
-        if( ! initialized ) {
-            initialize();
+    public Log4JCategoryLog (String name) {
+        if (!initialized) {
+            initialize ();
         }
-        this.category=Category.getInstance(name);
+        this.category = Category.getInstance (name);
     }
-
-    /** For use with a log4j factory
+    /** For use with a log4j factory
      */
-    public Log4JCategoryLog(Category category ) {
-        if( ! initialized ) {
-            initialize();
+    public Log4JCategoryLog (Category category) {
+        if (!initialized) {
+            initialize ();
         }
-        this.category=category;
+        this.category = category;
     }
 
 
     // ---------------------------------------------------------- Implmentation
 
-    private void initialize() {
-        Category root=Category.getRoot();
-        Enumeration appenders=root.getAllAppenders();
-        if( appenders==null || ! appenders.hasMoreElements() ) {
-            // No config, set some defaults ( consistent with
-            // commons-logging patterns ).
-            ConsoleAppender app=new ConsoleAppender(new PatternLayout( LAYOUT ),
-                                                    ConsoleAppender.SYSTEM_ERR );
-            app.setName("commons-logging");
-            
-            root.addAppender( app );
-            root.setPriority( Priority.INFO );
+    private void initialize () {
+        Category root = Category.getRoot ();
+        Enumeration appenders = root.getAllAppenders ();
+        if (appenders == null || !appenders.hasMoreElements ()) {
+            // No config, set some defaults (consistent with
+            // commons-logging patterns).
+            ConsoleAppender app = new ConsoleAppender (new PatternLayout (LAYOUT),
+                    ConsoleAppender.SYSTEM_ERR);
+            app.setName ("commons-logging");
+            root.addAppender (app);
+            root.setPriority (Priority.INFO);
         }
-        initialized=true;
+        initialized = true;
     }
-    
-
-    /**
+    /**
      * Log a message to the Log4j Category with <code>TRACE</code> priority.
      * Currently logs to <code>DEBUG</code> level in Log4J.
      */
-    public void trace(Object message) {
-        category.log(FQCN, Priority.DEBUG, message, null);
+    public void trace (Object message) {
+        category.log (FQCN, Priority.DEBUG, message, null);
     }
-
-
-    /**
+    /**
      * Log an error to the Log4j Category with <code>TRACE</code> priority.
      * Currently logs to <code>DEBUG</code> level in Log4J.
      */
-    public void trace(Object message, Throwable t) {
-        category.log(FQCN, Priority.DEBUG, message, t );
+    public void trace (Object message, Throwable t) {
+        category.log (FQCN, Priority.DEBUG, message, t);
     }
-
-
-    /**
+    /**
      * Log a message to the Log4j Category with <code>DEBUG</code> priority.
      */
-    public void debug(Object message) {
-        category.log(FQCN, Priority.DEBUG, message, null);
+    public void debug (Object message) {
+        category.log (FQCN, Priority.DEBUG, message, null);
     }
-
-    /**
+    /**
      * Log an error to the Log4j Category with <code>DEBUG</code> priority.
      */
-    public void debug(Object message, Throwable t) {
-        category.log(FQCN, Priority.DEBUG, message, t );
+    public void debug (Object message, Throwable t) {
+        category.log (FQCN, Priority.DEBUG, message, t);
     }
-
-
-    /**
+    /**
      * Log a message to the Log4j Category with <code>INFO</code> priority.
      */
-    public void info(Object message) {
-        category.log(FQCN, Priority.INFO, message, null );
+    public void info (Object message) {
+        category.log (FQCN, Priority.INFO, message, null);
     }
-
-
-    /**
+    /**
      * Log an error to the Log4j Category with <code>INFO</code> priority.
      */
-    public void info(Object message, Throwable t) {
-        category.log(FQCN, Priority.INFO, message, t );
+    public void info (Object message, Throwable t) {
+        category.log (FQCN, Priority.INFO, message, t);
     }
-
-
-    /**
+    /**
      * Log a message to the Log4j Category with <code>WARN</code> priority.
      */
-    public void warn(Object message) {
-        category.log(FQCN, Priority.WARN, message, null );
+    public void warn (Object message) {
+        category.log (FQCN, Priority.WARN, message, null);
     }
-
-
-    /**
+    /**
      * Log an error to the Log4j Category with <code>WARN</code> priority.
      */
-    public void warn(Object message, Throwable t) {
-        category.log(FQCN, Priority.WARN, message, t );
+    public void warn (Object message, Throwable t) {
+        category.log (FQCN, Priority.WARN, message, t);
     }
-
-
-    /**
+    /**
      * Log a message to the Log4j Category with <code>ERROR</code> priority.
      */
-    public void error(Object message) {
-        category.log(FQCN, Priority.ERROR, message, null );
+    public void error (Object message) {
+        category.log (FQCN, Priority.ERROR, message, null);
     }
-
-
-    /**
+    /**
      * Log an error to the Log4j Category with <code>ERROR</code> priority.
      */
-    public void error(Object message, Throwable t) {
-        category.log(FQCN, Priority.ERROR, message, t );
+    public void error (Object message, Throwable t) {
+        category.log (FQCN, Priority.ERROR, message, t);
     }
-
-
-    /**
+    /**
      * Log a message to the Log4j Category with <code>FATAL</code> priority.
      */
-    public void fatal(Object message) {
-        category.log(FQCN, Priority.FATAL, message, null );
+    public void fatal (Object message) {
+        category.log (FQCN, Priority.FATAL, message, null);
     }
-
-
-    /**
+    /**
      * Log an error to the Log4j Category with <code>FATAL</code> priority.
      */
-    public void fatal(Object message, Throwable t) {
-        category.log(FQCN, Priority.FATAL, message, t );
+    public void fatal (Object message, Throwable t) {
+        category.log (FQCN, Priority.FATAL, message, t);
     }
-
-
-    /**
+    /**
      * Check whether the Log4j Category used is enabled for <code>DEBUG</code> priority.
      */
-    public boolean isDebugEnabled() {
-        return category.isDebugEnabled();
+    public boolean isDebugEnabled () {
+        return category.isDebugEnabled ();
     }
-
-
-     /**
+    /**
      * Check whether the Log4j Category used is enabled for <code>ERROR</code> priority.
      */
-    public boolean isErrorEnabled() {
-        return category.isEnabledFor(Priority.ERROR);
+    public boolean isErrorEnabled () {
+        return category.isEnabledFor (Priority.ERROR);
     }
-
-
-    /**
+    /**
      * Check whether the Log4j Category used is enabled for <code>FATAL</code> priority.
      */
-    public boolean isFatalEnabled() {
-        return category.isEnabledFor(Priority.FATAL);
+    public boolean isFatalEnabled () {
+        return category.isEnabledFor (Priority.FATAL);
     }
-
-
-    /**
+    /**
      * Check whether the Log4j Category used is enabled for <code>INFO</code> priority.
      */
-    public boolean isInfoEnabled() {
-        return category.isInfoEnabled();
+    public boolean isInfoEnabled () {
+        return category.isInfoEnabled ();
     }
-
-
-    /**
+    /**
      * Check whether the Log4j Category used is enabled for <code>TRACE</code> priority.
      * For Log4J, this returns the value of <code>isDebugEnabled()</code>
      */
-    public boolean isTraceEnabled() {
-        return category.isDebugEnabled();
+    public boolean isTraceEnabled () {
+        return category.isDebugEnabled ();
     }
-
-    /**
+    /**
      * Check whether the Log4j Category used is enabled for <code>WARN</code> priority.
      */
-    public boolean isWarnEnabled() {
-        return category.isEnabledFor(Priority.WARN);
+    public boolean isWarnEnabled () {
+        return category.isEnabledFor (Priority.WARN);
     }
 }
+

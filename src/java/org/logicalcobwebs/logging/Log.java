@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/Log.java,v 1.1 2003/02/06 17:37:36 billhorsman Exp $
- * $Revision: 1.1 $
- * $Date: 2003/02/06 17:37:36 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/Log.java,v 1.2 2003/02/08 14:27:49 chr32 Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/02/08 14:27:49 $
  *
  * ====================================================================
  *
@@ -58,11 +58,8 @@
  * <http://www.apache.org/>.
  *
  */
-
-
-package org.logicalcobwebs.logging;
-
-/**
+package org.logicalcobwebs.logging;
+/**
  * <p>A simple logging interface abstracting logging APIs.  In order to be
  * instantiated successfully by {@link org.logicalcobwebs.logging.LogSource}, classes that implement
  * this interface must have a constructor that takes a single String
@@ -102,12 +99,10 @@ package org.logicalcobwebs.logging;
  *
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author Rod Waldhoff
- * @version $Id: Log.java,v 1.1 2003/02/06 17:37:36 billhorsman Exp $
+ * @version $Id: Log.java,v 1.2 2003/02/08 14:27:49 chr32 Exp $
  */
 public interface Log {
-
-
-    // ----------------------------------------------------- Logging Properties
+    // ----------------------------------------------------- Logging Properties
 
 
     /**
@@ -117,57 +112,47 @@ public interface Log {
      * (for example, <code>String</code> concatination)
      * when the log level is more than debug. </p>
      */
-    public boolean isDebugEnabled();
-
-
-    /**
+    boolean isDebugEnabled ();
+    /**
      * <p> Is error logging currently enabled? </p>
      *
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatination)
      * when the log level is more than error. </p>
      */
-    public boolean isErrorEnabled();
-
-
-    /**
+    boolean isErrorEnabled ();
+    /**
      * <p> Is fatal logging currently enabled? </p>
      *
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatination)
      * when the log level is more than fatal. </p>
      */
-    public boolean isFatalEnabled();
-
-
-    /**
+    boolean isFatalEnabled ();
+    /**
      * <p> Is info logging currently enabled? </p>
      *
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatination)
      * when the log level is more than info. </p>
      */
-    public boolean isInfoEnabled();
-
-
-    /**
+    boolean isInfoEnabled ();
+    /**
      * <p> Is trace logging currently enabled? </p>
      *
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatination)
      * when the log level is more than trace. </p>
      */
-    public boolean isTraceEnabled();
-
-
-    /**
+    boolean isTraceEnabled ();
+    /**
      * <p> Is warning logging currently enabled? </p>
      *
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatination)
      * when the log level is more than warning. </p>
      */
-    public boolean isWarnEnabled();
+    boolean isWarnEnabled ();
 
 
     // -------------------------------------------------------- Logging Methods
@@ -178,101 +163,78 @@ public interface Log {
      *
      * @param message log this message
      */
-    public void trace(Object message);
-
-
-    /**
+    void trace (Object message);
+    /**
      * <p> Log an error with trace log level. </p>
      *
      * @param message log this message
      * @param t log this cause
      */
-    public void trace(Object message, Throwable t);
-
-
-    /**
+    void trace (Object message, Throwable t);
+    /**
      * <p> Log a message with debug log level. </p>
      *
      * @param message log this message
      */
-    public void debug(Object message);
-
-
-    /**
+    void debug (Object message);
+    /**
      * <p> Log an error with debug log level. </p>
      *
      * @param message log this message
      * @param t log this cause
      */
-    public void debug(Object message, Throwable t);
-
-
-    /**
+    void debug (Object message, Throwable t);
+    /**
      * <p> Log a message with info log level. </p>
      *
      * @param message log this message
      */
-    public void info(Object message);
-
-
-    /**
+    void info (Object message);
+    /**
      * <p> Log an error with info log level. </p>
      *
      * @param message log this message
      * @param t log this cause
      */
-    public void info(Object message, Throwable t);
-
-
-    /**
+    void info (Object message, Throwable t);
+    /**
      * <p> Log a message with warn log level. </p>
      *
      * @param message log this message
      */
-    public void warn(Object message);
-
-
-    /**
+    void warn (Object message);
+    /**
      * <p> Log an error with warn log level. </p>
      *
      * @param message log this message
      * @param t log this cause
      */
-    public void warn(Object message, Throwable t);
-
-
-    /**
+    void warn (Object message, Throwable t);
+    /**
      * <p> Log a message with error log level. </p>
      *
      * @param message log this message
      */
-    public void error(Object message);
-
-
-    /**
+    void error (Object message);
+    /**
      * <p> Log an error with error log level. </p>
      *
      * @param message log this message
      * @param t log this cause
      */
-    public void error(Object message, Throwable t);
-
-
-    /**
+    void error (Object message, Throwable t);
+    /**
      * <p> Log a message with fatal log level. </p>
      *
      * @param message log this message
      */
-    public void fatal(Object message);
-
-
-    /**
+    void fatal (Object message);
+    /**
      * <p> Log an error with fatal log level. </p>
      *
      * @param message log this message
      * @param t log this cause
      */
-    public void fatal(Object message, Throwable t);
-
-
-}
+    void fatal (Object message, Throwable t);
+}
+

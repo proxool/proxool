@@ -9,9 +9,6 @@ import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -19,9 +16,9 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/08 00:56:03 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/08 14:27:52 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
  */
 public class StatsRoller {
@@ -135,6 +132,10 @@ public class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.6  2003/02/08 14:27:52  chr32
+ Style fixes.
+ Also tried to fix the dublicate linebreaks in the logging classes.
+
  Revision 1.5  2003/02/08 00:56:03  billhorsman
  merge changes from main source
 

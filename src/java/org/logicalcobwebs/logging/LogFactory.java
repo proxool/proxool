@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/LogFactory.java,v 1.1 2003/02/06 17:37:37 billhorsman Exp $
- * $Revision: 1.1 $
- * $Date: 2003/02/06 17:37:37 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/LogFactory.java,v 1.2 2003/02/08 14:27:50 chr32 Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/02/08 14:27:50 $
  *
  * ====================================================================
  *
@@ -58,27 +58,9 @@
  * <http://www.apache.org/>.
  *
  */
-
-package org.logicalcobwebs.logging;
-
-
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogConfigurationException;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Properties;
-
-
-/**
+package org.logicalcobwebs.logging;
+import java.io.BufferedReader;import java.io.IOException;import java.io.InputStream;import java.io.InputStreamReader;import java.lang.reflect.InvocationTargetException;import java.lang.reflect.Method;import java.security.AccessController;import java.security.PrivilegedAction;import java.util.Enumeration;import java.util.Hashtable;import java.util.Properties;
+/**
  * <p>Factory for creating {@link org.logicalcobwebs.logging.Log} instances, with discovery and
  * configuration features similar to that employed by standard Java APIs
  * such as JAXP.</p>
@@ -89,13 +71,10 @@ import java.util.Properties;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.1 $ $Date: 2003/02/06 17:37:37 $
+ * @version $Revision: 1.2 $ $Date: 2003/02/08 14:27:50 $
  */
-
-public abstract class LogFactory {
-
-
-    // ----------------------------------------------------- Manifest Constants
+public abstract class LogFactory {
+    // ----------------------------------------------------- Manifest Constants
 
 
     /**
@@ -103,29 +82,24 @@ public abstract class LogFactory {
      * class name.
      */
     public static final String FACTORY_PROPERTY =
-        "org.logicalcobwebs.logging.LogFactory";
-
-
-    /**
+            "org.logicalcobwebs.logging.LogFactory";
+    /**
      * The fully qualified class name of the fallback <code>LogFactory</code>
      * implementation class to use, if no other can be found.
      */
     public static final String FACTORY_DEFAULT =
-        "org.logicalcobwebs.logging.impl.LogFactoryImpl";
-
-
-    /**
+            "org.logicalcobwebs.logging.impl.LogFactoryImpl";
+    /**
      * The name of the properties file to search for.
      */
     public static final String FACTORY_PROPERTIES =
-        "commons-logging.properties";
-
-    /**
-     * JDK1.3+ 'Service Provider' specification 
-     * ( http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html )
+            "commons-logging.properties";
+    /**
+     * JDK1.3+ 'Service Provider' specification
+     * (http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html)
      */
     protected static final String SERVICE_ID =
-        "META-INF/services/org.logicalcobwebs.logging.LogFactory";
+            "META-INF/services/org.logicalcobwebs.logging.LogFactory";
 
 
     // ----------------------------------------------------------- Constructors
@@ -134,7 +108,7 @@ public abstract class LogFactory {
     /**
      * Protected constructor that is not available for public use.
      */
-    protected LogFactory() { }
+    protected LogFactory () {    }
 
 
     // --------------------------------------------------------- Public Methods
@@ -146,18 +120,14 @@ public abstract class LogFactory {
      *
      * @param name Name of the attribute to return
      */
-    public abstract Object getAttribute(String name);
-
-
-    /**
+    public abstract Object getAttribute (String name);
+    /**
      * Return an array containing the names of all currently defined
      * configuration attributes.  If there are no such attributes, a zero
      * length array is returned.
      */
-    public abstract String[] getAttributeNames();
-
-
-    /**
+    public abstract String[] getAttributeNames ();
+    /**
      * Convenience method to derive a name from the specified class and
      * call <code>getInstance(String)</code> with it.
      *
@@ -166,11 +136,9 @@ public abstract class LogFactory {
      * @exception org.logicalcobwebs.logging.LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
      */
-    public abstract Log getInstance(Class clazz)
-        throws LogConfigurationException;
-
-
-    /**
+    public abstract Log getInstance (Class clazz)
+            throws LogConfigurationException;
+    /**
      * <p>Construct (if necessary) and return a <code>Log</code> instance,
      * using the factory's current set of configuration attributes.</p>
      *
@@ -187,30 +155,24 @@ public abstract class LogFactory {
      * @exception org.logicalcobwebs.logging.LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
      */
-    public abstract Log getInstance(String name)
-        throws LogConfigurationException;
-
-
-    /**
+    public abstract Log getInstance (String name)
+            throws LogConfigurationException;
+    /**
      * Release any internal references to previously created {@link org.logicalcobwebs.logging.Log}
      * instances returned by this factory.  This is useful environments
      * like servlet containers, which implement application reloading by
      * throwing away a ClassLoader.  Dangling references to objects in that
      * class loader would prevent garbage collection.
      */
-    public abstract void release();
-
-
-    /**
+    public abstract void release ();
+    /**
      * Remove any configuration attribute associated with the specified name.
      * If there is no such attribute, no action is taken.
      *
      * @param name Name of the attribute to remove
      */
-    public abstract void removeAttribute(String name);
-
-
-    /**
+    public abstract void removeAttribute (String name);
+    /**
      * Set the configuration attribute with the specified name.  Calling
      * this with a <code>null</code> value is equivalent to calling
      * <code>removeAttribute(name)</code>.
@@ -219,7 +181,7 @@ public abstract class LogFactory {
      * @param value Value of the attribute to set, or <code>null</code>
      *  to remove any setting for this attribute
      */
-    public abstract void setAttribute(String name, Object value);
+    public abstract void setAttribute (String name, Object value);
 
 
     // ------------------------------------------------------- Static Variables
@@ -229,7 +191,7 @@ public abstract class LogFactory {
      * The previously constructed <code>LogFactory</code> instances, keyed by
      * the <code>ClassLoader</code> with which it was created.
      */
-    protected static Hashtable factories = new Hashtable();
+    private static Hashtable factories = new Hashtable ();
 
 
     // --------------------------------------------------------- Static Methods
@@ -259,27 +221,25 @@ public abstract class LogFactory {
      * @exception org.logicalcobwebs.logging.LogConfigurationException if the implementation class is not
      *  available or cannot be instantiated.
      */
-    public static LogFactory getFactory() throws LogConfigurationException {
-
-        // Identify the class loader we will be using
+    public static LogFactory getFactory () throws LogConfigurationException {
+        // Identify the class loader we will be using
         ClassLoader contextClassLoader =
-            (ClassLoader)AccessController.doPrivileged(
-                new PrivilegedAction() {
-                    public Object run() {
-                        return getContextClassLoader();
-                    }
-                });
+                (ClassLoader) AccessController.doPrivileged (
+                        new PrivilegedAction () {
+                            public Object run () {
+                                return getContextClassLoader ();
+                            }
+                        });
 
         // Return any previously registered factory for this class loader
-        LogFactory factory = getCachedFactory(contextClassLoader);
-        if (factory != null)
-            return factory;
+        LogFactory factory = getCachedFactory (contextClassLoader);
+        if (factory != null) {            return factory;        }
 
-        // First, try the system property
+        // First, try the system property
         try {
-            String factoryClass = System.getProperty(FACTORY_PROPERTY);
+            String factoryClass = System.getProperty (FACTORY_PROPERTY);
             if (factoryClass != null) {
-                factory = newFactory(factoryClass, contextClassLoader);
+                factory = newFactory (factoryClass, contextClassLoader);
             }
         } catch (SecurityException e) {
             ;  // ignore
@@ -287,98 +247,82 @@ public abstract class LogFactory {
 
         // Second, try to find a service by using the JDK1.3 jar
         // discovery mechanism. This will allow users to plug a logger
-        // by just placing it in the lib/ directory of the webapp ( or in
-        // CLASSPATH or equivalent ). This is similar with the second
+        // by just placing it in the lib/ directory of the webapp (or in
+        // CLASSPATH or equivalent). This is similar with the second
         // step, except that it uses the (standard?) jdk1.3 location in the jar.
 
         if (factory == null) {
             try {
                 InputStream is = (contextClassLoader == null
-                                  ? ClassLoader.getSystemResourceAsStream( SERVICE_ID )
-                                  : contextClassLoader.getResourceAsStream( SERVICE_ID ));
-
-                if( is != null ) {
+                        ? ClassLoader.getSystemResourceAsStream (SERVICE_ID)
+                        : contextClassLoader.getResourceAsStream (SERVICE_ID));
+                if (is != null) {
                     // This code is needed by EBCDIC and other strange systems.
                     // It's a fix for bugs reported in xerces
                     BufferedReader rd;
                     try {
-                        rd = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                        rd = new BufferedReader (new InputStreamReader (is, "UTF-8"));
                     } catch (java.io.UnsupportedEncodingException e) {
-                        rd = new BufferedReader(new InputStreamReader(is));
+                        rd = new BufferedReader (new InputStreamReader (is));
                     }
-                    
-                    String factoryClassName = rd.readLine();
-                    rd.close();
-                    
-                    if (factoryClassName != null &&
-                        ! "".equals(factoryClassName)) {
-                        
-                        factory= newFactory( factoryClassName, contextClassLoader );
-                    }
+                    String factoryClassName = rd.readLine ();
+                    rd.close ();
+                    if (factoryClassName != null && !"".equals (factoryClassName)) {                        factory = newFactory (factoryClassName, contextClassLoader);                    }
                 }
-            } catch( Exception ex ) {
+            } catch (Exception ex) {
                 ;
             }
         }
+        Properties props = null;
 
-
-        Properties props=null;
-        
-        // Third try a properties file. 
+        // Third try a properties file.
         // If the properties file exists, it'll be read and the properties
-        // used. IMHO ( costin ) System property and JDK1.3 jar service
+        // used. IMHO (costin) System property and JDK1.3 jar service
         // should be enough for detecting the class name. The properties
-        // should be used to set the attributes ( which may be specific to
+        // should be used to set the attributes (which may be specific to
         // the webapp, even if a default logger is set at JVM level by a
-        // system property )
+        // system property)
 
         try {
             InputStream stream = (contextClassLoader == null
-                                 ? ClassLoader.getSystemResourceAsStream( FACTORY_PROPERTIES )
-                                 : contextClassLoader.getResourceAsStream( FACTORY_PROPERTIES ));
+                    ? ClassLoader.getSystemResourceAsStream (FACTORY_PROPERTIES)
+                    : contextClassLoader.getResourceAsStream (FACTORY_PROPERTIES));
             if (stream != null) {
-                props = new Properties();
-                props.load(stream);
-                stream.close();
-                String factoryClass = props.getProperty(FACTORY_PROPERTY);
-                if( factory==null ) {
+                props = new Properties ();
+                props.load (stream);
+                stream.close ();
+                String factoryClass = props.getProperty (FACTORY_PROPERTY);
+                if (factory == null) {
                     if (factoryClass == null) {
                         factoryClass = FACTORY_DEFAULT;
                     }
-                    factory = newFactory(factoryClass, contextClassLoader);
+                    factory = newFactory (factoryClass, contextClassLoader);
                 }
             }
             // the properties will be set at the end.
-        } catch (IOException e) {
-        } catch (SecurityException e) {
-        }
+        } catch (IOException e) {            // oh well        } catch (SecurityException e) {            // oh well        }
 
         // Fourth, try the fallback implementation class
         if (factory == null) {
-            factory = newFactory(FACTORY_DEFAULT, LogFactory.class.getClassLoader());
+            factory = newFactory (FACTORY_DEFAULT, LogFactory.class.getClassLoader ());
         }
-        
-        if (factory != null) {
+        if (factory != null) {
             /**
              * Always cache using context class loader..
              */
-            cacheFactory(contextClassLoader, factory);
+            cacheFactory (contextClassLoader, factory);
         }
-
-        if( props!=null ) {
-            Enumeration names = props.propertyNames();
-            while (names.hasMoreElements()) {
-                String name = (String) names.nextElement();
-                String value = props.getProperty(name);
-                factory.setAttribute(name, value);
+        if (props != null) {
+            Enumeration names = props.propertyNames ();
+            while (names.hasMoreElements ()) {
+                String name = (String) names.nextElement ();
+                String value = props.getProperty (name);
+                factory.setAttribute (name, value);
             }
         }
-        
-        return factory;
+        return factory;
     }
-
-
-    /**
+    /**
      * Convenience method to return a named logger, without the application
      * having to care about factories.
      *
@@ -387,15 +331,11 @@ public abstract class LogFactory {
      * @exception org.logicalcobwebs.logging.LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
      */
-    public static Log getLog(Class clazz)
-        throws LogConfigurationException {
-
-        return (getFactory().getInstance(clazz));
-
-    }
-
-
-    /**
+    public static Log getLog (Class clazz)
+            throws LogConfigurationException {
+        return (getFactory ().getInstance (clazz));
+    }
+    /**
      * Convenience method to return a named logger, without the application
      * having to care about factories.
      *
@@ -406,15 +346,11 @@ public abstract class LogFactory {
      * @exception org.logicalcobwebs.logging.LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
      */
-    public static Log getLog(String name)
-        throws LogConfigurationException {
-
-        return (getFactory().getInstance(name));
-
-    }
-
-
-    /**
+    public static Log getLog (String name)
+            throws LogConfigurationException {
+        return (getFactory ().getInstance (name));
+    }
+    /**
      * Release any internal references to previously created {@link org.logicalcobwebs.logging.LogFactory}
      * instances, after calling the instance method <code>release()</code> on
      * each of them.  This is useful environments like servlet containers,
@@ -422,18 +358,16 @@ public abstract class LogFactory {
      * Dangling references to objects in that class loader would prevent
      * garbage collection.
      */
-    public static void releaseAll() {
-
-        synchronized (factories) {
-            Enumeration elements = factories.elements();
-            while (elements.hasMoreElements()) {
-                LogFactory element = (LogFactory) elements.nextElement();
-                element.release();
+    public static void releaseAll () {
+        synchronized (factories) {
+            Enumeration elements = factories.elements ();
+            while (elements.hasMoreElements ()) {
+                LogFactory element = (LogFactory) elements.nextElement ();
+                element.release ();
             }
-            factories.clear();
+            factories.clear ();
         }
-
-    }
+    }
 
 
     // ------------------------------------------------------ Protected Methods
@@ -442,83 +376,72 @@ public abstract class LogFactory {
     /**
      * Return the thread context class loader if available.
      * Otherwise return null.
-     * 
+     *
      * The thread context class loader is available for JDK 1.2
      * or later, if certain security conditions are met.
      *
      * @exception org.logicalcobwebs.logging.LogConfigurationException if a suitable class loader
      * cannot be identified.
      */
-    protected static ClassLoader getContextClassLoader()
-        throws LogConfigurationException
-    {
+    protected static ClassLoader getContextClassLoader ()
+            throws LogConfigurationException {
         ClassLoader classLoader = null;
-
-        try {
+        try {
             // Are we running on a JDK 1.2 or later system?
-            Method method = Thread.class.getMethod("getContextClassLoader", null);
+            Method method = Thread.class.getMethod ("getContextClassLoader", null);
 
             // Get the thread context class loader (if there is one)
             try {
-                classLoader = (ClassLoader)method.invoke(Thread.currentThread(), null);
+                classLoader = (ClassLoader) method.invoke (Thread.currentThread (), null);
             } catch (IllegalAccessException e) {
                 throw new LogConfigurationException
-                    ("Unexpected IllegalAccessException", e);
+                        ("Unexpected IllegalAccessException", e);
             } catch (InvocationTargetException e) {
                 /**
                  * InvocationTargetException is thrown by 'invoke' when
                  * the method being invoked (getContextClassLoader) throws
                  * an exception.
-                 * 
+                 *
                  * getContextClassLoader() throws SecurityException when
                  * the context class loader isn't an ancestor of the
                  * calling class's class loader, or if security
                  * permissions are restricted.
-                 * 
+                 *
                  * In the first case (not related), we want to ignore and
                  * keep going.  We cannot help but also ignore the second
                  * with the logic below, but other calls elsewhere (to
                  * obtain a class loader) will trigger this exception where
                  * we can make a distinction.
                  */
-                if (e.getTargetException() instanceof SecurityException) {
+                if (e.getTargetException () instanceof SecurityException) {
                     ;  // ignore
                 } else {
                     // Capture 'e.getTargetException()' exception for details
                     // alternate: log 'e.getTargetException()', and pass back 'e'.
                     throw new LogConfigurationException
-                        ("Unexpected InvocationTargetException", e.getTargetException());
+                            ("Unexpected InvocationTargetException", e.getTargetException ());
                 }
             }
         } catch (NoSuchMethodException e) {
             // Assume we are running on JDK 1.1
-            classLoader = LogFactory.class.getClassLoader();
+            classLoader = LogFactory.class.getClassLoader ();
         }
 
         // Return the selected class loader
         return classLoader;
     }
-
-    /**
+    /**
      * Check cached factories (keyed by classLoader)
      */
-    private static LogFactory getCachedFactory(ClassLoader contextClassLoader)
-    {
+    private static LogFactory getCachedFactory (ClassLoader contextClassLoader) {
         LogFactory factory = null;
-        
-        if (contextClassLoader != null)
-            factory = (LogFactory) factories.get(contextClassLoader);
-        
+        if (contextClassLoader != null) {            factory = (LogFactory) factories.get (contextClassLoader);        }
         return factory;
     }
-    
-    private static void cacheFactory(ClassLoader classLoader, LogFactory factory)
-    {
-        if (classLoader != null && factory != null)
-            factories.put(classLoader, factory);
-    }
-
-    /**
+    private static void cacheFactory (ClassLoader classLoader, LogFactory factory) {
+        if (classLoader != null && factory != null) {            factories.put (classLoader, factory);        }
+    }
+    /**
      * Return a new instance of the specified <code>LogFactory</code>
      * implementation class, loaded by the specified class loader.
      * If that fails, try the class loader used to load this
@@ -531,35 +454,29 @@ public abstract class LogFactory {
      * @exception org.logicalcobwebs.logging.LogConfigurationException if a suitable instance
      *  cannot be created
      */
-    protected static LogFactory newFactory(String factoryClass,
-                                           ClassLoader classLoader)
-        throws LogConfigurationException
-    {
-        
-        try {
-            if (classLoader == null)
-                classLoader = LogFactory.class.getClassLoader();
-
+    protected static LogFactory newFactory (String factoryClass,
+                                            ClassLoader classLoader)
+            throws LogConfigurationException {
+        try {
+            if (classLoader == null) {                classLoader = LogFactory.class.getClassLoader ();            }
             Class clazz = null;
             try {
                 // first the thread class loader
-                clazz = classLoader.loadClass(factoryClass);
+                clazz = classLoader.loadClass (factoryClass);
             } catch (ClassNotFoundException ex) {
                 // if this failed (i.e. no implementation is
                 // found in the webapp), try the caller's loader
                 // if we haven't already...
-                if (classLoader != LogFactory.class.getClassLoader()) {
-                    classLoader = LogFactory.class.getClassLoader();
-                    clazz = classLoader.loadClass(factoryClass);
+                if (classLoader != LogFactory.class.getClassLoader ()) {
+                    classLoader = LogFactory.class.getClassLoader ();
+                    clazz = classLoader.loadClass (factoryClass);
                 }
             }
-            
-            LogFactory factory = (LogFactory)clazz.newInstance();
-            
-            return factory;
+            LogFactory factory = (LogFactory) clazz.newInstance ();
+            return factory;
         } catch (Exception e) {
-            throw new LogConfigurationException(e);
+            throw new LogConfigurationException (e);
         }
-
-    }
+    }
 }
+

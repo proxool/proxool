@@ -77,31 +77,29 @@ package org.logicalcobwebs.proxool.util;
  * will take priority over those trying to get a read lock.
  *
  * @author <a href="mailto:leo.sutic@inspireinfrastructure.com">Leo Sutic</a>
- * @version CVS $Revision: 1.1 $ $Date: 2003/02/07 01:46:31 $
+ * @version CVS $Revision: 1.2 $ $Date: 2003/02/08 14:27:52 $
  * @since 4.0
  */
-public class ReadWriteLock
-{
+public class ReadWriteLock {
     /**
      * The number of read locks currently held.
      */
-    private int m_numReadLocksHeld = 0;
+    private int numReadLocksHeld = 0;
 
     /**
      * The number of threads waiting for a write lock.
      */
-    private int m_numWaitingForWrite = 0;
+    private int numWaitingForWrite = 0;
 
     /**
      * Synchronization primitive.
      */
-    private Object m_lock = new Object ();
+    private Object lock = new Object ();
 
     /**
      * Default constructor.
      */
-    public ReadWriteLock ()
-    {
+    public ReadWriteLock () {
     }
 
     /**
@@ -111,16 +109,12 @@ public class ReadWriteLock
      * @throws InterruptedException if the thread is interrupted while waiting for
      *                              a lock.
      */
-    public void aquireRead ()
-        throws InterruptedException
-    {
-        synchronized ( m_lock )
-        {
-            while ( !(m_numReadLocksHeld != -1 && m_numWaitingForWrite == 0) )
-            {
-                m_lock.wait();
+    public void aquireRead () throws InterruptedException {
+        synchronized (lock) {
+            while (!(numReadLocksHeld != -1 && numWaitingForWrite == 0)) {
+                lock.wait ();
             }
-            m_numReadLocksHeld++;
+            numReadLocksHeld++;
         }
     }
 
@@ -131,23 +125,16 @@ public class ReadWriteLock
      * @throws InterruptedException if the thread is interrupted while waiting for
      *                              a lock.
      */
-    public void aquireWrite ()
-        throws InterruptedException
-    {
-        synchronized ( m_lock )
-        {
-            m_numWaitingForWrite++;
-            try
-            {
-                while ( m_numReadLocksHeld != 0 )
-                {
-                    m_lock.wait();
+    public void aquireWrite () throws InterruptedException {
+        synchronized (lock) {
+            numWaitingForWrite++;
+            try {
+                while (numReadLocksHeld != 0) {
+                    lock.wait ();
                 }
-                m_numReadLocksHeld = -1;
-            }
-            finally
-            {
-                m_numWaitingForWrite--;
+                numReadLocksHeld = -1;
+            } finally {
+                numWaitingForWrite--;
             }
         }
     }
@@ -158,25 +145,19 @@ public class ReadWriteLock
      * @throws IllegalStateException when an attempt is made to release
      *                               an unlocked lock.
      */
-    public void release ()
-    {
-        synchronized ( m_lock )
-        {
-            if ( m_numReadLocksHeld == 0 )
-            {
+    public void release () {
+        synchronized (lock) {
+            if (numReadLocksHeld == 0) {
                 throw new IllegalStateException ("Attempted to release an unlocked ReadWriteLock.");
             }
 
-            if ( m_numReadLocksHeld == -1 )
-            {
-                m_numReadLocksHeld = 0;
-            }
-            else
-            {
-                m_numReadLocksHeld--;
+            if (numReadLocksHeld == -1) {
+                numReadLocksHeld = 0;
+            } else {
+                numReadLocksHeld--;
             }
 
-            m_lock.notifyAll();
+            lock.notifyAll ();
         }
     }
 
@@ -185,17 +166,12 @@ public class ReadWriteLock
      *
      * @return <code>true</code> iff the lock was successfully obtained.
      */
-    public boolean tryAquireRead ()
-    {
-        synchronized ( m_lock )
-        {
-            if ( m_numReadLocksHeld != -1 && m_numWaitingForWrite == 0 )
-            {
-                m_numReadLocksHeld++;
+    public boolean tryAquireRead () {
+        synchronized (lock) {
+            if (numReadLocksHeld != -1 && numWaitingForWrite == 0) {
+                numReadLocksHeld++;
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -206,17 +182,12 @@ public class ReadWriteLock
      *
      * @return <code>true</code> iff the lock was successfully obtained.
      */
-    public boolean tryAquireWrite ()
-    {
-        synchronized ( m_lock )
-        {
-            if ( m_numReadLocksHeld == 0 )
-            {
-                m_numReadLocksHeld = -1;
+    public boolean tryAquireWrite () {
+        synchronized (lock) {
+            if (numReadLocksHeld == 0) {
+                numReadLocksHeld = -1;
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }

@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/LogConfigurationException.java,v 1.1 2003/02/06 17:37:37 billhorsman Exp $
- * $Revision: 1.1 $
- * $Date: 2003/02/06 17:37:37 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/LogConfigurationException.java,v 1.2 2003/02/08 14:27:50 chr32 Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/02/08 14:27:50 $
  *
  * ====================================================================
  *
@@ -58,85 +58,58 @@
  * <http://www.apache.org/>.
  *
  */
-
-package org.logicalcobwebs.logging;
-
-
-/**
+package org.logicalcobwebs.logging;
+/**
  * <p>An exception that is thrown only if a suitable <code>LogFactory</code>
  * or <code>Log</code> instance cannot be created by the corresponding
  * factory methods.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2003/02/06 17:37:37 $
+ * @version $Revision: 1.2 $ $Date: 2003/02/08 14:27:50 $
  */
-
-public class LogConfigurationException extends RuntimeException {
-
-
-    /**
+public class LogConfigurationException extends RuntimeException {
+    /**
      * Construct a new exception with <code>null</code> as its detail message.
      */
-    public LogConfigurationException() {
-
-        super();
-
-    }
-
-
-    /**
+    public LogConfigurationException () {
+        super ();
+    }
+    /**
      * Construct a new exception with the specified detail message.
      *
      * @param message The detail message
      */
-    public LogConfigurationException(String message) {
-
-        super(message);
-
-    }
-
-
-    /**
+    public LogConfigurationException (String message) {
+        super (message);
+    }
+    /**
      * Construct a new exception with the specified cause and a derived
      * detail message.
      *
      * @param cause The underlying cause
      */
-    public LogConfigurationException(Throwable cause) {
-
-        this((cause == null) ? null : cause.toString(), cause);
-
-    }
-
-
-    /**
+    public LogConfigurationException (Throwable cause) {
+        this ((cause == null) ? null : cause.toString (), cause);
+    }
+    /**
      * Construct a new exception with the specified detail message and cause.
      *
      * @param message The detail message
      * @param cause The underlying cause
      */
-    public LogConfigurationException(String message, Throwable cause) {
-
-        super(message);
+    public LogConfigurationException (String message, Throwable cause) {
+        super (message);
         this.cause = cause; // Two-argument version requires JDK 1.4 or later
-
-    }
-
-
-    /**
+    }
+    /**
      * The underlying cause of this exception.
      */
-    protected Throwable cause = null;
-
-
-    /**
+    private Throwable cause = null;
+    /**
      * Return the underlying cause of this exception (if any).
      */
-    public Throwable getCause() {
-
-        return (this.cause);
-
-    }
-
-
-}
+    public Throwable getCause () {
+        return (this.cause);
+    }
+}
+

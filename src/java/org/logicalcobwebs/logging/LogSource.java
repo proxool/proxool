@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/LogSource.java,v 1.1 2003/02/06 17:37:38 billhorsman Exp $
- * $Revision: 1.1 $
- * $Date: 2003/02/06 17:37:38 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/Attic/LogSource.java,v 1.2 2003/02/08 14:27:50 chr32 Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/02/08 14:27:50 $
  *
  * ====================================================================
  *
@@ -58,18 +58,10 @@
  * <http://www.apache.org/>.
  *
  */
-
-package org.logicalcobwebs.logging;
-
-
-import java.lang.reflect.Constructor;
-import java.util.Hashtable;
-
-import org.logicalcobwebs.logging.impl.NoOpLog;
-import org.logicalcobwebs.logging.Log;
-
-
-/**
+package org.logicalcobwebs.logging;
+import org.logicalcobwebs.logging.impl.NoOpLog;
+import java.lang.reflect.Constructor;import java.util.Hashtable;
+/**
  * <p>Factory for creating {@link org.logicalcobwebs.logging.Log} instances.  Applications should call
  * the <code>makeNewLogInstance()</code> method to instantiate new instances
  * of the configured {@link org.logicalcobwebs.logging.Log} implementation class.</p>
@@ -98,31 +90,26 @@ import org.logicalcobwebs.logging.Log;
  *  implementation performs exactly the same algorithm as this class did
  *
  * @author Rod Waldhoff
- * @version $Id: LogSource.java,v 1.1 2003/02/06 17:37:38 billhorsman Exp $
+ * @version $Id: LogSource.java,v 1.2 2003/02/08 14:27:50 chr32 Exp $
  */
 public class LogSource {
+    // ------------------------------------------------------- Class Attributes
 
-    // ------------------------------------------------------- Class Attributes
-
-    static protected Hashtable logs = new Hashtable();
-
-    /** Is log4j available (in the current classpath) */
-    static protected boolean log4jIsAvailable = false;
-
-    /** Is JD 1.4 logging available */
-    static protected boolean jdk14IsAvailable = false;
-
-    /** Constructor for current log class */
-    static protected Constructor logImplctor = null;
+    private static Hashtable logs = new Hashtable ();
+    /** Is log4j available (in the current classpath) */
+    private static boolean log4jIsAvailable = false;
+    /** Is JD 1.4 logging available */
+    private static boolean jdk14IsAvailable = false;
+    /** Constructor for current log class */
+    private static Constructor logImplctor = null;
 
 
     // ----------------------------------------------------- Class Initializers
 
     static {
-
-        // Is Log4J Available?
+        // Is Log4J Available?
         try {
-            if (null != Class.forName("org.apache.log4j.Category")) {
+            if (null != Class.forName ("org.apache.log4j.Category")) {
                 log4jIsAvailable = true;
             } else {
                 log4jIsAvailable = false;
@@ -133,8 +120,7 @@ public class LogSource {
 
         // Is JDK 1.4 Logging Available?
         try {
-            if ((null != Class.forName("java.util.logging.Logger")) &&
-                (null != Class.forName("org.logicalcobwebs.logging.impl.Jdk14Logger"))) {
+            if ((null != Class.forName ("java.util.logging.Logger"))                && (null != Class.forName ("org.logicalcobwebs.logging.impl.Jdk14Logger"))) {
                 jdk14IsAvailable = true;
             } else {
                 jdk14IsAvailable = false;
@@ -146,15 +132,14 @@ public class LogSource {
         // Set the default Log implementation
         String name = null;
         try {
-            name = System.getProperty("org.apache.commons.logging.log");
+            name = System.getProperty ("org.apache.commons.logging.log");
             if (name == null) {
-                name = System.getProperty("org.logicalcobwebs.logging.Log");
+                name = System.getProperty ("org.logicalcobwebs.logging.Log");
             }
-        } catch (Throwable t) {
-        }
+        } catch (Throwable t) {            // oh well        }
         if (name != null) {
             try {
-                setLogImplementation(name);
+                setLogImplementation (name);
             } catch (Throwable t) {
                 try {
                     setLogImplementation
@@ -184,15 +169,14 @@ public class LogSource {
                 }
             }
         }
-
-    }
+    }
 
 
     // ------------------------------------------------------------ Constructor
 
 
     /** Don't allow others to create instances */
-    private LogSource() {
+    private LogSource () {
     }
 
 
@@ -206,54 +190,45 @@ public class LogSource {
      * takes a single {@link java.lang.String} argument (containing the name
      * of the log).
      */
-    static public void setLogImplementation(String classname) throws
+    public static void setLogImplementation (String classname) throws
             LinkageError, ExceptionInInitializerError,
-            NoSuchMethodException, SecurityException,
-            ClassNotFoundException {
+            SecurityException {
         try {
-            Class logclass = Class.forName(classname);
+            Class logclass = Class.forName (classname);
             Class[] argtypes = new Class[1];
-            argtypes[0] = "".getClass();
-            logImplctor = logclass.getConstructor(argtypes);
+            argtypes[0] = "".getClass ();
+            logImplctor = logclass.getConstructor (argtypes);
         } catch (Throwable t) {
             logImplctor = null;
         }
     }
-
-
-    /**
+    /**
      * Set the log implementation/log implementation factory
      * by class.  The given class must implement {@link org.logicalcobwebs.logging.Log},
      * and provide a constructor that takes a single {@link java.lang.String}
      * argument (containing the name of the log).
      */
-    static public void setLogImplementation(Class logclass) throws
+    public static void setLogImplementation (Class logclass) throws
             LinkageError, ExceptionInInitializerError,
             NoSuchMethodException, SecurityException {
         Class[] argtypes = new Class[1];
-        argtypes[0] = "".getClass();
-        logImplctor = logclass.getConstructor(argtypes);
+        argtypes[0] = "".getClass ();
+        logImplctor = logclass.getConstructor (argtypes);
     }
-
-
-    /** Get a <code>Log</code> instance by class name */
-    static public Log getInstance(String name) {
-        Log log = (Log) (logs.get(name));
+    /** Get a <code>Log</code> instance by class name */
+    public static Log getInstance (String name) {
+        Log log = (Log) (logs.get (name));
         if (null == log) {
-            log = makeNewLogInstance(name);
-            logs.put(name, log);
+            log = makeNewLogInstance (name);
+            logs.put (name, log);
         }
         return log;
     }
-
-
-    /** Get a <code>Log</code> instance by class */
-    static public Log getInstance(Class clazz) {
-        return getInstance(clazz.getName());
+    /** Get a <code>Log</code> instance by class */
+    public static Log getInstance (Class clazz) {
+        return getInstance (clazz.getName ());
     }
-
-
-    /**
+    /**
      * Create a new {@link org.logicalcobwebs.logging.Log} implementation, based
      * on the given <i>name</i>.
      * <p>
@@ -277,31 +252,26 @@ public class LogSource {
      *
      * @param name the log name (or category)
      */
-    static public Log makeNewLogInstance(String name) {
-
-        Log log = null;
+    public static Log makeNewLogInstance (String name) {
+        Log log = null;
         try {
             Object[] args = new Object[1];
             args[0] = name;
-            log = (Log) (logImplctor.newInstance(args));
+            log = (Log) (logImplctor.newInstance (args));
         } catch (Throwable t) {
             log = null;
         }
         if (null == log) {
-            log = new NoOpLog(name);
+            log = new NoOpLog (name);
         }
         return log;
-
-    }
-
-
-    /**
+    }
+    /**
      * Returns a {@link java.lang.String} array containing the names of
      * all logs known to me.
      */
-    static public String[] getLogNames() {
-        return (String[]) (logs.keySet().toArray(new String[logs.size()]));
+    public static String[] getLogNames () {
+        return (String[]) (logs.keySet ().toArray (new String[logs.size ()]));
     }
-
-
-}
+}
+

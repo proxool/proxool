@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/NoOpLog.java,v 1.1 2003/02/06 17:37:39 billhorsman Exp $
- * $Revision: 1.1 $
- * $Date: 2003/02/06 17:37:39 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/NoOpLog.java,v 1.2 2003/02/08 14:27:51 chr32 Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/02/08 14:27:51 $
  *
  * ====================================================================
  *
@@ -58,93 +58,80 @@
  * <http://www.apache.org/>.
  *
  */
-
-
-package org.logicalcobwebs.logging.impl;
-
-
-import org.logicalcobwebs.logging.Log;
-
-
-/**
+package org.logicalcobwebs.logging.impl;
+import org.logicalcobwebs.logging.Log;
+/**
  * <p>Default implementation of Log that throws away all messages.  No
  * configurable system properties are supported.</p>
  *
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author Rod Waldhoff
- * @version $Id: NoOpLog.java,v 1.1 2003/02/06 17:37:39 billhorsman Exp $
+ * @version $Id: NoOpLog.java,v 1.2 2003/02/08 14:27:51 chr32 Exp $
  */
 public final class NoOpLog implements Log {
-
-    /** Convenience constructor */
-    public NoOpLog() { }
+    /** Convenience constructor */
+    public NoOpLog () {    }
     /** Base constructor */
-    public NoOpLog(String name) { }
+    public NoOpLog (String name) {    }
     /** Do nothing */
-    public void trace(Object message) { }
+    public void trace (Object message) {    }
     /** Do nothing */
-    public void trace(Object message, Throwable t) { }
+    public void trace (Object message, Throwable t) {    }
     /** Do nothing */
-    public void debug(Object message) { }
+    public void debug (Object message) {    }
     /** Do nothing */
-    public void debug(Object message, Throwable t) { }
+    public void debug (Object message, Throwable t) {    }
     /** Do nothing */
-    public void info(Object message) { }
+    public void info (Object message) {    }
     /** Do nothing */
-    public void info(Object message, Throwable t) { }
+    public void info (Object message, Throwable t) {    }
     /** Do nothing */
-    public void warn(Object message) { }
+    public void warn (Object message) {    }
     /** Do nothing */
-    public void warn(Object message, Throwable t) { }
+    public void warn (Object message, Throwable t) {    }
     /** Do nothing */
-    public void error(Object message) { }
+    public void error (Object message) {    }
     /** Do nothing */
-    public void error(Object message, Throwable t) { }
+    public void error (Object message, Throwable t) {    }
     /** Do nothing */
-    public void fatal(Object message) { }
+    public void fatal (Object message) {    }
     /** Do nothing */
-    public void fatal(Object message, Throwable t) { }
-
-    /**
+    public void fatal (Object message, Throwable t) {    }
+    /**
      * Debug is never enabled.
      *
      * @return false
      */
-    public final boolean isDebugEnabled() { return false; }
-
-    /**
+    public final boolean isDebugEnabled () {        return false;    }
+    /**
      * Error is never enabled.
      *
      * @return false
      */
-    public final boolean isErrorEnabled() { return false; }
-
-    /**
+    public final boolean isErrorEnabled () {        return false;    }
+    /**
      * Fatal is never enabled.
      *
      * @return false
      */
-    public final boolean isFatalEnabled() { return false; }
-
-    /**
+    public final boolean isFatalEnabled () {        return false;    }
+    /**
      * Info is never enabled.
      *
      * @return false
      */
-    public final boolean isInfoEnabled() { return false; }
-
-    /**
+    public final boolean isInfoEnabled () {        return false;    }
+    /**
      * Trace is never enabled.
      *
      * @return false
      */
-    public final boolean isTraceEnabled() { return false; }
-
-    /**
+    public final boolean isTraceEnabled () {        return false;    }
+    /**
      * Warning is never enabled.
      *
      * @return false
      */
-    public final boolean isWarnEnabled() { return false; }
-
-}
+    public final boolean isWarnEnabled () {        return false;    }
+}
+

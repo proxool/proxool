@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/LogKitLogger.java,v 1.1 2003/02/06 17:37:39 billhorsman Exp $
- * $Revision: 1.1 $
- * $Date: 2003/02/06 17:37:39 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/LogKitLogger.java,v 1.2 2003/02/08 14:27:51 chr32 Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/02/08 14:27:51 $
  *
  * ====================================================================
  *
@@ -58,15 +58,9 @@
  * <http://www.apache.org/>.
  *
  */
-
-
-package org.logicalcobwebs.logging.impl;
-
-import org.apache.log.Logger;
-import org.apache.log.Hierarchy;
-import org.logicalcobwebs.logging.Log;
-
-/**
+package org.logicalcobwebs.logging.impl;
+import org.apache.log.Hierarchy;import org.apache.log.Logger;import org.logicalcobwebs.logging.Log;
+/**
  * <p>Implementation of <code>org.logicalcobwebs.logging.Log</code>
  * that wraps the <a href="http://jakarta.apache.org/avalon/logkit/">jakarta-avalon-logkit</a>
  * logging system. Configuration of <code>LogKit</code> is left to the user.</p>
@@ -77,17 +71,14 @@ import org.logicalcobwebs.logging.Log;
  *
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author Robert Burrell Donkin                                 *
- * @version $Id: LogKitLogger.java,v 1.1 2003/02/06 17:37:39 billhorsman Exp $
+ * @version $Id: LogKitLogger.java,v 1.2 2003/02/08 14:27:51 chr32 Exp $
  */
-
-public final class LogKitLogger implements Log {
-
-
-    // ------------------------------------------------------------- Attributes
+public final class LogKitLogger implements Log {
+    // ------------------------------------------------------------- Attributes
 
 
     /** Logging goes to this <code>LogKit</code> logger */
-    protected Logger logger = null;
+    private Logger logger = null;
 
 
     // ------------------------------------------------------------ Constructor
@@ -99,8 +90,8 @@ public final class LogKitLogger implements Log {
      *
      * @param name log name
      */
-    public LogKitLogger(String name) {
-        logger = Hierarchy.getDefaultHierarchy().getLoggerFor(name);
+    public LogKitLogger (String name) {
+        logger = Hierarchy.getDefaultHierarchy ().getLoggerFor (name);
     }
 
 
@@ -110,165 +101,130 @@ public final class LogKitLogger implements Log {
     /**
      * Log message to <code>LogKit</code> logger with <code>DEBUG</code> priority.
      */
-    public void trace(Object message) {
-        debug(message);
+    public void trace (Object message) {
+        debug (message);
     }
-
-
-    /**
+    /**
      * Log error to <code>LogKit</code> logger with <code>DEBUG</code> priority.
      */
-    public void trace(Object message, Throwable t) {
-        debug(message, t);
+    public void trace (Object message, Throwable t) {
+        debug (message, t);
     }
-
-
-    /**
+    /**
      * Log message to <code>LogKit</code> logger with <code>DEBUG</code> priority.
      */
-    public void debug(Object message) {
+    public void debug (Object message) {
         if (message != null) {
-            logger.debug(String.valueOf(message));
+            logger.debug (String.valueOf (message));
         }
     }
-
-
-    /**
+    /**
      * Log error to <code>LogKit</code> logger with <code>DEBUG</code> priority.
      */
-    public void debug(Object message, Throwable t) {
+    public void debug (Object message, Throwable t) {
         if (message != null) {
-            logger.debug(String.valueOf(message), t);
+            logger.debug (String.valueOf (message), t);
         }
     }
-
-
-    /**
+    /**
      * Log message to <code>LogKit</code> logger with <code>INFO</code> priority.
      */
-    public void info(Object message) {
+    public void info (Object message) {
         if (message != null) {
-            logger.info(String.valueOf(message));
+            logger.info (String.valueOf (message));
         }
     }
-
-
-    /**
+    /**
      * Log error to <code>LogKit</code> logger with <code>INFO</code> priority.
      */
-    public void info(Object message, Throwable t) {
+    public void info (Object message, Throwable t) {
         if (message != null) {
-            logger.info(String.valueOf(message), t);
+            logger.info (String.valueOf (message), t);
         }
     }
-
-
-    /**
+    /**
      * Log message to <code>LogKit</code> logger with <code>WARN</code> priority.
      */
-    public void warn(Object message) {
+    public void warn (Object message) {
         if (message != null) {
-            logger.warn(String.valueOf(message));
+            logger.warn (String.valueOf (message));
         }
     }
-
-
-    /**
+    /**
      * Log error to <code>LogKit</code> logger with <code>WARN</code> priority.
      */
-    public void warn(Object message, Throwable t) {
+    public void warn (Object message, Throwable t) {
         if (message != null) {
-            logger.warn(String.valueOf(message), t);
+            logger.warn (String.valueOf (message), t);
         }
     }
-
-
-    /**
+    /**
      * Log message to <code>LogKit</code> logger with <code>ERROR</code> priority.
      */
-    public void error(Object message) {
+    public void error (Object message) {
         if (message != null) {
-            logger.error(String.valueOf(message));
+            logger.error (String.valueOf (message));
         }
     }
-
-
-    /**
+    /**
      * Log error to <code>LogKit</code> logger with <code>ERROR</code> priority.
      */
-    public void error(Object message, Throwable t) {
+    public void error (Object message, Throwable t) {
         if (message != null) {
-            logger.error(String.valueOf(message), t);
+            logger.error (String.valueOf (message), t);
         }
     }
-
-
-    /**
+    /**
      * Log message to <code>LogKit</code> logger with <code>FATAL_ERROR</code> priority.
      */
-    public void fatal(Object message) {
+    public void fatal (Object message) {
         if (message != null) {
-            logger.fatalError(String.valueOf(message));
+            logger.fatalError (String.valueOf (message));
         }
     }
-
-
-    /**
+    /**
      * Log error to <code>LogKit</code> logger with <code>FATAL_ERROR</code> priority.
      */
-    public void fatal(Object message, Throwable t) {
+    public void fatal (Object message, Throwable t) {
         if (message != null) {
-            logger.fatalError(String.valueOf(message), t);
+            logger.fatalError (String.valueOf (message), t);
         }
     }
-
-
-    /**
+    /**
      * Check whether the <code>LogKit</code> logger will log messages of priority <code>DEBUG</code>.
      */
-    public boolean isDebugEnabled() {
-        return logger.isDebugEnabled();
+    public boolean isDebugEnabled () {
+        return logger.isDebugEnabled ();
     }
-
-
-    /**
+    /**
      * Check whether the <code>LogKit</code> logger will log messages of priority <code>ERROR</code>.
      */
-    public boolean isErrorEnabled() {
-        return logger.isErrorEnabled();
+    public boolean isErrorEnabled () {
+        return logger.isErrorEnabled ();
     }
-
-
-    /**
+    /**
      * Check whether the <code>LogKit</code> logger will log messages of priority <code>FATAL_ERROR</code>.
      */
-    public boolean isFatalEnabled() {
-        return logger.isFatalErrorEnabled();
+    public boolean isFatalEnabled () {
+        return logger.isFatalErrorEnabled ();
     }
-
-
-    /**
+    /**
      * Check whether the <code>LogKit</code> logger will log messages of priority <code>INFO</code>.
      */
-    public boolean isInfoEnabled() {
-        return logger.isInfoEnabled();
+    public boolean isInfoEnabled () {
+        return logger.isInfoEnabled ();
     }
-
-
-    /**
+    /**
      * Check whether the <code>LogKit</code> logger will log messages of priority <code>DEBUG</code>.
      */
-    public boolean isTraceEnabled() {
-        return logger.isDebugEnabled();
+    public boolean isTraceEnabled () {
+        return logger.isDebugEnabled ();
     }
-
-
-    /**
+    /**
      * Check whether the <code>LogKit</code> logger will log messages of priority <code>WARN</code>.
      */
-    public boolean isWarnEnabled() {
-        return logger.isWarnEnabled();
+    public boolean isWarnEnabled () {
+        return logger.isWarnEnabled ();
     }
-
-
-}
+}
+
