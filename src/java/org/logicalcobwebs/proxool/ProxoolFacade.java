@@ -7,8 +7,8 @@ package org.logicalcobwebs.proxool;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.proxool.stats.StatisticsIF;
-import org.logicalcobwebs.proxool.stats.SnapshotIF;
+import org.logicalcobwebs.proxool.monitor.StatisticsIF;
+import org.logicalcobwebs.proxool.monitor.SnapshotIF;
 
 import java.sql.Statement;
 import java.util.Collection;
@@ -17,6 +17,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Comparator;
+import java.util.Date;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -27,7 +31,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.36 $, $Date: 2003/01/31 00:18:27 $
+ * @version $Revision: 1.37 $, $Date: 2003/01/31 11:50:39 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -624,7 +628,7 @@ public class ProxoolFacade {
      * @throws ProxoolException if we couldn't find the pool
      */
     public static StatisticsIF getStatistics(String alias, String token) throws ProxoolException {
-        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getStats().getStatistics(token);
+        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor().getStatistics(token);
     }
 
     /**
@@ -634,7 +638,7 @@ public class ProxoolFacade {
      * @throws ProxoolException if we couldn't find the pool
      */
     public static StatisticsIF[] getStatistics(String alias) throws ProxoolException {
-        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getStats().getStatistics();
+        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor().getStatistics();
     }
 
     /**
@@ -643,15 +647,58 @@ public class ProxoolFacade {
      * @return the current status of the pool
      * @throws ProxoolException if we couldn't find the pool
      */
-    public static SnapshotIF getSnapshot(String alias) throws ProxoolException {
+    public static SnapshotIF getSnapshot(String alias, boolean detail) throws ProxoolException {
+        SnapshotIF snapshot = null;
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
-        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getStats().getSnapshot(cp, cp.getDefinition());
+
+        Set connectionInfos = null;
+        if (detail) {
+            connectionInfos = new TreeSet(new Comparator() {
+                        public int compare(Object o1, Object o2) {
+                            try {
+                                Date birth1 = ((ConnectionInfoIF)o1).getBirthDate();;
+                                Date birth2 = ((ConnectionInfoIF)o2).getBirthDate();;
+                                return birth1.compareTo(birth2);
+                            } catch (ClassCastException e) {
+                                LOG.error("Unexpected contents of connectionInfos Set: " + o1.getClass() + " and " + o2.getClass(), e);
+                                return String.valueOf(o1.hashCode()).compareTo(String.valueOf(o2.hashCode()));
+                            }
+                        }
+                    });
+            cp.lock();
+
+            Iterator i = getConnectionInfos(alias).iterator();
+            while (i.hasNext()) {
+                ConnectionInfoIF connectionInfo = (ConnectionInfoIF) i.next();
+                ConnectionInfo ci = new ConnectionInfo();
+                ci.setAge(connectionInfo.getAge());
+                ci.setBirthDate(connectionInfo.getBirthDate());
+                ci.setId(connectionInfo.getId());
+                ci.setMark(connectionInfo.getMark());
+                ci.setRequester(connectionInfo.getRequester());
+                ci.setStatus(connectionInfo.getStatus());
+                ci.setTimeLastStartActive(connectionInfo.getTimeLastStartActive());
+                ci.setTimeLastStopActive(connectionInfo.getTimeLastStopActive());
+                connectionInfos.add(ci);
+            }
+        }
+
+        snapshot = ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor().getSnapshot(cp, cp.getDefinition(), connectionInfos);
+
+        if (detail) {
+            cp.unlock();
+        }
+
+        return snapshot;
     }
 }
 
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.37  2003/01/31 11:50:39  billhorsman
+ changes for snapshot improvements
+
  Revision 1.36  2003/01/31 00:18:27  billhorsman
  statistics is now a string to allow multiple,
  comma-delimited values (plus allow access to all
