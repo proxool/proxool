@@ -14,7 +14,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.5 $, $Date: 2002/10/27 13:29:38 $
+ * @version $Revision: 1.6 $, $Date: 2002/11/09 15:55:42 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -80,7 +80,7 @@ public class ProxoolDriver implements Driver {
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
             throws SQLException {
 
-        DriverPropertyInfo[] dpi = new DriverPropertyInfo[12];
+        DriverPropertyInfo[] dpi = new DriverPropertyInfo[13];
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(url);
 
         if (cp != null) {
@@ -133,7 +133,10 @@ public class ProxoolDriver implements Driver {
             dpi[10] = new DriverPropertyInfo(ProxoolConstants.VERBOSE_PROPERTY,
                     "Either false (quiet) or true (loud). Default is false.");
 
-            dpi[11] = new DriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY,
+            dpi[11] = new DriverPropertyInfo(ProxoolConstants.VERBOSE_PROPERTY,
+                    "If true then every execution will be logged. Default is false.");
+
+            dpi[12] = new DriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY,
                     "All SQLExceptions are caught and tested for containing this text fragment. If it matches than this connection is considered useless "
                     + "and it is discarded. Regardless of what happens the exception is alway thrown again.");
 
@@ -178,6 +181,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.6  2002/11/09 15:55:42  billhorsman
+ added propertyInfo for verbose
+
  Revision 1.5  2002/10/27 13:29:38  billhorsman
  deprecated debug-level in favour of verbose
 
