@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.26 $, $Date: 2003/10/19 13:31:57 $
+ * @version $Revision: 1.27 $, $Date: 2003/10/20 11:40:53 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -222,12 +222,6 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             while (i.hasNext()) {
                 String key = (String) i.next();
                 String value = info.getProperty(key);
-                // This allows us to set properties to a null, even though Properties
-                // object doesn't allow null values. It means that you can't set a property
-                // to be a zero length string but that's ok.
-                if (value != null && value.length() == 0) {
-                    value = null;
-                }
                 changed = changed | setAnyProperty(key, value, pretend);
                 if (!pretend) {
                     completeInfo.setProperty(key, value);
@@ -359,28 +353,28 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             if (isChanged(fatalSqlExceptionsAsString, value)) {
                 changed = true;
                 if (!pretend) {
-                    setFatalSqlExceptionsAsString(value);
+                    setFatalSqlExceptionsAsString(value.length() > 0 ? value : null);
                 }
             }
         } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY)) {
             if (isChanged(fatalSqlExceptionWrapper, value)) {
                 changed = true;
                 if (!pretend) {
-                    setFatalSqlExceptionWrapper(value);
+                    setFatalSqlExceptionWrapper(value.length() > 0 ? value : null);
                 }
             }
         } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
             if (isChanged(getStatistics(), value)) {
                 changed = true;
                 if (!pretend) {
-                    setStatistics(value);
+                    setStatistics(value.length() > 0 ? value : null);
                 }
             }
         } else if (key.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY)) {
             if (isChanged(getStatisticsLogLevel(), value)) {
                 changed = true;
                 if (!pretend) {
-                    setStatisticsLogLevel(value);
+                    setStatisticsLogLevel(value.length() > 0 ? value : null);
                 }
             }
         } else if (setJndiProperty(key, value, pretend)) {
@@ -462,7 +456,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             if (isChanged(getHouseKeepingTestSql(), value)) {
                 changed = true;
                 if (!pretend) {
-                    setHouseKeepingTestSql(value);
+                    setHouseKeepingTestSql(value.length() > 0 ? value : null);
                 }
             }
         } else if (key.equals(ProxoolConstants.TEST_BEFORE_USE_PROPERTY)) {
@@ -495,42 +489,42 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             if (isChanged(getJndiName(), value)) {
                 changed = true;
                 if (!pretend) {
-                    setJndiName(value);
+                    setJndiName(value.length() > 0 ? value : null);
                 }
             }
         } else if (key.equals(ProxoolConstants.INITIAL_CONTEXT_FACTORY_PROPERTY)) {
             if (isChanged(getInitialContextFactory(), value)) {
                 changed = true;
                 if (!pretend) {
-                    setInitialContextFactory(value);
+                    setInitialContextFactory(value.length() > 0 ? value : null);
                 }
             }
         } else if (key.equals(ProxoolConstants.PROVIDER_URL_PROPERTY)) {
             if (isChanged(getProviderUrl(), value)) {
                 changed = true;
                 if (!pretend) {
-                    setProviderUrl(value);
+                    setProviderUrl(value.length() > 0 ? value : null);
                 }
             }
         } else if (key.equals(ProxoolConstants.SECURITY_AUTHENTICATION)) {
             if (isChanged(getSecurityAuthentication(), value)) {
                 changed = true;
                 if (!pretend) {
-                    setSecurityAuthentication(value);
+                    setSecurityAuthentication(value.length() > 0 ? value : null);
                 }
             }
         } else if (key.equals(ProxoolConstants.SECURITY_PRINCIPAL_PROPERTY)) {
             if (isChanged(getSecurityPrincipal(), value)) {
                 changed = true;
                 if (!pretend) {
-                    setSecurityPrincipal(value);
+                    setSecurityPrincipal(value.length() > 0 ? value : null);
                 }
             }
         } else if (key.equals(ProxoolConstants.SECURITY_CREDENTIALS_PROPERTY)) {
             if (isChanged(getSecurityCredentials(), value)) {
                 changed = true;
                 if (!pretend) {
-                    setSecurityCredentials(value);
+                    setSecurityCredentials(value.length() > 0 ? value : null);
                 }
             }
         } else {
@@ -1134,6 +1128,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.27  2003/10/20 11:40:53  billhorsman
+ Smarter handling of null and empty strings. No NPE during unit tests now.
+
  Revision 1.26  2003/10/19 13:31:57  billhorsman
  Setting a property to a zero length String actually sets it to a null
 
