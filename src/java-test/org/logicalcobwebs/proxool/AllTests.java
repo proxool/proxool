@@ -13,7 +13,7 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.12 $, $Date: 2003/02/18 16:51:19 $
+ * @version $Revision: 1.13 $, $Date: 2003/02/19 13:47:32 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
@@ -31,6 +31,7 @@ public class AllTests {
         suite.addTestSuite(GeneralTests.class);
         suite.addTestSuite(ConnectionResetterTest.class);
         suite.addTestSuite(ConnectionListenerTest.class);
+        suite.addTestSuite(ConfigurationListenerTest.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -47,6 +48,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.13  2003/02/19 13:47:32  chr32
+ Added configuration listener test.
+
  Revision 1.12  2003/02/18 16:51:19  chr32
  Added tests for ConnectionListeners.
 
