@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Test the prototyper in ConnectionPool
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/05 18:45:17 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/06 10:11:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -64,7 +64,7 @@ public class PrototyperTest extends AbstractProxoolTest {
                         && s.getAvailableConnectionCount() == 2);
             }
         };
-        srm.getResult();
+        assertEquals("Timeout", ResultMonitor.SUCCESS, srm.getResult());
         assertEquals("activeConnectionCount", 0, srm.getSnapshot().getActiveConnectionCount());
         assertEquals("availableConnectionCount", 2, srm.getSnapshot().getAvailableConnectionCount());
 
@@ -77,7 +77,7 @@ public class PrototyperTest extends AbstractProxoolTest {
                         && s.getAvailableConnectionCount() == 2);
             }
         };
-        srm.getResult();
+        assertEquals("Timeout", ResultMonitor.SUCCESS, srm.getResult());
         assertEquals("activeConnectionCount", 1, srm.getSnapshot().getActiveConnectionCount());
         assertEquals("availableConnectionCount", 2, srm.getSnapshot().getAvailableConnectionCount());
 
@@ -135,6 +135,9 @@ public class PrototyperTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: PrototyperTest.java,v $
+ Revision 1.8  2003/03/06 10:11:24  billhorsman
+ trap timeouts better
+
  Revision 1.7  2003/03/05 18:45:17  billhorsman
  better threading
 
