@@ -15,11 +15,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.19 $, $Date: 2002/12/17 17:15:39 $
+ * @version $Revision: 1.20 $, $Date: 2002/12/19 00:08:36 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -44,6 +47,8 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
     private ConnectionPool connectionPool;
 
     private String requester;
+
+    private Set openStatements = new HashSet();
 
     private DecimalFormat idFormat = new DecimalFormat("0000");
 
@@ -104,7 +109,12 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
                 if (argCount > 0 && args[0] instanceof String) {
                     sqlStatement = (String) args[0];
                 }
+
+                // We keep a track of all open statements
+                openStatements.add(result);
+
                 result = ProxyFactory.createProxyStatement((Statement) result, connectionPool, this, sqlStatement);
+
             }
 
         } catch (InvocationTargetException e) {
@@ -116,6 +126,14 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
         }
 
         return result;
+    }
+
+    protected void registerClosedStatement(Statement statement) {
+        if (openStatements.contains(statement)) {
+            openStatements.remove(statement);
+        } else {
+            connectionPool.getLog().warn(connectionPool.displayStatistics() + " - #" + getId() + " registered a statement as closed which wasn't known to be open.");
+        }
     }
 
     /**
@@ -153,6 +171,18 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
      */
     public void close() throws SQLException {
         try {
+
+            // Close any open statements, as specified in JDBC
+            Iterator i = openStatements.iterator();
+            while (i.hasNext()) {
+                Statement statement = (Statement) i.next();
+                statement.close();
+                if (connectionPool.getLog().isDebugEnabled()) {
+                    connectionPool.getLog().debug("Closing statement automatically");
+                }
+            }
+            openStatements.clear();
+
             if (needToReset) {
                 // This call should be as quick as possible. Should we consider only
                 // calling it if values have changed? The trouble with that is that it
@@ -388,6 +418,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.20  2002/12/19 00:08:36  billhorsman
+ automatic closure of statements when a connection is closed
+
  Revision 1.19  2002/12/17 17:15:39  billhorsman
  Better synchronization of status stuff
 

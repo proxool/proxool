@@ -28,7 +28,7 @@ import java.util.TreeMap;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.11 $, $Date: 2002/12/16 10:57:48 $
+ * @version $Revision: 1.12 $, $Date: 2002/12/19 00:08:36 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -47,6 +47,8 @@ class ProxyStatement implements InvocationHandler {
     private static final String EXECUTE_FRAGMENT = "execute";
 
     private static final String EQUALS_METHOD = "equals";
+
+    private static final String CLOSE_METHOD = "close";
 
     private Map parameters;
 
@@ -90,6 +92,9 @@ class ProxyStatement implements InvocationHandler {
         try {
             if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = new Boolean(statement.hashCode() == args[0].hashCode());
+            } else if (method.getName().equals(CLOSE_METHOD) && argCount == 0) {
+                statement.close();
+                proxyConnection.registerClosedStatement(statement);
             } else {
                 result = method.invoke(statement, args);
             }
@@ -213,6 +218,9 @@ class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.12  2002/12/19 00:08:36  billhorsman
+ automatic closure of statements when a connection is closed
+
  Revision 1.11  2002/12/16 10:57:48  billhorsman
  add getDelegateStatement to allow access to the
  delegate JDBC driver's Statement

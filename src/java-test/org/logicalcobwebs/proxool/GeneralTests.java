@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.26 $, $Date: 2002/12/16 17:15:29 $
+ * @version $Revision: 1.27 $, $Date: 2002/12/19 00:08:36 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -82,15 +82,50 @@ public class GeneralTests extends TestCase {
 
     }
 
-    private void templateTest() {
+    /**
+     * Tests whether a statement gets closed automatically by the
+     * Connection. I can't think of a way of asserting this but you should
+     * see a line in the log saying it was closed.
+     */
+    public void testCloseStatement() {
 
-        String testName = "template";
+        String testName = "closeStatement";
         ProxoolAdapter adapter = null;
         try {
             String alias = testName;
             Properties info = TestHelper.buildProperties();
             adapter = new ProxoolAdapter(alias);
             adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            Connection c = adapter.getConnection();
+            Statement s = c.createStatement();
+            try {
+                s.execute("drop table foo");
+            } catch (SQLException e) {
+                // Expected exception (foo doesn't exist)
+                LOG.debug("Excepted exception", e);
+            } finally {
+                // this should trigger an automatic close of the statement
+                c.close();
+            }
+
+            Connection c2 = adapter.getConnection();
+            Statement s2 = c.createStatement();
+            try {
+                s2.execute("drop table foo");
+            } catch (SQLException e) {
+                // Expected exception (foo doesn't exist)
+                LOG.debug("Excepted exception", e);
+            } finally {
+                if (s2 != null) {
+                    s2.close();
+                }
+                // this should NOT trigger an automatic close of the statement
+                c.close();
+            }
+
+            // this should trigger an automatic close of the statement
+            c.close();
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -411,6 +446,8 @@ public class GeneralTests extends TestCase {
             assertEquals("activeConnectionCount", 4, cps.getActiveConnectionCount());
             assertEquals("availableConnectionCount", 1, cps.getAvailableConnectionCount());
 
+            Thread.sleep(10000);
+
             // Clean up
             for (int i = 0; i < connections.length; i++) {
                 if (connections[i] != null && !connections[i].isClosed()) {
@@ -518,6 +555,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.27  2002/12/19 00:08:36  billhorsman
+ automatic closure of statements when a connection is closed
+
  Revision 1.26  2002/12/16 17:15:29  billhorsman
  fixes
 
