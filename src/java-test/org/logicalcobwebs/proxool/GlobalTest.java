@@ -14,7 +14,7 @@ import junit.extensions.TestSetup;
 
 /**
  * TODO
- * @version $Revision: 1.1 $, $Date: 2002/12/16 17:05:25 $
+ * @version $Revision: 1.2 $, $Date: 2002/12/16 17:15:12 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since TODO
@@ -49,9 +49,9 @@ public class GlobalTest {
      */
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(org.logicalcobwebs.proxool.AllTests.class);
-        suite.addTestSuite(org.logicalcobwebs.proxool.configuration.AllTests.class);
-        
+        suite.addTest(org.logicalcobwebs.proxool.AllTests.suite());
+        suite.addTest(org.logicalcobwebs.proxool.configuration.AllTests.suite());
+
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
             public void setUp() throws Exception {
@@ -67,6 +67,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.2  2002/12/16 17:15:12  billhorsman
+ fixes
+
  Revision 1.1  2002/12/16 17:05:25  billhorsman
  new test structure
 

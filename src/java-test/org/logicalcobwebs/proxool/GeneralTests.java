@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.25 $, $Date: 2002/12/16 17:05:54 $
+ * @version $Revision: 1.26 $, $Date: 2002/12/16 17:15:29 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -375,7 +375,7 @@ public class GeneralTests extends TestCase {
      */
     public void testPrototyping() {
 
-        String testName = "maximumActiveTime";
+        String testName = "prototyping";
         ProxoolAdapter adapter = null;
         try {
             String alias = testName;
@@ -518,6 +518,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.26  2002/12/16 17:15:29  billhorsman
+ fixes
+
  Revision 1.25  2002/12/16 17:05:54  billhorsman
  new test structure
 
