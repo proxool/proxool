@@ -24,7 +24,7 @@ import java.util.Set;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.17 $, $Date: 2003/03/11 14:51:47 $
+ * @version $Revision: 1.18 $, $Date: 2003/06/18 10:05:25 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -195,26 +195,32 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
     public void close() throws SQLException {
         try {
 
-            // Close any open statements, as specified in JDBC
-            Iterator i = openStatements.iterator();
-            while (i.hasNext()) {
-                Statement statement = (Statement) i.next();
-                statement.close();
+            if (isMarkedForExpiry()) {
                 if (connectionPool.getLog().isDebugEnabled()) {
-                    connectionPool.getLog().debug("Closing statement " + Integer.toHexString(statement.hashCode()) + " automatically");
+                    connectionPool.getLog().debug("Closing connection quickly (without reset) because it's marked for expiry anyway");
                 }
-            }
-            openStatements.clear();
+            } else {
+                // Close any open statements, as specified in JDBC
+                Iterator i = openStatements.iterator();
+                while (i.hasNext()) {
+                    Statement statement = (Statement) i.next();
+                    statement.close();
+                    if (connectionPool.getLog().isDebugEnabled()) {
+                        connectionPool.getLog().debug("Closing statement " + Integer.toHexString(statement.hashCode()) + " automatically");
+                    }
+                }
+                openStatements.clear();
 
-            if (needToReset) {
-                // This call should be as quick as possible. Should we consider only
-                // calling it if values have changed? The trouble with that is that it
-                // means keeping track when they change and that might be even
-                // slower
-                if (!connectionPool.resetConnection(connection, "#" + getId())) {
-                    connectionPool.removeProxyConnection(this, "it couldn't be reset", true, true);
+                if (needToReset) {
+                    // This call should be as quick as possible. Should we consider only
+                    // calling it if values have changed? The trouble with that is that it
+                    // means keeping track when they change and that might be even
+                    // slower
+                    if (!connectionPool.resetConnection(connection, "#" + getId())) {
+                        connectionPool.removeProxyConnection(this, "it couldn't be reset", true, true);
+                    }
+                    needToReset = false;
                 }
-                needToReset = false;
             }
             connectionPool.putConnection(this);
         } catch (Throwable t) {
@@ -442,6 +448,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.18  2003/06/18 10:05:25  billhorsman
+ don't bother resetting connections that are marked for expiry
+
  Revision 1.17  2003/03/11 14:51:47  billhorsman
  more concurrency fixes relating to snapshots
 
