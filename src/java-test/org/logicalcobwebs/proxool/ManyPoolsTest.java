@@ -15,9 +15,9 @@ import java.util.Properties;
 /**
  * Test whether Proxool is happy to run lots of pools. Is it scalable?
  *
- * @version $Revision: 1.2 $, $Date: 2004/05/26 17:19:09 $
+ * @version $Revision: 1.3 $, $Date: 2004/07/13 20:36:57 $
  * @author bill
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ManyPoolsTest extends AbstractProxoolTest {
@@ -52,7 +52,7 @@ public class ManyPoolsTest extends AbstractProxoolTest {
                     + ProxoolConstants.URL_DELIMITER
                     + TestConstants.HYPERSONIC_DRIVER
                     + ProxoolConstants.URL_DELIMITER
-                    + TestConstants.HYPERSONIC_TEST_URL;
+                    + TestConstants.HYPERSONIC_URL_PREFIX + i;
             ProxoolFacade.registerConnectionPool(url, info);
         }
 
@@ -74,6 +74,9 @@ public class ManyPoolsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ManyPoolsTest.java,v $
+ Revision 1.3  2004/07/13 20:36:57  billhorsman
+ Open a different database for each pool. Otherwise Hypersonic has some threading issues.
+
  Revision 1.2  2004/05/26 17:19:09  brenuart
  Allow JUnit tests to be executed against another database.
  By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
