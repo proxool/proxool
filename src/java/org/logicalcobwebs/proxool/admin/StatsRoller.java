@@ -20,7 +20,7 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/06 12:44:02 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/06 21:56:27 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -135,7 +135,6 @@ class StatsRoller {
         try {
             readWriteLock.aquireRead();
             currentStatistics.connectionReturned(activeTime);
-            LOG.debug("Logging connectionReturned to stats starting at " + currentStatistics.getStartDate());
         } catch (InterruptedException e) {
             LOG.error("Unable to log connectionReturned", e);
         } finally {
@@ -181,6 +180,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.5  2003/03/06 21:56:27  billhorsman
+ remove too much debug
+
  Revision 1.4  2003/03/06 12:44:02  billhorsman
  add readWriteLock
 
