@@ -7,16 +7,16 @@ package org.logicalcobwebs.proxool;
 
 /**
  * This provides real time information about the pool. You can get this from
- * {@linkplain ProxoolFacade#getConnectionPoolStatistics ProxoolFacade}.
+ * {@link ProxoolFacade#getConnectionPoolStatistics ProxoolFacade}.
  *
  * <pre>
  * String alias = "myPool";
  * ConnectionPoolStatisticsIF cps = ProxoolFacade.getConnectionPoolStatistics(alias);
  * </pre>
  *
- * @version $Revision: 1.2 $, $Date: 2002/10/25 16:00:26 $
+ * @version $Revision: 1.3 $, $Date: 2002/12/15 19:21:42 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public interface ConnectionPoolStatisticsIF {
 
@@ -44,6 +44,9 @@ public interface ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPoolStatisticsIF.java,v $
+ Revision 1.3  2002/12/15 19:21:42  chr32
+ Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
+
  Revision 1.2  2002/10/25 16:00:26  billhorsman
  added better class javadoc
 

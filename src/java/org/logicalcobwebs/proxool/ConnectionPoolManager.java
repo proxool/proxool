@@ -16,11 +16,12 @@ import java.util.Set;
 
 /**
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/09 15:49:36 $
+ * @version $Revision: 1.4 $, $Date: 2002/12/15 19:21:42 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 class ConnectionPoolManager {
+    private static final Object LOCK = new Object();
 
     private Map connectionPoolMap = new HashMap();
 
@@ -32,7 +33,7 @@ class ConnectionPoolManager {
 
     public static ConnectionPoolManager getInstance() {
         if (connectionPoolManager == null) {
-            synchronized (ConnectionPoolManager.class) {
+            synchronized (LOCK) {
                 if (connectionPoolManager == null) {
                     connectionPoolManager = new ConnectionPoolManager();
                 }
@@ -86,6 +87,9 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.4  2002/12/15 19:21:42  chr32
+ Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
+
  Revision 1.3  2002/11/09 15:49:36  billhorsman
  add method to get the name of every pool
 

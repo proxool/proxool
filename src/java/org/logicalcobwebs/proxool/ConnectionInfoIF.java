@@ -19,9 +19,9 @@ package org.logicalcobwebs.proxool;
  * }
  * </pre>
  *
- * @version $Revision: 1.3 $, $Date: 2002/10/25 16:00:19 $
+ * @version $Revision: 1.4 $, $Date: 2002/12/15 19:21:42 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public interface ConnectionInfoIF {
 
@@ -82,7 +82,7 @@ public interface ConnectionInfoIF {
      * active and we don't want to disrupt its use. So we mark it instead and when it
      * stops being active we can perform the necessary operation.
      *
-     * The only thing we do at the moment is {@linkplain #MARK_FOR_EXPIRY expire} the
+     * The only thing we do at the moment is {@link #MARK_FOR_EXPIRY expire} the
      * connection (if it is too old for instance). And this will happen if the
      * housekeeper decides it should but the connection is still active.
      */
@@ -90,10 +90,10 @@ public interface ConnectionInfoIF {
 
     /**
      * The status of the connection. Can be either:
-     * {@linkplain #STATUS_NULL null},
-     * {@linkplain #STATUS_AVAILABLE available},
-     * {@linkplain #STATUS_ACTIVE active} or
-     * {@linkplain #STATUS_OFFLINE offline}.
+     * {@link #STATUS_NULL null},
+     * {@link #STATUS_AVAILABLE available},
+     * {@link #STATUS_ACTIVE active} or
+     * {@link #STATUS_OFFLINE offline}.
      */
     int getStatus();
 
@@ -117,6 +117,9 @@ public interface ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.4  2002/12/15 19:21:42  chr32
+ Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
+
  Revision 1.3  2002/10/25 16:00:19  billhorsman
  added better class javadoc
 

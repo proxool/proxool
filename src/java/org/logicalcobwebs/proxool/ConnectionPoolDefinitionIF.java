@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  * A full definition of everything to do with a connection. You can get one of these
- * from {@linkplain ProxoolFacade#getConnectionPoolDefinition ProxoolFacade}.
+ * from {@link ProxoolFacade#getConnectionPoolDefinition ProxoolFacade}.
  *
  * <pre>
  * String alias = "myPool";
@@ -19,12 +19,12 @@ import java.util.Set;
  *
  * If you want to update the definition you should either update the properties
  * definition next time you
- * {@linkplain java.sql.Driver#connect ask} for a connection or call
- * {@linkplain ProxoolFacade#updateConnectionPool Proxool} directly.
+ * {@link java.sql.Driver#connect ask} for a connection or call
+ * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.7 $, $Date: 2002/11/09 15:50:15 $
+ * @version $Revision: 1.8 $, $Date: 2002/12/15 19:21:42 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public interface ConnectionPoolDefinitionIF {
 
@@ -166,6 +166,9 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.8  2002/12/15 19:21:42  chr32
+ Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
+
  Revision 1.7  2002/11/09 15:50:15  billhorsman
  new trace property and better doc
 

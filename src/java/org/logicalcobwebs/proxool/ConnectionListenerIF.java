@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * want to perform a task when the connection is born or dies. Actually,
  * the reason why we originally did this is now obsolete. But the code
  * remains here just in case. You need to
- * {@linkplain ProxoolFacade#setConnectionListener register}
+ * {@link ProxoolFacade#setConnectionListener register}
  * your implementation with ProxoolFacade.
  *
  * <pre>
@@ -22,9 +22,9 @@ import java.sql.SQLException;
  * ProxoolFacade.setConnectionListener(alias, myConnectionListener);
  * </pre>
  *
- * @version $Revision: 1.4 $, $Date: 2002/10/25 16:00:20 $
+ * @version $Revision: 1.5 $, $Date: 2002/12/15 19:21:42 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public interface ConnectionListenerIF {
 
@@ -73,6 +73,9 @@ public interface ConnectionListenerIF {
 /*
  Revision history:
  $Log: ConnectionListenerIF.java,v $
+ Revision 1.5  2002/12/15 19:21:42  chr32
+ Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
+
  Revision 1.4  2002/10/25 16:00:20  billhorsman
  added better class javadoc
 
