@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.17 $, $Date: 2003/04/19 12:58:41 $
+ * @version $Revision: 1.18 $, $Date: 2003/04/27 15:42:21 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -874,7 +874,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      */
     public boolean isEqual(String url, Properties info) {
         try {
-            return doChange(url, info, true);
+            return !doChange(url, info, true);
         } catch (ProxoolException e) {
             LOG.error("Problem checking equality", e);
             return false;
@@ -901,6 +901,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.18  2003/04/27 15:42:21  billhorsman
+ fix to condition that meant configuration change was getting sent too often (and sometimes not at all)
+
  Revision 1.17  2003/04/19 12:58:41  billhorsman
  fixed bug where ConfigurationListener's
  definitionUpdated was getting called too
