@@ -12,7 +12,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * This is instantiated statically by ProxoolFacade. It will automatically
  * close down all the connections when teh JVM stops.
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/10 15:13:57 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/26 11:20:59 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -35,7 +35,6 @@ class ShutdownHook implements Runnable {
      */
     private ShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(this));
-        LOG.debug("Registering ShutdownHook");
     }
 
     /**
@@ -54,6 +53,9 @@ class ShutdownHook implements Runnable {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.5  2003/02/26 11:20:59  billhorsman
+ removed debug
+
  Revision 1.4  2003/02/10 15:13:57  billhorsman
  fixed deprecated call
 
