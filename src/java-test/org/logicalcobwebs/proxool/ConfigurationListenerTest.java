@@ -14,7 +14,7 @@ import java.util.Properties;
  * Test that registering a {@link org.logicalcobwebs.proxool.ConfigurationListenerIF} with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/19 17:00:51 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/24 18:04:07 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
@@ -41,8 +41,8 @@ public class ConfigurationListenerTest extends TestCase {
         clear();
         Properties info = new Properties();
         info.setProperty("proxool.maximum-connection-count", "2");
-        info.setProperty("maximum-new-connections", "1");
-        info.setProperty("minimum-connection-count", "0");
+        info.setProperty("proxool.maximum-new-connections", "1");
+        info.setProperty("proxool.minimum-connection-count", "0");
         info.setProperty("user", "sa");
         info.setProperty("password", "");
         String alias = "configurationListenerTest";
@@ -53,7 +53,7 @@ public class ConfigurationListenerTest extends TestCase {
         ProxoolFacade.addConfigurationListener(alias, new TestConfigurationListener());
         ProxoolFacade.addConfigurationListener(alias, new TestConfigurationListener());
         info.setProperty("proxool.maximum-connection-count", "3");
-        info.setProperty("prototype-count", "1");
+        info.setProperty("proxool.prototype-count", "1");
         ProxoolFacade.updateConnectionPool(url, info);
         ProxoolFacade.killAllConnections(alias);
         ProxoolFacade.removeConnectionPool(alias);
@@ -139,6 +139,9 @@ public class ConfigurationListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.4  2003/02/24 18:04:07  chr32
+ Fixde some eroneous property names.
+
  Revision 1.3  2003/02/19 17:00:51  chr32
  Fixed eroneous method names.
 
