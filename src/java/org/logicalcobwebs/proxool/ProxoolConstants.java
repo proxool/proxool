@@ -8,9 +8,9 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.19 $, $Date: 2003/09/30 18:39:08 $
+ * @version $Revision: 1.20 $, $Date: 2004/03/15 02:43:47 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public interface ProxoolConstants {
 
@@ -170,37 +170,13 @@ public interface ProxoolConstants {
     /** @see ProxoolDriver#getPropertyInfo */
     public final String STATISTICS_LOG_LEVEL_PROPERTY = PROPERTY_PREFIX + STATISTICS_LOG_LEVEL;
 
-// Start JNDI
-
     public static final String JNDI_NAME = "jndi-name";
+    
+    /** Prefix for generic JNDI properties. */
+    public static final String JNDI_PROPERTY_PREFIX = "jndi-";
 
     /** @see ProxoolDriver#getPropertyInfo */
     public final String JNDI_NAME_PROPERTY = PROPERTY_PREFIX + JNDI_NAME;
-
-    public static final String INITIAL_CONTEXT_FACTORY = "initial-context-factory";
-
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String INITIAL_CONTEXT_FACTORY_PROPERTY = PROPERTY_PREFIX + INITIAL_CONTEXT_FACTORY;
-
-    public static final String PROVIDER_URL = "provider-url";
-
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String PROVIDER_URL_PROPERTY = PROPERTY_PREFIX + PROVIDER_URL;
-
-    public static final String SECURITY_AUTHENTICATION = "security-authentication";
-
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String SECURITY_AUTHENTICATION_PROPERTY = PROPERTY_PREFIX + SECURITY_AUTHENTICATION;
-
-    public static final String SECURITY_PRINCIPAL = "security-principal";
-
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String SECURITY_PRINCIPAL_PROPERTY = PROPERTY_PREFIX + SECURITY_PRINCIPAL;
-
-    public static final String SECURITY_CREDENTIALS = "security-credentials";
-
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String SECURITY_CREDENTIALS_PROPERTY = PROPERTY_PREFIX + SECURITY_CREDENTIALS;
 
 // End JNDI
 
@@ -264,6 +240,10 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.20  2004/03/15 02:43:47  chr32
+ Removed explicit JNDI properties. Going for a generic approach instead.
+ Added constant for JNDI properties prefix.
+
  Revision 1.19  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 
