@@ -21,7 +21,7 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.6 $, $Date: 2003/02/04 15:59:49 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/04 17:17:03 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -40,7 +40,7 @@ class StatsRoller {
 
     private int units;
 
-    private Timer timer = new Timer();
+    private Timer timer = new Timer(true);
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
 
@@ -177,6 +177,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.7  2003/02/04 17:17:03  billhorsman
+ make Timer a daemon
+
  Revision 1.6  2003/02/04 15:59:49  billhorsman
  finalize now shuts down StatsRoller timer
 
