@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.6 $, $Date: 2003/08/30 14:54:04 $
+ * @version $Revision: 1.7 $, $Date: 2003/10/27 20:26:19 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -67,10 +67,14 @@ public class Admin {
      * @param activeTime how long the connection was active
      */
     public void connectionReturned(long activeTime) {
-        Iterator i = statsRollers.values().iterator();
-        while (i.hasNext()) {
-            StatsRoller statsRoller = (StatsRoller) i.next();
-            statsRoller.connectionReturned(activeTime);
+        try {
+            Iterator i = statsRollers.values().iterator();
+            while (i.hasNext()) {
+                StatsRoller statsRoller = (StatsRoller) i.next();
+                statsRoller.connectionReturned(activeTime);
+            }
+        } catch (Throwable e) {
+            LOG.error("Stats connectionReturned call failed. Ignoring.", e);
         }
     }
 
@@ -78,10 +82,14 @@ public class Admin {
      * Call this every time a connection is refused
      */
     public void connectionRefused() {
-        Iterator i = statsRollers.values().iterator();
-        while (i.hasNext()) {
-            StatsRoller statsRoller = (StatsRoller) i.next();
-            statsRoller.connectionRefused();
+        try {
+            Iterator i = statsRollers.values().iterator();
+            while (i.hasNext()) {
+                StatsRoller statsRoller = (StatsRoller) i.next();
+                statsRoller.connectionRefused();
+            }
+        } catch (Exception e) {
+            LOG.error("Stats connectionRefused call failed. Ignoring.", e);
         }
     }
 
@@ -160,6 +168,11 @@ public class Admin {
 /*
  Revision history:
  $Log: Admin.java,v $
+ Revision 1.7  2003/10/27 20:26:19  billhorsman
+ connectionReturned() and connectionRefused() calls will now log any errors and continue rather than
+ possibly throwing RuntimeExceptions back to the caller. In principle, stats should not cause problems
+ to the core code. (No evidence of this happening - but it's more robust now.)
+
  Revision 1.6  2003/08/30 14:54:04  billhorsman
  Checkstyle
 
