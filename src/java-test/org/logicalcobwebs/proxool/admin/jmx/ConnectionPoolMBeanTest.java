@@ -5,13 +5,10 @@
  */
 package org.logicalcobwebs.proxool.admin.jmx;
 
-import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolDriver;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.TestConstants;
-import org.logicalcobwebs.proxool.TestHelper;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -22,8 +19,6 @@ import javax.management.NotificationFilter;
 import javax.management.NotificationFilterSupport;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -31,12 +26,12 @@ import java.util.Properties;
 /**
  * Test {@link org.logicalcobwebs.proxool.admin.jmx.ConnectionPoolMBean}.
  *
- * @version $Revision: 1.9 $, $Date: 2003/05/06 23:17:12 $
+ * @version $Revision: 1.10 $, $Date: 2003/10/20 07:40:44 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.8
  */
-public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
+public class ConnectionPoolMBeanTest extends AbstractJMXTest {
     private MBeanServer mBeanServer;
     private boolean notified;
 
@@ -108,7 +103,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
         final String newValue = "dingo";
         this.mBeanServer.setAttribute(objectName,
                 new Attribute(fatalSQLAttributeName, newValue));
-        final String fatalSQLAttribtueValue = (String) mBeanServer.getAttribute(objectName, fatalSQLAttributeName);
+        String fatalSQLAttribtueValue = (String) mBeanServer.getAttribute(objectName, fatalSQLAttributeName);
         // check that value vas registered by the bean.
         assertTrue("Expexted fatalSQLException JMX attribtue to have value '" + newValue + "' but the value was '"
                 + fatalSQLAttribtueValue + "'.",
@@ -119,6 +114,12 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
         assertTrue("Expexted fatal-sql-exception Proxool property to have value '"
                 + newValue + "' but the value was '" + proxoolProopertyValue + "'.",
                 proxoolProopertyValue.equals(newValue));
+        // check that string properites can be deleted.
+        this.mBeanServer.setAttribute(objectName,
+                new Attribute(fatalSQLAttributeName, ""));
+        fatalSQLAttribtueValue = (String) mBeanServer.getAttribute(objectName, fatalSQLAttributeName);
+        assertTrue("Expexted fatal-sql-exception Proxool property to be empty "
+            + " but the value was '" + fatalSQLAttribtueValue + "'.", "".equals(fatalSQLAttribtueValue));
         ProxoolFacade.removeConnectionPool(alias);
     }
 
@@ -164,7 +165,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
         this.mBeanServer.invoke(objectName, "shutdown", new Object[0], new String[0]);
         try {
             ProxoolFacade.removeConnectionPool(alias);
-            fail("Removal of pool alias should have failed, because it should have allready be removed.");
+            fail("Removal of pool alias should have failed, because it should have already be removed.");
         } catch (ProxoolException e) {
             // we want this
         }
@@ -178,7 +179,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
         this.mBeanServer.addNotificationListener(objectName, notificationListener, getFilter(), notificationListener);
         // test when updated through JMX.
         this.mBeanServer.setAttribute(objectName,
-                new Attribute(ProxoolJMXHelper.getValidIdentifier(ProxoolConstants.FATAL_SQL_EXCEPTION), alias));
+                new Attribute(ProxoolJMXHelper.getValidIdentifier(ProxoolConstants.FATAL_SQL_EXCEPTION), "dingo"));
         assertTrue("We did not get notified when updating through JMX.", this.notified);
         this.notified = false;
         // test when updated through ProxoolFacade
@@ -203,19 +204,6 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
         final NotificationFilterSupport notificationFilter = new NotificationFilterSupport();
         notificationFilter.enableType(ConnectionPoolMBean.NOTIFICATION_TYPE_DEFINITION_UPDATED);
         return notificationFilter;
-    }
-
-    private Properties createBasicPool(String alias) throws SQLException {
-        String url = TestHelper.buildProxoolUrl(alias,
-                TestConstants.HYPERSONIC_DRIVER,
-                TestConstants.HYPERSONIC_TEST_URL);
-        Properties info = new Properties();
-        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-        info.setProperty(ProxoolConstants.JMX_PROPERTY, Boolean.TRUE.toString());
-        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, alias);
-        DriverManager.getConnection(url, info).close();
-        return info;
     }
 
     /**
@@ -243,6 +231,9 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionPoolMBeanTest.java,v $
+ Revision 1.10  2003/10/20 07:40:44  chr32
+ Improved tests.
+
  Revision 1.9  2003/05/06 23:17:12  chr32
  Moving JMX tests back in from sandbox.
 
