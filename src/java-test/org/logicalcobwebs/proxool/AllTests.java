@@ -12,7 +12,7 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.23 $, $Date: 2003/10/26 16:23:20 $
+ * @version $Revision: 1.24 $, $Date: 2003/11/04 13:23:18 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -37,6 +37,7 @@ public class AllTests {
         suite.addTestSuite(HouseKeeperTest.class);
         suite.addTestSuite(HypersonicTest.class);
         suite.addTestSuite(ManyPoolsTest.class);
+        suite.addTestSuite(PropertyTest.class);
         suite.addTestSuite(PrototyperTest.class);
         suite.addTestSuite(ProxyConnectionTest.class);
         suite.addTestSuite(ProxyDatabaseMetaDataTest.class);
@@ -62,6 +63,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.24  2003/11/04 13:23:18  billhorsman
+ Added PropetyTest
+
  Revision 1.23  2003/10/26 16:23:20  billhorsman
  Fixed up test suites
 
