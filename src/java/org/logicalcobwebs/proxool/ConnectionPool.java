@@ -24,7 +24,7 @@ import java.util.Iterator;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.56 $, $Date: 2003/03/03 11:11:57 $
+ * @version $Revision: 1.57 $, $Date: 2003/03/03 16:06:44 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -145,7 +145,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         if (houseKeepingThread == null) {
             houseKeepingThread = new Thread(new HouseKeeper());
             houseKeepingThread.setDaemon(true);
-            houseKeepingThread.setName("HouseKeeper");
+            houseKeepingThread.setName(getDefinition().getAlias() + ".houseKeeper");
             houseKeepingThread.start();
         }
     }
@@ -154,7 +154,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         if (prototypingThread == null) {
             prototypingThread = new Prototyper();
             prototypingThread.setDaemon(true);
-            prototypingThread.setName("Prototyper");
+            prototypingThread.setName(getDefinition().getAlias() + ".prototyper");
             prototypingThread.start();
         } else {
             prototypingThread.wake();
@@ -1197,6 +1197,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.57  2003/03/03 16:06:44  billhorsman
+ name house keeper and prototyper threads now includes alias
+
  Revision 1.56  2003/03/03 11:11:57  billhorsman
  fixed licence
 
