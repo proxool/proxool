@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.20 $, $Date: 2002/12/16 11:16:51 $
+ * @version $Revision: 1.21 $, $Date: 2002/12/16 11:46:00 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -35,6 +35,8 @@ public class ProxoolFacade {
     private static final Log LOG = LogFactory.getLog(ProxoolFacade.class);
 
     private static Map infos = new HashMap();
+
+    private static Map completeInfos = new HashMap();
 
     private static Map configurators = new HashMap();
 
@@ -148,6 +150,12 @@ public class ProxoolFacade {
         }
         rememberedInfo = (Properties) infos.get(rememberedKey);
 
+        Properties completeInfo = (Properties) completeInfos.get(rememberedKey);
+        if (completeInfo == null) {
+            completeInfo = new Properties();
+            completeInfos.put(rememberedKey, completeInfo);
+        }
+
         if (info != null && (rememberedInfo == null || !info.equals(rememberedInfo))) {
 
             Log earlyLog = LogFactory.getLog("org.logicalcobwebs.proxool." + getAlias(url));
@@ -167,6 +175,8 @@ public class ProxoolFacade {
                 String key = (String) i.next();
                 String value = info.getProperty(key);
                 boolean isProxoolProperty = true;
+
+                completeInfo.setProperty(key, value);
 
                 if (key.equals(ProxoolConstants.USER_PROPERTY)) {
                     isProxoolProperty = false;
@@ -333,8 +343,7 @@ public class ProxoolFacade {
         }
 
         if (configurator != null) {
-            // TODO send properties
-            configurator.defintionUpdated(cpd, null, null);
+            configurator.defintionUpdated(cpd, completeInfo, changedProperties);
         }
 
         return cpd.getName();
@@ -566,6 +575,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.21  2002/12/16 11:46:00  billhorsman
+ send properties to definitionUpdated
+
  Revision 1.20  2002/12/16 11:16:51  billhorsman
  checkstyle
 
