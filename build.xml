@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.11 $
-    $Date: 2002/11/02 12:52:11 $
+    $Revision: 1.12 $
+    $Date: 2002/11/09 16:10:28 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -121,6 +121,26 @@
 
             <property key="checkstyle.require.version" value="true"/>
             <property key="checkstyle.javadoc.scope" value="nothing"/>
+            <property key="checkstyle.maxlinelen" value="200"/>
+            <property key="checkstyle.tab.width" value="4"/>
+
+        </checkstyle>
+    </target>
+
+    <target
+        name="strict-checkstyle"
+        description="Checks Java code for style (we don't enforce this strictness, yet)"
+        >
+        <checkstyle>
+
+            <fileset dir="src/java" includes="**/*.java"/>
+            <fileset dir="src/java-examples" includes="**/*.java"/>
+            <fileset dir="src/java-ext" includes="**/*.java"/>
+            <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
+            <fileset dir="src/java-test" includes="**/*.java"/>
+
+            <property key="checkstyle.require.version" value="true"/>
+            <property key="checkstyle.javadoc.scope" value="protected"/>
             <property key="checkstyle.maxlinelen" value="200"/>
             <property key="checkstyle.tab.width" value="4"/>
 
