@@ -14,7 +14,7 @@ import java.util.Properties;
 /**
  * Test that we can update the definition of a pool
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/04 12:50:44 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -117,7 +117,7 @@ public class UpdateDefinitionTest extends AbstractProxoolTest {
                 + ProxoolConstants.ALIAS_DELIMITER
                 + alias
                 + ProxoolConstants.URL_DELIMITER
-                + TestHelper.HYPERSONIC_DRIVER
+                + TestConstants.HYPERSONIC_DRIVER
                 + ProxoolConstants.URL_DELIMITER
                 + "jdbc:hsqldb:db/update";
 
@@ -150,6 +150,9 @@ public class UpdateDefinitionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: UpdateDefinitionTest.java,v $
+ Revision 1.6  2003/03/04 12:50:44  billhorsman
+ fix
+
  Revision 1.5  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 
