@@ -83,9 +83,9 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.13 $, $Date: 2003/09/30 18:38:27 $
+ * @version $Revision: 1.14 $, $Date: 2003/10/20 07:37:07 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, NotificationBroadcaster,
@@ -96,8 +96,8 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     public static final String NOTIFICATION_TYPE_DEFINITION_UPDATED = "proxool.definitionUpdated";
 
 
-    private static final Log LOG = LogFactory.getLog (ConnectionPoolMBean.class);
-    private static final String CLASS_NAME = ConnectionPoolMBean.class.getName ();
+    private static final Log LOG = LogFactory.getLog(ConnectionPoolMBean.class);
+    private static final String CLASS_NAME = ConnectionPoolMBean.class.getName();
 
     private static final String RECOURCE_NAME_MBEAN_POOL_DESCRIPTION = "mbean.pool.description";
     private static final String RECOURCE_NAME_MBEAN_NOTIFICATION_DESCRIPTION = "mbean.notification.description";
@@ -105,8 +105,8 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 
     private static final String OPERATION_NAME_SHUTDOWN = "shutdown";
 
-    private static final ResourceBundle ATTRIBUTE_DESCRIPTIONS_RESOURCE = createAttributeDescriptionsResource ();
-    private static final ResourceBundle JMX_RESOURCE = createJMXResource ();
+    private static final ResourceBundle ATTRIBUTE_DESCRIPTIONS_RESOURCE = createAttributeDescriptionsResource();
+    private static final ResourceBundle JMX_RESOURCE = createJMXResource();
 
     private static final MBeanNotificationInfo[] NOTIFICATION_INFOS = getNotificationInfos();
 
@@ -117,12 +117,12 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     private NotificationBroadcasterSupport notificationHelper = new NotificationBroadcasterSupport();
     private boolean active;
 
-    public ConnectionPoolMBean (String alias, Properties poolProperties)
-        throws ProxoolException {
+    public ConnectionPoolMBean(String alias, Properties poolProperties)
+            throws ProxoolException {
         this.poolDefinition = ProxoolFacade
-            .getConnectionPoolDefinition(alias);
+                .getConnectionPoolDefinition(alias);
         this.poolProperties = poolProperties;
-        this.mBeanInfo = getDynamicMBeanInfo(this.poolDefinition.getAlias ());
+        this.mBeanInfo = getDynamicMBeanInfo(this.poolDefinition.getAlias());
         ProxoolFacade.addProxoolListener(this);
         ProxoolFacade.addConfigurationListener(alias, this);
     }
@@ -130,49 +130,49 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     /**
      * @see javax.management.DynamicMBean#getAttribute(java.lang.String)
      */
-    public Object getAttribute (String attributeName) throws AttributeNotFoundException, MBeanException, ReflectionException {
+    public Object getAttribute(String attributeName) throws AttributeNotFoundException, MBeanException, ReflectionException {
         if (attributeName == null) {
             final String message = "Cannot invoke a getter of " + CLASS_NAME + " with null attribute name";
             LOG.error(message);
-            throw new RuntimeOperationsException (new IllegalArgumentException ("Attribute name cannot be null"),
-                message);
+            throw new RuntimeOperationsException(new IllegalArgumentException("Attribute name cannot be null"),
+                    message);
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Getting attribute " + attributeName + ".");
         }
-        return ((Attribute) getAttributes (new String[]{attributeName}).get (0)).getValue();
+        return ((Attribute) getAttributes(new String[]{attributeName}).get(0)).getValue();
     }
 
     /**
      * @see javax.management.DynamicMBean#setAttribute(javax.management.Attribute)
      */
-    public void setAttribute (Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException,
+    public void setAttribute(Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException,
             MBeanException, ReflectionException {
         if (attribute == null) {
             final String message = "Cannot invoke a setter of " + CLASS_NAME + " with null attribute";
             LOG.error(message);
-            throw new RuntimeOperationsException (new IllegalArgumentException ("Attribute cannot be null"),
-                message);
+            throw new RuntimeOperationsException(new IllegalArgumentException("Attribute cannot be null"),
+                    message);
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting attribute " + attribute.getName() + ".");
         }
-        final AttributeList attributeList = new AttributeList ();
-        attributeList.add (attribute);
-        setAttributes (attributeList);
+        final AttributeList attributeList = new AttributeList();
+        attributeList.add(attribute);
+        setAttributes(attributeList);
     }
 
     /**
      * @see javax.management.DynamicMBean#getAttributes(java.lang.String[])
      */
-    public AttributeList getAttributes (String[] attributeNames) {
+    public AttributeList getAttributes(String[] attributeNames) {
         if (attributeNames == null) {
             final String message = "Cannot invoke a null getter of " + CLASS_NAME;
             LOG.error(message);
-            throw new RuntimeOperationsException (new IllegalArgumentException ("attributeNames[] cannot be null"),
-                message);
+            throw new RuntimeOperationsException(new IllegalArgumentException("attributeNames[] cannot be null"),
+                    message);
         }
-        AttributeList resultList = new AttributeList ();
+        AttributeList resultList = new AttributeList();
 
         // if attributeNames is empty, return an empty result list
         if (attributeNames.length == 0) {
@@ -183,78 +183,78 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
         for (int i = 0; i < attributeNames.length; i++) {
             try {
                 if (equalsProperty(attributeNames[i], ProxoolConstants.ALIAS)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        this.poolDefinition.getAlias()));
+                    resultList.add(new Attribute(attributeNames[i],
+                            this.poolDefinition.getAlias()));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.DRIVER_PROPERTIES)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        getDelegatePropertiesAsString(this.poolProperties)));
+                    resultList.add(new Attribute(attributeNames[i],
+                            getDelegatePropertiesAsString(this.poolProperties)));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.DRIVER_URL)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        this.poolDefinition.getUrl ()));
+                    resultList.add(new Attribute(attributeNames[i],
+                            this.poolDefinition.getUrl()));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.FATAL_SQL_EXCEPTION)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        getValueOrEmpty(this.poolProperties.getProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY))));
+                    resultList.add(new Attribute(attributeNames[i],
+                            getValueOrEmpty(this.poolProperties.getProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY))));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getHouseKeepingSleepTime ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getHouseKeepingSleepTime())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.HOUSE_KEEPING_TEST_SQL)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        getValueOrEmpty(poolDefinition.getHouseKeepingTestSql ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            getValueOrEmpty(poolDefinition.getHouseKeepingTestSql())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.TEST_BEFORE_USE)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                            new Boolean (this.poolDefinition.isTestBeforeUse ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Boolean(this.poolDefinition.isTestBeforeUse())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.TEST_AFTER_USE)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                            new Boolean (this.poolDefinition.isTestAfterUse ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Boolean(this.poolDefinition.isTestAfterUse())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_ACTIVE_TIME)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getMaximumActiveTime ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getMaximumActiveTime())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_CONNECTION_COUNT)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getMaximumConnectionCount ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getMaximumConnectionCount())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getMaximumConnectionLifetime ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getMaximumConnectionLifetime())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_NEW_CONNECTIONS)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getMaximumNewConnections ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getMaximumNewConnections())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getSimultaneousBuildThrottle ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getSimultaneousBuildThrottle())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MINIMUM_CONNECTION_COUNT)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getMinimumConnectionCount ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getMinimumConnectionCount())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getOverloadWithoutRefusalLifetime ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getOverloadWithoutRefusalLifetime())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.PROTOTYPE_COUNT)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getPrototypeCount ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getPrototypeCount())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.RECENTLY_STARTED_THRESHOLD)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Integer (this.poolDefinition.getRecentlyStartedThreshold ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Integer(this.poolDefinition.getRecentlyStartedThreshold())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.STATISTICS)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        getValueOrEmpty(this.poolDefinition.getStatistics ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            getValueOrEmpty(this.poolDefinition.getStatistics())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.STATISTICS_LOG_LEVEL)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        getValueOrEmpty(this.poolDefinition.getStatisticsLogLevel ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            getValueOrEmpty(this.poolDefinition.getStatisticsLogLevel())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.TRACE)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Boolean (this.poolDefinition.isTrace ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Boolean(this.poolDefinition.isTrace())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.VERBOSE)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        new Boolean (this.poolDefinition.isVerbose ())));
+                    resultList.add(new Attribute(attributeNames[i],
+                            new Boolean(this.poolDefinition.isVerbose())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS)) {
-                    resultList.add (new Attribute (attributeNames[i],
-                        this.poolDefinition.getFatalSqlExceptionWrapper()));
+                    resultList.add(new Attribute(attributeNames[i],
+                            getValueOrEmpty(this.poolDefinition.getFatalSqlExceptionWrapper())));
                 } else {
                     final String message = "Unknown attribute: " + attributeNames[i];
                     LOG.error(message);
-                    throw new AttributeNotFoundException ();
+                    throw new AttributeNotFoundException(message);
                 }
             } catch (AttributeNotFoundException e) {
-                throw new RuntimeOperationsException (new IllegalArgumentException (e.getMessage ()));
+                throw new RuntimeOperationsException(new IllegalArgumentException(e.getMessage()));
             }
         }
         return resultList;
@@ -263,68 +263,74 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     /**
      * @see javax.management.DynamicMBean#setAttributes(javax.management.AttributeList)
      */
-    public AttributeList setAttributes (AttributeList attributes) {
+    public AttributeList setAttributes(AttributeList attributes) {
 
         if (attributes == null) {
             final String message = "AttributeList attributes cannot be null";
             LOG.error(message);
-            throw new RuntimeOperationsException (new IllegalArgumentException (message),
-                "Cannot invoke a setter of " + CLASS_NAME);
+            throw new RuntimeOperationsException(new IllegalArgumentException(message),
+                    "Cannot invoke a setter of " + CLASS_NAME);
         }
-        AttributeList resultList = new AttributeList ();
+        AttributeList resultList = new AttributeList();
 
-        if (attributes.isEmpty ()) {
+        if (attributes.isEmpty()) {
             return resultList;
         }
 
         String name = null;
         Object value = null;
         final Properties newProperties = new Properties();
-        for (Iterator i = attributes.iterator (); i.hasNext ();) {
-            Attribute attribute = (Attribute) i.next ();
+        Attribute attribute = null;
+        for (Iterator i = attributes.iterator(); i.hasNext();) {
+            attribute = (Attribute) i.next();
             try {
-                name = attribute.getName ();
-                value = attribute.getValue ();
+                name = attribute.getName();
+                value = attribute.getValue();
 
                 if (equalsProperty(name, ProxoolConstants.DRIVER_PROPERTIES)) {
-                    checkAssignable (name, String.class, value.getClass ());
-                    setDelegateProperties(newProperties, value.toString());
-                    resultList.add (new Attribute (name, value));
+                    if (!isEqualProperties(value.toString(), getDelegatePropertiesAsString(this.poolProperties))) {
+                        checkAssignable(name, String.class, value);
+                        setDelegateProperties(newProperties, value.toString());
+                        resultList.add(new Attribute(name, value));
+                    }
                 } else if (equalsProperty(name, ProxoolConstants.DRIVER_URL)) {
-                    checkAssignable (name, String.class, value.getClass ());
-                    if (notEmpty(value.toString())) {
+                    checkAssignable(name, String.class, value);
+                    if (notEmpty(value)) {
                         newProperties.setProperty(ProxoolConstants.DRIVER_URL_PROPERTY, value.toString());
                     } else {
-                        newProperties.remove(ProxoolConstants.DRIVER_URL_PROPERTY);
+                        newProperties.setProperty(ProxoolConstants.DRIVER_URL_PROPERTY, "");
                     }
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.FATAL_SQL_EXCEPTION)) {
-                    checkAssignable (name, String.class, value.getClass ());
-                    if (notEmpty(value.toString())) {
-                        newProperties.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, value.toString());
-                    } else {
-                        newProperties.remove(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY);
+                    if (!isEqualProperties(value.toString(),
+                            this.poolProperties.getProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY))) {
+                        checkAssignable(name, String.class, value);
+                        if (notEmpty(value)) {
+                            newProperties.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, value.toString());
+                        } else {
+                            newProperties.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "");
+                        }
+                        resultList.add(new Attribute(name, value));
                     }
-                    resultList.add (new Attribute (name, value));
                 } else if (equalsProperty(name, ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME)) {
                     setIntegerAttribute(name, ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, value,
                             ConnectionPoolDefinitionIF.DEFAULT_HOUSE_KEEPING_SLEEP_TIME, newProperties, resultList);
                 } else if (equalsProperty(name, ProxoolConstants.HOUSE_KEEPING_TEST_SQL)) {
-                    checkAssignable (name, String.class, value.getClass ());
-                    if (notEmpty(value.toString())) {
+                    checkAssignable(name, String.class, value);
+                    if (notEmpty(value)) {
                         newProperties.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, value.toString());
                     } else {
-                        newProperties.remove(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY);
+                        newProperties.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, "");
                     }
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.TEST_BEFORE_USE)) {
-                    checkAssignable (name, Boolean.class, value.getClass ());
+                    checkAssignable(name, Boolean.class, value);
                     newProperties.setProperty(ProxoolConstants.TEST_BEFORE_USE_PROPERTY, value.toString());
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.TEST_AFTER_USE)) {
-                    checkAssignable (name, Boolean.class, value.getClass ());
+                    checkAssignable(name, Boolean.class, value);
                     newProperties.setProperty(ProxoolConstants.TEST_AFTER_USE_PROPERTY, value.toString());
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.MAXIMUM_ACTIVE_TIME)) {
                     setIntegerAttribute(name, ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY, value,
                             ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_ACTIVE_TIME, newProperties, resultList);
@@ -341,58 +347,58 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                     setIntegerAttribute(name, ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY, value,
                             ConnectionPoolDefinitionIF.DEFAULT_SIMULTANEOUS_BUILD_THROTTLE, newProperties, resultList);
                 } else if (equalsProperty(name, ProxoolConstants.MINIMUM_CONNECTION_COUNT)) {
-                    checkAssignable (name, Integer.class, value.getClass ());
+                    checkAssignable(name, Integer.class, value);
                     newProperties.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, value.toString());
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME)) {
                     setIntegerAttribute(name, ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY, value,
                             ConnectionPoolDefinitionIF.DEFAULT_OVERLOAD_WITHOUT_REFUSAL_THRESHOLD, newProperties, resultList);
                 } else if (equalsProperty(name, ProxoolConstants.PROTOTYPE_COUNT)) {
-                    checkAssignable (name, Integer.class, value.getClass ());
+                    checkAssignable(name, Integer.class, value);
                     newProperties.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, value.toString());
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.RECENTLY_STARTED_THRESHOLD)) {
                     setIntegerAttribute(name, ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY, value,
                             ConnectionPoolDefinitionIF.DEFAULT_RECENTLY_STARTED_THRESHOLD, newProperties, resultList);
                 } else if (equalsProperty(name, ProxoolConstants.STATISTICS)) {
-                    checkAssignable (name, String.class, value.getClass ());
-                    if (notEmpty(value.toString())) {
+                    checkAssignable(name, String.class, value);
+                    if (notEmpty(value)) {
                         newProperties.setProperty(ProxoolConstants.STATISTICS_PROPERTY, value.toString());
                     } else {
-                        newProperties.remove(ProxoolConstants.STATISTICS_PROPERTY);
+                        newProperties.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "");
                     }
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.STATISTICS_LOG_LEVEL)) {
-                    checkAssignable (name, String.class, value.getClass ());
-                    if (notEmpty(value.toString())) {
+                    checkAssignable(name, String.class, value);
+                    if (notEmpty(value)) {
                         newProperties.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, value.toString());
                     } else {
-                        newProperties.remove(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY);
+                        newProperties.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, "");
                     }
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.TRACE)) {
-                    checkAssignable (name, Boolean.class, value.getClass ());
+                    checkAssignable(name, Boolean.class, value);
                     newProperties.setProperty(ProxoolConstants.TRACE_PROPERTY, value.toString());
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.VERBOSE)) {
-                    checkAssignable (name, Boolean.class, value.getClass ());
+                    checkAssignable(name, Boolean.class, value);
                     newProperties.setProperty(ProxoolConstants.VERBOSE_PROPERTY, value.toString());
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else if (equalsProperty(name, ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS)) {
-                    checkAssignable (name, Boolean.class, value.getClass ());
+                    checkAssignable(name, Boolean.class, value);
                     newProperties.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY, value.toString());
-                    resultList.add (new Attribute (name, value));
+                    resultList.add(new Attribute(name, value));
                 } else {
                     final String message = "Unknown attribute: " + name;
                     LOG.error(message);
-                    throw new AttributeNotFoundException (message);
+                    throw new AttributeNotFoundException(message);
                 }
             } catch (InvalidAttributeValueException e) {
-                final String message = "Attribute value was illegal: " + e.getMessage ();
+                final String message = "Attribute value was illegal: " + e.getMessage();
                 LOG.error(message);
-                throw new RuntimeOperationsException (new RuntimeException (message));
+                throw new RuntimeOperationsException(new RuntimeException(message));
             } catch (AttributeNotFoundException e) {
-                throw new RuntimeOperationsException (new IllegalArgumentException (e.getMessage ()));
+                throw new RuntimeOperationsException(new IllegalArgumentException(e.getMessage()));
             }
         }
         try {
@@ -407,9 +413,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     /**
      * @see javax.management.DynamicMBean#invoke(java.lang.String, java.lang.Object[], java.lang.String[])
      */
-    public Object invoke (String operationName, Object params[], String signature[]) throws MBeanException, ReflectionException {
+    public Object invoke(String operationName, Object params[], String signature[]) throws MBeanException, ReflectionException {
         if (operationName == null) {
-            throw new RuntimeOperationsException (new IllegalArgumentException ("Operation name cannot be null"), "Cannot invoke a null operation in " + CLASS_NAME);
+            throw new RuntimeOperationsException(new IllegalArgumentException("Operation name cannot be null"), "Cannot invoke a null operation in " + CLASS_NAME);
         } else if (operationName.equals(OPERATION_NAME_SHUTDOWN)) {
             try {
                 ProxoolFacade.removeConnectionPool(this.poolDefinition.getAlias());
@@ -419,110 +425,118 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
             return null;
         } else {
             throw new ReflectionException(new NoSuchMethodException(operationName),
-                "Cannot find the operation " + operationName + ".");
+                    "Cannot find the operation " + operationName + ".");
         }
     }
 
     /**
      * @see javax.management.DynamicMBean#getMBeanInfo()
      */
-    public MBeanInfo getMBeanInfo () {
+    public MBeanInfo getMBeanInfo() {
         return mBeanInfo;
     }
 
-    private MBeanInfo getDynamicMBeanInfo (String alias) {
+    private MBeanInfo getDynamicMBeanInfo(String alias) {
         final MBeanAttributeInfo[] attributeInfos = new MBeanAttributeInfo[]{
-            createProxoolAttribute (ProxoolConstants.ALIAS, String.class, false),
-            createProxoolAttribute (ProxoolConstants.DRIVER_PROPERTIES, String.class),
-            createProxoolAttribute (ProxoolConstants.DRIVER_URL, String.class),
-            createProxoolAttribute (ProxoolConstants.FATAL_SQL_EXCEPTION, String.class),
-            createProxoolAttribute (ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME, Integer.class),
-            createProxoolAttribute (ProxoolConstants.HOUSE_KEEPING_TEST_SQL, String.class),
-            createProxoolAttribute (ProxoolConstants.TEST_BEFORE_USE, Boolean.class),
-            createProxoolAttribute (ProxoolConstants.TEST_AFTER_USE, Boolean.class),
-            createProxoolAttribute (ProxoolConstants.MAXIMUM_ACTIVE_TIME, Integer.class),
-            createProxoolAttribute (ProxoolConstants.MAXIMUM_CONNECTION_COUNT, Integer.class),
-            createProxoolAttribute (ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME, Integer.class),
-            createProxoolAttribute (ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE, Integer.class),
-            createProxoolAttribute (ProxoolConstants.MINIMUM_CONNECTION_COUNT, Integer.class),
-            createProxoolAttribute (ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME, Integer.class),
-            createProxoolAttribute (ProxoolConstants.PROTOTYPE_COUNT, Integer.class),
-            createProxoolAttribute (ProxoolConstants.RECENTLY_STARTED_THRESHOLD, Integer.class),
-            createProxoolAttribute (ProxoolConstants.STATISTICS, String.class),
-            createProxoolAttribute (ProxoolConstants.STATISTICS_LOG_LEVEL, String.class),
-            createProxoolAttribute (ProxoolConstants.TRACE, Boolean.class),
-            createProxoolAttribute (ProxoolConstants.VERBOSE, Boolean.class),
-            createProxoolAttribute (ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS, String.class),
+            createProxoolAttribute(ProxoolConstants.ALIAS, String.class, false),
+            createProxoolAttribute(ProxoolConstants.DRIVER_PROPERTIES, String.class),
+            createProxoolAttribute(ProxoolConstants.DRIVER_URL, String.class),
+            createProxoolAttribute(ProxoolConstants.FATAL_SQL_EXCEPTION, String.class),
+            createProxoolAttribute(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME, Integer.class),
+            createProxoolAttribute(ProxoolConstants.HOUSE_KEEPING_TEST_SQL, String.class),
+            createProxoolAttribute(ProxoolConstants.TEST_BEFORE_USE, Boolean.class),
+            createProxoolAttribute(ProxoolConstants.TEST_AFTER_USE, Boolean.class),
+            createProxoolAttribute(ProxoolConstants.MAXIMUM_ACTIVE_TIME, Integer.class),
+            createProxoolAttribute(ProxoolConstants.MAXIMUM_CONNECTION_COUNT, Integer.class),
+            createProxoolAttribute(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME, Integer.class),
+            createProxoolAttribute(ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE, Integer.class),
+            createProxoolAttribute(ProxoolConstants.MINIMUM_CONNECTION_COUNT, Integer.class),
+            createProxoolAttribute(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME, Integer.class),
+            createProxoolAttribute(ProxoolConstants.PROTOTYPE_COUNT, Integer.class),
+            createProxoolAttribute(ProxoolConstants.RECENTLY_STARTED_THRESHOLD, Integer.class),
+            createProxoolAttribute(ProxoolConstants.STATISTICS, String.class),
+            createProxoolAttribute(ProxoolConstants.STATISTICS_LOG_LEVEL, String.class),
+            createProxoolAttribute(ProxoolConstants.TRACE, Boolean.class),
+            createProxoolAttribute(ProxoolConstants.VERBOSE, Boolean.class),
+            createProxoolAttribute(ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS, String.class),
         };
 
         final MBeanConstructorInfo[] constructorInfos = new MBeanConstructorInfo[]{
-            new MBeanConstructorInfo ("ConnectionPoolMBean(): Construct a ConnectionPoolMBean object.", ConnectionPoolMBean.class.getConstructors ()[0])
+            new MBeanConstructorInfo("ConnectionPoolMBean(): Construct a ConnectionPoolMBean object.", ConnectionPoolMBean.class.getConstructors()[0])
         };
 
         final MBeanOperationInfo[] operationInfos = new MBeanOperationInfo[]{
-            new MBeanOperationInfo (OPERATION_NAME_SHUTDOWN, "Stop and dispose this connection pool.",
-                new MBeanParameterInfo[]{}, "void", MBeanOperationInfo.ACTION)
+            new MBeanOperationInfo(OPERATION_NAME_SHUTDOWN, "Stop and dispose this connection pool.",
+                    new MBeanParameterInfo[]{}, "void", MBeanOperationInfo.ACTION)
         };
 
-        return new MBeanInfo (CLASS_NAME, MessageFormat.format (getJMXText (RECOURCE_NAME_MBEAN_POOL_DESCRIPTION),
-            new Object[]{alias}), attributeInfos, constructorInfos, operationInfos, new MBeanNotificationInfo[0]);
+        return new MBeanInfo(CLASS_NAME, MessageFormat.format(getJMXText(RECOURCE_NAME_MBEAN_POOL_DESCRIPTION),
+                new Object[]{alias}), attributeInfos, constructorInfos, operationInfos, new MBeanNotificationInfo[0]);
     }
 
-    private static String getAttributeDescription (String attributeName) {
+    private static String getAttributeDescription(String attributeName) {
         String description = "";
         if (ATTRIBUTE_DESCRIPTIONS_RESOURCE != null) {
             try {
-                description = ATTRIBUTE_DESCRIPTIONS_RESOURCE.getString (attributeName);
+                description = ATTRIBUTE_DESCRIPTIONS_RESOURCE.getString(attributeName);
             } catch (Exception e) {
-                LOG.warn ("Could not get description for attribute '" + attributeName + "' from resource " + ResourceNamesIF.ATTRIBUTE_DESCRIPTIONS + ".");
+                LOG.warn("Could not get description for attribute '" + attributeName + "' from resource " + ResourceNamesIF.ATTRIBUTE_DESCRIPTIONS + ".");
             }
         }
         return description;
     }
 
-    private static String getJMXText (String key) {
+    private static String getJMXText(String key) {
         String value = "";
         if (JMX_RESOURCE != null) {
             try {
-                value = JMX_RESOURCE.getString (key);
+                value = JMX_RESOURCE.getString(key);
             } catch (Exception e) {
-                LOG.warn ("Could not get value for attribute '" + key + "' from resource " + ResourceNamesIF.JMX + ".");
+                LOG.warn("Could not get value for attribute '" + key + "' from resource " + ResourceNamesIF.JMX + ".");
             }
         }
         return value;
     }
 
-    private static ResourceBundle createAttributeDescriptionsResource () {
+    private static ResourceBundle createAttributeDescriptionsResource() {
         try {
-            return ResourceBundle.getBundle (ResourceNamesIF.ATTRIBUTE_DESCRIPTIONS);
+            return ResourceBundle.getBundle(ResourceNamesIF.ATTRIBUTE_DESCRIPTIONS);
         } catch (Exception e) {
-            LOG.error ("Could not find resource " + ResourceNamesIF.ATTRIBUTE_DESCRIPTIONS, e);
+            LOG.error("Could not find resource " + ResourceNamesIF.ATTRIBUTE_DESCRIPTIONS, e);
         }
         return null;
     }
 
-    private static ResourceBundle createJMXResource () {
+    private static ResourceBundle createJMXResource() {
         try {
-            return ResourceBundle.getBundle (ResourceNamesIF.JMX);
+            return ResourceBundle.getBundle(ResourceNamesIF.JMX);
         } catch (Exception e) {
-            LOG.error ("Could not find resource " + ResourceNamesIF.JMX, e);
+            LOG.error("Could not find resource " + ResourceNamesIF.JMX, e);
         }
         return null;
     }
 
-    private static MBeanAttributeInfo createProxoolAttribute (String attributeName, Class type) {
+    private static MBeanAttributeInfo createProxoolAttribute(String attributeName, Class type) {
         return createProxoolAttribute(attributeName, type, true);
     }
 
-    private static MBeanAttributeInfo createProxoolAttribute (String attributeName, Class type, boolean writable) {
-        return new MBeanAttributeInfo (ProxoolJMXHelper.getValidIdentifier(attributeName), type.getName (),
-            getAttributeDescription (attributeName), true, writable, false);
+    private static MBeanAttributeInfo createProxoolAttribute(String attributeName, Class type, boolean writable) {
+        return new MBeanAttributeInfo(ProxoolJMXHelper.getValidIdentifier(attributeName), type.getName(),
+                getAttributeDescription(attributeName), true, writable, false);
     }
 
-    private void checkAssignable (String name, Class class1, Class class2) throws InvalidAttributeValueException {
-        if (!class1.isAssignableFrom (class2)) {
-            throw(new InvalidAttributeValueException ("Cannot set attribute " + name + " to a " + class2.getName ()
-                + " object, " + class1.getName () + " expected."));
+    private void checkAssignable(String name, Class clazz, Object value) throws InvalidAttributeValueException {
+        if (value == null) {
+            if (!String.class.equals(clazz)) {
+                throw(new InvalidAttributeValueException("Cannot set attribute " + name + " to null "
+                        + " an instance of " + clazz.getName() + " expected."));
+            }
+        } else {
+            Class valueClass = value.getClass();
+            if (!clazz.isAssignableFrom(valueClass)) {
+                throw(new InvalidAttributeValueException("Cannot set attribute " + name + " to a " + valueClass.getName()
+                        + " instance, " + clazz.getName() + " expected."));
+            }
         }
     }
 
@@ -531,7 +545,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     private void setDelegateProperties(Properties properties, String propertyString)
-        throws InvalidAttributeValueException {
+            throws InvalidAttributeValueException {
         if (propertyString == null || propertyString.trim().length() == 0) {
             return;
         }
@@ -543,10 +557,10 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
             equalsIndex = keyValuePair.indexOf("=");
             if (equalsIndex != -1) {
                 properties.put(keyValuePair.substring(0, equalsIndex).trim(),
-                    keyValuePair.substring(equalsIndex + 1).trim());
+                        keyValuePair.substring(equalsIndex + 1).trim());
             } else {
                 throw new InvalidAttributeValueException("Could not find key/value delimiter '=' in property definition: '"
-                    +  keyValuePair + "'.");
+                        + keyValuePair + "'.");
             }
         }
     }
@@ -570,8 +584,8 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
         return result.toString();
     }
 
-    private boolean notEmpty(String string) {
-        return string != null && string.trim().length() > 0;
+    private boolean notEmpty(Object object) {
+        return object != null && object.toString().trim().length() > 0;
     }
 
     private boolean notEmptyOrZero(Integer integer) {
@@ -583,21 +597,31 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     private void setIntegerAttribute(String attributeName, String propertyName, Object value, int defaultValue, Properties properties,
-        AttributeList resultList) throws InvalidAttributeValueException {
-        checkAssignable (attributeName, Integer.class, value.getClass ());
+                                     AttributeList resultList) throws InvalidAttributeValueException {
+        checkAssignable(attributeName, Integer.class, value);
         if (notEmptyOrZero((Integer) value)) {
             properties.setProperty(propertyName, value.toString());
-            resultList.add (new Attribute (attributeName, value));
+            resultList.add(new Attribute(attributeName, value));
         } else {
-            resultList.add (new Attribute (attributeName,
-                new Integer(defaultValue)));
+            resultList.add(new Attribute(attributeName,
+                    new Integer(defaultValue)));
+        }
+    }
+
+    private boolean isEqualProperties(String property1, String property2) {
+        if (property1 == null) {
+            return property2 == null;
+        } else if (property2 == null) {
+            return property1 == null;
+        } else {
+            return property1.equals(property2);
         }
     }
 
     private static MBeanNotificationInfo[] getNotificationInfos() {
-        return new MBeanNotificationInfo[] {
+        return new MBeanNotificationInfo[]{
             new MBeanNotificationInfo(
-                new String[]{NOTIFICATION_TYPE_DEFINITION_UPDATED}, Notification.class.getName(), getJMXText(RECOURCE_NAME_MBEAN_NOTIFICATION_DESCRIPTION))
+                    new String[]{NOTIFICATION_TYPE_DEFINITION_UPDATED}, Notification.class.getName(), getJMXText(RECOURCE_NAME_MBEAN_NOTIFICATION_DESCRIPTION))
         };
     }
 
@@ -630,19 +654,19 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
      * @see org.logicalcobwebs.proxool.ConfigurationListenerIF#definitionUpdated(org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF, java.util.Properties, java.util.Properties)
      */
     public void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo,
-        Properties changedInfo) {
+                                  Properties changedInfo) {
         this.poolDefinition = connectionPoolDefinition;
         this.poolProperties = completeInfo;
         this.notificationHelper.sendNotification(new Notification(NOTIFICATION_TYPE_DEFINITION_UPDATED, this,
-            definitionUpdatedSequence++, System.currentTimeMillis(),
-            getJMXText(RECOURCE_NAME_MBEAN_NOTIFICATION_DEF_UPDATED)));
+                definitionUpdatedSequence++, System.currentTimeMillis(),
+                getJMXText(RECOURCE_NAME_MBEAN_NOTIFICATION_DEF_UPDATED)));
     }
 
     /**
      * @see javax.management.NotificationBroadcaster#addNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     public void addNotificationListener(NotificationListener notificationListener, NotificationFilter notificationFilter,
-        Object handBack) throws IllegalArgumentException {
+                                        Object handBack) throws IllegalArgumentException {
         this.notificationHelper.addNotificationListener(notificationListener, notificationFilter, handBack);
     }
 
@@ -666,7 +690,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     public ObjectName preRegister(MBeanServer mBeanServer, ObjectName objectName) throws Exception {
         if (objectName == null) {
             throw new ProxoolException("objectName was null, but we can not construct an MBean instance without knowing"
-                + " the pool alias.");
+                    + " the pool alias.");
         }
         return objectName;
     }
@@ -697,6 +721,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.14  2003/10/20 07:37:07  chr32
+ Bettered handling of empty values. Now not setting attributes that has not changed.
+
  Revision 1.13  2003/09/30 18:38:27  billhorsman
  New properties
 
