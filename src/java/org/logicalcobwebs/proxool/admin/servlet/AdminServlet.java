@@ -44,7 +44,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/26 16:51:12 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/26 16:59:18 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -153,13 +153,13 @@ public class AdminServlet extends HttpServlet {
             openTable(out);
 
             // Served
-            printDefintionEntry(out, "Served", statistics.getServedCount() + " (" + DECIMAL_FORMAT.format(statistics.getServedPerSecond()) + "/s)");
+            printDefinitionEntry(out, "Served", statistics.getServedCount() + " (" + DECIMAL_FORMAT.format(statistics.getServedPerSecond()) + "/s)");
 
             // Refused
-            printDefintionEntry(out, "Refused", statistics.getRefusedCount() + " (" + DECIMAL_FORMAT.format(statistics.getRefusedPerSecond()) + "/s)");
+            printDefinitionEntry(out, "Refused", statistics.getRefusedCount() + " (" + DECIMAL_FORMAT.format(statistics.getRefusedPerSecond()) + "/s)");
 
             // averageActiveTime
-            printDefintionEntry(out, "Average active time", DECIMAL_FORMAT.format(statistics.getAverageActiveTime() / 1000) + "s");
+            printDefinitionEntry(out, "Average active time", DECIMAL_FORMAT.format(statistics.getAverageActiveTime() / 1000) + "s");
 
             // activityLevel
             StringBuffer activityLevelBuffer = new StringBuffer();
@@ -169,7 +169,7 @@ public class AdminServlet extends HttpServlet {
             String[] colours = {"0000ff", "eeeeee"};
             int[] lengths = {activityLevel, 100 - activityLevel};
             drawBarChart(activityLevelBuffer, colours, lengths);
-            printDefintionEntry(out, "Activity level", activityLevelBuffer.toString());
+            printDefinitionEntry(out, "Activity level", activityLevelBuffer.toString());
 
             closeTable(out);
         }
@@ -207,26 +207,26 @@ public class AdminServlet extends HttpServlet {
         openTable(out);
 
         // url
-        printDefintionEntry(out, "URL", cpd.getUrl());
+        printDefinitionEntry(out, "URL", cpd.getUrl());
 
         // driver
-        printDefintionEntry(out, "Driver", cpd.getDriver());
+        printDefinitionEntry(out, "Driver", cpd.getDriver());
 
         // minimumConnectionCount and maximumConnectionCount
-        printDefintionEntry(out, "Connections", cpd.getMinimumConnectionCount() + " (min), " + cpd.getMaximumConnectionCount() + " (max)");
+        printDefinitionEntry(out, "Connections", cpd.getMinimumConnectionCount() + " (min), " + cpd.getMaximumConnectionCount() + " (max)");
 
         // prototypeCount
-        printDefintionEntry(out, "Prototyping", cpd.getPrototypeCount() > 0 ? String.valueOf(cpd.getPrototypeCount()) : null);
+        printDefinitionEntry(out, "Prototyping", cpd.getPrototypeCount() > 0 ? String.valueOf(cpd.getPrototypeCount()) : null);
 
         // maximumConnectionLifetime
-        printDefintionEntry(out, "Connection Lifetime", TIME_FORMAT.format(new Date(cpd.getMaximumConnectionLifetime() - DATE_OFFSET)));
+        printDefinitionEntry(out, "Connection Lifetime", TIME_FORMAT.format(new Date(cpd.getMaximumConnectionLifetime() - DATE_OFFSET)));
 
         // maximumActiveTime
-        printDefintionEntry(out, "Maximum active time", TIME_FORMAT.format(new Date(cpd.getMaximumActiveTime() - DATE_OFFSET)));
-        printDefintionEntry(out, "House keeping sleep time", (cpd.getHouseKeepingSleepTime() / 1000) + "s");
+        printDefinitionEntry(out, "Maximum active time", TIME_FORMAT.format(new Date(cpd.getMaximumActiveTime() - DATE_OFFSET)));
+        printDefinitionEntry(out, "House keeping sleep time", (cpd.getHouseKeepingSleepTime() / 1000) + "s");
 
         // houseKeepingTestSql
-        printDefintionEntry(out, "House keeping test SQL", cpd.getHouseKeepingTestSql());
+        printDefinitionEntry(out, "House keeping test SQL", cpd.getHouseKeepingTestSql());
 
         // fatalSqlExceptions
         String fatalSqlExceptions = null;
@@ -240,10 +240,10 @@ public class AdminServlet extends HttpServlet {
             }
             fatalSqlExceptions = fatalSqlExceptionsBuffer.toString();
         }
-        printDefintionEntry(out, "Fatal SQL exceptions", fatalSqlExceptions);
+        printDefinitionEntry(out, "Fatal SQL exceptions", fatalSqlExceptions);
 
         // statistics
-        printDefintionEntry(out, "Statistics", cpd.getStatistics());
+        printDefinitionEntry(out, "Statistics", cpd.getStatistics());
 
         closeTable(out);
 
@@ -260,7 +260,7 @@ public class AdminServlet extends HttpServlet {
             openTable(out);
 
             // dateStarted
-            printDefintionEntry(out, "Start date", DATE_FORMAT.format(snapshot.getDateStarted()));
+            printDefinitionEntry(out, "Start date", DATE_FORMAT.format(snapshot.getDateStarted()));
 
             // connections
             StringBuffer connectionsBuffer = new StringBuffer();
@@ -278,13 +278,13 @@ public class AdminServlet extends HttpServlet {
             int[] lengths = {snapshot.getActiveConnectionCount(), snapshot.getAvailableConnectionCount(),
                              snapshot.getMaximumConnectionCount() - snapshot.getActiveConnectionCount() - snapshot.getAvailableConnectionCount()};
             drawBarChart(connectionsBuffer, colours, lengths);
-            printDefintionEntry(out, "Connections", connectionsBuffer.toString());
+            printDefinitionEntry(out, "Connections", connectionsBuffer.toString());
 
             // servedCount
-            printDefintionEntry(out, "Served", String.valueOf(snapshot.getServedCount()));
+            printDefinitionEntry(out, "Served", String.valueOf(snapshot.getServedCount()));
 
             // refusedCount
-            printDefintionEntry(out, "Refused", String.valueOf(snapshot.getRefusedCount()));
+            printDefinitionEntry(out, "Refused", String.valueOf(snapshot.getRefusedCount()));
 
             if (!detail) {
                 out.println("    <tr>");
@@ -495,7 +495,7 @@ public class AdminServlet extends HttpServlet {
     }
 
 
-    private void printDefintionEntry(ServletOutputStream out, String name, String value) throws IOException {
+    private void printDefinitionEntry(ServletOutputStream out, String name, String value) throws IOException {
         out.println("    <tr>");
         out.print("      <td width=\"200\" valign=\"top\" style=\"" + STYLE_CAPTION + "\">");
         out.print(name);
@@ -546,6 +546,9 @@ public class AdminServlet extends HttpServlet {
 /*
  Revision history:
  $Log: AdminServlet.java,v $
+ Revision 1.3  2003/02/26 16:59:18  billhorsman
+ fixed spelling error in method name
+
  Revision 1.2  2003/02/26 16:51:12  billhorsman
  fixed units for average active time. now displays
  properly in seconds
