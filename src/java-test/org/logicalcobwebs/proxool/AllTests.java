@@ -10,11 +10,13 @@ import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Run all tests
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/02 11:37:48 $
+ * @version $Revision: 1.6 $, $Date: 2002/11/07 18:53:41 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -22,6 +24,8 @@ import org.apache.log4j.xml.DOMConfigurator;
 public class AllTests {
 
     private static boolean initialised;
+
+    private static final Log LOG = LogFactory.getLog(AllTests.class);
 
     /**
      * Run all tests
@@ -47,9 +51,12 @@ public class AllTests {
     public static synchronized void globalSetup() {
         if (!initialised) {
             String log4jPath = System.getProperty("log4jPath");
-            System.out.println(log4jPath);
             if (log4jPath != null && log4jPath.length() > 0) {
-                DOMConfigurator.configure(log4jPath);
+                try {
+                    DOMConfigurator.configureAndWatch(log4jPath);
+                } catch (Exception e) {
+                    LOG.debug("Can't configure logging using " + log4jPath);
+                }
             }
             initialised = true;
         }
@@ -63,6 +70,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.6  2002/11/07 18:53:41  billhorsman
+ slight improvement to setup
+
  Revision 1.5  2002/11/02 11:37:48  billhorsman
  New tests
 
