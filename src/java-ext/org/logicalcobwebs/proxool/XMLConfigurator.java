@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.ext;
+package org.logicalcobwebs.proxool;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -40,7 +40,7 @@ import java.util.Properties;
  * ignore everything apart from the contained within the &lt;proxool&gt;
  * element.</p>
  *
- * @version $Revision: 1.1 $, $Date: 2002/09/19 08:53:41 $
+ * @version $Revision: 1.4 $, $Date: 2002/10/27 12:00:16 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */

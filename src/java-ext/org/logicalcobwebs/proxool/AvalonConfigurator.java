@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.ext;
+package org.logicalcobwebs.proxool;
 
 import org.apache.avalon.framework.activity.Disposable;
 import org.apache.avalon.framework.configuration.Configurable;
@@ -198,7 +198,7 @@ import java.util.Properties;
  * &lt;/jdbc-manager&gt;
  * </pre>
  *
- * @version $Revision: 1.2 $, $Date: 2002/10/23 21:04:37 $
+ * @version $Revision: 1.4 $, $Date: 2002/10/27 12:00:14 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -302,6 +302,9 @@ public class AvalonConfigurator implements Configurable, ThreadSafe, Disposable 
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.4  2002/10/27 12:00:14  billhorsman
+ moved classes from ext sub-package which is now obsolete - let's keep everything together in one place
+
  Revision 1.2  2002/10/23 21:04:37  billhorsman
  checkstyle fixes (reduced max line width and lenient naming convention
 

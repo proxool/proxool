@@ -4,7 +4,7 @@
 * This software is the proprietary information of Findexa AS.
 * Use is subject to license terms.
 */
-package org.logicalcobwebs.proxool.ext;
+package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.apache.commons.logging.Log;
@@ -39,7 +39,7 @@ import java.io.IOException;
  *<p>Note that there is nothing Proxool specific about this configurator. You can
  * configure any JDBC connection with it.</p>
  *
- * @version $Revision: 1.1 $, $Date: 2002/10/25 10:40:27 $
+ * @version $Revision: 1.1 $, $Date: 2002/10/27 12:00:16 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -116,6 +116,9 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.1  2002/10/27 12:00:16  billhorsman
+ moved classes from ext sub-package which is now obsolete - let's keep everything together in one place
+
  Revision 1.1  2002/10/25 10:40:27  billhorsman
  draft
 
