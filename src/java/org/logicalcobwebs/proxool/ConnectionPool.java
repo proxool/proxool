@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.51 $, $Date: 2003/02/19 23:46:10 $
+ * @version $Revision: 1.52 $, $Date: 2003/02/26 12:57:30 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -503,6 +503,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
             boolean connectionClosedManually = false;
             try {
+
+                // TODO need some sort of synchronization here. If the house keeper
+                // or prototyper are running right now they might create a new
+                // connection after we have closed them all below
                 try {
                     wakehouseKeeper();
                 } catch (NullPointerException e) {
@@ -1182,6 +1186,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.52  2003/02/26 12:57:30  billhorsman
+ added TODO
+
  Revision 1.51  2003/02/19 23:46:10  billhorsman
  renamed monitor package to admin
 
