@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.14 $
-    $Date: 2002/11/14 16:20:19 $
+    $Revision: 1.15 $
+    $Date: 2002/12/03 16:10:26 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -32,7 +32,7 @@
     <property name="debug" value="false"/>
 
     <!-- Current version -->
-    <property name="version" value="0.5-b1"/>
+    <property name="version" value="0.5"/>
 
     <!-- Log4J configuration to use for testing. See proxool-ant.properties
     file for more infomation. -->
@@ -241,7 +241,6 @@
 
     <target
         name="build-test"
-        description="Builds the source for running the tests"
         depends="init"
         >
         <property name="build-test" value="true"/>
@@ -251,7 +250,7 @@
     </target>
 
     <target
-        name="run-test"
+        name="test"
         description="Runs the JUnit tests"
         depends="init,build-test"
         >
