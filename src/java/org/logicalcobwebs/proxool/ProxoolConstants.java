@@ -8,11 +8,11 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:13:06 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/25 15:59:32 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public interface ProxoolConstants {
+interface ProxoolConstants {
 
     public final String PROXOOL = "proxool";
 
@@ -93,8 +93,11 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
- Revision 1.1  2002/09/13 08:13:06  billhorsman
- Initial revision
+ Revision 1.2  2002/10/25 15:59:32  billhorsman
+ made non-public where possible
+
+ Revision 1.1.1.1  2002/09/13 08:13:06  billhorsman
+ new
 
  Revision 1.3  2002/08/24 19:57:15  billhorsman
  checkstyle changes

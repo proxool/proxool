@@ -22,8 +22,9 @@ import java.util.Properties;
  *
  * <p>You need to use this class wisely. It is obviously specfic to proxool so it will
  * stop you switching to another driver. Consider isolating the code that calls this
- * class so that you can easily remove it if you have to.</p>.
- * @version $Revision: 1.5 $, $Date: 2002/10/25 10:12:52 $
+ * class so that you can easily remove it if you have to.</p>
+ * 
+ * @version $Revision: 1.6 $, $Date: 2002/10/25 15:59:32 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -408,6 +409,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.6  2002/10/25 15:59:32  billhorsman
+ made non-public where possible
+
  Revision 1.5  2002/10/25 10:12:52  billhorsman
  Improvements and fixes to the way connection pools close down. Including new ReloadMonitor to detect when a class is reloaded. Much better logging too.
 

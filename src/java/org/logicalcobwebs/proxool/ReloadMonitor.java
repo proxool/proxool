@@ -15,12 +15,12 @@ import java.util.Date;
  *
  * TODO
  *
- * @version $Revision: 1.1 $, $Date: 2002/10/25 10:12:52 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/25 15:59:32 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
-public class ReloadMonitor {
+class ReloadMonitor {
 
     private static final Log LOG = LogFactory.getLog(ReloadMonitor.class);
 
@@ -99,6 +99,9 @@ public class ReloadMonitor {
 /*
  Revision history:
  $Log: ReloadMonitor.java,v $
+ Revision 1.2  2002/10/25 15:59:32  billhorsman
+ made non-public where possible
+
  Revision 1.1  2002/10/25 10:12:52  billhorsman
  Improvements and fixes to the way connection pools close down. Including new ReloadMonitor to detect when a class is reloaded. Much better logging too.
 

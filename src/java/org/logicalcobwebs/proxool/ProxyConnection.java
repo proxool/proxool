@@ -18,11 +18,11 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.5 $, $Date: 2002/10/24 18:15:09 $
+ * @version $Revision: 1.6 $, $Date: 2002/10/25 15:59:32 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
+class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 
     private Connection connection;
 
@@ -343,6 +343,9 @@ public class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.6  2002/10/25 15:59:32  billhorsman
+ made non-public where possible
+
  Revision 1.5  2002/10/24 18:15:09  billhorsman
  removed unnecessary debug
 

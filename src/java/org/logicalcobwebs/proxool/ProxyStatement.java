@@ -24,11 +24,11 @@ import java.util.Set;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.2 $, $Date: 2002/10/17 15:29:18 $
+ * @version $Revision: 1.3 $, $Date: 2002/10/25 15:59:32 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public class ProxyStatement implements InvocationHandler {
+class ProxyStatement implements InvocationHandler {
 
     private static final Log LOG = LogFactory.getLog(ProxoolFacade.class);
 
@@ -116,6 +116,9 @@ public class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.3  2002/10/25 15:59:32  billhorsman
+ made non-public where possible
+
  Revision 1.2  2002/10/17 15:29:18  billhorsman
  fixes so that equals() works
 
