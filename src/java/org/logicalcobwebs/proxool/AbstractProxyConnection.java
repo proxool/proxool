@@ -23,7 +23,7 @@ import java.util.Date;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.10 $, $Date: 2003/02/12 12:30:10 $
+ * @version $Revision: 1.11 $, $Date: 2003/02/13 17:01:27 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -190,7 +190,7 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
                 Statement statement = (Statement) i.next();
                 statement.close();
                 if (connectionPool.getLog().isDebugEnabled()) {
-                    connectionPool.getLog().debug("Closing statement " + statement.hashCode() + " automatically");
+                    connectionPool.getLog().debug("Closing statement " + Integer.toHexString(statement.hashCode()) + " automatically");
                 }
             }
             openStatements.clear();
@@ -511,6 +511,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.11  2003/02/13 17:01:27  billhorsman
+ use hex for statement hashcode
+
  Revision 1.10  2003/02/12 12:30:10  billhorsman
  checkstyle
 
