@@ -22,8 +22,13 @@ import org.xml.sax.helpers.AttributesImpl;
  * The configuration can contain any number of &lt;proxool&gt; elements. The &lt;proxool&gt; elements
  * are delegated to {@link XMLConfigurator},
  * and have exactly the same format as is documented in that class.
+ * <p>
+ * This is a "faceless" Avalon component. This means that it does not present an operational interface, it
+ * simply configures Proxool when Avalon calls it's <code>configure</code> method. You need to lookup this
+ * component in your bootstrap code to make this happen.
+ * </p>
  *
- * @version $Revision: 1.6 $, $Date: 2002/12/23 02:44:44 $
+ * @version $Revision: 1.7 $, $Date: 2002/12/23 02:58:16 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -116,6 +121,9 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.7  2002/12/23 02:58:16  chr32
+ Improved doc.
+
  Revision 1.6  2002/12/23 02:44:44  chr32
  Added ROLE id and started implementing Component.
  Improved namespace support.
