@@ -13,7 +13,7 @@ import java.util.Stack;
 
 /**
  * Provides common code for all Proxool tests
- * @version $Revision: 1.1 $, $Date: 2003/03/03 17:08:54 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/03 17:38:47 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -45,7 +45,7 @@ public class AbstractProxoolTest extends TestCase {
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown();
+        GlobalTest.globalTeardown(alias);
         Thread.currentThread().setName((String) threadNames.pop());
         LOG.debug("Thread '" + alias + "' -> '" + Thread.currentThread().getName() + "'");
     }
@@ -56,6 +56,9 @@ public class AbstractProxoolTest extends TestCase {
 /*
  Revision history:
  $Log: AbstractProxoolTest.java,v $
+ Revision 1.2  2003/03/03 17:38:47  billhorsman
+ leave shutdown to AbstractProxoolTest
+
  Revision 1.1  2003/03/03 17:08:54  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/03 17:09:18 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/03 17:36:33 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -60,8 +60,6 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
         } catch (ProxoolException e) {
             throw e;
         }
-        ProxoolFacade.removeConnectionPool("xml-test");
-        ProxoolFacade.removeConnectionPool("xml-test-2");
     }
 
     /**
@@ -89,8 +87,6 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
         } catch (ProxoolException e) {
             throw e;
         }
-        ProxoolFacade.removeConnectionPool("xml-test-ns");
-        ProxoolFacade.removeConnectionPool("xml-test-ns-2");
     }
 
     /**
@@ -121,8 +117,6 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
         } catch (ProxoolException e) {
             throw e;
         }
-        ProxoolFacade.removeConnectionPool("xml-test-validating");
-        ProxoolFacade.removeConnectionPool("xml-test-validating-2");
     }
 
     /**
@@ -139,9 +133,6 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
             JAXPConfigurator.configure(inputSource, true);
         } catch (ProxoolException e) {
             failure = true;
-        } finally {
-            ProxoolFacade.removeConnectionPool("xml-test-validating");
-            ProxoolFacade.removeConnectionPool("xml-test-validating-2");
         }
         assertTrue("Configuration did not fail on unvalid xml document.", failure);
     }
@@ -175,6 +166,9 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.12  2003/03/03 17:36:33  billhorsman
+ leave shutdown to AbstractProxoolTest
+
  Revision 1.11  2003/03/03 17:09:18  billhorsman
  all tests now extend AbstractProxoolTest
 
