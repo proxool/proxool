@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.49 $, $Date: 2003/02/19 22:38:33 $
+ * @version $Revision: 1.50 $, $Date: 2003/02/19 23:07:46 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -93,8 +93,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     private long timeMillisOfLastRefusal = 0;
 
     private int upState;
-
-    private int recentlyStartedActiveConnectionCount;
 
     private static boolean loggedLegend;
 
@@ -177,7 +175,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             }
             log.info(displayStatistics() + " - " + MSG_MAX_CONNECTION_COUNT);
             timeMillisOfLastRefusal = System.currentTimeMillis();
-            calculateUpState();
             throwSQLException(MSG_MAX_CONNECTION_COUNT);
         }
 
@@ -232,24 +229,20 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             if (log.isDebugEnabled()) {
                 log.debug("Problem getting connection", e);
             }
-            calculateUpState();
             throw e;
         } catch (Throwable t) {
             log.error("Problem getting connection", t);
-            calculateUpState();
             throwSQLException(t.toString());
         } finally {
             if (proxyConnection != null) {
                 connectionsServedCount++;
                 proxyConnection.setRequester(requester);
-                calculateUpState();
             } else {
                 connectionsRefusedCount++;
                 if (monitor != null) {
                     monitor.connectionRefused();
                 }
                 timeMillisOfLastRefusal = System.currentTimeMillis();
-                calculateUpState();
             }
         }
 
@@ -362,7 +355,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         } finally {
 
             lastCreateWasSuccessful = (proxyConnection != null);
-            calculateUpState();
 
             if (!lastCreateWasSuccessful) {
                 // If there has been an exception then we won't be using this one and
@@ -424,17 +416,12 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         } finally {
             // This is probably due to getPoolableConnection returning a null.
-            calculateUpState();
         }
     }
 
     /** This means that there's something wrong the connection and it's probably best if no one uses it again. */
     protected void throwConnection(ProxyConnectionIF proxyConnection) {
-        try {
-            expireConnectionAsSoonAsPossible(proxyConnection, true);
-        } finally {
-            calculateUpState();
-        }
+        expireConnectionAsSoonAsPossible(proxyConnection, true);
     }
 
     /** Get a ProxyConnection by index */
@@ -486,7 +473,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private void expireProxyConnection(ProxyConnectionIF proxyConnection, boolean forceExpiry) {
         removeProxyConnection(proxyConnection, "age is " + proxyConnection.getAge() + "ms", forceExpiry);
-        calculateUpState();
     }
 
     /**
@@ -789,11 +775,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     // Let's see whether our counts agree
                     verifyConnectionCountState(verifiedConnectionCountByState);
 
-                    setRecentlyStartedActiveConnectionCount(recentlyStartedActiveConnectionCountTemp);
-
                     pokePrototyper();
 
-                    calculateUpState();
+                    calculateUpState(recentlyStartedActiveConnectionCountTemp);
                 } catch (RuntimeException e) {
                     // We don't want the housekeeping thread to fall over!
                     log.error("Housekeeping log.error( :", e);
@@ -1042,7 +1026,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         return upState;
     }
 
-    private void calculateUpState() {
+    private void calculateUpState(int recentlyStartedActiveConnectionCount) {
 
         try {
 
@@ -1061,7 +1045,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
             // if (this.lastCreateWasSuccessful) {
             final int availableConnectionCount = getAvailableConnectionCount();
-            final int recentlyStartedActiveConnectionCount = getRecentlyStartedActiveConnectionCount();
             if (availableConnectionCount > 0 || recentlyStartedActiveConnectionCount > 0) {
 
 /* Defintion of overloaded is that we refused a connection
@@ -1099,14 +1082,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         return proxyConnections;
     }
 
-    public int getRecentlyStartedActiveConnectionCount() {
-        return recentlyStartedActiveConnectionCount;
-    }
-
-    public void setRecentlyStartedActiveConnectionCount(int recentlyStartedActiveConnectionCount) {
-        this.recentlyStartedActiveConnectionCount = recentlyStartedActiveConnectionCount;
-    }
-
     /**
      * Manually expire a connection.
      * @param id the id of the connection to kill
@@ -1133,7 +1108,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 proxyConnection.fromAvailableToOffline();
                 proxyConnection.fromOfflineToNull();
                 removeProxyConnection(proxyConnection, "it was manually killed", forceExpiry);
-                calculateUpState();
                 success = true;
                 break;
             }
@@ -1208,6 +1182,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.50  2003/02/19 23:07:46  billhorsman
+ state changes are now only calculated every time the house
+ keeper runs, but it's more accurate
+
  Revision 1.49  2003/02/19 22:38:33  billhorsman
  fatal sql exception causes house keeper to run
  immediately
