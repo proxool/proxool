@@ -26,6 +26,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Calendar;
 
 /**
  * Use this to admin each pool within Proxool. It acts like a normal
@@ -44,7 +45,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/10 23:43:14 $
+ * @version $Revision: 1.7 $, $Date: 2003/08/06 20:08:58 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -62,9 +63,15 @@ public class AdminServlet extends HttpServlet {
     private static final String STYLE_CAPTION = "text-align: right; color: #333333;";
     private static final String STYLE_DATA = "background: white;";
     private static final String STYLE_NO_DATA = "color: #666666;";
-    private static final int DATE_OFFSET = 3600000;
+
+    /**
+     * HH:mm:ss
+     * @see #formatMilliseconds
+     */
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
     private static final String LEVEL = "level";
     private static final String LEVEL_MORE = "more";
@@ -219,10 +226,12 @@ public class AdminServlet extends HttpServlet {
         printDefinitionEntry(out, "Prototyping", cpd.getPrototypeCount() > 0 ? String.valueOf(cpd.getPrototypeCount()) : null);
 
         // maximumConnectionLifetime
-        printDefinitionEntry(out, "Connection Lifetime", TIME_FORMAT.format(new Date(cpd.getMaximumConnectionLifetime() - DATE_OFFSET)));
+        // printDefinitionEntry(out, "Connection Lifetime", TIME_FORMAT.format(new Date(cpd.getMaximumConnectionLifetime() - DATE_OFFSET)));
+        printDefinitionEntry(out, "Connection Lifetime", formatMilliseconds(cpd.getMaximumConnectionLifetime()));
 
         // maximumActiveTime
-        printDefinitionEntry(out, "Maximum active time", TIME_FORMAT.format(new Date(cpd.getMaximumActiveTime() - DATE_OFFSET)));
+        // printDefinitionEntry(out, "Maximum active time", TIME_FORMAT.format(new Date(cpd.getMaximumActiveTime() - DATE_OFFSET)));
+        printDefinitionEntry(out, "Maximum active time", formatMilliseconds(cpd.getMaximumActiveTime()));
         printDefinitionEntry(out, "House keeping sleep time", (cpd.getHouseKeepingSleepTime() / 1000) + "s");
 
         // houseKeepingTestSql
@@ -540,12 +549,28 @@ public class AdminServlet extends HttpServlet {
         closeTable(out);
 
     }
+
+    /**
+     * Express time in an easy to read HH:mm:ss format
+     * @param time in milliseconds
+     * @return time (e.g. 180000 = 00:30:00)
+     * @see #TIME_FORMAT
+     */
+    private String formatMilliseconds(int time) {
+        Calendar c = Calendar.getInstance();
+        c.clear();
+        c.add(Calendar.MILLISECOND, time);
+        return TIME_FORMAT.format(c.getTime());
+    }
 }
 
 
 /*
  Revision history:
  $Log: AdminServlet.java,v $
+ Revision 1.7  2003/08/06 20:08:58  billhorsman
+ fix timezone display of time (for millisecond based properties)
+
  Revision 1.6  2003/03/10 23:43:14  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...
