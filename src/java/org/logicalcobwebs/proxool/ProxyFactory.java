@@ -16,7 +16,7 @@ import java.lang.reflect.Proxy;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.6 $, $Date: 2002/12/06 15:57:08 $
+ * @version $Revision: 1.7 $, $Date: 2002/12/08 22:17:35 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -65,6 +65,9 @@ class ProxyFactory {
         } else {
             interfaces[0] = Statement.class;
         }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(delegate.getClass().getName() + " is being proxied using the " + interfaces[0]);
+        }
         return (Statement) Proxy.newProxyInstance(delegate.getClass().getClassLoader(), interfaces, new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
     }
 
@@ -74,6 +77,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.7  2002/12/08 22:17:35  billhorsman
+ debug for proxying statement interfaces
+
  Revision 1.6  2002/12/06 15:57:08  billhorsman
  fix for proxied statement where Statement interface is not directly
  implemented.
