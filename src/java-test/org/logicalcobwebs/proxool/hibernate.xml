@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<!-- This is used by HibernateTest.testHibernateConfiguredConnection to
+ see whether Hibernate can configure the Proxool pool itself. -->
+<proxool>
+    <alias>hibernateConfiguredConnection</alias>
+    <driver-class>org.hsqldb.jdbcDriver</driver-class>
+    <driver-url>jdbc:hsqldb:test</driver-url>
+    <driver-properties>
+        <property name="user" value="sa"/>
+    </driver-properties>
+</proxool>
