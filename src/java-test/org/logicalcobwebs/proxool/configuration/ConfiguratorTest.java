@@ -20,7 +20,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/06 17:41:03 $
+ * @version $Revision: 1.9 $, $Date: 2003/02/07 09:35:52 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -55,7 +55,7 @@ public class ConfiguratorTest extends TestCase {
 
     public void testConfigurator() {
 
-        String testName = "template";
+        String testName = "configurator";
         ProxoolAdapter adapter = null;
         try {
             String alias = testName;
@@ -84,6 +84,9 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.9  2003/02/07 09:35:52  billhorsman
+ changed alias for testConfigurator
+
  Revision 1.8  2003/02/06 17:41:03  billhorsman
  now uses imported logging
 
