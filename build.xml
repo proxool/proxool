@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.23 $
-    $Date: 2003/01/21 10:56:40 $
+    $Revision: 1.24 $
+    $Date: 2003/01/28 11:57:52 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -96,6 +96,13 @@
         description="Cleans build directory"
         >
         <delete dir="${build-dir}"/>
+    </target>
+
+    <target
+        name="deleteTestDb"
+        description="Cleans build directory"
+        >
+        <delete dir="db"/>
     </target>
 
     <target
