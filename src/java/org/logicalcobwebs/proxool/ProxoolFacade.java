@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -21,13 +23,15 @@ import java.util.Properties;
  * <p>You need to use this class wisely. It is obviously specfic to proxool so it will
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:13:19 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/17 15:27:31 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 public class ProxoolFacade {
 
     private static final Log LOG = LogFactory.getLog(ProxoolFacade.class);
+
+    private static Map infos = new HashMap();
 
     /** Build a ConnectionPool based on this definition and then start it. */
     public static String registerConnectionPool(String url, Properties info) throws SQLException {
@@ -48,7 +52,7 @@ public class ProxoolFacade {
                 throw new SQLException("Invalid URL format.");
             }
 
-            definePool(cpd, info);
+            definePool(null, url, cpd, info);
             connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
             connectionPool.start();
             name = cpd.getName();
@@ -93,13 +97,31 @@ public class ProxoolFacade {
      * @return the name of the pool
      * @throws SQLException if there were any validation errors.
      */
-    private static String definePool(ConnectionPoolDefinition cpd, Properties info) throws SQLException {
+    private static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException {
 
-        if (info != null) {
+        // TODO - need to rethink the way we pass ConnectionPool in here. It's
+
+        Properties rememberedInfo = null;
+        if (cp != null) {
+            rememberedInfo = (Properties) infos.get(cp.getDefinition().getUrl());
+        }
+
+        if (info != null && (rememberedInfo == null || !info.equals(rememberedInfo))) {
+
+            if (LOG.isDebugEnabled()) {
+                if (rememberedInfo == null) {
+                    LOG.debug("Setting properties on " + url);
+                } else {
+                    LOG.debug("Updating properties on " + url);
+                }
+        }
+
             Iterator i = info.keySet().iterator();
             while (i.hasNext()) {
                 String key = (String) i.next();
                 String value = info.getProperty(key);
+                boolean propertyRecognised = true;
+
 
                 if (key.equals(ProxoolConstants.USER_PROPERTY)) {
                     cpd.setUser(value);
@@ -181,8 +203,23 @@ public class ProxoolFacade {
                     cpd.setFatalSqlException(value);
                 } else {
                     cpd.setProperty(key, value);
+                    propertyRecognised = false;
                 }
 
+                if (LOG.isDebugEnabled() ) {
+                    if (propertyRecognised) {
+                        LOG.debug("Recognised proxool property: " + key + "=" + value);
+                    } else {
+                        LOG.debug("Delgating property to Driver: " + key + "=" + value);
+                    }
+                }
+
+            }
+
+            if (cp != null) {
+                infos.put(cp.getDefinition().getUrl(), info);
+            } else {
+                infos.put(url, info);
             }
 
         }
@@ -352,8 +389,9 @@ public class ProxoolFacade {
      */
     public static void updateConnectionPool(String url, Properties info) throws SQLException {
         String poolName = getAlias(url);
-        ConnectionPoolDefinition cpd = ConnectionPoolManager.getInstance().getConnectionPool(poolName).getDefinition();
-        definePool(cpd, info);
+        ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(poolName);
+        ConnectionPoolDefinition cpd = cp.getDefinition();
+        definePool(cp, url, cpd, info);
     }
 
 }
@@ -361,8 +399,11 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
- Revision 1.1  2002/09/13 08:13:19  billhorsman
- Initial revision
+ Revision 1.2  2002/10/17 15:27:31  billhorsman
+ better reporting of property settings
+
+ Revision 1.1.1.1  2002/09/13 08:13:19  billhorsman
+ new
 
  Revision 1.11  2002/08/24 20:07:28  billhorsman
  removed debug to stdout
