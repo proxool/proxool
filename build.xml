@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.35 $
-    $Date: 2003/02/28 12:09:46 $
+    $Revision: 1.36 $
+    $Date: 2003/02/28 12:13:28 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -282,6 +282,7 @@
     <target
         name="test"
         description="Runs the JUnit tests"
+        depends="clean,init,build-test,deleteTestDb"
         >
         <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}" />
