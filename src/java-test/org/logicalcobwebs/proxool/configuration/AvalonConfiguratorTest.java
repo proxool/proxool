@@ -8,7 +8,6 @@ package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
 
-import java.sql.SQLException;
 import java.io.File;
 
 import org.logicalcobwebs.proxool.ProxoolException;
@@ -18,7 +17,6 @@ import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.avalon.framework.context.DefaultContext;
-import org.apache.avalon.framework.component.ComponentException;
 import org.apache.avalon.excalibur.component.ExcaliburComponentManager;
 import org.apache.avalon.excalibur.component.DefaultRoleManager;
 import org.apache.log.Hierarchy;
@@ -29,7 +27,7 @@ import org.apache.log.Priority;
 /**
  * Tests that the AvalonConfgiuration works.
  *
- * @version $Revision: 1.1 $, $Date: 2002/12/23 02:40:49 $
+ * @version $Revision: 1.2 $, $Date: 2002/12/23 02:48:07 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.6
@@ -47,8 +45,8 @@ public class AvalonConfiguratorTest extends TestCase {
     /**
      * Test that the configuration succeds and that all expected properties
      * has been received by Proxool. The configuration file does not use namspaces.
-     * @throws ComponentException if the configuration fails.
-     * @throws SQLException if ProxoolFacade operation fails.
+     * @throws org.apache.avalon.framework.component.ComponentException if the configuration fails.
+     * @throws java.sql.SQLException if ProxoolFacade operation fails.
      */
     public void testNoNamspaces() throws Exception {
         initializeAvalon("src/java-test/org/logicalcobwebs/proxool/configuration/role.conf",
@@ -72,8 +70,8 @@ public class AvalonConfiguratorTest extends TestCase {
     /**
      * Test that the configuration succeds and that all expected properties
      * has been received by Proxool. The configuration file uses namspaces.
-     * @throws ComponentException if the configuration fails.
-     * @throws SQLException if ProxoolFacade operation fails.
+     * @throws org.apache.avalon.framework.component.ComponentException if the configuration fails.
+     * @throws java.sql.SQLException if ProxoolFacade operation fails.
      */
     public void testWithNamspaces() throws Exception {
         initializeAvalon("src/java-test/org/logicalcobwebs/proxool/configuration/role.conf",
@@ -136,6 +134,9 @@ public class AvalonConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: AvalonConfiguratorTest.java,v $
+ Revision 1.2  2002/12/23 02:48:07  chr32
+ Checkstyle.
+
  Revision 1.1  2002/12/23 02:40:49  chr32
  Init rev.
 
