@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.70 $
-    $Date: 2004/05/26 22:43:42 $
+    $Revision: 1.71 $
+    $Date: 2004/05/26 23:06:45 $
     $Author: brenuart $
 
     http://proxool.sourceforge.net
@@ -230,6 +230,7 @@
         <echo level="info" message="Using ${java.vm.vendor} ${java.vm.name} ${java.vm.version} in ${java.home}"/>
         <copy todir="${build-dir}/src/java" preservelastmodified="yes">
             <fileset dir="src/java" includes="**/*.java"/>
+            <fileset dir="src/java" includes="**/*.dtd"/>
         </copy>
     </target>
 
@@ -254,7 +255,6 @@
         <echo level="verbose" message="Collecting test classes"/>
         <copy todir="${build-dir}/src/java">
             <fileset dir="src/java-test" includes="**/*.java"/>
-        	<fileset dir="src/java-test" includes="**/*.properties"/>
         </copy>
     </target>
 
@@ -265,6 +265,10 @@
         <property name="build-test" value="true"/>
         <antcall target="build-src"/>
         <antcall target="compile"/>
+
+        <copy todir="${build-dir}/classes">
+            <fileset dir="src/java-test" includes="**/*.properties"/>
+        </copy>
     </target>
 
     <target
