@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.3 $, $Date: 2002/10/27 13:29:38 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/09 15:50:15 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -51,27 +51,44 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     private boolean verbose;
 
+    private boolean trace;
+
     private Set fatalSqlExceptions = new HashSet();
 
     /** Holds value of property houseKeepingTestSql. */
     private String houseKeepingTestSql;
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getUser
+     */
     public String getUser() {
         return getProperty(USER_PROPERTY);
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getUser
+     */
     public void setUser(String user) {
         setProperty(USER_PROPERTY, user);
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getPassword
+     */
     public String getPassword() {
         return getProperty(PASSWORD_PROPERTY);
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getPassword
+     */
     public void setPassword(String password) {
         setProperty(PASSWORD_PROPERTY, password);
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getJdbcDriverVersion
+     */
     public String getJdbcDriverVersion() {
 
         try {
@@ -85,156 +102,282 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     }
 
+    /**
+     * @see Object#toString
+     */
     public String toString() {
         return getCompleteUrl();
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getName
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getName
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMaximumConnectionLifetime
+     */
     public int getMaximumConnectionLifetime() {
         return maximumConnectionLifetime;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMaximumConnectionLifetime
+     */
     public void setMaximumConnectionLifetime(int maximumConnectionLifetime) {
         this.maximumConnectionLifetime = maximumConnectionLifetime;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getPrototypeCount
+     */
     public int getPrototypeCount() {
         return prototypeCount;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getPrototypeCount
+     */
     public void setPrototypeCount(int prototypeCount) {
         this.prototypeCount = prototypeCount;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMinimumConnectionCount
+     */
     public int getMinimumConnectionCount() {
         return minimumConnectionCount;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMinimumConnectionCount
+     */
     public void setMinimumConnectionCount(int minimumConnectionCount) {
         this.minimumConnectionCount = minimumConnectionCount;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMaximumConnectionCount
+     */
     public int getMaximumConnectionCount() {
         return maximumConnectionCount;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMaximumConnectionCount
+     */
     public void setMaximumConnectionCount(int maximumConnectionCount) {
         this.maximumConnectionCount = maximumConnectionCount;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getHouseKeepingSleepTime
+     */
     public int getHouseKeepingSleepTime() {
         return houseKeepingSleepTime;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getHouseKeepingSleepTime
+     */
     public void setHouseKeepingSleepTime(int houseKeepingSleepTime) {
         this.houseKeepingSleepTime = houseKeepingSleepTime;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMaximumNewConnections
+     */
     public int getMaximumNewConnections() {
         return maximumNewConnections;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMaximumNewConnections
+     */
     public void setMaximumNewConnections(int maximumNewConnections) {
         this.maximumNewConnections = maximumNewConnections;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getProperties
+     */
     public Properties getProperties() {
         return properties;
     }
 
+    /**
+     * Get a property
+     * @param name the name of the property
+     * @return the value of the property
+     * @see ConnectionPoolDefinitionIF#getProperties
+     */
     public String getProperty(String name) {
         return getProperties().getProperty(name);
     }
 
+    /**
+     * Set a property
+     * @param name the name of the property
+     * @param value the value of the property
+     * @see ConnectionPoolDefinitionIF#getProperties
+     */
     public void setProperty(String name, String value) {
         getProperties().setProperty(name, value);
 
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getUrl
+     */
     public String getUrl() {
         return url;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getUrl
+     */
     public void setUrl(String url) {
         this.url = url;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getDriver
+     */
     public String getDriver() {
         return driver;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getDriver
+     */
     public void setDriver(String driver) {
         this.driver = driver;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getRecentlyStartedThreshold
+     */
     public int getRecentlyStartedThreshold() {
         return recentlyStartedThreshold;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getRecentlyStartedThreshold
+     */
     public void setRecentlyStartedThreshold(int recentlyStartedThreshold) {
         this.recentlyStartedThreshold = recentlyStartedThreshold;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getOverloadWithoutRefusalLifetime
+     */
     public int getOverloadWithoutRefusalLifetime() {
         return overloadWithoutRefusalLifetime;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getOverloadWithoutRefusalLifetime
+     */
     public void setOverloadWithoutRefusalLifetime(int overloadWithoutRefusalLifetime) {
         this.overloadWithoutRefusalLifetime = overloadWithoutRefusalLifetime;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMaximumActiveTime
+     */
     public int getMaximumActiveTime() {
         return maximumActiveTime;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getMaximumActiveTime
+     */
     public void setMaximumActiveTime(int maximumActiveTime) {
         this.maximumActiveTime = maximumActiveTime;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getDebugLevel
+     * @deprecated use {@link #isVerbose} instead
+     */
     public int getDebugLevel() {
         return (verbose ? 1 : 0);
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#isVerbose
+     */
     public boolean isVerbose() {
         return verbose;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#isVerbose
+     */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#isTrace
+     */
+    public boolean isTrace() {
+        return trace;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isTrace
+     */
+    public void setTrace(boolean trace) {
+        this.trace = trace;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getCompleteUrl
+     */
     public String getCompleteUrl() {
         return completeUrl;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getCompleteUrl
+     */
     public void setCompleteUrl(String completeUrl) {
         this.completeUrl = completeUrl;
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getFatalSqlExceptions
+     */
     public void setFatalSqlException(String messageFragment) {
         fatalSqlExceptions.add(messageFragment);
     }
 
+    /**
+     * @see ConnectionPoolDefinitionIF#getFatalSqlExceptions
+     */
     public Set getFatalSqlExceptions() {
         return fatalSqlExceptions;
     }
 
-    /** Getter for property houseKeepingTestSql.
-     * @return Value of property houseKeepingTestSql.
+    /**
+     * @see ConnectionPoolDefinitionIF#getHouseKeepingTestSql
      */
     public String getHouseKeepingTestSql() {
         return houseKeepingTestSql;
     }
 
-    /** Setter for property houseKeepingTestSql.
-     * @param houseKeepingTestSql New value of property houseKeepingTestSql.
+    /**
+     * @see ConnectionPoolDefinitionIF#getHouseKeepingTestSql
      */
     public void setHouseKeepingTestSql(String houseKeepingTestSql) {
         this.houseKeepingTestSql = houseKeepingTestSql;
@@ -245,6 +388,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.4  2002/11/09 15:50:15  billhorsman
+ new trace property and better doc
+
  Revision 1.3  2002/10/27 13:29:38  billhorsman
  deprecated debug-level in favour of verbose
 

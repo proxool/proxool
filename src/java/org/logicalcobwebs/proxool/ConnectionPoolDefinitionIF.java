@@ -22,7 +22,7 @@ import java.util.Set;
  * {@linkplain java.sql.Driver#connect ask} for a connection or call
  * {@linkplain ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.6 $, $Date: 2002/10/27 13:29:38 $
+ * @version $Revision: 1.7 $, $Date: 2002/11/09 15:50:15 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -153,11 +153,22 @@ public interface ConnectionPoolDefinitionIF {
      */
     boolean isVerbose();
 
+    /**
+     * if this is true then we will log each execution. The SQL used and the
+     * execution time.
+     *
+     * @return true if we should log each execution
+     */
+    boolean isTrace();
+
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.7  2002/11/09 15:50:15  billhorsman
+ new trace property and better doc
+
  Revision 1.6  2002/10/27 13:29:38  billhorsman
  deprecated debug-level in favour of verbose
 

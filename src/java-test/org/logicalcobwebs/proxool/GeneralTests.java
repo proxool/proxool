@@ -18,7 +18,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.14 $, $Date: 2002/11/07 19:08:55 $
+ * @version $Revision: 1.15 $, $Date: 2002/11/09 15:50:15 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -34,7 +34,11 @@ public class GeneralTests extends TestCase {
 
     protected void setUp() throws Exception {
         AllTests.globalSetup();
-        TestHelper.createTable(TEST_TABLE);
+        try {
+            TestHelper.createTable(TEST_TABLE);
+        } catch (Exception e) {
+            LOG.debug("Problem creating table", e);
+        }
     }
 
     protected void tearDown() throws Exception {
@@ -151,6 +155,52 @@ public class GeneralTests extends TestCase {
             assertTrue("Connection has not been closed after " + elapsed + " milliseconds as expected", connection.isClosed());
 
             assertEquals("Expected the connection to be inactive", ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount(), 0);
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            ScriptFacade.tearDownAdapter(adapter);
+        }
+
+    }
+
+    public void testConnectionListener() {
+
+        String testName = "connectionListener";
+        ProxoolAdapter adapter = null;
+        try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, "true");
+            adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            ProxoolFacade.setConnectionListener(alias, new ConnectionListenerIF() {
+
+                public void onBirth(Connection connection) throws SQLException {
+                    LOG.debug("onBirth");
+                }
+
+                public void onDeath(Connection connection) throws SQLException {
+                    LOG.debug("onDeath");
+                }
+
+                public void onExecute(String command, long elapsedTime) {
+                    LOG.debug("onExecute: " + command + " (" + elapsedTime + ")");
+                }
+
+                public void onFail(String command, Exception exception) {
+                    LOG.debug("onFail", exception);
+                }
+
+            });
+
+            Connection connection = adapter.getConnection();
+
+            TestHelper.execute(connection, "insert into test values(1)");
+
+            connection.close();
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -342,6 +392,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.15  2002/11/09 15:50:15  billhorsman
+ new trace property and better doc
+
  Revision 1.14  2002/11/07 19:08:55  billhorsman
  Fixed up tests a bit
 
