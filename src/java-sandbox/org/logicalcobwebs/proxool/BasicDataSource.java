@@ -28,7 +28,7 @@ import java.util.Properties;
 
 /**
  * Basic implementation of DataSource
- * @version $Revision: 1.2 $, $Date: 2003/07/23 06:54:48 $
+ * @version $Revision: 1.3 $, $Date: 2003/08/30 14:54:23 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -215,7 +215,7 @@ public class BasicDataSource implements DataSource {
     public Connection getConnection(String username, String password)
             throws SQLException {
         throw new UnsupportedOperationException("You should configure the username and password "
-            + "within the proxool configuration and just call getConnection() instead.");
+                + "within the proxool configuration and just call getConnection() instead.");
     }
 
     /**
@@ -542,7 +542,8 @@ public class BasicDataSource implements DataSource {
         maximumConnectionCount = ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_CONNECTION_COUNT;
         houseKeepingSleepTime = ConnectionPoolDefinitionIF.DEFAULT_HOUSE_KEEPING_SLEEP_TIME;
         houseKeepingTestSql = null;
-        simultaneousBuildThrottle = ConnectionPoolDefinitionIF.DEFAULT_SIMULTANEOUS_BUILD_THROTTLE;;
+        simultaneousBuildThrottle = ConnectionPoolDefinitionIF.DEFAULT_SIMULTANEOUS_BUILD_THROTTLE;
+        ;
         recentlyStartedThreshold = ConnectionPoolDefinitionIF.DEFAULT_RECENTLY_STARTED_THRESHOLD;
         overloadWithoutRefusalLifetime = ConnectionPoolDefinitionIF.DEFAULT_OVERLOAD_WITHOUT_REFUSAL_THRESHOLD;
         maximumActiveTime = ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_ACTIVE_TIME;
@@ -557,8 +558,7 @@ public class BasicDataSource implements DataSource {
      * binding in jndi.
      */
     public Reference getReference()
-        throws NamingException
-    {
+            throws NamingException {
         // this class implements its own factory
         String factory = getClass().getName();
         Reference ref = new Reference(getClass().getName(), factory, null);
@@ -567,17 +567,13 @@ public class BasicDataSource implements DataSource {
 
         byte[] ser = null;
         // BinaryRefAddr does not allow null byte[].
-        if ( jndiEnvironment != null )
-        {
-            try
-            {
+        if (jndiEnvironment != null) {
+            try {
                 ser = serialize(jndiEnvironment);
                 ref.add(new BinaryRefAddr("jndiEnvironment", ser));
-            }
-            catch (IOException ioe)
-            {
-                throw new NamingException("An IOException prevented " +
-                   "serializing the jndiEnvironment properties.");
+            } catch (IOException ioe) {
+                throw new NamingException("An IOException prevented "
+                   + "serializing the jndiEnvironment properties.");
             }
         }
 
@@ -589,9 +585,8 @@ public class BasicDataSource implements DataSource {
      * implements ObjectFactory to create an instance of this class
      */
     public Object getObjectInstance(Object refObj, Name name,
-                                    Context context, Hashtable env)
-        throws Exception
-    {
+            Context context, Hashtable env)
+            throws Exception {
         // TODO
         return null;
     }
@@ -603,11 +598,9 @@ public class BasicDataSource implements DataSource {
      *
      * @return value of jndiEnvironment.
      */
-    public String getJndiEnvironment(String key)
-    {
+    public String getJndiEnvironment(String key) {
         String value = null;
-        if (jndiEnvironment != null)
-        {
+        if (jndiEnvironment != null) {
             value = jndiEnvironment.getProperty(key);
         }
         return value;
@@ -621,10 +614,8 @@ public class BasicDataSource implements DataSource {
      * @param key property key
      * @param value  to assign to jndiEnvironment.
      */
-    public void setJndiEnvironment(String key, String value)
-    {
-        if (jndiEnvironment == null)
-        {
+    public void setJndiEnvironment(String key, String value) {
+        if (jndiEnvironment == null) {
             jndiEnvironment = new Properties();
         }
         jndiEnvironment.setProperty(key, value);
@@ -638,24 +629,19 @@ public class BasicDataSource implements DataSource {
      * @exception java.io.IOException if conversion to a byte[] fails.
      */
     private static byte[] serialize(Serializable obj)
-        throws IOException
-    {
+            throws IOException {
         byte[] byteArray = null;
         ByteArrayOutputStream baos = null;
         ObjectOutputStream out = null;
-        try
-        {
+        try {
             // These objects are closed in the finally.
             baos = new ByteArrayOutputStream();
             out = new ObjectOutputStream(baos);
 
             out.writeObject(obj);
             byteArray = baos.toByteArray();
-        }
-        finally
-        {
-            if (out != null)
-            {
+        } finally {
+            if (out != null) {
                 out.close();
             }
         }

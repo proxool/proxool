@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.20 $, $Date: 2003/08/30 11:37:31 $
+ * @version $Revision: 1.21 $, $Date: 2003/08/30 14:54:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -243,7 +243,6 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     }
 
     private boolean setAnyProperty(String key, String value, boolean pretend) throws ProxoolException {
-
         boolean proxoolProperty = true;
         boolean changed = false;
         if (key.equals(ProxoolConstants.USER_PROPERTY)) {
@@ -352,7 +351,54 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                     setMaximumActiveTime(getInt(key, value));
                 }
             }
-        } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
+        } else if (setLoggingProperty(key, value, pretend)) {
+            changed = true;
+        } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
+            if (isChanged(fatalSqlExceptionsAsString, value)) {
+                changed = true;
+                if (!pretend) {
+                    setFatalSqlExceptionsAsString(value);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
+            if (isChanged(getStatistics(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setStatistics(value);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY)) {
+            if (isChanged(getStatisticsLogLevel(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setStatisticsLogLevel(value);
+                }
+            }
+        } else if (setJndiProperty(key, value, pretend)) {
+            changed = true;
+        } else {
+            if (isChanged(getDelegateProperty(key), value)) {
+                changed = true;
+                if (!pretend) {
+                    setDelegateProperty(key, value);
+                }
+            }
+            proxoolProperty = false;
+        }
+        if (changed && !pretend) {
+            logChange(proxoolProperty, key, value);
+            changedInfo.setProperty(key, value);
+        }
+        return changed;
+    }
+
+    /**
+     * Subset of {@link #setAnyProperty} to avoid overly long method
+     * @see #setAnyProperty
+     */
+    private boolean setLoggingProperty(String key, String value, boolean pretend) throws ProxoolException {
+        boolean changed = false;
+        if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
             if (value != null && value.equals("1")) {
                 poolLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
                 if (!isVerbose()) {
@@ -386,29 +432,17 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                     setTrace(valueAsBoolean);
                 }
             }
-        } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
-            if (isChanged(fatalSqlExceptionsAsString, value)) {
-                changed = true;
-                if (!pretend) {
-                    setFatalSqlExceptionsAsString(value);
-                }
-            }
-        } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
-            if (isChanged(getStatistics(), value)) {
-                changed = true;
-                if (!pretend) {
-                    setStatistics(value);
-                }
-            }
-        } else if (key.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY)) {
-            if (isChanged(getStatisticsLogLevel(), value)) {
-                changed = true;
-                if (!pretend) {
-                    setStatisticsLogLevel(value);
-                }
-            }
-// Start JNDI
-        } else if (key.equals(ProxoolConstants.JNDI_NAME_PROPERTY)) {
+        }
+        return changed;
+    }
+
+    /**
+     * Subset of {@link #setAnyProperty} to avoid overly long method
+     * @see #setAnyProperty
+     */
+    private boolean setJndiProperty(String key, String value, boolean pretend) throws ProxoolException {
+        boolean changed = false;
+        if (key.equals(ProxoolConstants.JNDI_NAME_PROPERTY)) {
             if (isChanged(getJndiName(), value)) {
                 changed = true;
                 if (!pretend) {
@@ -450,25 +484,11 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                     setSecurityCredentials(value);
                 }
             }
-// End JNDI
         } else {
-            if (isChanged(getDelegateProperty(key), value)) {
-                changed = true;
-                if (!pretend) {
-                    setDelegateProperty(key, value);
-                }
-            }
-            proxoolProperty = false;
-        }
 
-        if (changed && !pretend) {
-            logChange(proxoolProperty, key, value);
-            changedInfo.setProperty(key, value);
         }
-
         return changed;
     }
-
     private int getInt(String key, String value) throws ProxoolException {
         try {
             return Integer.parseInt(value);
@@ -1010,6 +1030,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.21  2003/08/30 14:54:04  billhorsman
+ Checkstyle
+
  Revision 1.20  2003/08/30 11:37:31  billhorsman
  Trim fatal-sql-exception messages so that whitespace around the comma delimiters does not
  get used to match against exception message.

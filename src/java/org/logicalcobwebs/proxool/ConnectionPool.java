@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.66 $, $Date: 2003/04/10 08:23:54 $
+ * @version $Revision: 1.67 $, $Date: 2003/08/30 14:54:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -931,7 +931,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      */
     protected void acquirePrimaryWriteLock() throws InterruptedException {
         boolean success = false;
-        try {
+//        try {
 //            if (log.isDebugEnabled()) {
 //                try {
 //                    throw new RuntimeException("TRACE ONLY");
@@ -950,7 +950,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 //                }
 //                //log.debug("Acquired primary write lock");
 //            }
-        } finally {
+//        } finally {
 //            if (log.isDebugEnabled() && !success) {
 //                try {
 //                    throw new RuntimeException("TRACE ONLY");
@@ -959,7 +959,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 //                }
 //                //log.debug("Failed to acquire primary write lock");
 //            }
-        }
+//        }
     }
 
     /**
@@ -1046,6 +1046,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.67  2003/08/30 14:54:04  billhorsman
+ Checkstyle
+
  Revision 1.66  2003/04/10 08:23:54  billhorsman
  removed very frequent debug
 

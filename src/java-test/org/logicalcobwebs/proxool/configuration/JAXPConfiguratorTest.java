@@ -5,19 +5,23 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import org.logicalcobwebs.proxool.*;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
+import org.logicalcobwebs.proxool.ProxoolConstants;
+import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.TestHelper;
 import org.xml.sax.InputSource;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.sql.SQLException;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.15 $, $Date: 2003/04/29 11:51:49 $
+ * @version $Revision: 1.16 $, $Date: 2003/08/30 14:54:23 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -154,6 +158,9 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.16  2003/08/30 14:54:23  billhorsman
+ Checkstyle
+
  Revision 1.15  2003/04/29 11:51:49  billhorsman
  added new "with-alias" test
 

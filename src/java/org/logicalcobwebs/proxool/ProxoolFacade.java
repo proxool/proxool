@@ -12,17 +12,13 @@ import org.logicalcobwebs.proxool.admin.SnapshotIF;
 import org.logicalcobwebs.proxool.admin.StatisticsIF;
 import org.logicalcobwebs.proxool.admin.StatisticsListenerIF;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.lang.reflect.Method;
-import java.sql.Statement;
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Hashtable;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -33,7 +29,7 @@ import java.util.Hashtable;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.70 $, $Date: 2003/08/28 10:55:49 $
+ * @version $Revision: 1.71 $, $Date: 2003/08/30 14:54:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -664,6 +660,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.71  2003/08/30 14:54:04  billhorsman
+ Checkstyle
+
  Revision 1.70  2003/08/28 10:55:49  billhorsman
  comment out JNDI stuff for now
 

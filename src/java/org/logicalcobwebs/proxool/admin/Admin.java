@@ -10,8 +10,6 @@ import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.Prototyper;
-import org.logicalcobwebs.proxool.ConnectionInfoIF;
 
 import java.util.Collection;
 import java.util.Date;
@@ -25,7 +23,7 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/11 14:51:55 $
+ * @version $Revision: 1.6 $, $Date: 2003/08/30 14:54:04 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -156,21 +154,15 @@ public class Admin {
         return s;
     }
 
-    private static int getCount(ConnectionInfoIF[] connectionInfos, int status) {
-        int count = 0;
-        for (int i = 0; i < connectionInfos.length; i++) {
-            if (connectionInfos[i].getStatus() == status) {
-                count++;
-            }
-        }
-        return count;
-    }
 }
 
 
 /*
  Revision history:
  $Log: Admin.java,v $
+ Revision 1.6  2003/08/30 14:54:04  billhorsman
+ Checkstyle
+
  Revision 1.5  2003/03/11 14:51:55  billhorsman
  more concurrency fixes relating to snapshots
 
