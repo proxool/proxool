@@ -1,11 +1,21 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.28 $
-$Date: 2003/10/26 15:23:53 $
+$Revision: 1.29 $
+$Date: 2003/10/27 13:13:58 $
 $Author: billhorsman $
 
-0.8.0 - (26 October, 2003)
+0.8.1 - October 27, 2003
+
+- NullPointerException that occured during SQL logging for certain methods
+  of excecuting statements has been fixed. Also, logging is optimised to
+  do less work if nothing is listening. (No ConnectionListeners registered
+  and log level not equal to debug or trace is off).
+
+- Fixed typos in ShutdownHook. And now silently ignore IllegalStateException
+  during removal of shutdownHook that occurs during JVM shut down.
+
+0.8.0 - October 26, 2003
 
 - We now use Cglib's proxy library. Together with dropping the use of Timer
   and only referencing ShutdownHooks at runtime we are now able to support
