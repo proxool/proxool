@@ -19,7 +19,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.8 $, $Date: 2002/10/25 10:12:52 $
+ * @version $Revision: 1.9 $, $Date: 2002/10/27 12:07:45 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -742,11 +742,19 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
                 boolean keepAtIt = true;
                 boolean somethingDone = false;
-                while (connectionPoolUp && keepAtIt && (connectionCount < getDefinition().getMinimumConnectionCount()
-                        || getAvailableConnectionCount() < getDefinition().getPrototypeCount())
+                while (connectionPoolUp && keepAtIt
                         && connectionCount < getDefinition().getMaximumConnectionCount()) {
+
+                    String reason = null;
+                    if (connectionCount < getDefinition().getMinimumConnectionCount()) {
+                        reason = "to achieve minimum of " +getDefinition().getMinimumConnectionCount();
+                    } else if (getAvailableConnectionCount() < getDefinition().getPrototypeCount()) {
+                        reason = "to keep " +getDefinition().getPrototypeCount() + " available";
+                    }
+
+                    if (reason != null) {
                     try {
-                        ProxyConnection poolableConnection = createPoolableConnection(ProxyConnection.STATUS_AVAILABLE, "by prototyper");
+                        ProxyConnection poolableConnection = createPoolableConnection(ProxyConnection.STATUS_AVAILABLE, reason);
                         addPoolableConnection(poolableConnection);
                         somethingDone = true;
                     } catch (Exception e) {
@@ -758,6 +766,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         keepAtIt = false;
                         // Don't wory, we'll start again the next time the
                         // housekeeping thread runs.
+                    }
+                    } else {
+                        break;
                     }
                 }
 
@@ -852,10 +863,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      */
     protected synchronized void setDefinition(ConnectionPoolDefinition definition) {
         this.definition = definition;
-
-        if (definition.getProperties().size() == 0) {
-            throw new RuntimeException("No properties defined");
-        }
 
         try {
             Class.forName(definition.getDriver());
@@ -1033,6 +1040,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.9  2002/10/27 12:07:45  billhorsman
+ fix bug where prototyper kept making connections up to maximum. Log now gives reason why connection was prototyped. Fix bug where definition with no properties was not allowed (it is now).
+
  Revision 1.8  2002/10/25 10:12:52  billhorsman
  Improvements and fixes to the way connection pools close down. Including new ReloadMonitor to detect when a class is reloaded. Much better logging too.
 
