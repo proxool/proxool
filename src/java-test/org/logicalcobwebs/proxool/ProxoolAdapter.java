@@ -18,7 +18,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.13 $, $Date: 2003/01/18 15:13:13 $
+ * @version $Revision: 1.14 $, $Date: 2003/01/23 11:13:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -109,7 +109,8 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
         }
 
         fullUrl = TestHelper.buildProxoolUrl(alias, driver, url);
-        ProxoolFacade.registerConnectionPool(fullUrl, info, this);
+        ProxoolFacade.registerConnectionPool(fullUrl, info);
+        ProxoolFacade.setConfigurationListener(alias, this);
     }
 
     public Connection getConnection()
@@ -141,6 +142,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.14  2003/01/23 11:13:40  billhorsman
+ use new setConfiguratorListener method
+
  Revision 1.13  2003/01/18 15:13:13  billhorsman
  Signature changes (new ProxoolException
  thrown) on the ProxoolFacade API.
