@@ -17,7 +17,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.15 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.16 $, $Date: 2003/02/07 10:12:59 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -69,7 +69,7 @@ public class ProxoolDriver implements Driver {
                 // Perhaps we should be updating the definition?
                 cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
                 ConnectionPoolDefinition cpd = cp.getDefinition();
-                ProxoolFacade.updatePoolByDriver(cp, url, cpd, info);
+                ProxoolFacade.updatePoolByDriver(url, cpd, info);
             }
         } catch (ProxoolException e) {
             LOG.error("Problem", e);
@@ -206,6 +206,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.16  2003/02/07 10:12:59  billhorsman
+ changed updatePoolByDriver sig.
+
  Revision 1.15  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 
