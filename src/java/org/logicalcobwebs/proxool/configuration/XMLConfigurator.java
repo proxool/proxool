@@ -20,13 +20,14 @@ import java.util.Properties;
 /**
  * <p>A SAX ContentHandler that can configure Proxool from an XML source.</p>
  *
- * <p>This is just a ContentHandler, so you must associate it with a SAX parser for it to actually do anything.
+ * <p>This is just a <a href="http://www.saxproject.org/apidoc/org/xml/sax/ContentHandler.html" target="_new">ContentHandler</a>, so you must associate it with a SAX parser for it to actually do anything.
  * If you have JAXP available {@link JAXPConfigurator} will do this for you.</p>
  *
  * <p>Properties that you pass on to the delegate driver have to be treated specially. They
  * must be contained within a &lt;driver-properties&gt; element.</p>
  *
- * <p>See [TODO] for documentation on the available configuration properties.</p>
+ * <p>See the <a href="http://proxool.sourceforge.net/properties.html" target="_new">Proxool properties</a> for documentation
+ * on the available configuration properties.</p>
  *
  * Example configuration:
  * <pre>
@@ -35,8 +36,8 @@ import java.util.Properties;
  *     &lt;driver-url&gt;jdbc:hsqldb:.&lt;/driver-url&gt;
  *     &lt;driver-class&gt;org.hsqldb.jdbcDriver&lt;/driver-class&gt;
  *     &lt;driver-properties&gt;
- *         &lt;user&gt;abc&lt;/user&gt;
- *         &lt;password&gt;abc&lt;/password&gt;
+ *         &lt;property name="user" value="abc" /&gt;
+ *         &lt;property name="password" value="def" /&gt;
  *     &lt;/driver-properties&gt;
  *     &lt;house-keeping-sleep-time&gt;40000&lt;/house-keeping-sleep-time&gt;
  *     &lt;house-keeping-test-sql&gt;select CURRENT_DATE&lt;/house-keeping-test-sql&gt;
@@ -64,7 +65,7 @@ import java.util.Properties;
  *
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.2 $, $Date: 2002/12/15 19:43:11 $
+ * @version $Revision: 1.3 $, $Date: 2002/12/16 02:36:04 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -91,6 +92,12 @@ public class XMLConfigurator extends DefaultHandler {
 
     private static final String DRIVER_PROPERTIES = "driver-properties";
 
+    private static final String PROPERTY = "property";
+
+    private static final String NAME = "name";
+
+    private static final String VALUE = "value";
+
     private boolean insideDelegateProperties;
 
     private boolean insideProxool;
@@ -114,6 +121,10 @@ public class XMLConfigurator extends DefaultHandler {
         if (insideProxool) {
             if (lname.equals(DRIVER_PROPERTIES)) {
                 insideDelegateProperties = true;
+            } else if (insideDelegateProperties) {
+                if (lname.equals(PROPERTY)) {
+                    setDriverProperty(attributes);
+                }
             }
         }
     }
@@ -174,26 +185,37 @@ public class XMLConfigurator extends DefaultHandler {
         if (insideProxool && !lname.equals(PROXOOL)) {
             if (lname.equals(DRIVER_PROPERTIES)) {
                 insideDelegateProperties = false;
-            } else {
-                setProperty(lname, content.toString().trim());
+            } else if (!insideDelegateProperties){
+                setProxoolProperty(lname, content.toString().trim());
             }
         }
     }
 
-    private void setProperty(String localName, String value) {
+    private void setProxoolProperty(String localName, String value) {
         if (localName.equals(POOL_NAME)) {
             poolName = value;
         } else if (localName.equals(DRIVER_CLASS)) {
             driverClass = value;
         } else if (localName.equals(DRIVER_URL)) {
             driverUrl = value;
-        } else if (!localName.equals(DRIVER_PROPERTIES)) {
-            final String name = insideDelegateProperties ? localName : (ProxoolConstants.PROPERTY_PREFIX + localName);
+        } else {
             if (LOG.isDebugEnabled()) {
-                        LOG.debug("Setting property '" + name + "' to value '" + value + "'.");
-                    }
-            properties.put(name, value);
+                        LOG.debug("Setting property '" + ProxoolConstants.PROPERTY_PREFIX + localName + "' to value '" + value + "'.");
+            }
+            properties.put(ProxoolConstants.PROPERTY_PREFIX + localName, value);
         }
+    }
+
+    private void setDriverProperty(Attributes attributes) throws SAXException {
+        final String name = attributes.getValue(NAME);
+        final String value = attributes.getValue(VALUE);
+        if (name == null || name.length() < 1 || value == null) {
+            throw new SAXException("Name or value attribute missing from property element.");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding driver property " + name + " with value " + value + ".");
+        }
+        properties.put(name, value);
     }
 
     /**

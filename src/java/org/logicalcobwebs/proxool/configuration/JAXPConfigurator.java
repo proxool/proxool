@@ -23,10 +23,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Configurator that uses JAXP to get a parser for Proxool configuration xml. The parser is validating
- * and namespace aware.<br>
+ * Configurator that uses JAXP to get a parser for Proxool configuration xml. The parser relies on JAXP version 1.1 or higher
+ * and is namespace aware.<br>
  * See {@link XMLConfigurator} for the Proxool xml configuration format.
- * @version $Revision: 1.2 $, $Date: 2002/12/15 19:43:11 $
+ * @version $Revision: 1.3 $, $Date: 2002/12/16 02:38:47 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.6
@@ -112,6 +112,9 @@ public class JAXPConfigurator {
 /*
  Revision history:
  $Log: JAXPConfigurator.java,v $
+ Revision 1.3  2002/12/16 02:38:47  chr32
+ Updated to new driver-properties xml format.
+
  Revision 1.2  2002/12/15 19:43:11  chr32
  Style fixes.
 

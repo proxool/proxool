@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
 Properties for Proxool Configurator testing. Defines the same parameters as
 TestHelper.buildCompleteAlternativeProperties()
@@ -9,8 +9,8 @@ TestHelper.buildCompleteAlternativeProperties()
         <driver-url>jdbc:hsqldb:.</driver-url>
         <driver-class>org.hsqldb.jdbcDriver</driver-class>
         <driver-properties>
-            <user>sa</user>
-            <!-- <password>TEST_USER_PW</password> -->
+            <property name="user" value="sa"/>
+            <property name="password" value=""/>
         </driver-properties>
         <house-keeping-sleep-time>40000</house-keeping-sleep-time>
         <house-keeping-test-sql>select CURRENT_DATE</house-keeping-test-sql>
@@ -32,8 +32,8 @@ TestHelper.buildCompleteAlternativeProperties()
             <driver-url>jdbc:hsqldb:.</driver-url>
             <driver-class>org.hsqldb.jdbcDriver</driver-class>
             <driver-properties>
-                <user>sa</user>
-                <!-- <password>TEST_USER_PW</password> -->
+                <property name="user" value="sa"/>
+                <property name="password" value=""/>
             </driver-properties>
             <house-keeping-sleep-time>40000</house-keeping-sleep-time>
             <house-keeping-test-sql>select CURRENT_DATE</house-keeping-test-sql>

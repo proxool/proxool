@@ -11,6 +11,7 @@ import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.thread.ThreadSafe;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.xml.sax.SAXException;
+import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -19,7 +20,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * are delegated to {@link XMLConfigurator},
  * and have exactly the same format as is documented in that class.
  *
- * @version $Revision: 1.2 $, $Date: 2002/12/15 19:42:18 $
+ * @version $Revision: 1.3 $, $Date: 2002/12/16 02:37:14 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -61,7 +62,7 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
             if (namespace == null) {
                 namespace = "";
             }
-            xmlConfigurator.startElement(namespace, configuration.getName(), "", new AttributesImpl());
+            xmlConfigurator.startElement(namespace, configuration.getName(), "", getAttributes(configuration));
             children = configuration.getChildren();
             // If this is a leaf node, report the value,
             // else recurse.
@@ -76,11 +77,28 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
             xmlConfigurator.endElement(namespace, configuration.getName(), "");
         }
     }
+
+    // create a SAX attributes instance from
+    // Avalon configuration attributes
+    private Attributes getAttributes(Configuration configuration) throws ConfigurationException{
+        final AttributesImpl attributes = new AttributesImpl();
+        final String[] avalonAttributeNames = configuration.getAttributeNames();
+        if (avalonAttributeNames != null && avalonAttributeNames.length > 0) {
+            for (int i = 0; i < avalonAttributeNames.length; ++i) {
+                attributes.addAttribute("", avalonAttributeNames[i], "", "CDATA",
+                    configuration.getAttribute(avalonAttributeNames[i]));
+            }
+        }
+        return attributes;
+    }
 }
 
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.3  2002/12/16 02:37:14  chr32
+ Updated to new driver-properties xml format.
+
  Revision 1.2  2002/12/15 19:42:18  chr32
  Rewrite. Now delegates to XMLConfigurator.
 

@@ -19,7 +19,7 @@ import org.logicalcobwebs.proxool.ProxoolFacade;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.2 $, $Date: 2002/12/15 19:41:26 $
+ * @version $Revision: 1.3 $, $Date: 2002/12/16 02:35:40 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.6
@@ -53,6 +53,11 @@ public class JAXPConfiguratorTest extends TestCase {
         } catch (ProxoolException e) {
             fail(e.getMessage());
         }
+        try {
+            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-2"));
+        } catch (ProxoolException e) {
+            fail(e.getMessage());
+        }
         ProxoolFacade.removeConnectionPool("xml-test");
         ProxoolFacade.removeConnectionPool("xml-test-2");
     }
@@ -74,6 +79,11 @@ public class JAXPConfiguratorTest extends TestCase {
         }
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-ns"));
+        } catch (ProxoolException e) {
+            fail(e.getMessage());
+        }
+        try {
+            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-ns-2"));
         } catch (ProxoolException e) {
             fail(e.getMessage());
         }
@@ -100,6 +110,9 @@ public class JAXPConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.3  2002/12/16 02:35:40  chr32
+ Updated to new driver-properties xml format.
+
  Revision 1.2  2002/12/15 19:41:26  chr32
  Style fixes.
 
