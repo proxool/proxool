@@ -14,7 +14,7 @@ import org.logicalcobwebs.proxool.ResultMonitor;
 /**
  * A ResultMonitor specifically for Snapshots
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/04 10:24:41 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/06 22:28:32 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -61,6 +61,18 @@ public class StatisticsResultMonitor extends ResultMonitor {
         }
     }
 
+    /**
+     * This gets called when we get new statistics. By overriding this
+     * method you get the option of rejecting these new statistics and
+     * waiting for the next set
+     * @param statistics the newly created statistics
+     * @return true if we accept them, false if we want to wait for the next set
+     * (if you don't override this it will return true)
+     */
+    protected boolean check(StatisticsIF statistics) {
+        return true;
+    }
+
     public int getResult() throws ProxoolException {
         oldStatistics = statistics;
         return super.getResult();
@@ -79,6 +91,9 @@ public class StatisticsResultMonitor extends ResultMonitor {
 /*
  Revision history:
  $Log: StatisticsResultMonitor.java,v $
+ Revision 1.8  2003/03/06 22:28:32  billhorsman
+ another go at statistics threading (in tests)
+
  Revision 1.7  2003/03/04 10:24:41  billhorsman
  removed try blocks around each test
 

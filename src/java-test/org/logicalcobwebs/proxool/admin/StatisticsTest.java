@@ -22,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.20 $, $Date: 2003/03/06 12:45:06 $
+ * @version $Revision: 1.21 $, $Date: 2003/03/06 22:28:31 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -73,6 +73,11 @@ public class StatisticsTest extends AbstractProxoolTest {
 
         DriverManager.getConnection(url).close();
 
+        srm = new StatisticsResultMonitor(alias, "10s") {
+            protected boolean check(StatisticsIF statistics) {
+                return (statistics.getServedCount() == 1);
+            }
+        };
         assertEquals("Timeout", ResultMonitor.SUCCESS, srm.getResult());
         StatisticsIF statistics = srm.getStatistics();
 
@@ -118,6 +123,9 @@ public class StatisticsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.21  2003/03/06 22:28:31  billhorsman
+ another go at statistics threading (in tests)
+
  Revision 1.20  2003/03/06 12:45:06  billhorsman
  switch on verbose logging
 
