@@ -9,6 +9,8 @@ package org.logicalcobwebs.proxool.configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolConstants;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,27 +21,60 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Uses a standard Java properties file to cofigure Proxool. For example:
+ * Uses a standard Java properties file to configure Proxool. For example:
  *
  * <pre>
- * jdbc-0.url=proxool.apple:org.hsqldb.jdbcDriver:jdbc:hsqldb:.
- * jdbc-0.user=sa
+ * jdbc-0.proxool.pool-name=property-test
+ * jdbc-0.proxool.driver-url=jdbc:hsqldb:.
+ * jdbc-0.proxool.driver-class=org.hsqldb.jdbcDriver
+ * jdbc-0.user=foo
+ * jdbc-0.password=bar
+ * jdbc-0.proxool.house-keeping-sleep-time=40000
+ * jdbc-0.proxool.house-keeping-test-sql=select CURRENT_DATE
  * jdbc-0.proxool.maximum-connection-count=10
- * jdbc-1.url=proxool.banana:org.hsqldb.jdbcDriver:jdbc:hsqldb:.
- * jdbc-1.user=sa
- * jdbc-1.proxool.maximum-connection-count=20
+ * jdbc-0.proxool.minimum-connection-count=3
+ * jdbc-0.proxool.maximum-connection-lifetime=18000000
+ * jdbc-0.proxool.maximum-new-connections=5
+ * jdbc-0.proxool.recently-started-threshold=40000
+ * jdbc-0.proxool.overload-without-refusal-lifetime=50000
+ * jdbc-0.proxool.maximum-active-time=60000
+ * jdbc-0.proxool.verbose=true
+ * jdbc-0.proxool.trace=true
+ * jdbc-0.proxool.fatal-sql-exception=Fatal error
+ * jdbc-0.proxool.prototype-count=2
+ *
+ * jdbc-1.proxool.pool-name=property-test-2
+ * jdbc-1.proxool.driver-url=jdbc:hsqldb:.
+ * jdbc-1.proxool.driver-class=org.hsqldb.jdbcDriver
+ * jdbc-1.user=scott
+ * jdbc-1.password=tiger
+ * jdbc-1.proxool.house-keeping-sleep-time=40000
+ * jdbc-1.proxool.house-keeping-test-sql=select CURRENT_DATE
+ * jdbc-1.proxool.maximum-connection-count=10
+ * jdbc-1.proxool.minimum-connection-count=3
+ * jdbc-1.proxool.maximum-connection-lifetime=18000000
+ * jdbc-1.proxool.maximum-new-connections=5
+ * jdbc-1.proxool.recently-started-threshold=40000
+ * jdbc-1.proxool.overload-without-refusal-lifetime=50000
+ * jdbc-1.proxool.maximum-active-time=60000
+ * jdbc-1.proxool.verbose=true
+ * jdbc-1.proxool.trace=true
+ * jdbc-1.proxool.fatal-sql-exception=Fatal error
+ * jdbc-1.proxool.prototype-count=2
  * </pre>
  *
  * <p>The first word (up to the first dot) must start with "jdbc", but it can
  * be anything you like. Use unique names to identify each pool. Any property
  * not starting with "jdbc" will be ignored.</p>
+ * <p>
+ * The properties prefixed with "proxool."  will be used by Proxool while
+ * the properties that are not prefixed will be passed on to the
+ * delegate JDBC driver.
+ * </p>
  *
- *<p>Note that there is nothing Proxool specific about this configurator. You can
- * configure any JDBC connection with it.</p>
- *
- * @version $Revision: 1.1 $, $Date: 2002/12/15 18:48:33 $
+ * @version $Revision: 1.2 $, $Date: 2002/12/26 11:32:59 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class PropertyConfigurator {
@@ -51,60 +86,88 @@ public class PropertyConfigurator {
 
     private static final String EXAMPLE_FORMAT = PREFIX + "*" + DOT + "*";
 
-    private static final String URL_PROPERTY = "url";
-
-    public static void configure(String filename) throws SQLException {
-        Properties p = new Properties();
+    /**
+     * Configure proxool with the given properties file.
+     * @param filename the filename of the properties file.
+     * @throws ProxoolException if the configuration fails.
+     */
+    public static void configure(String filename) throws ProxoolException {
+        Properties properties = new Properties();
         try {
-            p.load(new FileInputStream(filename));
+            properties.load(new FileInputStream(filename));
         } catch (IOException e) {
-            LOG.warn("Problem whilst loading " + filename, e);
-            throw new SQLException("Couldn't load property file " + filename);
+            throw new ProxoolException("Couldn't load property file " + filename);
         }
-        configure(p);
+        configure(properties);
     }
 
-    public static void configure(Properties properties) throws SQLException {
+    /**
+     * Configure proxool with the given properties.
+     * @param properties the properties instance to use.
+     * @throws ProxoolException if the configuration fails.
+     */
+    public static void configure(Properties properties) throws ProxoolException {
+        final Map propertiesMap = new HashMap();
+        final Iterator allPropertyKeysIterator = properties.keySet().iterator();
+        Properties proxoolProperties = null;
 
-        Map urlMap = new HashMap();
-        Map propertiesMap = new HashMap();
-
-        Iterator i = properties.keySet().iterator();
-        while (i.hasNext()) {
-            String key = (String) i.next();
+        while (allPropertyKeysIterator.hasNext()) {
+            String key = (String) allPropertyKeysIterator.next();
             String value = properties.getProperty(key);
 
             if (key.startsWith(PREFIX)) {
                 int a = key.indexOf(DOT);
                 if (a == -1) {
-                    throw new RuntimeException("Property " + key + " must be of the format " + EXAMPLE_FORMAT);
+                    throw new ProxoolException("Property " + key + " must be of the format " + EXAMPLE_FORMAT);
                 }
-                String tag = key.substring(0, a);
-                String name = key.substring(a + 1);
-
-                if (name.equals(URL_PROPERTY)) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Configuring " + value + " pool");
-                    }
-
-                    urlMap.put(tag, value);
-                } else {
-                    Properties p = (Properties) propertiesMap.get(tag);
-                    if (p == null) {
-                        p = new Properties();
-                        propertiesMap.put(tag, p);
-                    }
-                    p.setProperty(name, value);
+                final String tag = key.substring(0, a);
+                final String name = key.substring(a + 1);
+                proxoolProperties = (Properties) propertiesMap.get(tag);
+                if (proxoolProperties == null) {
+                    proxoolProperties = new Properties();
+                    propertiesMap.put(tag, proxoolProperties);
                 }
+                proxoolProperties.put(name, value);
             }
         }
 
-        Iterator tags = urlMap.keySet().iterator();
+        final Iterator tags = propertiesMap.keySet().iterator();
         while (tags.hasNext()) {
-            String tag = (String) tags.next();
-            String url = (String) urlMap.get(tag);
-            Properties p = (Properties) propertiesMap.get(tag);
-            ProxoolFacade.registerConnectionPool(url, p);
+            proxoolProperties = (Properties) propertiesMap.get(tags.next());
+            // make sure that required propeties are defined
+            // and build the url
+            // Check that we have defined the minimum information
+            final String driverClass = proxoolProperties.getProperty(ProxoolConstants.DRIVER_CLASS_PROPERTY);
+            final String driverUrl = proxoolProperties.getProperty(ProxoolConstants.DRIVER_URL_PROPERTY);
+            if (driverClass == null || driverUrl == null) {
+                throw new ProxoolException("You must define the " + ProxoolConstants.DRIVER_CLASS_PROPERTY + " and the "
+                    + ProxoolConstants.DRIVER_URL_PROPERTY + ".");
+            }
+            final String poolName = proxoolProperties.getProperty(ProxoolConstants.POOL_NAME_PROPERTY);
+
+            // Build the URL; optionally defining a name
+            StringBuffer url = new StringBuffer();
+            url.append("proxool");
+            if (poolName != null) {
+                url.append(ProxoolConstants.ALIAS_DELIMITER);
+                url.append(poolName);
+                proxoolProperties.remove(ProxoolConstants.POOL_NAME_PROPERTY);
+            }
+            url.append(ProxoolConstants.URL_DELIMITER);
+            url.append(driverClass);
+            proxoolProperties.remove(ProxoolConstants.DRIVER_CLASS_PROPERTY);
+            url.append(ProxoolConstants.URL_DELIMITER);
+            url.append(driverUrl);
+            proxoolProperties.remove(ProxoolConstants.DRIVER_URL_PROPERTY);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Created url: " + url);
+            }
+
+            try {
+                ProxoolFacade.registerConnectionPool(url.toString(), proxoolProperties);
+            } catch (SQLException e) {
+                throw new ProxoolException(e);
+            }
         }
     }
 
@@ -113,6 +176,9 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.2  2002/12/26 11:32:59  billhorsman
+ Rewrote to support new format.
+
  Revision 1.1  2002/12/15 18:48:33  chr32
  Movied in from 'ext' source tree.
 
