@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.8 $, $Date: 2003/01/23 10:41:05 $
+ * @version $Revision: 1.9 $, $Date: 2003/01/30 17:22:03 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -130,6 +130,10 @@ public interface ProxoolConstants {
     /** @see ProxoolDriver#getPropertyInfo */
     public final String FATAL_SQL_EXCEPTION_PROPERTY = PROPERTY_PREFIX + FATAL_SQL_EXCEPTION;
 
+    public static final String STATISTICS = "statistics";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String STATISTICS_PROPERTY = PROPERTY_PREFIX + STATISTICS;
     /**
      *  Un-prefixed propety name for the Proxool alias configuration property. Value: alias
      */
@@ -156,6 +160,9 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.9  2003/01/30 17:22:03  billhorsman
+ new statistics property
+
  Revision 1.8  2003/01/23 10:41:05  billhorsman
  changed use of pool-name to alias for consistency
 

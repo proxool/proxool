@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.10 $, $Date: 2003/01/17 00:38:12 $
+ * @version $Revision: 1.11 $, $Date: 2003/01/30 17:20:37 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -182,11 +182,21 @@ public interface ConnectionPoolDefinitionIF {
      */
     boolean isTrace();
 
+    /**
+     * The sample length (in seconds) when taking statistical information,
+     * or zero to disable statistics. Default is zero.
+     * @return statistics period
+     */
+    int getStatistics();
+
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.11  2003/01/30 17:20:37  billhorsman
+ new statistics property
+
  Revision 1.10  2003/01/17 00:38:12  billhorsman
  wide ranging changes to clarify use of alias and url -
  this has led to some signature changes (new exceptions

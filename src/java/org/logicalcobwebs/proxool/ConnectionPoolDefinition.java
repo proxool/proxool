@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.5 $, $Date: 2003/01/17 00:38:12 $
+ * @version $Revision: 1.6 $, $Date: 2003/01/30 17:20:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -52,6 +52,8 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private boolean verbose;
 
     private boolean trace;
+
+    private int statistics;
 
     private Set fatalSqlExceptions = new HashSet();
 
@@ -391,11 +393,21 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         this.houseKeepingTestSql = houseKeepingTestSql;
     }
 
+    public int getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(int statistics) {
+        this.statistics = statistics;
+    }
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.6  2003/01/30 17:20:38  billhorsman
+ new statistics property
+
  Revision 1.5  2003/01/17 00:38:12  billhorsman
  wide ranging changes to clarify use of alias and url -
  this has led to some signature changes (new exceptions

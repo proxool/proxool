@@ -17,7 +17,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.11 $, $Date: 2003/01/18 15:13:11 $
+ * @version $Revision: 1.12 $, $Date: 2003/01/30 17:22:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -93,7 +93,7 @@ public class ProxoolDriver implements Driver {
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
             throws SQLException {
 
-        DriverPropertyInfo[] dpi = new DriverPropertyInfo[13];
+        DriverPropertyInfo[] dpi = new DriverPropertyInfo[14];
         ConnectionPool cp = null;
         try {
             cp = ConnectionPoolManager.getInstance().getConnectionPool(url);
@@ -157,6 +157,10 @@ public class ProxoolDriver implements Driver {
                 + "and it is discarded. Regardless of what happens the exception is always thrown again. This property behaves like a collection; "
                 + "you can set it more than once and each value is checked.");
 
+        dpi[13] = new DriverPropertyInfo(ProxoolConstants.STATISTICS_PROPERTY,
+                "The sample length (in seconds) when taking statistical information, "
+                + " or zero to disable statistics. Default is zero.");
+
         return dpi;
     }
 
@@ -196,6 +200,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.12  2003/01/30 17:22:01  billhorsman
+ new statistics property
+
  Revision 1.11  2003/01/18 15:13:11  billhorsman
  Signature changes (new ProxoolException
  thrown) on the ProxoolFacade API.
