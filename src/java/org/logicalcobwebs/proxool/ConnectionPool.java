@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.44 $, $Date: 2003/02/07 14:16:46 $
+ * @version $Revision: 1.45 $, $Date: 2003/02/07 14:19:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -705,7 +705,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                                     try {
                                         testResult = testStatement.execute(sql);
                                     } finally {
-                                        if (log.isDebugEnabled() && getDefinition().getDebugLevel() == ConnectionPoolDefinitionIF.DEBUG_LEVEL_LOUD) {
+                                        if (log.isDebugEnabled() && getDefinition().isVerbose()) {
                                             log.debug(displayStatistics() + " - Testing connection " + proxyConnection.getId() + (testResult ? ": OK" : ": FAIL"));
                                         }
                                     }
@@ -791,7 +791,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     // We don't want the housekeeping thread to fall over!
                     log.error("Housekeeping log.error( :", e);
                 } finally {
-                    if (getDefinition().getDebugLevel() > getDefinition().DEBUG_LEVEL_QUIET) {
+                    if (getDefinition().isVerbose()) {
                         if (log.isDebugEnabled()) {
                             log.debug(displayStatistics() + " - House keeping sweep done");
                         }
@@ -1191,6 +1191,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.45  2003/02/07 14:19:01  billhorsman
+ fixed deprecated use of debugLevel property
+
  Revision 1.44  2003/02/07 14:16:46  billhorsman
  support for StatisticsListenerIF
 
