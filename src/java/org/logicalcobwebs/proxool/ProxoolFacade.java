@@ -10,6 +10,7 @@ import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.monitor.StatisticsIF;
 import org.logicalcobwebs.proxool.monitor.SnapshotIF;
 import org.logicalcobwebs.proxool.monitor.Monitor;
+import org.logicalcobwebs.proxool.monitor.StatisticsListenerIF;
 
 import java.sql.Statement;
 import java.util.Collection;
@@ -32,7 +33,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.47 $, $Date: 2003/02/07 10:27:47 $
+ * @version $Revision: 1.48 $, $Date: 2003/02/07 14:16:46 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -682,6 +683,16 @@ public class ProxoolFacade {
     }
 
     /**
+     * Add a listener that receives statistics as they are produced
+     * @param statisticsListener the new listener
+     * @throws ProxoolException if the pool couldn't be found
+     */
+    public static void addStatisticsListener(String alias, StatisticsListenerIF statisticsListener) throws ProxoolException {
+        final Monitor monitor = ConnectionPoolManager.getInstance().getConnectionPool(alias).getMonitor();
+        monitor.addStatisticsListener(statisticsListener);
+    }
+
+    /**
      * Gives a snapshot of what the pool is doing
      * @param alias identifies the pool
      * @return the current status of the pool
@@ -736,6 +747,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.48  2003/02/07 14:16:46  billhorsman
+ support for StatisticsListenerIF
+
  Revision 1.47  2003/02/07 10:27:47  billhorsman
  change in shutdown procedure to allow re-registration
 

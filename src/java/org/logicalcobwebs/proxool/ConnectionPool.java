@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.43 $, $Date: 2003/02/07 10:27:47 $
+ * @version $Revision: 1.44 $, $Date: 2003/02/07 14:16:46 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -125,7 +125,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         if (definition.getStatistics() != null) {
             try {
-                monitor = new Monitor(definition.getAlias(), definition.getStatistics());
+                monitor = new Monitor(definition);
             } catch (ProxoolException e) {
                 log.error("Failed to initialise statistics", e);
             }
@@ -1191,6 +1191,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.44  2003/02/07 14:16:46  billhorsman
+ support for StatisticsListenerIF
+
  Revision 1.43  2003/02/07 10:27:47  billhorsman
  change in shutdown procedure to allow re-registration
 

@@ -8,12 +8,7 @@ package org.logicalcobwebs.proxool.monitor;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.ProxoolConstants;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,14 +18,14 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.9 $, $Date: 2003/02/06 17:41:06 $
+ * @version $Revision: 1.10 $, $Date: 2003/02/07 14:16:46 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 class StatsRoller {
 
-    private Log log;
+    private static final Log LOG = LogFactory.getLog(StatsRoller.class);
 
     private Statistics completeStatistics;
 
@@ -44,15 +39,13 @@ class StatsRoller {
 
     private Timer timer = new Timer(true);
 
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+    private CompositeStatisticsListener compositeStatisticsListener;
 
-    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    private String alias;
 
-    private String logLevel;
-
-    public StatsRoller(String alias, String token) throws ProxoolException {
-        log = LogFactory.getLog("org.logicalcobwebs.proxool.stats." + alias);
-        logLevel = ProxoolFacade.getConnectionPoolDefinition(alias).getStatisticsLogLevel();
+    public StatsRoller(String alias, CompositeStatisticsListener compositeStatisticsListener, String token) throws ProxoolException {
+        this.alias = alias;
+        this.compositeStatisticsListener = compositeStatisticsListener;
 
         nextRollDate = Calendar.getInstance();
         if (token.endsWith("s")) {
@@ -88,7 +81,7 @@ class StatsRoller {
             nextRollDate.add(units, period);
         }
 
-        log.debug("Collecting first statistics for '" + token + "' at " + nextRollDate.getTime());
+        LOG.debug("Collecting first statistics for '" + token + "' at " + nextRollDate.getTime());
         currentStatistics = new Statistics(now.getTime());
 
         // Automatically trigger roll if no activity
@@ -118,42 +111,7 @@ class StatsRoller {
             completeStatistics = currentStatistics;
             currentStatistics = new Statistics(nextRollDate.getTime());
             nextRollDate.add(units, period);
-            logStats(completeStatistics);
-        }
-    }
-
-    private void logStats(StatisticsIF statistics) {
-
-        if (statistics != null && logLevel != null) {
-
-            StringBuffer out = new StringBuffer();
-
-            out.append(TIME_FORMAT.format(statistics.getStartDate()));
-            out.append(" - ");
-            out.append(TIME_FORMAT.format(statistics.getStopDate()));
-            out.append(", s:");
-            out.append(statistics.getServedCount());
-            out.append(":");
-            out.append(DECIMAL_FORMAT.format(statistics.getServedPerSecond()));
-
-            out.append("/s, r:");
-            out.append(statistics.getRefusedCount());
-            out.append(":");
-            out.append(DECIMAL_FORMAT.format(statistics.getRefusedPerSecond()));
-
-            out.append("/s, a:");
-            out.append(DECIMAL_FORMAT.format(statistics.getAverageActiveTime()));
-            out.append("ms/");
-            out.append(DECIMAL_FORMAT.format(statistics.getAverageActiveCount()));
-
-            if (logLevel.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_TRACE)) {
-                log.trace(out.toString());
-            } else if (logLevel.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG)) {
-                log.debug(out.toString());
-            } else if (logLevel.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_INFO)) {
-                log.info(out.toString());
-            }
-
+            compositeStatisticsListener.statistics(alias, completeStatistics);
         }
     }
 
@@ -190,6 +148,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.10  2003/02/07 14:16:46  billhorsman
+ support for StatisticsListenerIF
+
  Revision 1.9  2003/02/06 17:41:06  billhorsman
  now uses imported logging
 

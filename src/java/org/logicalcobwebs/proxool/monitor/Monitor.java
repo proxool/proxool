@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.6 $, $Date: 2003/02/06 17:41:05 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/07 14:16:45 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -34,20 +34,31 @@ public class Monitor {
 
     private Map statsRollers = new HashMap();
 
+    private CompositeStatisticsListener  compositeStatisticsListener  = new CompositeStatisticsListener();
+
     /**
-     * @param alias identifies the pool
+     * @param definition gives access to pool definition
      * @param definition see {@link org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF#getStatistics definition}
      */
-    public Monitor(String alias, String definition) throws ProxoolException {
-        log = LogFactory.getLog("org.logicalcobwebs.proxool.stats." + alias);
+    public Monitor(ConnectionPoolDefinitionIF definition) throws ProxoolException {
+        log = LogFactory.getLog("org.logicalcobwebs.proxool.stats." + definition.getAlias());
 
-        StringTokenizer st = new StringTokenizer(definition, ",");
+        StringTokenizer st = new StringTokenizer(definition.getStatistics(), ",");
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            statsRollers.put(token, new StatsRoller(alias, token));
+            statsRollers.put(token, new StatsRoller(definition.getAlias(), compositeStatisticsListener, token));
+        }
+
+        if (definition.getStatisticsLogLevel() != null) {
+            compositeStatisticsListener.addListener(new StatisticsLogger(log, definition.getStatisticsLogLevel()));
         }
 
     }
+
+    public void addStatisticsListener(StatisticsListenerIF statisticsListener) {
+        this.compositeStatisticsListener.addListener(statisticsListener);
+    }
+
 
     /**
      * Call this every time an active connection is returned to the pool
@@ -70,6 +81,10 @@ public class Monitor {
             StatsRoller statsRoller = (StatsRoller) i.next();
             statsRoller.connectionRefused();
         }
+    }
+
+    public CompositeStatisticsListener getCompositeStatisticsListener() {
+        return compositeStatisticsListener;
     }
 
     /**
@@ -135,6 +150,9 @@ public class Monitor {
 /*
  Revision history:
  $Log: Monitor.java,v $
+ Revision 1.7  2003/02/07 14:16:45  billhorsman
+ support for StatisticsListenerIF
+
  Revision 1.6  2003/02/06 17:41:05  billhorsman
  now uses imported logging
 
