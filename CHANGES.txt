@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.17 $
-$Date: 2003/02/26 17:00:11 $
+$Revision: 1.18 $
+$Date: 2003/03/06 11:30:16 $
 $Author: billhorsman $
 
 0.8 - scheduled for March 2003
@@ -25,6 +25,19 @@ $Author: billhorsman $
 
 - Change to ConfigurationListenerIF API. defintionChanged is now
   called definitionChanged (stupid spelling error).
+
+- ConnectionListenerIF.onDeath now gets called for all connections
+  closed during shutdown.
+
+- Pools manually removed (using ProxoolFacade.removeConnectionPool)
+  are no longer attempted to be removed during shutdown.
+
+- Maximum-new-connections property has been deprecated in favour of
+  the more descriptive simultaneous-build-throttle property.
+
+- Refactoring of house keeper and prototyper so that the number of threads
+  used by Proxool is more scalable. (Proxool used to create two threads
+  per pool).
 
 0.7 - February 21, 2003
 
