@@ -14,9 +14,9 @@ import junit.extensions.TestSetup;
 
 /**
  * TODO
- * @version $Revision: 1.2 $, $Date: 2002/12/16 17:15:12 $
+ * @version $Revision: 1.3 $, $Date: 2002/12/18 03:15:03 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since TODO
  */
 public class GlobalTest {
@@ -35,6 +35,12 @@ public class GlobalTest {
                     LOG.debug("Can't configure logging using " + log4jPath);
                 }
             }
+
+            /* uncomment this if you want to turn on debug loggin to the console
+            org.apache.log4j.BasicConfigurator.resetConfiguration();
+            org.apache.log4j.BasicConfigurator.configure();
+            */
+
             initialised = true;
         }
     }
@@ -57,8 +63,11 @@ public class GlobalTest {
             public void setUp() throws Exception {
                 GlobalTest.globalSetup();
             }
-        };
 
+            protected void tearDown() throws Exception {
+                GlobalTest.globalTeardown();
+            }
+        };
         return wrapper;
     }
 }
@@ -67,6 +76,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.3  2002/12/18 03:15:03  chr32
+ Added commented-out code that will make logging level DEBUG.
+
  Revision 1.2  2002/12/16 17:15:12  billhorsman
  fixes
 
