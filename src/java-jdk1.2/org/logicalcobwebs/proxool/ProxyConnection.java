@@ -8,450 +8,199 @@ package org.logicalcobwebs.proxool;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.text.DecimalFormat;
 import java.util.Map;
 
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.2 $, $Date: 2002/09/18 13:47:14 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/28 11:55:03 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public class ProxyConnection implements Connection, ConnectionInfoIF {
+public class ProxyConnection extends AbstractProxyConnection  implements Connection {
 
-    /** This is the start and end state of every connection */
-    protected static final int STATUS_NULL = 0;
-
-    /** The connection is available for use */
-    protected static final int STATUS_AVAILABLE = 1;
-
-    /** The connection is in use */
-    protected static final int STATUS_ACTIVE = 2;
-
-    /** The connection is in use by the house keeping thread */
-    protected static final int STATUS_OFFLINE = 3;
-
-    /** Default - treat as normal */
-    protected static final int MARK_FOR_USE = 0;
-
-    /** The next time this connection is made available expire it. */
-    protected static final int MARK_FOR_EXPIRY = 1;
-
-    private Connection connection;
-
-    private int mark;
-
-    private int status;
-
-    private long id;
-
-    private long birthTime;
-
-    private long timeLastStartActive;
-
-    private long timeLastStopActive;
-
-    private ConnectionPool connectionPool;
-
-    private String requester;
-
-    private DecimalFormat idFormat = new DecimalFormat("0000");
-
-    public ProxyConnection(long id, ConnectionPoolDefinitionIF connectionPoolDefinition) throws SQLException,
-            ClassNotFoundException {
-
-        connectionPool = ConnectionPoolManager.getInstance().getConnectionPool(connectionPoolDefinition.getName());
-
-        if (connectionPoolDefinition.getDebugLevel() > ConnectionPoolDefinitionIF.DEBUG_LEVEL_QUIET) {
-            connectionPool.getLog().debug("Initialising connection #" + id + " using " + connectionPoolDefinition.getUrl());
-
-        }
-
-        try {
-            connection = DriverManager.getConnection(connectionPoolDefinition.getUrl(), connectionPoolDefinition.getProperties());
-        } catch (SQLException e) {
-            throw e;
-        }
-
-        // Initialize some variables
-        setId(id);
-        setBirthTime(System.currentTimeMillis());
-        setStatus(STATUS_OFFLINE);
-
-        if (connection == null) {
-            throw new SQLException("Unable to create new connection");
-        }
+    public ProxyConnection(Connection connection, long id, ConnectionPool connectionPool) throws SQLException {
+        super(connection,  id, connectionPool);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#createStatement}
+     * Delegates to {@link Connection#createStatement}
      */
     public Statement createStatement() throws SQLException {
-        return new ProxyStatement(connection.createStatement(), connectionPool);
+        final Statement statement = getConnection().createStatement();
+        addOpenStatement(statement);
+        return ProxyFactory.createProxyStatement(statement, getConnectionPool(), this, null);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#prepareStatement}
+     * Delegates to {@link Connection#prepareStatement}
      */
     public PreparedStatement prepareStatement(String sql)
             throws SQLException {
-        return new ProxyPreparedStatement(connection.prepareStatement(sql), connectionPool);
+        final PreparedStatement statement = getConnection().prepareStatement(sql);
+        addOpenStatement(statement);
+        return (PreparedStatement) ProxyFactory.createProxyStatement(statement, getConnectionPool(), this, sql);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#prepareCall}
+     * Delegates to {@link Connection#prepareCall}
      */
     public CallableStatement prepareCall(String sql) throws SQLException {
-        return new ProxyCallableStatement(connection.prepareCall(sql), connectionPool);
+        final CallableStatement statement = getConnection().prepareCall(sql);
+        addOpenStatement(statement);
+        return (CallableStatement) ProxyFactory.createProxyStatement(statement, getConnectionPool(), this, sql);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#nativeSQL}
+     * Delegates to {@link Connection#nativeSQL}
      */
     public String nativeSQL(String sql) throws SQLException {
-        return connection.nativeSQL(sql);
+        return getConnection().nativeSQL(sql);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#setAutoCommit}
+     * Delegates to {@link Connection#setAutoCommit}
      */
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        connection.setAutoCommit(autoCommit);
+        setNeedToReset(true);
+        getConnection().setAutoCommit(autoCommit);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#getAutoCommit}
+     * Delegates to {@link Connection#getAutoCommit}
      */
     public boolean getAutoCommit() throws SQLException {
-        return connection.getAutoCommit();
+        return getConnection().getAutoCommit();
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#commit}
+     * Delegates to {@link Connection#commit}
      */
     public void commit() throws SQLException {
-        connection.commit();
+        getConnection().commit();
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#rollback}
+     * Delegates to {@link Connection#rollback}
      */
     public void rollback() throws SQLException {
-        connection.rollback();
-    }
-
-    protected void reallyClose() throws SQLException {
-        try {
-            connectionPool.registerRemovedConnection(getStatus());
-            // Clean up the actual connection
-            connection.close();
-        } catch (Throwable t) {
-            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during destruction: " + t);
-        }
-
+        getConnection().rollback();
     }
 
     /**
-     * Doesn't really close the connection, just puts it back in the pool
-     */
-    public void close() throws SQLException {
-        try {
-            connectionPool.putConnection(this);
-        } catch (Throwable t) {
-            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during destruction: " + t);
-        }
-
-    }
-
-    /**
-     * Not whether the actual Connection is closed but whether it is "not active".
-     */
-    public boolean isClosed() throws SQLException {
-        return !isActive();
-    }
-
-    public boolean isReallyClosed() throws SQLException {
-        return connection.isClosed();
-    }
-
-    /**
-     * Delegates to {@link java.sql.Connection#getMetaData}
+     * Delegates to {@link Connection#getMetaData}
      */
     public DatabaseMetaData getMetaData() throws SQLException {
-        return connection.getMetaData();
+        return getConnection().getMetaData();
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#setReadOnly}
+     * Delegates to {@link Connection#setReadOnly}
      */
     public void setReadOnly(boolean readOnly) throws SQLException {
-        connection.setReadOnly(readOnly);
+        setNeedToReset(true);
+        getConnection().setReadOnly(readOnly);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#isReadOnly}
+     * Delegates to {@link Connection#isReadOnly}
      */
     public boolean isReadOnly() throws SQLException {
-        return connection.isReadOnly();
+        return getConnection().isReadOnly();
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#setCatalog}
+     * Delegates to {@link Connection#setCatalog}
      */
     public void setCatalog(String catalog) throws SQLException {
-        connection.setCatalog(catalog);
+        setNeedToReset(true);
+        getConnection().setCatalog(catalog);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#getCatalog}
+     * Delegates to {@link Connection#getCatalog}
      */
     public String getCatalog() throws SQLException {
-        return connection.getCatalog();
+        return getConnection().getCatalog();
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#setTransactionIsolation}
+     * Delegates to {@link Connection#setTransactionIsolation}
      */
     public void setTransactionIsolation(int level) throws SQLException {
-        connection.setTransactionIsolation(level);
+        setNeedToReset(true);
+        getConnection().setTransactionIsolation(level);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#getTransactionIsolation}
+     * Delegates to {@link Connection#getTransactionIsolation}
      */
     public int getTransactionIsolation() throws SQLException {
-        return connection.getTransactionIsolation();
+        return getConnection().getTransactionIsolation();
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#getWarnings}
+     * Delegates to {@link Connection#getWarnings}
      */
     public SQLWarning getWarnings() throws SQLException {
-        return connection.getWarnings();
+        return getConnection().getWarnings();
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#clearWarnings}
+     * Delegates to {@link Connection#clearWarnings}
      */
     public void clearWarnings() throws SQLException {
-        connection.clearWarnings();
+        getConnection().clearWarnings();
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#createStatement(int, int)}
+     * Delegates to {@link Connection#createStatement(int, int)}
      */
     public Statement createStatement(int resultSetType, int resultSetConcurrency)
             throws SQLException {
-        return new ProxyStatement(connection.createStatement(resultSetType, resultSetConcurrency), connectionPool);
+        final Statement statement = getConnection().createStatement(resultSetType, resultSetConcurrency);
+        addOpenStatement(statement);
+        return ProxyFactory.createProxyStatement(statement, getConnectionPool(), this, null);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#prepareStatement(java.lang.String, int, int)}
+     * Delegates to {@link Connection#prepareStatement(String, int, int)}
      */
     public PreparedStatement prepareStatement(String sql, int resultSetType,
                                               int resultSetConcurrency)
             throws SQLException {
-        return new ProxyPreparedStatement(connection.prepareStatement(sql, resultSetType, resultSetConcurrency), connectionPool);
+        final PreparedStatement statement = getConnection().prepareStatement(sql, resultSetType, resultSetConcurrency);
+        addOpenStatement(statement);
+        return (PreparedStatement) ProxyFactory.createProxyStatement(statement, getConnectionPool(), this, sql);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#prepareCall(java.lang.String, int, int)}
+     * Delegates to {@link Connection#prepareCall(String, int, int)}
      */
     public CallableStatement prepareCall(String sql, int resultSetType,
                                          int resultSetConcurrency) throws SQLException {
-        return new ProxyCallableStatement(connection.prepareCall(sql, resultSetType, resultSetConcurrency), connectionPool);
+        final CallableStatement statement = getConnection().prepareCall(sql, resultSetType, resultSetConcurrency);
+        addOpenStatement(statement);
+        return (CallableStatement) ProxyFactory.createProxyStatement(statement, getConnectionPool(), this, sql);
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#getTypeMap}
+     * Delegates to {@link Connection#getTypeMap}
      */
     public Map getTypeMap() throws SQLException {
-        return connection.getTypeMap();
+        return getConnection().getTypeMap();
     }
 
     /**
-     * Delegates to {@link java.sql.Connection#setTypeMap}
+     * Delegates to {@link Connection#setTypeMap}
      */
     public void setTypeMap(Map map) throws SQLException {
-        connection.setTypeMap(map);
-    }
-
-    public int getMark() {
-        return mark;
-    }
-
-    public void setMark(int mark) {
-        this.mark = mark;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        if (this.status != status) {
-            connectionPool.changeStatus(this.status, status);
-        }
-        if (this.status == ProxyConnection.STATUS_NULL && status != ProxyConnection.STATUS_NULL) {
-            connectionPool.incrementConnectedConnectionCount();
-        }
-        this.status = status;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public long getBirthTime() {
-        return birthTime;
-    }
-
-    public long getAge() {
-        return System.currentTimeMillis() - getBirthTime();
-    }
-
-    public void setBirthTime(long birthTime) {
-        this.birthTime = birthTime;
-    }
-
-    public long getTimeLastStartActive() {
-        return timeLastStartActive;
-    }
-
-    public void setTimeLastStartActive(long timeLastStartActive) {
-        this.timeLastStartActive = timeLastStartActive;
-        setTimeLastStopActive(0);
-    }
-
-    public long getTimeLastStopActive() {
-        return timeLastStopActive;
-    }
-
-    public void setTimeLastStopActive(long timeLastStopActive) {
-        this.timeLastStopActive = timeLastStopActive;
-    }
-
-    public String getRequester() {
-        return requester;
-    }
-
-    public void setRequester(String requester) {
-        this.requester = requester;
-    }
-
-    protected boolean fromActiveToAvailable() {
-        boolean success = false;
-        synchronized (this) {
-            if (isActive()) {
-                setStatus(STATUS_AVAILABLE);
-                setTimeLastStopActive(System.currentTimeMillis());
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    protected boolean fromActiveToNull() {
-        boolean success = false;
-        synchronized (this) {
-            if (isActive()) {
-                setStatus(STATUS_NULL);
-                setTimeLastStopActive(System.currentTimeMillis());
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    protected boolean fromAvailableToActive() {
-        boolean success = false;
-        synchronized (this) {
-            if (isAvailable()) {
-                setStatus(STATUS_ACTIVE);
-                setTimeLastStartActive(System.currentTimeMillis());
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    protected boolean fromOfflineToAvailable() {
-        boolean success = false;
-        synchronized (this) {
-            if (isOffline()) {
-                setStatus(STATUS_AVAILABLE);
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    protected boolean fromOfflineToNull() {
-        boolean success = false;
-        synchronized (this) {
-            if (isOffline()) {
-                setStatus(STATUS_NULL);
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    protected boolean fromOfflineToActive() {
-        boolean success = false;
-        synchronized (this) {
-            if (isOffline()) {
-                setStatus(STATUS_ACTIVE);
-                setTimeLastStartActive(System.currentTimeMillis());
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    protected boolean fromAvailableToOffline() {
-        boolean success = false;
-        synchronized (this) {
-            if (isAvailable()) {
-                setStatus(STATUS_OFFLINE);
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    protected boolean isNull() {
-        return getStatus() == STATUS_NULL;
-    }
-
-    protected boolean isAvailable() {
-        return getStatus() == STATUS_AVAILABLE;
-    }
-
-    protected boolean isActive() {
-        return getStatus() == STATUS_ACTIVE;
-    }
-
-    protected boolean isOffline() {
-        return getStatus() == STATUS_OFFLINE;
-    }
-
-    protected void markForExpiry() {
-        setMark(MARK_FOR_EXPIRY);
-    }
-
-    protected boolean isMarkedForExpiry() {
-        return getMark() == MARK_FOR_EXPIRY;
+        setNeedToReset(true);
+        getConnection().setTypeMap(map);
     }
 
 }
@@ -459,6 +208,9 @@ public class ProxyConnection implements Connection, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.3  2003/01/28 11:55:03  billhorsman
+ new JDK 1.2 patches (functioning but not complete)
+
  Revision 1.2  2002/09/18 13:47:14  billhorsman
  fixes for new logging
 

@@ -22,7 +22,6 @@ import java.sql.SQLWarning;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -30,35 +29,17 @@ import java.util.Map;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.2 $, $Date: 2002/09/18 13:47:14 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/28 11:55:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public class ProxyCallableStatement implements CallableStatement {
+public class ProxyCallableStatement extends ProxyPreparedStatement  implements CallableStatement {
 
     private CallableStatement callableStatement;
 
-    private ConnectionPool connectionPool;
-
-    public ProxyCallableStatement(CallableStatement callableStatement, ConnectionPool connectionPool) {
+    public ProxyCallableStatement(CallableStatement callableStatement, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection, String sqlStatement) {
+        super(callableStatement, connectionPool, proxyConnection, sqlStatement);
         this.callableStatement = callableStatement;
-        this.connectionPool = connectionPool;
-    }
-
-    private void testException(SQLException e) {
-        Iterator i = connectionPool.getDefinition().getFatalSqlExceptions().iterator();
-        while (i.hasNext()) {
-            if (e.getMessage().indexOf((String) i.next()) > -1) {
-                // This SQL exception indicates a fatal problem with this connection. We should probably
-                // just junk it.
-                try {
-                    close();
-                    connectionPool.throwConnection(getConnection());
-                } catch (SQLException e2) {
-                    connectionPool.getLog().debug("Couldn't close statement after detecting fatal exception", e2);
-                }
-            }
-        }
     }
 
     public void registerOutParameter(int parameterIndex, int sqlType)
@@ -489,6 +470,9 @@ public class ProxyCallableStatement implements CallableStatement {
 /*
  Revision history:
  $Log: ProxyCallableStatement.java,v $
+ Revision 1.3  2003/01/28 11:55:04  billhorsman
+ new JDK 1.2 patches (functioning but not complete)
+
  Revision 1.2  2002/09/18 13:47:14  billhorsman
  fixes for new logging
 

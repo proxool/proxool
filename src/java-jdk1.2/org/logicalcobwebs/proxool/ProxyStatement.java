@@ -5,52 +5,36 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.logicalcobwebs.proxool.ConnectionPool;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.Iterator;
 
 /**
  * Delegates to Statement for all calls. But also, for all execute methods, it
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.2 $, $Date: 2002/09/18 13:47:14 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/28 11:55:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-public class ProxyStatement implements Statement {
+public class ProxyStatement extends AbstractProxyStatement  implements Statement {
 
-    private Statement statement;
+    private static final Log LOG = LogFactory.getLog(ProxyStatement.class);
 
-    private ConnectionPool connectionPool;
-
-    public ProxyStatement(Statement statement, ConnectionPool connectionPool) {
-        this.statement = statement;
-        this.connectionPool = connectionPool;
-    }
-
-    private void testException(SQLException e) {
-        Iterator i = connectionPool.getDefinition().getFatalSqlExceptions().iterator();
-        while (i.hasNext()) {
-            if (e.getMessage().indexOf((String) i.next()) > -1) {
-                // This SQL exception indicates a fatal problem with this connection. We should probably
-                // just junk it.
-                try {
-                    close();
-                    connectionPool.throwConnection(getConnection());
-                } catch (SQLException e2) {
-                    connectionPool.getLog().debug("Couldn't close statement after detecting fatal exception", e2);
-                }
-            }
-        }
+    public ProxyStatement(Statement statement, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection, String sqlStatement) {
+        super(statement, connectionPool, proxyConnection, sqlStatement);
     }
 
     public ResultSet executeQuery(String sql) throws SQLException {
         try {
-            ResultSet rs = statement.executeQuery(sql);
+            ResultSet rs = getStatement().executeQuery(sql);
             return rs;
         } catch (SQLException e) {
             testException(e);
@@ -60,64 +44,60 @@ public class ProxyStatement implements Statement {
 
     public int executeUpdate(String sql) throws SQLException {
         try {
-            return statement.executeUpdate(sql);
+            return getStatement().executeUpdate(sql);
         } catch (SQLException e) {
             testException(e);
             throw e;
         }
     }
 
-    public void close() throws SQLException {
-        statement.close();
-    }
-
     public int getMaxFieldSize() throws SQLException {
-        return statement.getMaxFieldSize();
+        return getStatement().getMaxFieldSize();
     }
 
     public void setMaxFieldSize(int max) throws SQLException {
-        statement.setMaxFieldSize(max);
+        getStatement().setMaxFieldSize(max);
     }
 
     public int getMaxRows() throws SQLException {
-        return statement.getMaxRows();
+        return getStatement().getMaxRows();
     }
 
     public void setMaxRows(int max) throws SQLException {
-        statement.setMaxFieldSize(max);
+        getStatement().setMaxFieldSize(max);
     }
 
     public void setEscapeProcessing(boolean enable) throws SQLException {
-        statement.setEscapeProcessing(enable);
+        getStatement().setEscapeProcessing(enable);
     }
 
     public int getQueryTimeout() throws SQLException {
-        return statement.getQueryTimeout();
+        return getStatement().getQueryTimeout();
     }
 
     public void setQueryTimeout(int seconds) throws SQLException {
-        statement.setQueryTimeout(seconds);
+        getStatement().setQueryTimeout(seconds);
     }
 
     public void cancel() throws SQLException {
-        statement.cancel();
+        getStatement().cancel();
     }
 
     public SQLWarning getWarnings() throws SQLException {
-        return statement.getWarnings();
+        return getStatement().getWarnings();
     }
 
     public void clearWarnings() throws SQLException {
-        statement.clearWarnings();
+        getStatement().clearWarnings();
     }
 
     public void setCursorName(String name) throws SQLException {
-        statement.setCursorName(name);
+        getStatement().setCursorName(name);
     }
 
     public boolean execute(String sql) throws SQLException {
         try {
-            return statement.execute(sql);
+            return getStatement().execute(sql);
         } catch (SQLException e) {
             testException(e);
             throw e;
@@ -125,53 +105,53 @@ public class ProxyStatement implements Statement {
     }
 
     public ResultSet getResultSet() throws SQLException {
-        ResultSet rs = statement.getResultSet();
+        ResultSet rs = getStatement().getResultSet();
         return rs;
     }
 
     public int getUpdateCount() throws SQLException {
-        return statement.getUpdateCount();
+        return getStatement().getUpdateCount();
     }
 
     public boolean getMoreResults() throws SQLException {
-        return statement.getMoreResults();
+        return getStatement().getMoreResults();
     }
 
     public void setFetchDirection(int direction) throws SQLException {
-        statement.setFetchDirection(direction);
+        getStatement().setFetchDirection(direction);
     }
 
     public int getFetchDirection() throws SQLException {
-        return statement.getFetchDirection();
+        return getStatement().getFetchDirection();
     }
 
     public void setFetchSize(int rows) throws SQLException {
-        statement.setFetchSize(rows);
+        getStatement().setFetchSize(rows);
     }
 
     public int getFetchSize() throws SQLException {
-        return statement.getFetchSize();
+        return getStatement().getFetchSize();
     }
 
     public int getResultSetConcurrency() throws SQLException {
-        return statement.getResultSetConcurrency();
+        return getStatement().getResultSetConcurrency();
     }
 
     public int getResultSetType() throws SQLException {
-        return statement.getResultSetType();
+        return getStatement().getResultSetType();
     }
 
     public void addBatch(String sql) throws SQLException {
-        statement.addBatch(sql);
+        getStatement().addBatch(sql);
     }
 
     public void clearBatch() throws SQLException {
-        statement.clearBatch();
+        getStatement().clearBatch();
     }
 
     public int[] executeBatch() throws SQLException {
         try {
-            return statement.executeBatch();
+            return getStatement().executeBatch();
         } catch (SQLException e) {
             testException(e);
             throw e;
@@ -179,13 +159,17 @@ public class ProxyStatement implements Statement {
     }
 
     public Connection getConnection() throws SQLException {
-        return statement.getConnection();
+        return getStatement().getConnection();
     }
+
 }
 
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.3  2003/01/28 11:55:04  billhorsman
+ new JDK 1.2 patches (functioning but not complete)
+
  Revision 1.2  2002/09/18 13:47:14  billhorsman
  fixes for new logging
 
