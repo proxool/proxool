@@ -6,14 +6,14 @@
 
     DTD for configuring Proxool using XMLConfigurator
 
-    version $Revision: 1.4 $, $Date: 2003/03/05 23:28:56 $
+    version $Revision: 1.5 $, $Date: 2004/03/17 10:51:48 $
     author billhorsman
-    author $Author: billhorsman $ (current maintainer)
+    author $Author: brenuart $ (current maintainer)
     since Proxool 0.6
 
   -->
 <!ELEMENT proxool-config (proxool+)>
-<!ELEMENT proxool (alias, driver-url, driver-class, driver-properties?, house-keeping-sleep-time?, house-keeping-test-sql?, maximum-connection-count?, minimum-connection-count?, maximum-connection-lifetime?, maximum-new-connections?, simultaneous-build-throttle?, recently-started-threshold?, overload-without-refusal-lifetime?, maximum-active-time?, verbose?, trace?, fatal-sql-exception*, prototype-count?)>
+<!ELEMENT proxool (alias, driver-url, driver-class, driver-properties?, house-keeping-sleep-time?, house-keeping-test-sql?, maximum-connection-count?, minimum-connection-count?, maximum-connection-lifetime?, maximum-new-connections?, simultaneous-build-throttle?, recently-started-threshold?, overload-without-refusal-lifetime?, maximum-active-time?, verbose?, trace?, fatal-sql-exception*, prototype-count?, statistics?, statistics-log-level?)>
 <!-- This is the alias for the pool -->
 <!ELEMENT alias (#PCDATA)>
 <!-- The delegate driver we are delegating to
@@ -76,9 +76,21 @@
 	name CDATA #REQUIRED
 	value CDATA #REQUIRED
 >
+<!-- The sample length when taking statistical information, comma-delimited. For example: '10s,15m' 
+	would mean take samples every 10 seconds and every 15 minutes. Valid units are s(econds), 
+	m(inutes), h(ours) and d(ays). Default is no statistics -->
+<!ELEMENT statistics (#PCDATA)>
+<!-- Whether statistics are logged as they are produced. Range: DEBUG, INFO, WARN, ERROR, FATAL. 
+	Not to be confused with the level used with the general log. You have to configure that 
+	separately. Default is no logging -->
+<!ELEMENT statistics-log-level (#PCDATA)>
+
 <!--
  Revision history:
  $Log: proxool.dtd,v $
+ Revision 1.5  2004/03/17 10:51:48  brenuart
+ Add statistics & statistics-log-level elements
+
  Revision 1.4  2003/03/05 23:28:56  billhorsman
  deprecated maximum-new-connections property in favour of
  more descriptive simultaneous-build-throttle
