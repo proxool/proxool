@@ -7,7 +7,7 @@ TestHelper.buildCompleteAlternativeProperties()
 <proxool-config>
 	<proxool>
 		<alias>xml-test-validating</alias>
-		<driver-url>jdbc:hsqldb:.</driver-url>
+		<driver-url>jdbc:hsqldb:db/test</driver-url>
 		<driver-class>org.hsqldb.jdbcDriver</driver-class>
 		<driver-properties>
 			<property name="user" value="sa"/>
@@ -31,7 +31,7 @@ TestHelper.buildCompleteAlternativeProperties()
 	<not-allowed>Ouch!</not-allowed>
 	<proxool>
 		<alias>xml-test-validating-2</alias>
-		<driver-url>jdbc:hsqldb:.</driver-url>
+		<driver-url>jdbc:hsqldb:db/test</driver-url>
 		<driver-class>org.hsqldb.jdbcDriver</driver-class>
 		<driver-properties>
 			<property name="user" value="sa"/>
