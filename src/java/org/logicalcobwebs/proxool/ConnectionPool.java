@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.16 $, $Date: 2002/11/05 21:24:18 $
+ * @version $Revision: 1.17 $, $Date: 2002/11/06 20:27:30 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -92,9 +92,15 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private static boolean loggedLegend;
 
+    /**
+     * Initialised in {@link ConnectionPool#ConnectionPool constructor}.
+     */
+    private ConnectionResetter connectionResetter;
+
     protected ConnectionPool(ConnectionPoolDefinition definition) {
         reloadMonitor = new ReloadMonitor(definition.getName());
         log = LogFactory.getLog("org.logicalcobwebs.proxool." + definition.getName());
+        connectionResetter = new ConnectionResetter(log);
         setDefinition(definition);
         connectionPoolUp = true;
     }
@@ -1033,6 +1039,23 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         return log;
     }
 
+    /**
+     * {@link ConnectionResetter#initialise Initialises} the ConnectionResetter.
+     * @param connection sample Connection to use for default values
+     */
+    protected void initialiseConnectionResetter(Connection connection) {
+        connectionResetter.initialise(connection);
+    }
+
+    /**
+     * {@link ConnectionResetter#reset Resets} a Connection to its
+     * original state.
+     * @param connection the one to reset
+     */
+    protected void resetConnection(Connection connection) {
+        connectionResetter.reset(connection);
+    }
+
     private static final boolean FORCE_EXPIRY = true;
 
     private static final boolean REQUEST_EXPIRY = false;
@@ -1042,6 +1065,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.17  2002/11/06 20:27:30  billhorsman
+ supports the ConnectionResetter
+
  Revision 1.16  2002/11/05 21:24:18  billhorsman
  cosmetic: changed format of statistics dumped to log to make it less confusing for locales that use a space separator for thousands
 
