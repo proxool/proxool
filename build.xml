@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.8 $
-    $Date: 2002/10/25 17:39:50 $
+    $Revision: 1.9 $
+    $Date: 2002/10/27 12:11:45 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -33,6 +33,10 @@
 
     <!-- Current version -->
     <property name="version" value="0.4"/>
+
+    <!-- Log4J configuration to use for testing. See proxool-ant.properties
+    file for more infomation. -->
+    <property name="log4jPath" value=""/>
 
     <!-- Classpath -->
     <path id="classpath" path="${build-dir}/classes" >
@@ -168,6 +172,7 @@
         >
         <copy todir="${build-dir}/src/java" preservelastmodified="yes">
             <fileset dir="src/java" includes="**/*.java"/>
+            <fileset dir="src/java-ext" includes="**/PropertyConfigurator.java"/>
         </copy>
     </target>
 
@@ -221,32 +226,18 @@
         depends="init"
         >
         <property name="build-test" value="true"/>
+        <property name="build-ext" value="true"/>
         <antcall target="build-src"/>
         <antcall target="compile"/>
     </target>
 
     <target
-        name="run-test-with-chainsaw"
-        description="Runs the JUnit tests (with Chainsaw)"
-        depends="init"
-        >
-        <parallel>
-            <java fork="yes" classpathref="classpath" classname="org.apache.log4j.chainsaw.Main" />
-            <sequential>
-                <sleep seconds="10"/>
-                <java fork="yes" classpathref="classpath" classname="junit.textui.TestRunner" >
-                    <arg value="org.logicalcobwebs.proxool.GeneralTests" />
-                </java>
-            </sequential>
-        </parallel>
-    </target>
-
-    <target
         name="run-test"
         description="Runs the JUnit tests"
-        depends="init"
+        depends="init,build-test"
         >
         <java fork="yes" classpathref="classpath" classname="junit.textui.TestRunner" >
+            <sysproperty key="log4jPath" value="${log4jPath}" />
             <arg value="org.logicalcobwebs.proxool.AllTests" />
         </java>
     </target>
