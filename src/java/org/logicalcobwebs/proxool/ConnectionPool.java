@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.67 $, $Date: 2003/08/30 14:54:04 $
+ * @version $Revision: 1.68 $, $Date: 2003/09/20 17:04:06 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -339,7 +339,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         // Just check that it is null
         if (forceExpiry || proxyConnection.isNull()) {
 
-            proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE);
+            proxyConnection.setStatus(ProxyConnectionIF.STATUS_NULL);
 
             /* Run some code everytime we destroy a connection */
 
@@ -357,7 +357,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             }
 
             try {
-                proxyConnection.setStatus(ProxyConnectionIF.STATUS_NULL);
                 // If we're shutting down then getting a write lock will cause a deadlock
                 if (isConnectionPoolUp()) {
                     acquireConnectionStatusWriteLock();
@@ -1046,6 +1045,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.68  2003/09/20 17:04:06  billhorsman
+ Fix for incorrect OFFLINE count when house keeper removed a connection if the test SQL failed. This
+ meant that the offline count went negative. The only consequence of that is that the logs look funny.
+
  Revision 1.67  2003/08/30 14:54:04  billhorsman
  Checkstyle
 
