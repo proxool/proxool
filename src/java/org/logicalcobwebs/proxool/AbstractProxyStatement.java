@@ -19,7 +19,7 @@ import java.util.TreeMap;
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
- * @version $Revision: 1.14 $, $Date: 2003/10/19 09:50:08 $
+ * @version $Revision: 1.15 $, $Date: 2003/10/27 11:18:42 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -192,27 +192,29 @@ abstract class AbstractProxyStatement {
      * if a batch is being peformed) then it is appended to the end.
      */
     protected void appendToSqlLog() {
-        int parameterIndex = 0;
-        StringTokenizer st = new StringTokenizer(sqlStatement, "?");
-        while (st.hasMoreTokens()) {
-            if (parameterIndex > 0) {
-                if (parameters != null) {
-                    final Object value = parameters.get(new Integer(parameterIndex));
-                    if (value != null) {
-                        sqlLog.append(value);
+        if (sqlStatement != null && sqlStatement.length() > 0) {
+            int parameterIndex = 0;
+            StringTokenizer st = new StringTokenizer(sqlStatement, "?");
+            while (st.hasMoreTokens()) {
+                if (parameterIndex > 0) {
+                    if (parameters != null) {
+                        final Object value = parameters.get(new Integer(parameterIndex));
+                        if (value != null) {
+                            sqlLog.append(value);
+                        } else {
+                            sqlLog.append("?");
+                        }
                     } else {
-                        sqlLog.append("?");
+                            sqlLog.append("?");
                     }
-                } else {
-                        sqlLog.append("?");
                 }
+                parameterIndex++;
+                sqlLog.append(st.nextToken());
             }
-            parameterIndex++;
-            sqlLog.append(st.nextToken());
-        }
-        sqlLog.append("; ");
-        if (parameters != null) {
-            parameters.clear();
+            sqlLog.append("; ");
+            if (parameters != null) {
+                parameters.clear();
+            }
         }
     }
 
@@ -236,6 +238,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.15  2003/10/27 11:18:42  billhorsman
+ Fix for sqlStatement being null.
+
  Revision 1.14  2003/10/19 09:50:08  billhorsman
  Debug exception displays class name.
 
