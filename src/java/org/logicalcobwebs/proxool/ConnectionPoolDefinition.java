@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.25 $, $Date: 2003/10/16 18:54:49 $
+ * @version $Revision: 1.26 $, $Date: 2003/10/19 13:31:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -222,6 +222,12 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             while (i.hasNext()) {
                 String key = (String) i.next();
                 String value = info.getProperty(key);
+                // This allows us to set properties to a null, even though Properties
+                // object doesn't allow null values. It means that you can't set a property
+                // to be a zero length string but that's ok.
+                if (value != null && value.length() == 0) {
+                    value = null;
+                }
                 changed = changed | setAnyProperty(key, value, pretend);
                 if (!pretend) {
                     completeInfo.setProperty(key, value);
@@ -1128,6 +1134,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.26  2003/10/19 13:31:57  billhorsman
+ Setting a property to a zero length String actually sets it to a null
+
  Revision 1.25  2003/10/16 18:54:49  billhorsman
  Fixed javadoc for update() and redefine() methods which were transposed. Also improved exception handling for
  incomplete pool definitions.
