@@ -1,15 +1,15 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.34 $
-$Date: 2004/03/25 12:29:40 $
+$Revision: 1.35 $
+$Date: 2004/04/22 07:11:06 $
 $Author: billhorsman $
 
 0.9.0 
 
 - New DataSource implementation. TODO more
 
-- All connections are now wrapped in disposable wrappers. TODO more
+- All connections are now wrapped in disposable wrappers. TODO more 
 
 - Connections, Statements, PreparedStatements, and CallableStatements now implement
   all the public intefaces that the delegate connection does. This means that you can,
