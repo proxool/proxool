@@ -5,6 +5,9 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,14 +19,15 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:13:50 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/18 13:47:13 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPool implements ConnectionPoolStatisticsIF {
-    /** TODO try to avoid expiring all connections at once! */
 
-    private static final String[] statusDescriptions = {"NULL", "AVAILABLE", "ACTIVE", "OFFLINE"};
+    private Log log;
+
+    private static final String[] STATUS_DESCRIPTIONS = {"NULL", "AVAILABLE", "ACTIVE", "OFFLINE"};
 
     private static final String MSG_MAX_CONNECTION_COUNT = "Couldn't get connection because we are at maximum connection count and there are none available";
 
@@ -84,15 +88,15 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private int recentlyStartedActiveConnectionCount;
 
-    protected ConnectionPool(ConnectionPoolDefinition definition, LogListenerIF logListener) {
+    protected ConnectionPool(ConnectionPoolDefinition definition) {
+        log = LogFactory.getLog("org.logicalcobwebs.proxool." + definition.getName());
         setDefinition(definition);
         connectionPoolUp = true;
-        Logger.registerLogListener(logListener, definition.getName());
     }
 
     /** Starts up house keeping and prototyper threads. */
     protected void start() {
-        info("Establishing ConnectionPool " + definition.getName());
+        log.info("Establishing ConnectionPool " + definition.getName());
 
         houseKeepingThread = new Thread(new HouseKeeper());
         houseKeepingThread.setDaemon(true);
@@ -127,7 +131,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         if (connectionCount >= getDefinition().getMaximumConnectionCount() && getAvailableConnectionCount() == 0) {
             connectionsRefusedCount++;
-            info(displayStatistics() + " - " + MSG_MAX_CONNECTION_COUNT);
+            log.info(displayStatistics() + " - " + MSG_MAX_CONNECTION_COUNT);
             timeMillisOfLastRefusal = System.currentTimeMillis();
             calculateUpState();
             throwSQLException(MSG_MAX_CONNECTION_COUNT);
@@ -136,8 +140,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         if (prototypingThread != null) {
             // log(OK + displayStatistics() + " - prototypingThread.notify()");
             prototypingThread.wake();
-        }
-        else {
+        } else {
             prototypingThread = new Prototyper();
             prototypingThread.setDaemon(true);
             prototypingThread.start();
@@ -145,18 +148,16 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         ProxyConnection proxyConnection = null;
         try {
             if (connectionCount - connectedConnectionCount > getDefinition().getMaximumNewConnections()) {
-                throwSQLException("Already making " + (connectionCount - connectedConnectionCount) +
-                    " connections - trying to avoid overload");
-            }
-            else {
+                throwSQLException("Already making " + (connectionCount - connectedConnectionCount)
+                        + " connections - trying to avoid overload");
+            } else {
                 // We need to look at all the connections, but we don't want to keep looping round forever
                 for (int connectionsTried = 0; connectionsTried < proxyConnections.size(); connectionsTried++) {
                     // By doing this in a try/catch we avoid needing to synch on the size().  We need to do be
                     // able to cope with connections being removed whilst we are going round this loop
                     try {
                         proxyConnection = (ProxyConnection) proxyConnections.elementAt(nextAvailableConnection);
-                    }
-                    catch (ArrayIndexOutOfBoundsException e) {
+                    } catch (ArrayIndexOutOfBoundsException e) {
                         nextAvailableConnection = 0;
                         proxyConnection = (ProxyConnection) proxyConnections.elementAt(nextAvailableConnection);
                     }
@@ -166,8 +167,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     if (proxyConnection != null && proxyConnection.fromAvailableToActive()) {
                         nextAvailableConnection++;
                         break;
-                    }
-                    else {
+                    } else {
                         proxyConnection = null;
                     }
                     nextAvailableConnection++;
@@ -179,41 +179,42 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         proxyConnection = createPoolableConnection(ProxyConnection.STATUS_ACTIVE);
                         if (proxyConnection != null) {
                             addPoolableConnection(proxyConnection);
-                            if (isDebugEnabled())
-                                debug(displayStatistics() + " - #" +
-                                    idFormat.format(proxyConnection.getId()) + " on demand");
+                            if (log.isDebugEnabled()) {
+                                log.debug(displayStatistics() + " - #"
+                                        + idFormat.format(proxyConnection.getId()) + " on demand");
+                            }
+                        } else {
+                            if (log.isDebugEnabled()) {
+                                log.debug("createPoolableConnection returned null");
+                            }
                         }
-                        else {
-                            if (isDebugEnabled()) debug("createPoolableConnection returned null");
-                        }
-                    }
-                    catch (Exception e) {
-                        error(e);
+                    } catch (Exception e) {
+                        log.error(e);
                         throwSQLException(e.toString());
                     }
                 }
 
             }
-        }
-        catch (SQLException e) {
-            if (isDebugEnabled()) debug(e);
+        } catch (SQLException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(e);
+            }
             calculateUpState();
             throw e;
-        }
-        catch (Throwable t) {
-            error(t);
-            if (isDebugEnabled()) debug(t);
+        } catch (Throwable t) {
+            log.error(t);
+            if (log.isDebugEnabled()) {
+                log.debug(t);
+            }
             calculateUpState();
             throwSQLException(t.toString());
-        }
-        finally {
+        } finally {
             if (proxyConnection != null) {
                 connectionsServedCount++;
                 proxyConnection.setRequester(requester);
                 calculateUpState();
                 return proxyConnection;
-            }
-            else {
+            } else {
                 connectionsRefusedCount++;
                 timeMillisOfLastRefusal = System.currentTimeMillis();
                 calculateUpState();
@@ -261,35 +262,37 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     break;
 
                 default:
-/* Not quite sure what we should do here. oh well, leave it offline*/
-                    error(displayStatistics() + " - Didn't expect to set new connection to state " + state);
+                    /* Not quite sure what we should do here. oh well, leave it offline*/
+                    log.error(displayStatistics() + " - Didn't expect to set new connection to state " + state);
             }
 
             if (proxyConnection.getStatus() != state) {
-                throwSQLException("Unable to set connection #" + proxyConnection.getId() + " to " +
-                    statusDescriptions[state]);
+                throwSQLException("Unable to set connection #" + proxyConnection.getId() + " to "
+                        + STATUS_DESCRIPTIONS[state]);
 
+            } else {
+                if (log.isDebugEnabled() && getDefinition().getDebugLevel() == ConnectionPoolDefinitionIF.DEBUG_LEVEL_LOUD) {
+                    log.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " is now " + proxyConnection.getStatus());
+                }
             }
-            else {
-                if (isDebugEnabled() && getDefinition().getDebugLevel() == ConnectionPoolDefinitionIF.DEBUG_LEVEL_LOUD) debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " is now " + proxyConnection.getStatus());
-            }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             // error(displayStatistics() + " - Couldn't initialise connection #" + proxyConnection.getId() + ": " + e);
             throw e;
-        }
-        catch (ClassNotFoundException e) {
-            if (isDebugEnabled()) debug(e);
+        } catch (ClassNotFoundException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(e);
+            }
             throw e;
-        }
-        catch (RuntimeException e) {
-            if (isDebugEnabled()) debug(e);
+        } catch (RuntimeException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(e);
+            }
             throw e;
-        }
-        catch (Throwable t) {
-            if (isDebugEnabled()) debug(t);
-        }
-        finally {
+        } catch (Throwable t) {
+            if (log.isDebugEnabled()) {
+                log.debug(t);
+            }
+        } finally {
 
             lastCreateWasSuccessful = (proxyConnection != null);
             calculateUpState();
@@ -306,9 +309,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         return proxyConnection;
     }
 
-    /** Add a ProxyConnection to the pool */
-    private void addPoolableConnection(ProxyConnection ProxyConnection) {
-        proxyConnections.addElement(ProxyConnection);
+    /** Add a proxyConnection to the pool */
+    private void addPoolableConnection(ProxyConnection proxyConnection) {
+        proxyConnections.addElement(proxyConnection);
     }
 
     /**
@@ -330,14 +333,12 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 if (proxyConnection.fromActiveToNull()) {
                     expirePoolableConnection(proxyConnection, REQUEST_EXPIRY);
                 }
-            }
-            else {
+            } else {
                 // Let's make it available for someone else
                 proxyConnection.fromActiveToAvailable();
             }
-        }
+        } finally {
             // This is probably due to getPoolableConnection returning a null.
-        finally {
             calculateUpState();
         }
     }
@@ -350,12 +351,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             if (proxyConnection.fromActiveToNull()) {
                 expirePoolableConnection(proxyConnection, REQUEST_EXPIRY);
             }
-        }
+        } catch (ClassCastException e) {
             // This is probably due to getPoolableConnection returning a null.
-        catch (ClassCastException e) {
-            error("Tried to throwConnection() a connection that wasn't a ProxyConnection");
-        }
-        finally {
+            log.error("Tried to throwConnection() a connection that wasn't a ProxyConnection");
+        } finally {
             calculateUpState();
         }
     }
@@ -375,43 +374,40 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
             try {
                 onDeath(proxyConnection);
-            }
-            catch (SQLException e) {
-                error(e);
+            } catch (SQLException e) {
+                log.error(e);
             }
 
             // The reallyClose() method also decrements the connectionCount.
             try {
                 proxyConnection.reallyClose();
-            }
-            catch (SQLException e) {
-                error(e);
+            } catch (SQLException e) {
+                log.error(e);
             }
 
             proxyConnections.removeElement(proxyConnection);
 
-            if (isDebugEnabled())
-                debug(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId()) +
-                    " removed because " + reason + ".");
+            if (log.isDebugEnabled()) {
+                log.debug(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId())
+                        + " removed because " + reason + ".");
+            }
             // if the prototyper is suspended then wake it up
             if (prototypingThread != null) {
                 // log(OK + displayStatistics() + " - prototypingThread.wake()");
                 prototypingThread.wake();
-            }
-            else {
+            } else {
                 prototypingThread = new Prototyper();
                 prototypingThread.setDaemon(true);
                 prototypingThread.start();
             }
-        }
-        else {
-            error(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId()) +
-                " was not removed because isNull() was false.");
+        } else {
+            log.error(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId())
+                    + " was not removed because isNull() was false.");
         }
     }
 
-    private void expirePoolableConnection(ProxyConnection ProxyConnection, boolean forceExpiry) {
-        removePoolableConnection(ProxyConnection, "age is " + ProxyConnection.getAge() + "ms", forceExpiry);
+    private void expirePoolableConnection(ProxyConnection proxyConnection, boolean forceExpiry) {
+        removePoolableConnection(proxyConnection, "age is " + proxyConnection.getAge() + "ms", forceExpiry);
         calculateUpState();
     }
 
@@ -429,11 +425,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             connectionPoolUp = false;
 
             if (delay > 0) {
-                info("Closing down connection pool - waiting for " + delay +
-                    " milliseconds for everything to stop by " + finalizerName);
-            }
-            else {
-                info("Closing down connection pool immediately by " + finalizerName);
+                log.info("Closing down connection pool - waiting for " + delay
+                        + " milliseconds for everything to stop by " + finalizerName);
+            } else {
+                log.info("Closing down connection pool immediately by " + finalizerName);
             }
 
             /* Interrupt the threads (in case they're sleeping) */
@@ -441,45 +436,45 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             try {
                 try {
                     wakeThread(houseKeepingThread);
-                }
-                catch (Exception e) {
-                    error("Can't wake houseKeepingThread", e);
+                } catch (Exception e) {
+                    log.error("Can't wake houseKeepingThread", e);
                 }
 
                 try {
                     wakeThread(prototypingThread);
-                }
-                catch (Exception e) {
-                    error("Can't wake prototypingThread", e);
+                } catch (Exception e) {
+                    log.error("Can't wake prototypingThread", e);
                 }
 
                 /* Patience, patience. */
 
                 try {
                     Thread.sleep(delay);
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     // Oh well
                 }
 
                 // Silently close all connections
                 for (int i = proxyConnections.size() - 1; i >= 0; i--) {
                     try {
-                        if (isDebugEnabled()) debug("Closing connection #" + getProxyConnection(i).getId());
+                        if (log.isDebugEnabled()) {
+                            log.debug("Closing connection #" + getProxyConnection(i).getId());
+                        }
                         getProxyConnection(i).close();
-                    }
-                    catch (Throwable t) {
+                    } catch (Throwable t) {
                         // Ignore
                     }
                 }
-            }
-            finally {
-                if (isDebugEnabled()) debug("Connection pool has been finalized (stopped) by " + finalizerName);
+            } finally {
+                if (log.isDebugEnabled()) {
+                    log.debug("Connection pool has been finalized (stopped) by " + finalizerName);
+                }
                 super.finalize();
             }
-        }
-        else {
-            if (isDebugEnabled()) debug("Ignoring duplicate attempt to finalize connection pool by " + finalizerName);
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Ignoring duplicate attempt to finalize connection pool by " + finalizerName);
+            }
         }
     }
 
@@ -547,13 +542,14 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
                     try {
                         Thread.sleep(getDefinition().getHouseKeepingSleepTime());
-                    }
-                    catch (InterruptedException e) {
+                    } catch (InterruptedException e) {
                         return;
                     }
 
                     if (getDefinition().getDebugLevel() > getDefinition().DEBUG_LEVEL_QUIET) {
-                        if (isDebugEnabled()) debug(displayStatistics() + " - House keeping start");
+                        if (log.isDebugEnabled()) {
+                            log.debug(displayStatistics() + " - House keeping start");
+                        }
                     }
 
                     // Right, now we know we're the right thread then we can carry on house keeping
@@ -584,23 +580,24 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                                 String sql = getDefinition().getHouseKeepingTestSql();
                                 if (sql != null && sql.length() > 0) {
                                     // A Test Statement has been provided. Execute it!
-                                    if (isDebugEnabled() && getDefinition().getDebugLevel() == ConnectionPoolDefinitionIF.DEBUG_LEVEL_LOUD) debug("Testing connection " + proxyConnection.getId() + " ...");
+                                    if (log.isDebugEnabled() && getDefinition().getDebugLevel() == ConnectionPoolDefinitionIF.DEBUG_LEVEL_LOUD) {
+                                        log.debug("Testing connection " + proxyConnection.getId() + " ...");
+                                    }
                                     boolean testResult = testStatement.execute(sql);
-                                    if (isDebugEnabled() && getDefinition().getDebugLevel() == ConnectionPoolDefinitionIF.DEBUG_LEVEL_LOUD) debug("Connection " + proxyConnection.getId() + (testResult ? " OK" : " returned with false"));
+                                    if (log.isDebugEnabled() && getDefinition().getDebugLevel() == ConnectionPoolDefinitionIF.DEBUG_LEVEL_LOUD) {
+                                        log.debug("Connection " + proxyConnection.getId() + (testResult ? " OK" : " returned with false"));
+                                    }
                                 } // END if (sql != null && sql.length() > 0)
 
                                 proxyConnection.fromOfflineToAvailable();
-                            }
-                            catch (SQLException e) {
+                            } catch (SQLException e) {
                                 // There is a problem with this connection.  Let's remove it!
                                 proxyConnection.fromOfflineToNull();
                                 removePoolableConnection(proxyConnection, "it has problems: " + e, REQUEST_EXPIRY);
-                            }
-                            finally {
+                            } finally {
                                 try {
                                     testStatement.close();
-                                }
-                                catch (Throwable t) {
+                                } catch (Throwable t) {
                                     // Never mind.
                                 }
                             }
@@ -613,15 +610,15 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                                     // It is.  Expire it now .
                                     expirePoolableConnection(proxyConnection, REQUEST_EXPIRY);
                                 }
-                            }
-                            else {
+                            } else {
                                 // Oh no, it's in use.  Never mind, we'll mark it for expiry
                                 // next time it is available.  This will happen in the
                                 // putConnection() method.
                                 proxyConnection.markForExpiry();
-                                if (isDebugEnabled())
-                                    debug(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId()) +
-                                        " marked for expiry.");
+                                if (log.isDebugEnabled()) {
+                                    log.debug(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId())
+                                            + " marked for expiry.");
+                                }
                             } // END if (poolableConnection.setOffline())
                         } // END if (poolableConnection.getAge() > maximumConnectionLifetime)
 
@@ -645,8 +642,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                                 // This connection has been active for way too long. We're
                                 // going to kill it :)
                                 removePoolableConnection(proxyConnection,
-                                    "it has been active for " + activeTime +
-                                    " milliseconds", FORCE_EXPIRY);
+                                        "it has been active for " + activeTime
+                                        + " milliseconds", FORCE_EXPIRY);
 
                             }
                         }
@@ -660,22 +657,21 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     if (prototypingThread != null) {
                         // log(OK + displayStatistics() + " - prototypingThread.notify()");
                         prototypingThread.wake();
-                    }
-                    else {
+                    } else {
                         prototypingThread = new Prototyper();
                         prototypingThread.setDaemon(true);
                         prototypingThread.start();
                     }
 
                     calculateUpState();
-                }
-                catch (RuntimeException e) {
+                } catch (RuntimeException e) {
                     // We don't want the housekeeping thread to fall over!
-                    error("Housekeeping error :", e);
-                }
-                finally {
+                    log.error("Housekeeping error :", e);
+                } finally {
                     if (getDefinition().getDebugLevel() > getDefinition().DEBUG_LEVEL_QUIET) {
-                        if (isDebugEnabled()) debug(displayStatistics() + " - House keeping stop");
+                        if (log.isDebugEnabled()) {
+                            log.debug(displayStatistics() + " - House keeping stop");
+                        }
                     }
                 }
             } // END while (connectionPoolUp)
@@ -695,28 +691,29 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             while (connectionPoolUp) {
 
                 if (getDefinition().getDebugLevel() > getDefinition().DEBUG_LEVEL_QUIET) {
-                    if (isDebugEnabled()) debug(displayStatistics() + " - Prototyping start");
+                    if (log.isDebugEnabled()) {
+                        log.debug(displayStatistics() + " - Prototyping start");
+                    }
                 }
 
                 boolean keepAtIt = true;
-                while (connectionPoolUp && keepAtIt && (connectionCount < getDefinition().getMinimumConnectionCount() ||
-                    getAvailableConnectionCount() < getDefinition().getPrototypeCount()) && connectionCount < getDefinition().getMaximumConnectionCount()) {
+                while (connectionPoolUp && keepAtIt && (connectionCount < getDefinition().getMinimumConnectionCount()
+                        || getAvailableConnectionCount() < getDefinition().getPrototypeCount()) && connectionCount < getDefinition().getMaximumConnectionCount()) {
                     try {
                         ProxyConnection poolableConnection = createPoolableConnection(ProxyConnection.STATUS_AVAILABLE);
                         if (poolableConnection == null) {
                             // If we failed on one then might as well give up.  Probably
                             // because we've reached the maximum anyway.
                             break;
-                        }
-                        else {
+                        } else {
                             addPoolableConnection(poolableConnection);
-                            if (isDebugEnabled())
-                                debug(displayStatistics() + " - #" +
-                                    idFormat.format(poolableConnection.getId()) + " prototype");
+                            if (log.isDebugEnabled()) {
+                                log.debug(displayStatistics() + " - #"
+                                        + idFormat.format(poolableConnection.getId()) + " prototype");
+                            }
                         }
-                    }
-                    catch (Exception e) {
-                        error("Prototype", e);
+                    } catch (Exception e) {
+                        log.error("Prototype", e);
                         // If there's been an exception, perhaps we should stop
                         // prototyping for a while.  Otherwise if the database
                         // has problems we end up trying the connection every 2ms
@@ -728,15 +725,16 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 }
 
                 if (getDefinition().getDebugLevel() > getDefinition().DEBUG_LEVEL_QUIET) {
-                    if (isDebugEnabled()) debug(displayStatistics() + " - Prototyping stop");
+                    if (log.isDebugEnabled()) {
+                        log.debug(displayStatistics() + " - Prototyping stop");
+                    }
                 }
 
                 try {
                     synchronized (this) {
                         this.wait();
                     }
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     //
                 }
             }
@@ -759,8 +757,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 // It is.  Expire it now .
                 expirePoolableConnection(poolableConnection, REQUEST_EXPIRY);
             }
-        }
-        else {
+        } else {
             // Oh no, it's in use.
 
             if (merciful) {
@@ -768,9 +765,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 // next time it is available.  This will happen in the
                 // putConnection() method.
                 poolableConnection.markForExpiry();
-                if (isDebugEnabled()) debug(displayStatistics() + " - #" + idFormat.format(poolableConnection.getId()) + " marked for expiry.");
-            }
-            else {
+                if (log.isDebugEnabled()) {
+                    log.debug(displayStatistics() + " - #" + idFormat.format(poolableConnection.getId()) + " marked for expiry.");
+                }
+            } else {
                 // So? Kill, kill, kill
 
                 // We have to make sure it's null first.
@@ -781,7 +779,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     protected void registerRemovedConnection(int status) {
-        if (isDebugEnabled()) debug("Decrementing connectionCount, connectedConnectionCount and connectionCountByState[" + status + "]");
+        if (log.isDebugEnabled()) {
+            log.debug("Decrementing connectionCount, connectedConnectionCount and connectionCountByState[" + status + "]");
+        }
         connectionCount--;
         connectedConnectionCount--;
         connectionCountByState[status]--;
@@ -817,9 +817,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         try {
             Class.forName(definition.getDriver());
-        }
-        catch (ClassNotFoundException e) {
-            error(e);
+        } catch (ClassNotFoundException e) {
+            log.error(e);
         }
 
     }
@@ -885,28 +884,22 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                  * (because we were too busy) within the last minute.
                  */
 
-                if (this.timeMillisOfLastRefusal > (System.currentTimeMillis() -
-                    getDefinition().getOverloadWithoutRefusalLifetime())) {
+                if (this.timeMillisOfLastRefusal > (System.currentTimeMillis()
+                        - getDefinition().getOverloadWithoutRefusalLifetime())) {
                     calculatedUpState = StateListenerIF.STATE_OVERLOADED;
-                }
-
-/* Are we doing anything at all?
-                 */
-
-                else if (getActiveConnectionCount() > 0) {
+                } else if (getActiveConnectionCount() > 0) {
+                    /* Are we doing anything at all? */
                     calculatedUpState = StateListenerIF.STATE_BUSY;
                 }
 
-            }
-            else {
+            } else {
                 calculatedUpState = StateListenerIF.STATE_DOWN;
             }
 
             setUpState(calculatedUpState);
 
-        }
-        catch (Exception e) {
-            error(e);
+        } catch (Exception e) {
+            log.error(e);
         }
     }
 
@@ -951,8 +944,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             // able to cope with connections being removed whilst we are going round this loop
             try {
                 proxyConnection = (ProxyConnection) proxyConnections.elementAt(nextAvailableConnection);
-            }
-            catch (ArrayIndexOutOfBoundsException e) {
+            } catch (ArrayIndexOutOfBoundsException e) {
                 nextAvailableConnection = 0;
                 proxyConnection = (ProxyConnection) proxyConnections.elementAt(nextAvailableConnection);
             }
@@ -971,49 +963,33 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         }
 
         if (!success) {
-            if (isDebugEnabled())
-                debug(displayStatistics() + " - couldn't find " + idFormat.format(proxyConnection.getId()) +
-                    " and I've just been asked to expire it");
+            if (log.isDebugEnabled()) {
+                log.debug(displayStatistics() + " - couldn't find " + idFormat.format(proxyConnection.getId())
+                        + " and I've just been asked to expire it");
+            }
         }
 
         return success;
+    }
+
+    public Log getLog() {
+        return log;
     }
 
     private static final boolean FORCE_EXPIRY = true;
 
     private static final boolean REQUEST_EXPIRY = false;
 
-    protected void debug(Object o) {
-        Logger.debug(o, getDefinition().getName());
-    }
-
-    protected boolean isDebugEnabled() {
-        return Logger.isDebugEnabled(getDefinition().getName());
-    }
-
-    protected void info(Object o) {
-        Logger.info(o, getDefinition().getName());
-    }
-
-    protected boolean isInfoEnabled() {
-        return Logger.isInfoEnabled(getDefinition().getName());
-    }
-
-    protected void error(Object o) {
-        Logger.error(o, getDefinition().getName());
-    }
-
-    protected void error(Object o, Throwable t) {
-        Logger.error(o, t, getDefinition().getName());
-    }
-
 }
 
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
- Revision 1.1  2002/09/13 08:13:50  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:47:13  billhorsman
+ fixes for new logging
+
+ Revision 1.1.1.1  2002/09/13 08:13:50  billhorsman
+ new
 
  Revision 1.10  2002/07/04 09:05:36  billhorsman
  Fixes

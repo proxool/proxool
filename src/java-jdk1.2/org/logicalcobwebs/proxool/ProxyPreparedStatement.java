@@ -29,7 +29,7 @@ import java.util.Iterator;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:14:07 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/18 13:47:14 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -53,8 +53,8 @@ public class ProxyPreparedStatement implements PreparedStatement {
                 try {
                     close();
                     connectionPool.throwConnection(getConnection());
-                }
-                catch (SQLException e2) {
+                } catch (SQLException e2) {
+                    connectionPool.getLog().debug("Couldn't close statement after detecting fatal exception", e2);
                 }
             }
         }
@@ -63,8 +63,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     public ResultSet executeQuery() throws SQLException {
         try {
             return preparedStatement.executeQuery();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -73,8 +72,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     public ResultSet executeQuery(String sql) throws SQLException {
         try {
             return preparedStatement.executeQuery(sql);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -83,8 +81,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     public int executeUpdate() throws SQLException {
         try {
             return preparedStatement.executeUpdate();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -93,8 +90,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     public int executeUpdate(String sql) throws SQLException {
         try {
             return preparedStatement.executeUpdate(sql);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -189,7 +185,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     }
 
     public void setDate(int parameterIndex, Date x)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setDate(parameterIndex, x);
     }
 
@@ -198,22 +194,21 @@ public class ProxyPreparedStatement implements PreparedStatement {
     }
 
     public void setTime(int parameterIndex, Time x)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setTime(parameterIndex, x);
     }
 
     public boolean execute(String sql) throws SQLException {
         try {
             return preparedStatement.execute(sql);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
     }
 
     public void setTimestamp(int parameterIndex, Timestamp x)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setTimestamp(parameterIndex, x);
     }
 
@@ -222,7 +217,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     }
 
     public void setAsciiStream(int parameterIndex, InputStream x, int length)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setAsciiStream(parameterIndex, x, length);
     }
 
@@ -231,7 +226,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     }
 
     public void setUnicodeStream(int parameterIndex, InputStream x,
-        int length) throws SQLException {
+                                 int length) throws SQLException {
         preparedStatement.setUnicodeStream(parameterIndex, x, length);
     }
 
@@ -240,7 +235,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     }
 
     public void setBinaryStream(int parameterIndex, InputStream x,
-        int length) throws SQLException {
+                                int length) throws SQLException {
         preparedStatement.setBinaryStream(parameterIndex, x, length);
     }
 
@@ -257,7 +252,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     }
 
     public void setObject(int parameterIndex, Object x, int targetSqlType, int scale)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setObject(parameterIndex, x, targetSqlType, scale);
     }
 
@@ -266,7 +261,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     }
 
     public void setObject(int parameterIndex, Object x, int targetSqlType)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setObject(parameterIndex, x, targetSqlType);
     }
 
@@ -285,8 +280,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     public boolean execute() throws SQLException {
         try {
             return preparedStatement.execute();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -305,8 +299,8 @@ public class ProxyPreparedStatement implements PreparedStatement {
     }
 
     public void setCharacterStream(int parameterIndex,
-        Reader reader,
-        int length) throws SQLException {
+                                   Reader reader,
+                                   int length) throws SQLException {
         preparedStatement.setCharacterStream(parameterIndex, reader, length);
     }
 
@@ -321,8 +315,7 @@ public class ProxyPreparedStatement implements PreparedStatement {
     public int[] executeBatch() throws SQLException {
         try {
             return preparedStatement.executeBatch();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -349,22 +342,22 @@ public class ProxyPreparedStatement implements PreparedStatement {
     }
 
     public void setDate(int parameterIndex, Date x, Calendar cal)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setDate(parameterIndex, x, cal);
     }
 
     public void setTime(int parameterIndex, Time x, Calendar cal)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setTime(parameterIndex, x, cal);
     }
 
     public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setTimestamp(parameterIndex, x, cal);
     }
 
     public void setNull(int paramIndex, int sqlType, String typeName)
-        throws SQLException {
+            throws SQLException {
         preparedStatement.setNull(paramIndex, sqlType, typeName);
     }
 }
@@ -372,8 +365,11 @@ public class ProxyPreparedStatement implements PreparedStatement {
 /*
  Revision history:
  $Log: ProxyPreparedStatement.java,v $
- Revision 1.1  2002/09/13 08:14:07  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:47:14  billhorsman
+ fixes for new logging
+
+ Revision 1.1.1.1  2002/09/13 08:14:07  billhorsman
+ new
 
  Revision 1.5  2002/07/02 11:19:08  billhorsman
  layout code and imports

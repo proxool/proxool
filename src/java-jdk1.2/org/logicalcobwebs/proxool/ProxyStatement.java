@@ -10,16 +10,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Delegates to Statement for all calls. But also, for all execute methods, it
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:14:09 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/18 13:47:14 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -28,8 +26,6 @@ public class ProxyStatement implements Statement {
     private Statement statement;
 
     private ConnectionPool connectionPool;
-
-    protected Set resultSets = new HashSet();
 
     public ProxyStatement(Statement statement, ConnectionPool connectionPool) {
         this.statement = statement;
@@ -45,8 +41,8 @@ public class ProxyStatement implements Statement {
                 try {
                     close();
                     connectionPool.throwConnection(getConnection());
-                }
-                catch (SQLException e2) {
+                } catch (SQLException e2) {
+                    connectionPool.getLog().debug("Couldn't close statement after detecting fatal exception", e2);
                 }
             }
         }
@@ -55,10 +51,8 @@ public class ProxyStatement implements Statement {
     public ResultSet executeQuery(String sql) throws SQLException {
         try {
             ResultSet rs = statement.executeQuery(sql);
-            resultSets.add(rs);
             return rs;
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -67,8 +61,7 @@ public class ProxyStatement implements Statement {
     public int executeUpdate(String sql) throws SQLException {
         try {
             return statement.executeUpdate(sql);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -125,8 +118,7 @@ public class ProxyStatement implements Statement {
     public boolean execute(String sql) throws SQLException {
         try {
             return statement.execute(sql);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -134,7 +126,6 @@ public class ProxyStatement implements Statement {
 
     public ResultSet getResultSet() throws SQLException {
         ResultSet rs = statement.getResultSet();
-        resultSets.add(rs);
         return rs;
     }
 
@@ -181,8 +172,7 @@ public class ProxyStatement implements Statement {
     public int[] executeBatch() throws SQLException {
         try {
             return statement.executeBatch();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             testException(e);
             throw e;
         }
@@ -196,8 +186,11 @@ public class ProxyStatement implements Statement {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
- Revision 1.1  2002/09/13 08:14:09  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:47:14  billhorsman
+ fixes for new logging
+
+ Revision 1.1.1.1  2002/09/13 08:14:09  billhorsman
+ new
 
  Revision 1.5  2002/07/02 11:19:08  billhorsman
  layout code and imports

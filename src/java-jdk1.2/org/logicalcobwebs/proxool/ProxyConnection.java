@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:14:03 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/18 13:47:14 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -64,19 +64,18 @@ public class ProxyConnection implements Connection, ConnectionInfoIF {
     private DecimalFormat idFormat = new DecimalFormat("0000");
 
     public ProxyConnection(long id, ConnectionPoolDefinitionIF connectionPoolDefinition) throws SQLException,
-        ClassNotFoundException {
+            ClassNotFoundException {
 
         connectionPool = ConnectionPoolManager.getInstance().getConnectionPool(connectionPoolDefinition.getName());
 
         if (connectionPoolDefinition.getDebugLevel() > ConnectionPoolDefinitionIF.DEBUG_LEVEL_QUIET) {
-            connectionPool.debug("Initialising connection #" + id + " using " + connectionPoolDefinition.getUrl());
+            connectionPool.getLog().debug("Initialising connection #" + id + " using " + connectionPoolDefinition.getUrl());
 
         }
 
         try {
             connection = DriverManager.getConnection(connectionPoolDefinition.getUrl(), connectionPoolDefinition.getProperties());
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw e;
         }
 
@@ -101,7 +100,7 @@ public class ProxyConnection implements Connection, ConnectionInfoIF {
      * Delegates to {@link java.sql.Connection#prepareStatement}
      */
     public PreparedStatement prepareStatement(String sql)
-        throws SQLException {
+            throws SQLException {
         return new ProxyPreparedStatement(connection.prepareStatement(sql), connectionPool);
     }
 
@@ -152,9 +151,8 @@ public class ProxyConnection implements Connection, ConnectionInfoIF {
             connectionPool.registerRemovedConnection(getStatus());
             // Clean up the actual connection
             connection.close();
-        }
-        catch (Throwable t) {
-            connectionPool.error("#" + idFormat.format(getId()) + " encountered errors during destruction: " + t);
+        } catch (Throwable t) {
+            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during destruction: " + t);
         }
 
     }
@@ -165,9 +163,8 @@ public class ProxyConnection implements Connection, ConnectionInfoIF {
     public void close() throws SQLException {
         try {
             connectionPool.putConnection(this);
-        }
-        catch (Throwable t) {
-            connectionPool.error("#" + idFormat.format(getId()) + " encountered errors during destruction: " + t);
+        } catch (Throwable t) {
+            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during destruction: " + t);
         }
 
     }
@@ -250,7 +247,7 @@ public class ProxyConnection implements Connection, ConnectionInfoIF {
      * Delegates to {@link java.sql.Connection#createStatement(int, int)}
      */
     public Statement createStatement(int resultSetType, int resultSetConcurrency)
-        throws SQLException {
+            throws SQLException {
         return new ProxyStatement(connection.createStatement(resultSetType, resultSetConcurrency), connectionPool);
     }
 
@@ -258,8 +255,8 @@ public class ProxyConnection implements Connection, ConnectionInfoIF {
      * Delegates to {@link java.sql.Connection#prepareStatement(java.lang.String, int, int)}
      */
     public PreparedStatement prepareStatement(String sql, int resultSetType,
-        int resultSetConcurrency)
-        throws SQLException {
+                                              int resultSetConcurrency)
+            throws SQLException {
         return new ProxyPreparedStatement(connection.prepareStatement(sql, resultSetType, resultSetConcurrency), connectionPool);
     }
 
@@ -267,7 +264,7 @@ public class ProxyConnection implements Connection, ConnectionInfoIF {
      * Delegates to {@link java.sql.Connection#prepareCall(java.lang.String, int, int)}
      */
     public CallableStatement prepareCall(String sql, int resultSetType,
-        int resultSetConcurrency) throws SQLException {
+                                         int resultSetConcurrency) throws SQLException {
         return new ProxyCallableStatement(connection.prepareCall(sql, resultSetType, resultSetConcurrency), connectionPool);
     }
 
@@ -462,8 +459,11 @@ public class ProxyConnection implements Connection, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
- Revision 1.1  2002/09/13 08:14:03  billhorsman
- Initial revision
+ Revision 1.2  2002/09/18 13:47:14  billhorsman
+ fixes for new logging
+
+ Revision 1.1.1.1  2002/09/13 08:14:03  billhorsman
+ new
 
  Revision 1.6  2002/07/02 11:19:08  billhorsman
  layout code and imports
