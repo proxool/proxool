@@ -13,14 +13,16 @@ import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 
 import java.sql.Connection;
 import java.util.Properties;
+import java.text.DecimalFormat;
 
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:51 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/26 18:30:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -28,6 +30,8 @@ import java.util.Properties;
 public class StatisticsTest extends TestCase {
 
     private static final Log LOG = LogFactory.getLog(StatisticsTest.class);
+
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
 
     /**
      * @see TestCase#TestCase
@@ -99,6 +103,44 @@ public class StatisticsTest extends TestCase {
 
     }
 
+    public void testOverhead() {
+        String testName = "overhead";
+        String alias = testName;
+        try {
+            String url = TestHelper.getFullUrl(alias);
+            Properties info = TestHelper.buildProperties();
+            info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s");
+            info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
+
+            // We don't test whether anything is logged, but this line should make something appear
+            info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
+
+            // Register pool
+            ProxoolFacade.registerConnectionPool(url, info);
+
+            ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
+            Admin admin = new Admin(cpd);
+
+            final int loops = 100000;
+            long start = System.currentTimeMillis();
+            for (int i = 0; i < loops; i++) {
+                admin.connectionReturned(10);
+            }
+            double avg = (double) (System.currentTimeMillis() - start) / (double) loops;
+            LOG.info("Statistics take " + DECIMAL_FORMAT.format(avg * 1000) + " microseconds");
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            try {
+                ProxoolFacade.removeConnectionPool(alias);
+            } catch (ProxoolException e) {
+                LOG.error("Couldn't shutdown pool", e);
+            }
+        }
+    }
+
     private StatisticsIF waitForNextStatistics(String alias, String token, StatisticsIF oldStatistics, int timeout) throws ProxoolException {
         long startWaiting = System.currentTimeMillis();
         StatisticsIF statistics = null;
@@ -128,6 +170,9 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.3  2003/02/26 18:30:02  billhorsman
+ test for stats overhead
+
  Revision 1.2  2003/02/26 16:05:51  billhorsman
  widespread changes caused by refactoring the way we
  update and redefine pool definitions.
