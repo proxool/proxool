@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -18,7 +17,7 @@ import java.util.Properties;
 /**
  * Test whether ProxyConnection works
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/03 17:09:04 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:40 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -40,52 +39,45 @@ public class ProxyConnectionTest extends AbstractProxoolTest {
 
         String testName = "closeStatement";
         String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        Connection c = DriverManager.getConnection(url);
+        Statement s = c.createStatement();
         try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            ProxoolFacade.registerConnectionPool(url, info);
-
-            Connection c = DriverManager.getConnection(url);
-            Statement s = c.createStatement();
-            try {
-                s.execute("drop table foo");
-            } catch (SQLException e) {
-                // Expected exception (foo doesn't exist)
-                LOG.debug("Ignoring excepted exception", e);
-            } finally {
-                // this should trigger an automatic close of the statement.
-                // Unfortunately, I can't find a way of asserting that this
-                // really happens. Hypersonic seems to let me continue
-                // to use all the methods on the Statement despite it being
-                // closed.
-                c.close();
-            }
-
-            c = DriverManager.getConnection(url);
-            Statement s2 = c.createStatement();
-            try {
-                s2.execute("drop table foo");
-            } catch (SQLException e) {
-                // Expected exception (foo doesn't exist)
-                LOG.debug("Excepted exception", e);
-            } finally {
-                if (s2 != null) {
-                    s2.close();
-                }
-                // this should NOT trigger an automatic close of the statement
-                // because it's been closed explicitly above
-                c.close();
-            }
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
+            s.execute("drop table foo");
+        } catch (SQLException e) {
+            // Expected exception (foo doesn't exist)
+            LOG.debug("Ignoring excepted exception", e);
         } finally {
-            ProxoolFacade.removeConnectionPool(alias);
+            // this should trigger an automatic close of the statement.
+            // Unfortunately, I can't find a way of asserting that this
+            // really happens. Hypersonic seems to let me continue
+            // to use all the methods on the Statement despite it being
+            // closed.
+            c.close();
+        }
+
+        c = DriverManager.getConnection(url);
+        Statement s2 = c.createStatement();
+        try {
+            s2.execute("drop table foo");
+        } catch (SQLException e) {
+            // Expected exception (foo doesn't exist)
+            LOG.debug("Excepted exception", e);
+        } finally {
+            if (s2 != null) {
+                s2.close();
+            }
+            // this should NOT trigger an automatic close of the statement
+            // because it's been closed explicitly above
+            c.close();
         }
 
     }
@@ -96,6 +88,9 @@ public class ProxyConnectionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ProxyConnectionTest.java,v $
+ Revision 1.5  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.4  2003/03/03 17:09:04  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -6,11 +6,10 @@
 package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
-import org.logicalcobwebs.proxool.GlobalTest;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.xml.sax.InputSource;
 
 import java.io.FileInputStream;
@@ -21,7 +20,7 @@ import java.sql.SQLException;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.12 $, $Date: 2003/03/03 17:36:33 $
+ * @version $Revision: 1.13 $, $Date: 2003/03/04 10:24:41 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -50,16 +49,8 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
         } catch (ProxoolException e) {
             fail("2nd (deeply nested) pool was not configured.");
         }
-        try {
-            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test"));
-        } catch (ProxoolException e) {
-            throw e;
-        }
-        try {
-            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-2"));
-        } catch (ProxoolException e) {
-            throw e;
-        }
+        TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test"));
+        TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-2"));
     }
 
     /**
@@ -77,16 +68,8 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
         } catch (ProxoolException e) {
             fail("2nd (deeply nested) pool was not configured.");
         }
-        try {
-            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-ns"));
-        } catch (ProxoolException e) {
-            throw e;
-        }
-        try {
-            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-ns-2"));
-        } catch (ProxoolException e) {
-            throw e;
-        }
+        TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-ns"));
+        TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-ns-2"));
     }
 
     /**
@@ -107,16 +90,8 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
         } catch (ProxoolException e) {
             fail("2nd (deeply nested) pool was not configured.");
         }
-        try {
-            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-validating"));
-        } catch (ProxoolException e) {
-            throw e;
-        }
-        try {
-            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-validating-2"));
-        } catch (ProxoolException e) {
-            throw e;
-        }
+        TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-validating"));
+        TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-validating-2"));
     }
 
     /**
@@ -166,6 +141,9 @@ public class JAXPConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.13  2003/03/04 10:24:41  billhorsman
+ removed try blocks around each test
+
  Revision 1.12  2003/03/03 17:36:33  billhorsman
  leave shutdown to AbstractProxoolTest
 

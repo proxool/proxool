@@ -21,7 +21,7 @@ import java.util.Properties;
  *
  * Provides Simpool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.10 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.11 $, $Date: 2003/03/04 10:24:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -67,7 +67,7 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
         // Do nothing !
     }
 
-    public void tearDown()  {
+    public void tearDown() {
         try {
             for (int i = 0; i < connections.length; i++) {
                 connections[i].close();
@@ -82,6 +82,9 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: SimpoolAdapter.java,v $
+ Revision 1.11  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.10  2003/03/03 11:12:05  billhorsman
  fixed licence
 

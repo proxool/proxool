@@ -6,18 +6,17 @@
 package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
-import org.logicalcobwebs.proxool.GlobalTest;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.sql.SQLException;
 
 /**
  * Tests that the PropertyConfigurator works.
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/03 17:09:18 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/04 10:24:41 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -39,16 +38,8 @@ public class PropertyConfiguratorTest extends AbstractProxoolTest {
      */
     public void testPropertyConfigurator() throws ProxoolException, SQLException {
         PropertyConfigurator.configure("src/java-test/org/logicalcobwebs/proxool/configuration/test.properties");
-        try {
-            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("property-test"));
-        } catch (ProxoolException e) {
-            throw e;
-        }
-        try {
-            TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("property-test-2"));
-        } catch (ProxoolException e) {
-            throw e;
-        }
+        TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("property-test"));
+        TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("property-test-2"));
         ProxoolFacade.removeConnectionPool("property-test");
         ProxoolFacade.removeConnectionPool("property-test-2");
 
@@ -59,6 +50,9 @@ public class PropertyConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: PropertyConfiguratorTest.java,v $
+ Revision 1.7  2003/03/04 10:24:41  billhorsman
+ removed try blocks around each test
+
  Revision 1.6  2003/03/03 17:09:18  billhorsman
  all tests now extend AbstractProxoolTest
 

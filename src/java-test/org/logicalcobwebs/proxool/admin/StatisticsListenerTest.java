@@ -8,12 +8,11 @@ package org.logicalcobwebs.proxool.admin;
 import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.proxool.GlobalTest;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.sql.DriverManager;
 import java.util.Properties;
@@ -21,7 +20,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/03 17:09:08 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/04 10:24:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -44,43 +43,35 @@ public class StatisticsListenerTest extends AbstractProxoolTest {
 
         String testName = "listener";
         String alias = testName;
-        try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "5s");
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "5s");
 
-            // We don't test whether anything is logged, but this line should make something appear
-            info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
+        // We don't test whether anything is logged, but this line should make something appear
+        info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
 
-            // Register pool
-            ProxoolFacade.registerConnectionPool(url, info);
+        // Register pool
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            // Add listener
-            TestListener testListener = new TestListener();
-            ProxoolFacade.addStatisticsListener(alias, testListener);
-            long lap0 = System.currentTimeMillis();
+        // Add listener
+        TestListener testListener = new TestListener();
+        ProxoolFacade.addStatisticsListener(alias, testListener);
+        long lap0 = System.currentTimeMillis();
 
-            // Wait for next statistics so we can guarantee that next set won't
-            // be produced whilst we are building connection
-            testListener.getNextStatistics();
-            long lap1 = System.currentTimeMillis();
+        // Wait for next statistics so we can guarantee that next set won't
+        // be produced whilst we are building connection
+        testListener.getNextStatistics();
+        long lap1 = System.currentTimeMillis();
 
-            DriverManager.getConnection(url).close();
-            StatisticsIF statistics = testListener.getNextStatistics();
-            long lap2 = System.currentTimeMillis();
+        DriverManager.getConnection(url).close();
+        StatisticsIF statistics = testListener.getNextStatistics();
+        long lap2 = System.currentTimeMillis();
 
-            assertEquals("servedCount (" + (lap1 - lap0) + ", " + (lap2 - lap1) + " ms)", 1L, statistics.getServedCount());
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
+        assertEquals("servedCount (" + (lap1 - lap0) + ", " + (lap2 - lap1) + " ms)", 1L, statistics.getServedCount());
 
     }
 
@@ -132,6 +123,9 @@ public class StatisticsListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.10  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.9  2003/03/03 17:09:08  billhorsman
  all tests now extend AbstractProxoolTest
 

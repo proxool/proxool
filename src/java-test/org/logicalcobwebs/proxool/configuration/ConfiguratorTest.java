@@ -5,23 +5,21 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
-import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.util.Properties;
 
 /**
  * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.14 $, $Date: 2003/03/03 17:09:17 $
+ * @version $Revision: 1.15 $, $Date: 2003/03/04 10:24:41 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -43,29 +41,22 @@ public class ConfiguratorTest extends AbstractProxoolTest {
 
         String testName = "configurator";
         String alias = testName;
-        try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            ProxoolFacade.registerConnectionPool(url, info);
 
-            Properties newInfo = new Properties();
-            newInfo.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "3");
-            ProxoolFacade.updateConnectionPool(url, newInfo);
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            final ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
-            assertNotNull("definition is null", cpd);
-            assertEquals("prototypeCount", 3, cpd.getPrototypeCount());
+        Properties newInfo = new Properties();
+        newInfo.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "3");
+        ProxoolFacade.updateConnectionPool(url, newInfo);
 
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
+        final ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
+        assertNotNull("definition is null", cpd);
+        assertEquals("prototypeCount", 3, cpd.getPrototypeCount());
 
     }
 
@@ -74,6 +65,9 @@ public class ConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.15  2003/03/04 10:24:41  billhorsman
+ removed try blocks around each test
+
  Revision 1.14  2003/03/03 17:09:17  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.12 $, $Date: 2003/03/03 17:08:56 $
+ * @version $Revision: 1.13 $, $Date: 2003/03/04 10:24:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -40,33 +40,28 @@ public class ConnectionResetterTest extends AbstractProxoolTest {
 
         String testName = "autoCommit";
         String alias = testName;
-        try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            ProxoolFacade.registerConnectionPool(url, info);
 
-            Connection c1 = DriverManager.getConnection(url);;
-            Connection c2 = DriverManager.getConnection(url);;
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            c1.setAutoCommit(false);
-            c1.close();
+        Connection c1 = DriverManager.getConnection(url);
+        ;
+        Connection c2 = DriverManager.getConnection(url);
+        ;
 
-            c1 = DriverManager.getConnection(url);
-            assertTrue("c1.getAutoCommit", c1.getAutoCommit());
+        c1.setAutoCommit(false);
+        c1.close();
 
-            c2.close();
-            c1.close();
+        c1 = DriverManager.getConnection(url);
+        assertTrue("c1.getAutoCommit", c1.getAutoCommit());
 
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
+        c2.close();
+        c1.close();
 
     }
 
@@ -78,35 +73,31 @@ public class ConnectionResetterTest extends AbstractProxoolTest {
 
         String testName = "readOnly";
         String alias = testName;
-        try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
-            ProxoolFacade.registerConnectionPool(url, info);
 
-            Connection c1 = DriverManager.getConnection(url);;
-            Connection c2 = DriverManager.getConnection(url);;
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            boolean originalReadOnly = c1.isReadOnly();
-            c1.setReadOnly(true);
-            c1.close();
+        Connection c1 = DriverManager.getConnection(url);
+        ;
+        Connection c2 = DriverManager.getConnection(url);
+        ;
 
-            c1 = DriverManager.getConnection(url);;
-            assertTrue("readOnly", c1.isReadOnly() == originalReadOnly);
+        boolean originalReadOnly = c1.isReadOnly();
+        c1.setReadOnly(true);
+        c1.close();
 
-            c2.close();
-            c1.close();
+        c1 = DriverManager.getConnection(url);
+        ;
+        assertTrue("readOnly", c1.isReadOnly() == originalReadOnly);
 
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
+        c2.close();
+        c1.close();
 
     }
 
@@ -115,6 +106,9 @@ public class ConnectionResetterTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.13  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.12  2003/03/03 17:08:56  billhorsman
  all tests now extend AbstractProxoolTest
 

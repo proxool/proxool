@@ -15,18 +15,17 @@ import org.apache.log.Hierarchy;
 import org.apache.log.LogTarget;
 import org.apache.log.Logger;
 import org.apache.log.Priority;
-import org.logicalcobwebs.proxool.GlobalTest;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.io.File;
 
 /**
  * Tests that the AvalonConfgiuration works.
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/03 17:09:12 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/04 10:24:41 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -49,7 +48,7 @@ public class AvalonConfiguratorTest extends AbstractProxoolTest {
      */
     public void testNoNamspaces() throws Exception {
         initializeAvalon("src/java-test/org/logicalcobwebs/proxool/configuration/role.conf",
-            "src/java-test/org/logicalcobwebs/proxool/configuration/component.conf");
+                "src/java-test/org/logicalcobwebs/proxool/configuration/component.conf");
         this.componentManager.lookup(AvalonConfigurator.ROLE);
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("avalon-test"));
@@ -71,7 +70,7 @@ public class AvalonConfiguratorTest extends AbstractProxoolTest {
      */
     public void testWithNamespaces() throws Exception {
         initializeAvalon("src/java-test/org/logicalcobwebs/proxool/configuration/role.conf",
-            "src/java-test/org/logicalcobwebs/proxool/configuration/component-ns.conf");
+                "src/java-test/org/logicalcobwebs/proxool/configuration/component-ns.conf");
         this.componentManager.lookup(AvalonConfigurator.ROLE);
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("avalon-test-ns"));
@@ -95,7 +94,7 @@ public class AvalonConfiguratorTest extends AbstractProxoolTest {
      */
     public void testDisposeOnClose() throws Exception {
         initializeAvalon("src/java-test/org/logicalcobwebs/proxool/configuration/role.conf",
-            "src/java-test/org/logicalcobwebs/proxool/configuration/component.conf");
+                "src/java-test/org/logicalcobwebs/proxool/configuration/component.conf");
         this.componentManager.lookup(AvalonConfigurator.ROLE);
         this.componentManager.dispose();
         try {
@@ -119,7 +118,7 @@ public class AvalonConfiguratorTest extends AbstractProxoolTest {
      */
     public void testNotDisposeOnClose() throws Exception {
         initializeAvalon("src/java-test/org/logicalcobwebs/proxool/configuration/role.conf",
-            "src/java-test/org/logicalcobwebs/proxool/configuration/component-ns.conf");
+                "src/java-test/org/logicalcobwebs/proxool/configuration/component-ns.conf");
         this.componentManager.lookup(AvalonConfigurator.ROLE);
         this.componentManager.dispose();
         try {
@@ -141,7 +140,7 @@ public class AvalonConfiguratorTest extends AbstractProxoolTest {
         final LogTarget logTarget = new LogKitTargetAdapter();
         final Logger rootLogger = Hierarchy.getDefaultHierarchy().getLoggerFor("root");
         rootLogger.unsetLogTargets();
-        rootLogger.setLogTargets(new LogTarget[] {logTarget});
+        rootLogger.setLogTargets(new LogTarget[]{logTarget});
         rootLogger.setPriority(Priority.WARN);
         final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder(true);
         // create component configuration
@@ -165,6 +164,9 @@ public class AvalonConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: AvalonConfiguratorTest.java,v $
+ Revision 1.9  2003/03/04 10:24:41  billhorsman
+ removed try blocks around each test
+
  Revision 1.8  2003/03/03 17:09:12  billhorsman
  all tests now extend AbstractProxoolTest
 

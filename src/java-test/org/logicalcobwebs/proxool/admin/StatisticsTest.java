@@ -8,14 +8,13 @@ package org.logicalcobwebs.proxool.admin;
 import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
-import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ResultMonitor;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.sql.DriverManager;
 import java.text.DecimalFormat;
@@ -24,7 +23,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.16 $, $Date: 2003/03/03 17:09:09 $
+ * @version $Revision: 1.17 $, $Date: 2003/03/04 10:24:41 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -49,83 +48,69 @@ public class StatisticsTest extends AbstractProxoolTest {
 
         String testName = "statistics";
         String alias = testName;
-        try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s,15s");
-            info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
 
-            // We don't test whether anything is logged, but this line should make something appear
-            info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s,15s");
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
 
-            // Register pool
-            ProxoolFacade.registerConnectionPool(url, info);
+        // We don't test whether anything is logged, but this line should make something appear
+        info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
 
-            // Skip past the first set because they will probably be for only part
-            // of the 10s period.
-            StatisticsResultMonitor srm = new StatisticsResultMonitor(alias, "10s");
-            assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
-            StatisticsIF statistics1 = srm.getStatistics();
+        // Register pool
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        // Skip past the first set because they will probably be for only part
+        // of the 10s period.
+        StatisticsResultMonitor srm = new StatisticsResultMonitor(alias, "10s");
+        assertEquals("Timeout", ResultMonitor.SUCCESS, srm.getResult());
+        StatisticsIF statistics1 = srm.getStatistics();
 
 
-            DriverManager.getConnection(url).close();
+        DriverManager.getConnection(url).close();
 
-            assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
-            StatisticsIF statistics2 = srm.getStatistics();
+        assertEquals("Timeout", ResultMonitor.SUCCESS, srm.getResult());
+        StatisticsIF statistics2 = srm.getStatistics();
 
-            assertEquals("servedCount", 1L, statistics2.getServedCount());
-            assertEquals("servedPerSecond", 0.09, 0.11, statistics2.getServedPerSecond());
-            assertEquals("refusedCount", 0L, statistics2.getRefusedCount());
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
+        assertEquals("servedCount", 1L, statistics2.getServedCount());
+        assertEquals("servedPerSecond", 0.09, 0.11, statistics2.getServedPerSecond());
+        assertEquals("refusedCount", 0L, statistics2.getRefusedCount());
 
     }
 
     public void testOverhead() throws Exception {
         String testName = "overhead";
         String alias = testName;
-        try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s");
-            info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s");
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
 
-            // We don't test whether anything is logged, but this line should make something appear
-            info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
+        // We don't test whether anything is logged, but this line should make something appear
+        info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
 
-            // Register pool
-            ProxoolFacade.registerConnectionPool(url, info);
+        // Register pool
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
-            Admin admin = new Admin(cpd);
+        ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
+        Admin admin = new Admin(cpd);
 
-            final int loops = 100000;
-            long start = System.currentTimeMillis();
-            for (int i = 0; i < loops; i++) {
-                admin.connectionReturned(10);
-            }
-            double avg = (double) (System.currentTimeMillis() - start) / (double) loops;
-            LOG.info("Statistics take " + DECIMAL_FORMAT.format(avg * 1000) + " microseconds");
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
+        final int loops = 100000;
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < loops; i++) {
+            admin.connectionReturned(10);
         }
+        double avg = (double) (System.currentTimeMillis() - start) / (double) loops;
+        LOG.info("Statistics take " + DECIMAL_FORMAT.format(avg * 1000) + " microseconds");
+
     }
 
 }
@@ -133,6 +118,9 @@ public class StatisticsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.17  2003/03/04 10:24:41  billhorsman
+ removed try blocks around each test
+
  Revision 1.16  2003/03/03 17:09:09  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.dbscript.ScriptFacade;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
@@ -18,7 +17,7 @@ import java.sql.SQLException;
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/03 17:08:57 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/04 10:24:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -46,6 +45,9 @@ public class PerformanceTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.12  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.11  2003/03/03 17:08:57  billhorsman
  all tests now extend AbstractProxoolTest
 

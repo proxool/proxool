@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -16,7 +15,7 @@ import java.util.Properties;
 /**
  * Test the house keeper in ConnectionPool
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/03 17:08:57 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/04 10:24:40 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -36,50 +35,41 @@ public class HouseKeeperTest extends AbstractProxoolTest {
     public void testMaximumActiveTime() throws Exception {
 
         String testName = "maximumActiveTime";
-        String threadName = Thread.currentThread().getName();
-        Thread.currentThread().setName(testName);
         String alias = testName;
-        try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY, "1000");
-            info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
-            ProxoolFacade.registerConnectionPool(url, info);
 
-            assertEquals("Shouldn't be any active connections yet", 0, ProxoolFacade.getSnapshot(alias, false).getServedCount());
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY, "1000");
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            final Connection connection = DriverManager.getConnection(url);;
-            long start = System.currentTimeMillis();
+        assertEquals("Shouldn't be any active connections yet", 0, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
-            assertEquals("We just opened 1 connection", 1, ProxoolFacade.getSnapshot(alias, false).getServedCount());
+        final Connection connection = DriverManager.getConnection(url);
+        ;
+        long start = System.currentTimeMillis();
 
-            new ResultMonitor() {
-                public boolean check() throws Exception {
-                    return connection.isClosed();
-                }
-            }.getResult();
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                LOG.debug("Awoken.");
+        assertEquals("We just opened 1 connection", 1, ProxoolFacade.getSnapshot(alias, false).getServedCount());
+
+        new ResultMonitor() {
+            public boolean check() throws Exception {
+                return connection.isClosed();
             }
-
-            long elapsed = System.currentTimeMillis() - start;
-            assertTrue("Connection has not been closed after " + elapsed + " milliseconds as expected", connection.isClosed());
-
-            assertEquals("Expected the connection to be inactive", 0, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-            Thread.currentThread().setName(threadName);
+        }.getResult();
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            LOG.debug("Awoken.");
         }
+
+        long elapsed = System.currentTimeMillis() - start;
+        assertTrue("Connection has not been closed after " + elapsed + " milliseconds as expected", connection.isClosed());
+
+        assertEquals("Expected the connection to be inactive", 0, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
 
     }
 
@@ -91,15 +81,8 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 
         String testName = "houseKeeperTestSql";
         String alias = testName;
-        try {
 
-            assertTrue("Humph", true);
-            // TODO complete this test
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        }
+        // TODO complete this test
 
     }
 
@@ -109,6 +92,9 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: HouseKeeperTest.java,v $
+ Revision 1.6  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.5  2003/03/03 17:08:57  billhorsman
  all tests now extend AbstractProxoolTest
 

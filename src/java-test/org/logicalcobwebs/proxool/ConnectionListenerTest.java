@@ -16,7 +16,7 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/03 17:08:55 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/04 10:24:40 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -135,19 +135,19 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
     }
 
     class TestConnectionListener implements ConnectionListenerIF {
-        public void onBirth (Connection connection) throws SQLException {
+        public void onBirth(Connection connection) throws SQLException {
             onBirthCalls++;
         }
 
-        public void onDeath (Connection connection) throws SQLException {
+        public void onDeath(Connection connection) throws SQLException {
             onDeathCalls++;
         }
 
-        public void onExecute (String command, long elapsedTime) {
+        public void onExecute(String command, long elapsedTime) {
             onExecuteCalls++;
         }
 
-        public void onFail (String command, Exception exception) {
+        public void onFail(String command, Exception exception) {
             onFailCalls++;
         }
     }
@@ -156,6 +156,9 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.9  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.8  2003/03/03 17:08:55  billhorsman
  all tests now extend AbstractProxoolTest
 

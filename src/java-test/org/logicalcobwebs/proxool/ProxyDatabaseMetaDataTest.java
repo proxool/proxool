@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -17,7 +16,7 @@ import java.util.Properties;
 /**
  * Test whether ProxyDatabaseMetaData works
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/03 17:09:05 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:40 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -39,32 +38,23 @@ public class ProxyDatabaseMetaDataTest extends AbstractProxoolTest {
         String testName = "getConnection";
         String alias = testName;
 
-        try {
+        // Register pool
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            // Register pool
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            ProxoolFacade.registerConnectionPool(url, info);
+        Connection connection = DriverManager.getConnection(url);
+        DatabaseMetaData dmd = connection.getMetaData();
+        Connection retrievedConnection = dmd.getConnection();
 
-            Connection connection = DriverManager.getConnection(url);
-            DatabaseMetaData dmd = connection.getMetaData();
-            Connection retrievedConnection = dmd.getConnection();
+        assertEquals("Retrieved connection not the same", connection, retrievedConnection);
+        assertEquals("Retrieved connection not the same", connection.getClass(), retrievedConnection.getClass());
 
-            assertEquals("Retrieved connection not the same", connection, retrievedConnection);
-            assertEquals("Retrieved connection not the same", connection.getClass(), retrievedConnection.getClass());
-
-            connection.close();
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
+        connection.close();
 
     }
 
@@ -74,6 +64,9 @@ public class ProxyDatabaseMetaDataTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ProxyDatabaseMetaDataTest.java,v $
+ Revision 1.5  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.4  2003/03/03 17:09:05  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -16,7 +16,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * An Avalon LogKit target that delegates to a Jakarta Commons <code>org.logicalcobwebs.logging.Log</code>.
  * Can be used to make Avalons internal logging go the same output as
  * the Proxool internal logging.
- * @version $Revision: 1.4 $, $Date: 2003/03/03 11:12:06 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:41 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -74,7 +74,7 @@ public class LogKitTargetAdapter extends AbstractOutputTarget {
             }
         } else {
             logger.warn("Got log event of unknown priority: " + priority
-                + ". Message: " + event.getMessage(), originalThrowable);
+                    + ". Message: " + event.getMessage(), originalThrowable);
         }
     }
 
@@ -104,6 +104,9 @@ public class LogKitTargetAdapter extends AbstractOutputTarget {
 /*
  Revision history:
  $Log: LogKitTargetAdapter.java,v $
+ Revision 1.5  2003/03/04 10:24:41  billhorsman
+ removed try blocks around each test
+
  Revision 1.4  2003/03/03 11:12:06  billhorsman
  fixed licence
 

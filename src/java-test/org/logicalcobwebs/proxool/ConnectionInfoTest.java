@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -16,7 +15,7 @@ import java.util.Properties;
 /**
  * Tests {@link ProxoolFacade#getConnectionInfos}
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/03 17:08:55 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:40 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -37,39 +36,32 @@ public class ConnectionInfoTest extends AbstractProxoolTest {
 
         String testName = "connectionInfo";
         String alias = testName;
-        try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            ProxoolFacade.registerConnectionPool(url, info);
 
-            DriverManager.getConnection(url);
-            assertEquals("connectionInfo count", 1, ProxoolFacade.getConnectionInfos(alias).size());
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            DriverManager.getConnection(url);
-            assertEquals("connectionInfo count", 2, ProxoolFacade.getConnectionInfos(alias).size());
+        DriverManager.getConnection(url);
+        assertEquals("connectionInfo count", 1, ProxoolFacade.getConnectionInfos(alias).size());
 
-            DriverManager.getConnection(url).close();
-            assertEquals("connectionInfo count", 3, ProxoolFacade.getConnectionInfos(alias).size());
+        DriverManager.getConnection(url);
+        assertEquals("connectionInfo count", 2, ProxoolFacade.getConnectionInfos(alias).size());
 
-            Iterator i = ProxoolFacade.getConnectionInfos(alias).iterator();
-            ConnectionInfoIF ci1 = (ConnectionInfoIF) i.next();
-            ConnectionInfoIF ci2 = (ConnectionInfoIF) i.next();
-            ConnectionInfoIF ci3 = (ConnectionInfoIF) i.next();
+        DriverManager.getConnection(url).close();
+        assertEquals("connectionInfo count", 3, ProxoolFacade.getConnectionInfos(alias).size());
 
-            assertEquals("#1 status", ConnectionInfoIF.STATUS_ACTIVE, ci1.getStatus());
-            assertEquals("#2 status", ConnectionInfoIF.STATUS_ACTIVE, ci2.getStatus());
-            assertEquals("#3 status", ConnectionInfoIF.STATUS_AVAILABLE, ci3.getStatus());
+        Iterator i = ProxoolFacade.getConnectionInfos(alias).iterator();
+        ConnectionInfoIF ci1 = (ConnectionInfoIF) i.next();
+        ConnectionInfoIF ci2 = (ConnectionInfoIF) i.next();
+        ConnectionInfoIF ci3 = (ConnectionInfoIF) i.next();
 
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
+        assertEquals("#1 status", ConnectionInfoIF.STATUS_ACTIVE, ci1.getStatus());
+        assertEquals("#2 status", ConnectionInfoIF.STATUS_ACTIVE, ci2.getStatus());
+        assertEquals("#3 status", ConnectionInfoIF.STATUS_AVAILABLE, ci3.getStatus());
 
     }
 
@@ -79,6 +71,9 @@ public class ConnectionInfoTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionInfoTest.java,v $
+ Revision 1.5  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.4  2003/03/03 17:08:55  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -8,13 +8,12 @@ package org.logicalcobwebs.proxool.admin;
 import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ConnectionInfoIF;
-import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/03 17:09:08 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/04 10:24:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -46,67 +45,59 @@ public class SnapshotTest extends AbstractProxoolTest {
 
         String testName = "statistics";
         String alias = testName;
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s,15s");
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
+
+        // We don't test whether anything is logged, but this line should make something appear
+        info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
+
+        // Register pool
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        // Wait for prototyper to build connections
         try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s,15s");
-            info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            LOG.debug("Awoken", e);
+        }
 
-            // We don't test whether anything is logged, but this line should make something appear
-            info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
+        {
+            Connection c = DriverManager.getConnection(url);
+            c.close();
 
-            // Register pool
-            ProxoolFacade.registerConnectionPool(url, info);
+            SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
 
-            // Wait for prototyper to build connections
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                LOG.debug("Awoken", e);
-            }
+            assertEquals("servedCount", 1L, snapshot.getServedCount());
+            assertEquals("refusedCount", 0L, snapshot.getRefusedCount());
+            assertEquals("availableConnectionCount", 1, snapshot.getAvailableConnectionCount());
+            assertEquals("activeConnectionCount", 0, snapshot.getActiveConnectionCount());
 
-            {
-                Connection c = DriverManager.getConnection(url);
-                c.close();
+            ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
+            assertEquals("connectionInfos.length", 1, connectionInfos.length);
+            assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_AVAILABLE, connectionInfos[0].getStatus());
+        }
 
-                SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
+        {
+            Connection c = DriverManager.getConnection(url);
 
-                assertEquals("servedCount", 1L, snapshot.getServedCount());
-                assertEquals("refusedCount", 0L, snapshot.getRefusedCount());
-                assertEquals("availableConnectionCount", 1, snapshot.getAvailableConnectionCount());
-                assertEquals("activeConnectionCount", 0, snapshot.getActiveConnectionCount());
+            SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
 
-                ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
-                assertEquals("connectionInfos.length", 1, connectionInfos.length);
-                assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_AVAILABLE, connectionInfos[0].getStatus());
-            }
+            assertEquals("servedCount", 2L, snapshot.getServedCount());
+            assertEquals("refusedCount", 0L, snapshot.getRefusedCount());
+            assertEquals("availableConnectionCount", 0, snapshot.getAvailableConnectionCount());
+            assertEquals("activeConnectionCount", 1, snapshot.getActiveConnectionCount());
 
-            {
-                Connection c = DriverManager.getConnection(url);
+            ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
+            assertEquals("connectionInfos.length", 1, connectionInfos.length);
+            assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_ACTIVE, connectionInfos[0].getStatus());
 
-                SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
-
-                assertEquals("servedCount", 2L, snapshot.getServedCount());
-                assertEquals("refusedCount", 0L, snapshot.getRefusedCount());
-                assertEquals("availableConnectionCount", 0, snapshot.getAvailableConnectionCount());
-                assertEquals("activeConnectionCount", 1, snapshot.getActiveConnectionCount());
-
-                ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
-                assertEquals("connectionInfos.length", 1, connectionInfos.length);
-                assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_ACTIVE, connectionInfos[0].getStatus());
-
-                c.close();
-            }
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
+            c.close();
         }
 
     }
@@ -116,6 +107,9 @@ public class SnapshotTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: SnapshotTest.java,v $
+ Revision 1.7  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.6  2003/03/03 17:09:08  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -12,7 +12,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Waits for a set of results to become true with timeout
  * functionality
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/04 10:24:40 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -38,7 +38,7 @@ public abstract class ResultMonitor {
     public static final int TIMEOUT = 3;
 
     /**
-     * Seems awfully long, but it seems to need it. Sometimes. 
+     * Seems awfully long, but it seems to need it. Sometimes.
      */
     private long timeout = 60000;
 
@@ -106,6 +106,9 @@ public abstract class ResultMonitor {
 /*
  Revision history:
  $Log: ResultMonitor.java,v $
+ Revision 1.8  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.7  2003/03/03 11:12:05  billhorsman
  fixed licence
 

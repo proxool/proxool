@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.admin.SnapshotIF;
@@ -18,7 +17,7 @@ import java.util.Properties;
 /**
  * Test the prototyper in ConnectionPool
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/03 17:08:57 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/04 10:24:40 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -38,71 +37,64 @@ public class PrototyperTest extends AbstractProxoolTest {
 
         final String testName = "prototypeCount";
         final String alias = testName;
-        try {
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
-            info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
-            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
-            info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "2");
-            info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
-            String url = ProxoolConstants.PROXOOL
+
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
+        info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "2");
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
+        String url = ProxoolConstants.PROXOOL
                 + ProxoolConstants.ALIAS_DELIMITER
                 + alias
                 + ProxoolConstants.URL_DELIMITER
                 + TestConstants.HYPERSONIC_DRIVER
                 + ProxoolConstants.URL_DELIMITER
                 + TestConstants.HYPERSONIC_TEST_URL;
-            ProxoolFacade.registerConnectionPool(url, info);
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            Connection[] connections = new Connection[6];
+        Connection[] connections = new Connection[6];
 
-            SnapshotResultMonitor srm = new SnapshotResultMonitor(alias) {
-                            public boolean check(SnapshotIF snapshot) throws Exception {
-                                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
-                                return (s.getActiveConnectionCount() == 0
-                                        && s.getAvailableConnectionCount() == 2);
-                            }
-                        };
-            srm.getResult();
-            assertEquals("activeConnectionCount", 0, srm.getSnapshot().getActiveConnectionCount());
-            assertEquals("availableConnectionCount", 2, srm.getSnapshot().getAvailableConnectionCount());
+        SnapshotResultMonitor srm = new SnapshotResultMonitor(alias) {
+            public boolean check(SnapshotIF snapshot) throws Exception {
+                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
+                return (s.getActiveConnectionCount() == 0
+                        && s.getAvailableConnectionCount() == 2);
+            }
+        };
+        srm.getResult();
+        assertEquals("activeConnectionCount", 0, srm.getSnapshot().getActiveConnectionCount());
+        assertEquals("availableConnectionCount", 2, srm.getSnapshot().getAvailableConnectionCount());
 
-            connections[0] = DriverManager.getConnection(url);
+        connections[0] = DriverManager.getConnection(url);
 
-            srm = new SnapshotResultMonitor(alias) {
-                            public boolean check(SnapshotIF snapshot) throws Exception {
-                                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
-                                return (s.getActiveConnectionCount() == 1
-                                        && s.getAvailableConnectionCount() == 2);
-                            }
-                        };
-            srm.getResult();
-            assertEquals("activeConnectionCount", 1, srm.getSnapshot().getActiveConnectionCount());
-            assertEquals("availableConnectionCount", 2, srm.getSnapshot().getAvailableConnectionCount());
+        srm = new SnapshotResultMonitor(alias) {
+            public boolean check(SnapshotIF snapshot) throws Exception {
+                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
+                return (s.getActiveConnectionCount() == 1
+                        && s.getAvailableConnectionCount() == 2);
+            }
+        };
+        srm.getResult();
+        assertEquals("activeConnectionCount", 1, srm.getSnapshot().getActiveConnectionCount());
+        assertEquals("availableConnectionCount", 2, srm.getSnapshot().getAvailableConnectionCount());
 
-            connections[1] = DriverManager.getConnection(url);
-            connections[2] = DriverManager.getConnection(url);
-            connections[3] = DriverManager.getConnection(url);
+        connections[1] = DriverManager.getConnection(url);
+        connections[2] = DriverManager.getConnection(url);
+        connections[3] = DriverManager.getConnection(url);
 
-            srm = new SnapshotResultMonitor(alias) {
-                            public boolean check(SnapshotIF snapshot) throws Exception {
-                                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
-                                return (s.getActiveConnectionCount() == 4
-                                        && s.getAvailableConnectionCount() == 1);
-                            }
-                        };
-            srm.getResult();
-            assertEquals("activeConnectionCount", 4, srm.getSnapshot().getActiveConnectionCount());
-            assertEquals("availableConnectionCount", 1, srm.getSnapshot().getAvailableConnectionCount());
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
+        srm = new SnapshotResultMonitor(alias) {
+            public boolean check(SnapshotIF snapshot) throws Exception {
+                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
+                return (s.getActiveConnectionCount() == 4
+                        && s.getAvailableConnectionCount() == 1);
+            }
+        };
+        srm.getResult();
+        assertEquals("activeConnectionCount", 4, srm.getSnapshot().getActiveConnectionCount());
+        assertEquals("availableConnectionCount", 1, srm.getSnapshot().getAvailableConnectionCount());
 
     }
 
@@ -113,27 +105,20 @@ public class PrototyperTest extends AbstractProxoolTest {
 
         String testName = "miniumumConnectionCount";
         String alias = testName;
-        try {
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
-            info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "2");
-            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
-            info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "0");
-            info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
-            String url = TestHelper.buildProxoolUrl(alias, TestConstants.HYPERSONIC_DRIVER, TestConstants.HYPERSONIC_TEST_URL);
-            ProxoolFacade.registerConnectionPool(url, info);
 
-            Thread.sleep(2000);
-            assertEquals("availableConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "2");
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
+        info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "0");
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
+        String url = TestHelper.buildProxoolUrl(alias, TestConstants.HYPERSONIC_DRIVER, TestConstants.HYPERSONIC_TEST_URL);
+        ProxoolFacade.registerConnectionPool(url, info);
 
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
+        Thread.sleep(2000);
+        assertEquals("availableConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
 
     }
 
@@ -143,6 +128,9 @@ public class PrototyperTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: PrototyperTest.java,v $
+ Revision 1.6  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.5  2003/03/03 17:08:57  billhorsman
  all tests now extend AbstractProxoolTest
 

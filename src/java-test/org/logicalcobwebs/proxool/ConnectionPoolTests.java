@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -16,7 +15,7 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/03 17:08:55 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:40 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -37,34 +36,27 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
 
         String testName = "maximumConnectionCount";
         String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        DriverManager.getConnection(url);
+        DriverManager.getConnection(url);
+
         try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
-            ProxoolFacade.registerConnectionPool(url, info);
-
             DriverManager.getConnection(url);
-            DriverManager.getConnection(url);
-
-            try {
-                DriverManager.getConnection(url);
-                fail("Didn't expect to get third connection");
-            } catch (SQLException e) {
-                LOG.debug("Ignoring expected exception", e);
-            }
-
-            assertEquals("activeConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
+            fail("Didn't expect to get third connection");
+        } catch (SQLException e) {
+            LOG.debug("Ignoring expected exception", e);
         }
+
+        assertEquals("activeConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
 
     }
 
@@ -74,6 +66,9 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionPoolTests.java,v $
+ Revision 1.5  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.4  2003/03/03 17:08:55  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -5,14 +5,13 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
 /**
  * Very basic test to see if Hypersonic test database is working
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/03 17:08:57 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/04 10:24:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -30,12 +29,8 @@ public class HypersonicTest extends AbstractProxoolTest {
     public void testHypersonic() throws Exception {
 
         String testName = "hypersonic";
-        try {
-            TestHelper.getDirectConnection().close();
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        }
+
+        TestHelper.getDirectConnection().close();
 
     }
 
@@ -44,6 +39,9 @@ public class HypersonicTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: HypersonicTest.java,v $
+ Revision 1.12  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.11  2003/03/03 17:08:57  billhorsman
  all tests now extend AbstractProxoolTest
 

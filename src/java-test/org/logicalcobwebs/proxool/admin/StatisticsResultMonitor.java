@@ -5,16 +5,16 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.ResultMonitor;
-import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.ResultMonitor;
 
 /**
  * A ResultMonitor specifically for Snapshots
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/03 11:12:06 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/04 10:24:41 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -47,7 +47,7 @@ public class StatisticsResultMonitor extends ResultMonitor {
      * @throws Exception if anything goes wrong
      */
     public boolean check() throws Exception {
-        statistics= ProxoolFacade.getStatistics(alias, token);
+        statistics = ProxoolFacade.getStatistics(alias, token);
         if (statistics == null) {
             return false;
         } else if (oldStatistics == null) {
@@ -56,7 +56,7 @@ public class StatisticsResultMonitor extends ResultMonitor {
             if (!statistics.getStartDate().equals(oldStatistics.getStartDate())) {
                 return true;
             } else {
-               return false;
+                return false;
             }
         }
     }
@@ -79,6 +79,9 @@ public class StatisticsResultMonitor extends ResultMonitor {
 /*
  Revision history:
  $Log: StatisticsResultMonitor.java,v $
+ Revision 1.7  2003/03/04 10:24:41  billhorsman
+ removed try blocks around each test
+
  Revision 1.6  2003/03/03 11:12:06  billhorsman
  fixed licence
 

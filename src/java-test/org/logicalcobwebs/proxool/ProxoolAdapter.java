@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.20 $, $Date: 2003/03/03 11:12:04 $
+ * @version $Revision: 1.21 $, $Date: 2003/03/04 10:24:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -116,7 +116,7 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
         }
     }
 
-    public void tearDown()  {
+    public void tearDown() {
         try {
             ProxoolFacade.removeConnectionPool(alias);
         } catch (ProxoolException e) {
@@ -129,6 +129,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.21  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.20  2003/03/03 11:12:04  billhorsman
  fixed licence
 

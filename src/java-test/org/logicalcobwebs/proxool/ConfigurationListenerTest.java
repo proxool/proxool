@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -16,7 +15,7 @@ import java.util.Properties;
  * with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/03 17:08:54 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/04 10:24:40 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -42,71 +41,63 @@ public class ConfigurationListenerTest extends AbstractProxoolTest {
         String testName = "addAndRemove";
         String alias = testName;
 
-        try {
+        // Register pool
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
 
-            // Register pool
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            ProxoolFacade.registerConnectionPool(url, info);
+        // add a listener
+        MyConfigurationListener mcl1 = new MyConfigurationListener();
+        ProxoolFacade.addConfigurationListener(alias, mcl1);
 
-            // add a listener
-            MyConfigurationListener mcl1 = new MyConfigurationListener();
-            ProxoolFacade.addConfigurationListener(alias, mcl1);
+        // Update the definition
+        Properties newInfo = new Properties();
+        newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
+        ProxoolFacade.updateConnectionPool(url, newInfo);
+        assertEquals("definitionReceived", true, mcl1.isUpdateReceived());
+        mcl1.reset();
 
-            // Update the definition
-            Properties newInfo = new Properties();
-            newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
-            ProxoolFacade.updateConnectionPool(url, newInfo);
-            assertEquals("definitionReceived", true, mcl1.isUpdateReceived());
-            mcl1.reset();
+        // add another listener
+        MyConfigurationListener mcl2 = new MyConfigurationListener();
+        ProxoolFacade.addConfigurationListener(alias, mcl2);
 
-            // add another listener
-            MyConfigurationListener mcl2 = new MyConfigurationListener();
-            ProxoolFacade.addConfigurationListener(alias, mcl2);
+        // Update the definition
+        newInfo = new Properties();
+        newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.FALSE.toString());
+        ProxoolFacade.updateConnectionPool(url, newInfo);
+        assertEquals("definitionReceived", true, mcl1.isUpdateReceived());
+        assertEquals("definitionReceived", true, mcl2.isUpdateReceived());
+        mcl1.reset();
+        mcl2.reset();
 
-            // Update the definition
-            newInfo = new Properties();
-            newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.FALSE.toString());
-            ProxoolFacade.updateConnectionPool(url, newInfo);
-            assertEquals("definitionReceived", true, mcl1.isUpdateReceived());
-            assertEquals("definitionReceived", true, mcl2.isUpdateReceived());
-            mcl1.reset();
-            mcl2.reset();
+        // Remove the first listener
+        ProxoolFacade.removeConfigurationListener(alias, mcl1);
 
-            // Remove the first listener
-            ProxoolFacade.removeConfigurationListener(alias, mcl1);
+        // Update the definition
+        newInfo = new Properties();
+        newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
+        ProxoolFacade.updateConnectionPool(url, newInfo);
+        assertEquals("definitionReceived", false, mcl1.isUpdateReceived());
+        assertEquals("definitionReceived", true, mcl2.isUpdateReceived());
+        mcl1.reset();
+        mcl2.reset();
 
-            // Update the definition
-            newInfo = new Properties();
-            newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
-            ProxoolFacade.updateConnectionPool(url, newInfo);
-            assertEquals("definitionReceived", false, mcl1.isUpdateReceived());
-            assertEquals("definitionReceived", true, mcl2.isUpdateReceived());
-            mcl1.reset();
-            mcl2.reset();
+        // Remove the second listener
+        ProxoolFacade.removeConfigurationListener(alias, mcl2);
 
-            // Remove the second listener
-            ProxoolFacade.removeConfigurationListener(alias, mcl2);
+        // Update the definition
+        newInfo = new Properties();
+        newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.FALSE.toString());
+        ProxoolFacade.updateConnectionPool(url, newInfo);
+        assertEquals("definitionReceived", false, mcl1.isUpdateReceived());
+        assertEquals("definitionReceived", false, mcl2.isUpdateReceived());
+        mcl1.reset();
+        mcl2.reset();
 
-            // Update the definition
-            newInfo = new Properties();
-            newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.FALSE.toString());
-            ProxoolFacade.updateConnectionPool(url, newInfo);
-            assertEquals("definitionReceived", false, mcl1.isUpdateReceived());
-            assertEquals("definitionReceived", false, mcl2.isUpdateReceived());
-            mcl1.reset();
-            mcl2.reset();
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
     }
 
     /**
@@ -119,67 +110,59 @@ public class ConfigurationListenerTest extends AbstractProxoolTest {
         String testName = "configurationListener";
         String alias = testName;
 
-        try {
+        // Register pool
+        final String delegateUrl1 = TestConstants.HYPERSONIC_URL_PREFIX + "1";
+        final String delegateUrl2 = TestConstants.HYPERSONIC_URL_PREFIX + "2";
 
-            // Register pool
-            final String delegateUrl1 = TestConstants.HYPERSONIC_URL_PREFIX + "1";
-            final String delegateUrl2 = TestConstants.HYPERSONIC_URL_PREFIX + "2";
+        final String url1 = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                delegateUrl1);
+        final String url2 = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                delegateUrl2);
 
-            final String url1 = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    delegateUrl1);
-            final String url2 = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    delegateUrl2);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url1, info);
 
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            ProxoolFacade.registerConnectionPool(url1, info);
+        int propertyCount = info.size();
 
-            int propertyCount = info.size();
+        // listen to the configuration
+        MyConfigurationListener mcl = new MyConfigurationListener();
+        ProxoolFacade.addConfigurationListener(alias, mcl);
 
-            // listen to the configuration
-            MyConfigurationListener mcl = new MyConfigurationListener();
-            ProxoolFacade.addConfigurationListener(alias, mcl);
+        // Update the URL
+        ProxoolFacade.updateConnectionPool(url2, null);
+        LOG.debug("changed: " + mcl.getChangedInfo());
+        LOG.debug("complete: " + mcl.getCompleteInfo());
+        assertEquals("changed size", 0, mcl.getChangedInfo().size());
+        assertEquals("complete size", propertyCount, mcl.getCompleteInfo().size());
+        assertEquals("url", delegateUrl2, mcl.getConnectionPoolDefinition().getUrl());
+        mcl.reset();
 
-            // Update the URL
-            ProxoolFacade.updateConnectionPool(url2, null);
-            LOG.debug("changed: " + mcl.getChangedInfo());
-            LOG.debug("complete: " + mcl.getCompleteInfo());
-            assertEquals("changed size", 0, mcl.getChangedInfo().size());
-            assertEquals("complete size", propertyCount, mcl.getCompleteInfo().size());
-            assertEquals("url", delegateUrl2, mcl.getConnectionPoolDefinition().getUrl());
-            mcl.reset();
+        // Add the verbose property
+        Properties newInfo = new Properties();
+        newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
+        ProxoolFacade.updateConnectionPool(url2, newInfo);
+        LOG.debug("changed: " + mcl.getChangedInfo());
+        LOG.debug("complete: " + mcl.getCompleteInfo());
+        assertEquals("completeInfo size", propertyCount + 1, mcl.getCompleteInfo().size());
+        assertEquals("changedInfo size", 1, mcl.getChangedInfo().size());
+        assertEquals("url", true, mcl.getConnectionPoolDefinition().isVerbose());
+        mcl.reset();
 
-            // Add the verbose property
-            Properties newInfo = new Properties();
-            newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.TRUE.toString());
-            ProxoolFacade.updateConnectionPool(url2, newInfo);
-            LOG.debug("changed: " + mcl.getChangedInfo());
-            LOG.debug("complete: " + mcl.getCompleteInfo());
-            assertEquals("completeInfo size", propertyCount + 1, mcl.getCompleteInfo().size());
-            assertEquals("changedInfo size", 1, mcl.getChangedInfo().size());
-            assertEquals("url", true, mcl.getConnectionPoolDefinition().isVerbose());
-            mcl.reset();
+        // modify the verbose property
+        newInfo = new Properties();
+        newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.FALSE.toString());
+        ProxoolFacade.updateConnectionPool(url2, newInfo);
+        LOG.debug("changed: " + mcl.getChangedInfo());
+        LOG.debug("complete: " + mcl.getCompleteInfo());
+        assertEquals("completeInfo size", propertyCount + 1, mcl.getCompleteInfo().size());
+        assertEquals("changedInfo size", 1, mcl.getChangedInfo().size());
+        assertEquals("url", false, mcl.getConnectionPoolDefinition().isVerbose());
+        mcl.reset();
 
-            // modify the verbose property
-            newInfo = new Properties();
-            newInfo.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.FALSE.toString());
-            ProxoolFacade.updateConnectionPool(url2, newInfo);
-            LOG.debug("changed: " + mcl.getChangedInfo());
-            LOG.debug("complete: " + mcl.getCompleteInfo());
-            assertEquals("completeInfo size", propertyCount + 1, mcl.getCompleteInfo().size());
-            assertEquals("changedInfo size", 1, mcl.getChangedInfo().size());
-            assertEquals("url", false, mcl.getConnectionPoolDefinition().isVerbose());
-            mcl.reset();
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
-        }
     }
 
     class MyConfigurationListener implements ConfigurationListenerIF {
@@ -228,6 +211,9 @@ public class ConfigurationListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.9  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.8  2003/03/03 17:08:54  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -6,7 +6,6 @@
 package org.logicalcobwebs.proxool.util;
 
 import junit.framework.TestCase;
-import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
 import java.util.Iterator;
@@ -14,7 +13,7 @@ import java.util.Iterator;
 /**
  * Test {@link AbstractListenerContainer}.
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/03 17:09:18 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/04 10:24:41 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -38,7 +37,7 @@ public class ListenerContainerTest extends AbstractProxoolTest {
         }
         compositeTestListener.onEvent();
         assertTrue("Only got " + compositeTestListener.getNumberOfNotifications()
-            + " notifications but expected 10.", compositeTestListener.getNumberOfNotifications() == 10);
+                + " notifications but expected 10.", compositeTestListener.getNumberOfNotifications() == 10);
     }
 
     /**
@@ -59,10 +58,10 @@ public class ListenerContainerTest extends AbstractProxoolTest {
             assertTrue("Removal of a listener failed.", compositeTestListener.removeListener(testListeners[i]));
         }
         assertTrue("Removal of unregistered listener returned true",
-            !compositeTestListener.removeListener(new TestListener()));
+                !compositeTestListener.removeListener(new TestListener()));
         compositeTestListener.onEvent();
         assertTrue("Listeners was notified even if all listeners had been removed.",
-            compositeTestListener.getNumberOfNotifications() == 0);
+                compositeTestListener.getNumberOfNotifications() == 0);
     }
 
 }
@@ -73,7 +72,8 @@ interface TestListenerIF {
 
 class CompositeTestListener extends AbstractListenerContainer implements TestListenerIF {
     private int numberOfNotifications;
-    public void onEvent () {
+
+    public void onEvent() {
         try {
             Iterator listeners = getListenerIterator();
             if (listeners != null) {
@@ -89,21 +89,27 @@ class CompositeTestListener extends AbstractListenerContainer implements TestLis
             releaseReadLock();
         }
     }
+
     int getNumberOfNotifications() {
         return numberOfNotifications;
     }
+
     private synchronized void notification() {
         numberOfNotifications++;
     }
 }
 
 class TestListener implements TestListenerIF {
-    public void onEvent () {
+    public void onEvent() {
     }
 }
+
 /*
  Revision history:
  $Log: ListenerContainerTest.java,v $
+ Revision 1.4  2003/03/04 10:24:41  billhorsman
+ removed try blocks around each test
+
  Revision 1.3  2003/03/03 17:09:18  billhorsman
  all tests now extend AbstractProxoolTest
 

@@ -18,7 +18,7 @@ import java.util.Properties;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/03 17:09:06 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/04 10:24:40 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -42,66 +42,59 @@ public class StateListenerTest extends AbstractProxoolTest {
 
         String testName = "addStateListener";
         String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
+        info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
+        info.setProperty(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY, "6000");
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+
+        StateResultMonitor srm = new StateResultMonitor();
+        ProxoolFacade.addStateListener(alias, srm);
+
+        assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+
+        Connection c1 = DriverManager.getConnection(url);
+
+        // Test BUSY
+        srm.setExpectedUpState(StateListenerIF.STATE_BUSY);
+        assertEquals("Timeout waiting for BUSY", ResultMonitor.SUCCESS, srm.getResult());
+
+        assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
+
         try {
-            String url = TestHelper.buildProxoolUrl(alias,
-                    TestConstants.HYPERSONIC_DRIVER,
-                    TestConstants.HYPERSONIC_TEST_URL);
-            Properties info = new Properties();
-            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
-            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
-            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
-            info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
-            info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
-            info.setProperty(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY, "6000");
-            ProxoolFacade.registerConnectionPool(url, info);
-
-            assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
-
-            StateResultMonitor srm = new StateResultMonitor();
-            ProxoolFacade.addStateListener(alias, srm);
-
-            assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
-
-            Connection c1 = DriverManager.getConnection(url);
-
-            // Test BUSY
-            srm.setExpectedUpState(StateListenerIF.STATE_BUSY);
-            assertEquals("Timeout waiting for BUSY", ResultMonitor.SUCCESS,srm.getResult());
-
-            assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
-
-            try {
-                Connection c2 = DriverManager.getConnection(url);
-                fail("Didn't expect second connection since maximumConnectionCount is 1");
-            } catch (SQLException e) {
-                // We expect a refusal here
-                LOG.debug("Expected refusal", e);
-            }
-
-            // Test Overloaded
-            srm.setExpectedUpState(StateListenerIF.STATE_OVERLOADED);
-            assertEquals("Timeout waiting for OVERLOADED", ResultMonitor.SUCCESS,srm.getResult());
-
-            // Test Busy again
-            srm.setExpectedUpState(StateListenerIF.STATE_BUSY);
-            assertEquals("Timeout waiting for BUSY", ResultMonitor.SUCCESS,srm.getResult());
-
-            // Test Quiet again
-            c1.close();
-            srm.setExpectedUpState(StateListenerIF.STATE_QUIET);
-            assertEquals("Timeout waiting for QUIET", ResultMonitor.SUCCESS,srm.getResult());
-
-            // Bogus definition -> should be down
-            ProxoolFacade.updateConnectionPool("proxool." + alias + ":blah:foo", null);
-            srm.setExpectedUpState(StateListenerIF.STATE_DOWN);
-            assertEquals("Timeout waiting for DOWN", ResultMonitor.SUCCESS,srm.getResult());
-
-        } catch (Exception e) {
-            LOG.error("Whilst performing " + testName, e);
-            throw e;
-        } finally {
-            ProxoolFacade.removeConnectionPool(alias);
+            Connection c2 = DriverManager.getConnection(url);
+            fail("Didn't expect second connection since maximumConnectionCount is 1");
+        } catch (SQLException e) {
+            // We expect a refusal here
+            LOG.debug("Expected refusal", e);
         }
+
+        // Test Overloaded
+        srm.setExpectedUpState(StateListenerIF.STATE_OVERLOADED);
+        assertEquals("Timeout waiting for OVERLOADED", ResultMonitor.SUCCESS, srm.getResult());
+
+        // Test Busy again
+        srm.setExpectedUpState(StateListenerIF.STATE_BUSY);
+        assertEquals("Timeout waiting for BUSY", ResultMonitor.SUCCESS, srm.getResult());
+
+        // Test Quiet again
+        c1.close();
+        srm.setExpectedUpState(StateListenerIF.STATE_QUIET);
+        assertEquals("Timeout waiting for QUIET", ResultMonitor.SUCCESS, srm.getResult());
+
+        // Bogus definition -> should be down
+        ProxoolFacade.updateConnectionPool("proxool." + alias + ":blah:foo", null);
+        srm.setExpectedUpState(StateListenerIF.STATE_DOWN);
+        assertEquals("Timeout waiting for DOWN", ResultMonitor.SUCCESS, srm.getResult());
 
     }
 
@@ -136,7 +129,7 @@ public class StateListenerTest extends AbstractProxoolTest {
             while (!somethingHappened) {
                 if (upState == stateToWaitFor) {
                     if (!somethingHappened) {
-                        LOG.error("Waiting for state = " + stateToWaitFor + " but it's already at that state") ;
+                        LOG.error("Waiting for state = " + stateToWaitFor + " but it's already at that state");
                         break;
                     }
                 }
@@ -163,6 +156,9 @@ public class StateListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.10  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.9  2003/03/03 17:09:06  billhorsman
  all tests now extend AbstractProxoolTest
 

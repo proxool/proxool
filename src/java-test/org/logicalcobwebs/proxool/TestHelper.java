@@ -78,35 +78,35 @@ public class TestHelper {
      * @throws ProxoolException if any properties are missing or have the wrong value.
      */
     public static void equalsCompleteAlternativeProperties(ConnectionPoolDefinitionIF connectionPoolDefinition)
-        throws ProxoolException {
+            throws ProxoolException {
         checkProperty("user", "sa", connectionPoolDefinition.getDelegateProperties().getProperty("user"));
         checkProperty("password", "", connectionPoolDefinition.getDelegateProperties().getProperty("password"));
         checkProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME, 40000,
-            connectionPoolDefinition.getHouseKeepingSleepTime());
+                connectionPoolDefinition.getHouseKeepingSleepTime());
         checkProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL, "select CURRENT_DATE",
-            connectionPoolDefinition.getHouseKeepingTestSql());
+                connectionPoolDefinition.getHouseKeepingTestSql());
         checkProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT, 10,
-            connectionPoolDefinition.getMaximumConnectionCount());
+                connectionPoolDefinition.getMaximumConnectionCount());
         checkProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT, 3,
-            connectionPoolDefinition.getMinimumConnectionCount());
+                connectionPoolDefinition.getMinimumConnectionCount());
         checkProperty(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME, 18000000,
-            connectionPoolDefinition.getMaximumConnectionLifetime());
+                connectionPoolDefinition.getMaximumConnectionLifetime());
         checkProperty(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS, 5,
-            connectionPoolDefinition.getMaximumNewConnections());
+                connectionPoolDefinition.getMaximumNewConnections());
         checkProperty(ProxoolConstants.RECENTLY_STARTED_THRESHOLD, 40000,
-            connectionPoolDefinition.getRecentlyStartedThreshold());
+                connectionPoolDefinition.getRecentlyStartedThreshold());
         checkProperty(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME, 50000,
-            connectionPoolDefinition.getOverloadWithoutRefusalLifetime());
+                connectionPoolDefinition.getOverloadWithoutRefusalLifetime());
         checkProperty(ProxoolConstants.MAXIMUM_ACTIVE_TIME, 60000,
-            connectionPoolDefinition.getMaximumActiveTime());
+                connectionPoolDefinition.getMaximumActiveTime());
         checkProperty(ProxoolConstants.VERBOSE, "true",
-            new Boolean(connectionPoolDefinition.isVerbose()).toString());
+                new Boolean(connectionPoolDefinition.isVerbose()).toString());
         checkProperty(ProxoolConstants.TRACE, "true",
-            new Boolean(connectionPoolDefinition.isTrace() == true).toString());
+                new Boolean(connectionPoolDefinition.isTrace() == true).toString());
         checkProperty(ProxoolConstants.FATAL_SQL_EXCEPTION, "Fatal error",
-            connectionPoolDefinition.getFatalSqlExceptions().iterator().next().toString());
+                connectionPoolDefinition.getFatalSqlExceptions().iterator().next().toString());
         checkProperty(ProxoolConstants.PROTOTYPE_COUNT, 2,
-            connectionPoolDefinition.getPrototypeCount());
+                connectionPoolDefinition.getPrototypeCount());
     }
 
     private static void checkProperty(String name, String correctValue, String candidateValue) throws ProxoolException {
@@ -114,12 +114,12 @@ public class TestHelper {
             throw new ProxoolException(name + " was null.");
         } else if (!candidateValue.equals(correctValue)) {
             throw new ProxoolException("Expected value for " + name + " was " + correctValue + " but the value was "
-                + candidateValue + ".");
+                    + candidateValue + ".");
         }
     }
 
     private static void checkProperty(String name, int correctValue, int candidateValue) throws ProxoolException {
-            checkProperty(name, String.valueOf(correctValue), String.valueOf(candidateValue));
+        checkProperty(name, String.valueOf(correctValue), String.valueOf(candidateValue));
     }
 
     public static String getSimpleUrl(String alias) {

@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import junit.framework.TestCase;
 import org.logicalcobwebs.dbscript.CommandFilterIF;
 import org.logicalcobwebs.dbscript.CommandIF;
 import org.logicalcobwebs.dbscript.ScriptFacade;
@@ -19,7 +18,7 @@ import java.util.Random;
 /**
  * Test how well Proxool works in a threaded test.
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/03 17:09:06 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/04 10:24:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -95,6 +94,9 @@ public class ThreadTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ThreadTest.java,v $
+ Revision 1.9  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.8  2003/03/03 17:09:06  billhorsman
  all tests now extend AbstractProxoolTest
 

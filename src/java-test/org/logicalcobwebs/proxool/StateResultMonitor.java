@@ -11,12 +11,12 @@ import org.logicalcobwebs.logging.LogFactory;
 /**
  * A ResultMonitor specifically for State
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/04 10:24:40 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class StateResultMonitor extends ResultMonitor implements StateListenerIF  {
+public class StateResultMonitor extends ResultMonitor implements StateListenerIF {
 
     private static final Log LOG = LogFactory.getLog(StateResultMonitor.class);
 
@@ -47,6 +47,9 @@ public class StateResultMonitor extends ResultMonitor implements StateListenerIF
 /*
  Revision history:
  $Log: StateResultMonitor.java,v $
+ Revision 1.3  2003/03/04 10:24:40  billhorsman
+ removed try blocks around each test
+
  Revision 1.2  2003/03/03 11:12:05  billhorsman
  fixed licence
 
