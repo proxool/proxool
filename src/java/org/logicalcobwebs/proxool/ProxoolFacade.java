@@ -25,7 +25,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.16 $, $Date: 2002/12/04 13:19:43 $
+ * @version $Revision: 1.17 $, $Date: 2002/12/12 10:49:43 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -464,7 +464,8 @@ public class ProxoolFacade {
 
         ConfiguratorIF configurator = (ConfiguratorIF) configurators.get(cpd.getName());
         if (configurator != null) {
-            configurator.defintionUpdated(cpd);
+            // TODO send properties
+            configurator.defintionUpdated(cpd, null, null);
         }
 
     }
@@ -474,13 +475,14 @@ public class ProxoolFacade {
         LOG.debug("Finalising");
     }
 
-    public static void updatePoolByDriver(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException {
+    protected static void updatePoolByDriver(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException {
         definePool(cp, url, cpd, info);
 
         ConfiguratorIF configurator = (ConfiguratorIF) configurators.get(cpd.getName());
         if (configurator != null) {
             cp.getLog().warn("The pool, which is associated with a configurator, has been updated on the fly. This is not recommended.");
-            configurator.defintionUpdated(cpd);
+            // TODO send properties
+            configurator.defintionUpdated(cpd, null, null);
         }
 
     }
@@ -489,6 +491,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.17  2002/12/12 10:49:43  billhorsman
+ now includes properties in definitionChanged event
+
  Revision 1.16  2002/12/04 13:19:43  billhorsman
  draft ConfiguratorIF stuff for persistent configuration
 

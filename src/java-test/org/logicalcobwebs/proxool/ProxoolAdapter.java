@@ -18,7 +18,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.9 $, $Date: 2002/12/04 13:20:10 $
+ * @version $Revision: 1.10 $, $Date: 2002/12/12 10:49:43 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -47,7 +47,7 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
     public ProxoolAdapter() {
     }
 
-    public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition) {
+    public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
         setConnectionPoolDefinition(connectionPoolDefinition);
     }
 
@@ -105,6 +105,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.10  2002/12/12 10:49:43  billhorsman
+ now includes properties in definitionChanged event
+
  Revision 1.9  2002/12/04 13:20:10  billhorsman
  ConfiguratorIF test
 
