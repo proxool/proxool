@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/01 15:27:25 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/01 15:38:38 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -81,12 +81,13 @@ public class StatisticsListenerTest extends TestCase {
             // Wait for next statistics so we can guarantee that next set won't
             // be produced whilst we are building connection
             testListener.getNextStatistics();
+            long lap0 = System.currentTimeMillis();
 
             DriverManager.getConnection(url).close();
             StatisticsIF statistics = testListener.getNextStatistics();
+            long lap1 = System.currentTimeMillis();
 
-            assertEquals("servedCount", 1L, statistics.getServedCount());
-            LOG.debug("statistics().getServedCount()=" + statistics.getServedCount());
+            assertEquals("servedCount (" + (lap1 - lap0) + " ms)", 1L, statistics.getServedCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -145,6 +146,9 @@ public class StatisticsListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.6  2003/03/01 15:38:38  billhorsman
+ better assert msg
+
  Revision 1.5  2003/03/01 15:27:25  billhorsman
  checkstyle
 
