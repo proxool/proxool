@@ -5,14 +5,16 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.cglib.proxy.Proxy;
+import org.logicalcobwebs.cglib.proxy.Enhancer;
+import org.logicalcobwebs.cglib.proxy.Factory;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Map;
@@ -24,7 +26,7 @@ import java.lang.reflect.Modifier;
  * object given a proxy.
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.26 $, $Date: 2004/03/23 21:19:45 $
+ * @version $Revision: 1.27 $, $Date: 2004/06/02 20:50:47 $
  * @since Proxool 0.5
  */
 class ProxyFactory {
@@ -43,9 +45,21 @@ class ProxyFactory {
      */
     protected static Connection getWrappedConnection(ProxyConnection proxyConnection) {
         final WrappedConnection wrappedConnection = new WrappedConnection(proxyConnection);
+/*
         Object delegate = Proxy.newProxyInstance(
                 proxyConnection.getConnection().getClass().getClassLoader(),
-                getInterfaces(proxyConnection.getConnection().getClass()),
+                getInterfaces(proxyConnection.getConnection().getClass(), proxyConnection.getConnectionPool()),
+                wrappedConnection);
+*/
+/*
+        Object delegate = Enhancer.create(
+                proxyConnection.getConnection().getClass(),
+                getInterfaces(proxyConnection.getConnection().getClass(), proxyConnection.getConnectionPool()),
+                wrappedConnection);
+*/
+        Object delegate = Enhancer.create(
+                null,
+                getInterfaces(proxyConnection.getConnection().getClass(), proxyConnection.getConnectionPool()),
                 wrappedConnection);
         return (Connection) delegate;
     }
@@ -59,7 +73,10 @@ class ProxyFactory {
      */
     protected static Statement getDelegateStatement(Statement statement) {
         Statement ds = statement;
+/*
         ProxyStatement ps = (ProxyStatement) Proxy.getInvocationHandler(statement);
+*/
+        ProxyStatement ps = (ProxyStatement) ((Factory)statement).getCallback(0);
         ds = ps.getDelegateStatement();
         return ds;
     }
@@ -72,15 +89,31 @@ class ProxyFactory {
      * @see ProxoolFacade#getDelegateConnection(java.sql.Connection)
      */
     protected static Connection getDelegateConnection(Connection connection) {
+/*
         WrappedConnection wc = (WrappedConnection) Proxy.getInvocationHandler(connection);
+*/
+        WrappedConnection wc = (WrappedConnection) ((Factory)connection).getCallback(0);
         return wc.getProxyConnection().getConnection();
     }
 
     protected static Statement getStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection, String sqlStatement) {
+        Object o = Enhancer.create(
+                null,
+                getInterfaces(delegate.getClass(), connectionPool),
+                new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
+/*
+        Object o = Enhancer.create(
+                delegate.getClass(),
+                getInterfaces(delegate.getClass(), connectionPool),
+                new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
+*/
+        return (Statement) o;
+/*
         return (Statement) Proxy.newProxyInstance(
                 delegate.getClass().getClassLoader(),
-                getInterfaces(delegate.getClass()),
+                getInterfaces(delegate.getClass(), connectionPool),
                 new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
+*/
     }
 
     /**
@@ -90,11 +123,30 @@ class ProxyFactory {
      * @param clazz the class to examine.
      * @return an array of classes (all interfaces) that this class implements.
      */
-    private static Class[] getInterfaces(Class clazz) {
+    private static Class[] getInterfaces(Class clazz, ConnectionPool connectionPool) {
         Class[] interfaceArray = (Class[]) interfaceMap.get(clazz);
         if (interfaceArray == null) {
             Set interfaces = new HashSet();
             traverseInterfacesRecursively(interfaces, clazz);
+            if (connectionPool != null) {
+                // Work out which interface we should be injecting (if it has been configured). Make sure
+                // we check CallableStatement then PreparedStatement then Statement or all three will get
+                // caught by Statement
+                Class injectableClass = null;
+                if (Connection.class.isAssignableFrom(clazz)) {
+                    injectableClass = connectionPool.getDefinition().getInjectableConnectionInterface();
+                } else if (CallableStatement.class.isAssignableFrom(clazz)) {
+                    injectableClass = connectionPool.getDefinition().getInjectableCallableStatementInterface();
+                } else if (PreparedStatement.class.isAssignableFrom(clazz)) {
+                    injectableClass = connectionPool.getDefinition().getInjectablePreparedStatementInterface();
+                } else if (Statement.class.isAssignableFrom(clazz)) {
+                    injectableClass = connectionPool.getDefinition().getInjectableStatementInterface();
+                }
+                // Inject it if it was configured.
+                if (injectableClass != null) {
+                    interfaces.add(injectableClass);
+                }
+            }
             interfaceArray = (Class[]) interfaces.toArray(new Class[interfaces.size()]);
 /*
             if (LOG.isDebugEnabled()) {
@@ -165,16 +217,29 @@ class ProxyFactory {
 
     /**
      * Create a new DatabaseMetaData from a connection
-     * @param connection the proxy connection we are using
+     * @param databaseMetaData the meta data we use to delegate all calls to (except getConnection())
+     * @param wrappedConnection the connection we return if asked for the connection
      * @return databaseMetaData
-     * @throws SQLException if the delegfate connection couldn't get the metaData
      */
-    protected static DatabaseMetaData getDatabaseMetaData(Connection connection, Connection wrappedConnection) throws SQLException {
+    protected static DatabaseMetaData getDatabaseMetaData(DatabaseMetaData databaseMetaData, Connection wrappedConnection) {
+/*
         return (DatabaseMetaData) Proxy.newProxyInstance(
                 DatabaseMetaData.class.getClassLoader(),
                 new Class[]{DatabaseMetaData.class},
                 new ProxyDatabaseMetaData(connection, wrappedConnection)
         );
+*/
+        ProxyDatabaseMetaData proxyDatabaseMetaData = new ProxyDatabaseMetaData(databaseMetaData, wrappedConnection);
+        Object delegate = Enhancer.create(
+                null,
+                getInterfaces(databaseMetaData.getClass(), null),
+                proxyDatabaseMetaData);
+/*
+        Object delegate = Enhancer.create(
+                databaseMetaData.getClass(),
+                proxyDatabaseMetaData);
+*/
+        return (DatabaseMetaData) delegate;
     }
 
     /**
@@ -183,7 +248,10 @@ class ProxyFactory {
      * @return the wrapped connection or null if it couldn't be found
      */
     public static WrappedConnection getWrappedConnection(Connection connection) {
+/*
         return (WrappedConnection) Proxy.getInvocationHandler(connection);
+*/
+        return (WrappedConnection) ((Factory)connection).getCallback(0);
     }
 
 }
@@ -191,6 +259,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.27  2004/06/02 20:50:47  billhorsman
+ Dropped obsolete InvocationHandler reference and injectable interface stuff.
+
  Revision 1.26  2004/03/23 21:19:45  billhorsman
  Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
 

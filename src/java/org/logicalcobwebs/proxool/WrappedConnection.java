@@ -10,6 +10,7 @@ import org.logicalcobwebs.cglib.proxy.MethodInterceptor;
 import org.logicalcobwebs.cglib.proxy.MethodProxy;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.proxy.InvokerFacade;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
@@ -19,12 +20,12 @@ import java.sql.Connection;
 
 /**
  * Wraps up a {@link ProxyConnection}. It is proxied as a {@link java.sql.Connection}
- * @version $Revision: 1.1 $, $Date: 2004/03/23 21:19:45 $
+ * @version $Revision: 1.2 $, $Date: 2004/06/02 20:50:47 $
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
  */
-public class WrappedConnection implements InvocationHandler, MethodInterceptor {
+public class WrappedConnection implements MethodInterceptor {
 
     private static final Log LOG = LogFactory.getLog(WrappedConnection.class);
 
@@ -97,8 +98,12 @@ public class WrappedConnection implements InvocationHandler, MethodInterceptor {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Object result = null;
         int argCount = args != null ? args.length : 0;
+        Method concreteMethod = method;
+        if (proxyConnection != null && proxyConnection.getConnection() != null) {
+            concreteMethod = InvokerFacade.getConcreteMethod(proxyConnection.getConnection().getClass(), method);
+        }
         try {
-            if (method.getName().equals(CLOSE_METHOD)) {
+            if (concreteMethod.getName().equals(CLOSE_METHOD)) {
                 // It's okay to close a connection twice. Only we ignore the
                 // second time.
                 if (proxyConnection != null) {
@@ -106,30 +111,31 @@ public class WrappedConnection implements InvocationHandler, MethodInterceptor {
                     // Set it to null so that we can't do anything else to it.
                     proxyConnection = null;
                 }
-            } else if (method.getName().equals(EQUALS_METHOD) && argCount == 1) {
+            } else if (concreteMethod.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = equals(args[0]) ? Boolean.TRUE : Boolean.FALSE;
-            } else if (method.getName().equals(HASH_CODE_METHOD) && argCount == 0) {
+            } else if (concreteMethod.getName().equals(HASH_CODE_METHOD) && argCount == 0) {
                 result = new Integer(hashCode());
-            } else if (method.getName().equals(IS_CLOSED_METHOD) && argCount == 0) {
+            } else if (concreteMethod.getName().equals(IS_CLOSED_METHOD) && argCount == 0) {
                 result = (proxyConnection == null || proxyConnection.isClosed()) ? Boolean.TRUE : Boolean.FALSE;
-            } else if (method.getName().equals(GET_META_DATA_METHOD) && argCount == 0) {
+            } else if (concreteMethod.getName().equals(GET_META_DATA_METHOD) && argCount == 0) {
                 if (proxyConnection != null) {
-                    result = ProxyFactory.getDatabaseMetaData(proxyConnection.getConnection(),(Connection) proxy);
+                    Connection connection = ProxyFactory.getWrappedConnection(proxyConnection);
+                    result = ProxyFactory.getDatabaseMetaData(proxyConnection.getConnection().getMetaData(), connection);
                 } else {
-                    throw new SQLException("You can't perform a " + method.getName() + " operation after the connection has been closed");
+                    throw new SQLException("You can't perform a " + concreteMethod.getName() + " operation after the connection has been closed");
                 }
-            } else if (method.getName().equals(FINALIZE_METHOD)) {
+            } else if (concreteMethod.getName().equals(FINALIZE_METHOD)) {
                 super.finalize();
-            } else if (method.getName().equals(TO_STRING_METHOD)) {
+            } else if (concreteMethod.getName().equals(TO_STRING_METHOD)) {
                 result = toString();
             } else {
                 if (proxyConnection != null) {
-                    if (method.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
+                    if (concreteMethod.getName().startsWith(ConnectionResetter.MUTATOR_PREFIX)) {
                         proxyConnection.setNeedToReset(true);
                     }
-                    result = method.invoke(proxyConnection.getConnection(), args);
+                    result = concreteMethod.invoke(proxyConnection.getConnection(), args);
                 } else {
-                    throw new SQLException("You can't perform a " + method.getName() + " operation after the connection has been closed");
+                    throw new SQLException("You can't perform a " + concreteMethod.getName() + " operation after the connection has been closed");
                 }
             }
 
@@ -160,7 +166,7 @@ public class WrappedConnection implements InvocationHandler, MethodInterceptor {
             }
             throw e.getTargetException();
         } catch (SQLException e) {
-            throw new SQLException("Couldn't perform the operation " + method.getName());
+            throw new SQLException("Couldn't perform the operation " + concreteMethod.getName());
         } catch (Exception e) {
             LOG.error("Unexpected invocation exception", e);
             if (FatalSqlExceptionHelper.testException(proxyConnection.getConnectionPool().getDefinition(), e)) {
@@ -198,8 +204,8 @@ public class WrappedConnection implements InvocationHandler, MethodInterceptor {
     public boolean equals(Object obj) {
         if (obj instanceof Connection) {
             final WrappedConnection wc = ProxyFactory.getWrappedConnection((Connection) obj);
-            if (wc != null) {
-                return wc.hashCode() == hashCode();
+            if (wc != null && wc.getId() > 0 && getId() > 0) {
+                return wc.getId() == getId();
             } else {
                 return false;
             }
@@ -222,6 +228,9 @@ public class WrappedConnection implements InvocationHandler, MethodInterceptor {
 /*
  Revision history:
  $Log: WrappedConnection.java,v $
+ Revision 1.2  2004/06/02 20:50:47  billhorsman
+ Dropped obsolete InvocationHandler reference and injectable interface stuff.
+
  Revision 1.1  2004/03/23 21:19:45  billhorsman
  Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
 

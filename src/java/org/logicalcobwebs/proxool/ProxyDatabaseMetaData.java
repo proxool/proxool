@@ -10,22 +10,20 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import org.logicalcobwebs.cglib.proxy.MethodInterceptor;
 import org.logicalcobwebs.cglib.proxy.MethodProxy;
-import org.logicalcobwebs.cglib.proxy.InvocationHandler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.DatabaseMetaData;
 
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.7 $, $Date: 2004/03/23 21:19:45 $
+ * @version $Revision: 1.8 $, $Date: 2004/06/02 20:50:47 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-class ProxyDatabaseMetaData implements MethodInterceptor, InvocationHandler {
+class ProxyDatabaseMetaData implements MethodInterceptor {
 
     private static final Log LOG = LogFactory.getLog(ProxyDatabaseMetaData.class);
 
@@ -39,16 +37,16 @@ class ProxyDatabaseMetaData implements MethodInterceptor, InvocationHandler {
 
     private Connection wrappedConnection;
 
-    public ProxyDatabaseMetaData(Connection connection, Connection wrappedConnection) throws SQLException {
-        databaseMetaData = connection.getMetaData();
+    /**
+     * @param databaseMetaData the meta data we use to delegate all calls to (except getConnection())
+     * @param wrappedConnection the connection we return if asked for the connection
+     */
+    public ProxyDatabaseMetaData(DatabaseMetaData databaseMetaData, Connection wrappedConnection) {
+        this.databaseMetaData = databaseMetaData;
         this.wrappedConnection = wrappedConnection;
     }
 
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-        return invoke(proxy, method, args);
-    }
-
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         Object result = null;
         int argCount = args != null ? args.length : 0;
         try {
@@ -112,6 +110,9 @@ class ProxyDatabaseMetaData implements MethodInterceptor, InvocationHandler {
 /*
  Revision history:
  $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.8  2004/06/02 20:50:47  billhorsman
+ Dropped obsolete InvocationHandler reference and injectable interface stuff.
+
  Revision 1.7  2004/03/23 21:19:45  billhorsman
  Added disposable wrapper to proxied connection. And made proxied objects implement delegate interfaces too.
 
