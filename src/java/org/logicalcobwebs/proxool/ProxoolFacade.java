@@ -24,7 +24,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.8 $, $Date: 2002/10/27 13:29:38 $
+ * @version $Revision: 1.9 $, $Date: 2002/10/28 19:43:30 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -111,11 +111,13 @@ public class ProxoolFacade {
 
         if (info != null && (rememberedInfo == null || !info.equals(rememberedInfo))) {
 
-            if (LOG.isDebugEnabled()) {
+            Log earlyLog = LogFactory.getLog("org.logicalcobwebs.proxool." + getAlias(url));
+
+            if (earlyLog.isDebugEnabled()) {
                 if (rememberedInfo == null) {
-                    LOG.debug("Setting properties on " + url);
+                    earlyLog.debug("Setting properties on " + url);
                 } else {
-                    LOG.debug("Updating properties on " + url);
+                    earlyLog.debug("Updating properties on " + url);
                 }
             }
 
@@ -198,10 +200,10 @@ public class ProxoolFacade {
                     }
                 } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
                     if (value != null && value.equals("1")) {
-                        LOG.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
+                        earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
                         cpd.setVerbose(true);
                     } else {
-                        LOG.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=0 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=false instead.");
+                        earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=0 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=false instead.");
                         cpd.setVerbose(false);
                     }
                 } else if (key.equals(ProxoolConstants.VERBOSE_PROPERTY)) {
@@ -213,11 +215,11 @@ public class ProxoolFacade {
                     isProxoolProperty = false;
                 }
 
-                if (LOG.isDebugEnabled()) {
+                if (earlyLog.isDebugEnabled()) {
                     if (isProxoolProperty) {
-                        LOG.debug("Recognised proxool property: " + key + "=" + value);
+                        earlyLog.debug("Recognised proxool property: " + key + "=" + value);
                     } else {
-                        LOG.debug("Delgating property to Driver: " + key + "=" + value);
+                        earlyLog.debug("Delgating property to Driver: " + key + "=" + value);
                     }
                 }
 
@@ -413,6 +415,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.9  2002/10/28 19:43:30  billhorsman
+ configuring of pool now gets logged to that pool's logger (rather than general log)
+
  Revision 1.8  2002/10/27 13:29:38  billhorsman
  deprecated debug-level in favour of verbose
 
