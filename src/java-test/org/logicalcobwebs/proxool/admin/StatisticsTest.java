@@ -11,13 +11,11 @@ import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.GlobalTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.ResultMonitor;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.ResultMonitor;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.DecimalFormat;
 import java.util.Properties;
@@ -25,7 +23,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.13 $, $Date: 2003/03/02 01:16:37 $
+ * @version $Revision: 1.14 $, $Date: 2003/03/03 09:10:41 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -94,15 +92,6 @@ public class StatisticsTest extends TestCase {
             assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
             StatisticsIF statistics2 = srm.getStatistics();
 
-            LOG.error("statistics1: " + statistics1.getStartDate() + " to " + statistics1.getStopDate() + ", served " + statistics1.getServedCount());
-            LOG.error("statistics2: " + statistics2.getStartDate() + " to " + statistics2.getStopDate() + ", served " + statistics2.getServedCount());
-
-            if (statistics2.getServedCount() == 0) {
-                LOG.error("Waiting for another set of statistics");
-                statistics2 = srm.getStatistics();
-                LOG.error("statistics3: " + statistics2.getStartDate() + " to " + statistics2.getStopDate() + ", served " + statistics2.getServedCount());
-            }
-
             assertEquals("servedCount", 1L, statistics2.getServedCount());
             assertEquals("servedPerSecond", 0.09, 0.11, statistics2.getServedPerSecond());
             assertEquals("refusedCount", 0L, statistics2.getRefusedCount());
@@ -159,6 +148,9 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.14  2003/03/03 09:10:41  billhorsman
+ removed debug
+
  Revision 1.13  2003/03/02 01:16:37  billhorsman
  removed flakey average active time test
 
