@@ -5,9 +5,9 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
 
 import java.util.Iterator;
 
@@ -18,7 +18,7 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.2 $, $Date: 2003/03/03 11:11:59 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/10 15:26:51 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -52,6 +52,10 @@ public class CompositeStatisticsListener extends AbstractListenerContainer imple
 /*
  Revision history:
  $Log: CompositeStatisticsListener.java,v $
+ Revision 1.3  2003/03/10 15:26:51  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.2  2003/03/03 11:11:59  billhorsman
  fixed licence
 

@@ -11,7 +11,7 @@ import org.logicalcobwebs.logging.LogFactory;
 /**
  * Responsible for running {@link Prototyper#sweep sweep}. There
  * could be just one of the objects, or more.
- * @version $Revision: 1.1 $, $Date: 2003/03/05 18:42:33 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/10 15:26:48 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -33,11 +33,19 @@ public class PrototyperThread extends Thread {
             int sweptCount = 0;
             while (PrototyperController.isKeepSweeping()) {
                 PrototyperController.sweepStarted();
-                Prototyper[] prototyperArray = PrototyperController.getPrototypers();
-                for (int i = 0; i < prototyperArray.length; i++) {
-                    if (prototyperArray[i].isSweepNeeded()) {
-                        prototyperArray[i].sweep();
-                        sweptCount++;
+                ConnectionPool[] cps = ConnectionPoolManager.getInstance().getConnectionPools();
+                for (int i = 0; i < cps.length; i++) {
+                    Prototyper p = cps[i].getPrototyper();
+                    try {
+                        cps[i].acquirePrimaryReadLock();
+                        if (cps[i].isConnectionPoolUp() && p.isSweepNeeded()) {
+                            p.sweep();
+                            sweptCount++;
+                        }
+                    } catch (InterruptedException e) {
+                        LOG.error("Couldn't acquire primary read lock", e);
+                    } finally {
+                        cps[i].releasePrimaryReadLock();
                     }
                 }
             }
@@ -67,6 +75,10 @@ public class PrototyperThread extends Thread {
 /*
  Revision history:
  $Log: PrototyperThread.java,v $
+ Revision 1.2  2003/03/10 15:26:48  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.1  2003/03/05 18:42:33  billhorsman
  big refactor of prototyping and house keeping to
  drastically reduce the number of threads when using

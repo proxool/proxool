@@ -5,12 +5,12 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
 
-import java.util.Properties;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * A {@link ConfigurationListenerIF} that keeps a list of <code>ConfigurationListenerIF</code>s
@@ -19,7 +19,7 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.4 $, $Date: 2003/03/03 11:11:56 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/10 15:26:43 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -54,6 +54,10 @@ public class CompositeConfigurationListener extends AbstractListenerContainer im
 /*
  Revision history:
  $Log: CompositeConfigurationListener.java,v $
+ Revision 1.5  2003/03/10 15:26:43  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.4  2003/03/03 11:11:56  billhorsman
  fixed licence
 

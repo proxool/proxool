@@ -9,17 +9,13 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.resources.ResourceNamesIF;
 
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.DriverPropertyInfo;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.19 $, $Date: 2003/03/03 11:11:58 $
+ * @version $Revision: 1.20 $, $Date: 2003/03/10 15:26:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -216,6 +212,10 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.20  2003/03/10 15:26:48  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.19  2003/03/03 11:11:58  billhorsman
  fixed licence
 

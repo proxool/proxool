@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.1 $, $Date: 2003/03/05 18:42:33 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/10 15:26:47 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -65,41 +65,47 @@ public class Prototyper {
     protected boolean sweep() {
 
         boolean somethingDone = false;
-        while (!cancel) {
+        try {
 
-            if (log.isDebugEnabled()) {
-                log.debug("Prototyping");
-            }
+            while (!cancel && connectionPool.isConnectionPoolUp()) {
 
-            String reason = null;
-            if (connectionCount >= getDefinition().getMaximumConnectionCount()) {
-                // We don't want to make any more that the maximum
-                break;
-            } else if (connectionCount < getDefinition().getMinimumConnectionCount()) {
-                reason = "to achieve minimum of " + getDefinition().getMinimumConnectionCount();
-            } else if (connectionPool.getAvailableConnectionCount() < getDefinition().getPrototypeCount()) {
-                reason = "to keep " + getDefinition().getPrototypeCount() + " available";
-            } else {
-                // Nothing to do
-                break;
-            }
-
-            try {
                 if (log.isDebugEnabled()) {
-                    log.debug("buildConnection");
+                    log.debug("Prototyping");
                 }
-                buildConnection(ProxyConnection.STATUS_AVAILABLE, reason);
-                somethingDone = true;
-            } catch (Exception e) {
-                log.error("Prototype", e);
-                // If there's been an exception, perhaps we should stop
-                // prototyping for a while.  Otherwise if the database
-                // has problems we end up trying the connection every 2ms
-                // or so and then the log grows pretty fast.
-                break;
-                // Don't wory, we'll start again the next time the
-                // housekeeping thread runs.
+
+                String reason = null;
+                if (connectionCount >= getDefinition().getMaximumConnectionCount()) {
+                    // We don't want to make any more that the maximum
+                    break;
+                } else if (connectionCount < getDefinition().getMinimumConnectionCount()) {
+                    reason = "to achieve minimum of " + getDefinition().getMinimumConnectionCount();
+                } else if (connectionPool.getAvailableConnectionCount() < getDefinition().getPrototypeCount()) {
+                    reason = "to keep " + getDefinition().getPrototypeCount() + " available";
+                } else {
+                    // Nothing to do
+                    break;
+                }
+
+                try {
+                    // If it has been shutdown then we should just stop now.
+                    if (!connectionPool.isConnectionPoolUp()) {
+                        break;
+                    }
+                    buildConnection(ProxyConnection.STATUS_AVAILABLE, reason);
+                    somethingDone = true;
+                } catch (Exception e) {
+                    log.error("Prototype", e);
+                    // If there's been an exception, perhaps we should stop
+                    // prototyping for a while.  Otherwise if the database
+                    // has problems we end up trying the connection every 2ms
+                    // or so and then the log grows pretty fast.
+                    break;
+                    // Don't wory, we'll start again the next time the
+                    // housekeeping thread runs.
+                }
             }
+        } catch (Throwable t) {
+            log.error("Unexpected error", t);
         }
 
         return somethingDone;
@@ -146,11 +152,11 @@ public class Prototyper {
             }
             switch (state) {
                 case ProxyConnection.STATUS_ACTIVE:
-                    proxyConnection.fromOfflineToActive();
+                    proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_ACTIVE);
                     break;
 
                 case ProxyConnection.STATUS_AVAILABLE:
-                    proxyConnection.fromOfflineToAvailable();
+                    proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_AVAILABLE);
                     break;
 
                 default:
@@ -231,10 +237,10 @@ public class Prototyper {
      */
     protected void checkSimultaneousBuildThrottle() throws SQLException {
         // Check we aren't making too many simultaneously
-        if (connectionsBeingMade > getDefinition().getMaximumNewConnections()) {
+        if (connectionsBeingMade > getDefinition().getSimultaneousBuildThrottle()) {
             throw new SQLException("We are already in the process of making " + connectionsBeingMade
                     + " connections and the number of simultaneous builds has been throttled to "
-                    + getDefinition().getMaximumNewConnections());
+                    + getDefinition().getSimultaneousBuildThrottle());
         }
     }
 
@@ -276,6 +282,10 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.2  2003/03/10 15:26:47  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.1  2003/03/05 18:42:33  billhorsman
  big refactor of prototyping and house keeping to
  drastically reduce the number of threads when using

@@ -15,7 +15,7 @@ import java.sql.Statement;
 /**
  * Responisble for house keeping one pool
  *
- * @version $Revision: 1.1 $, $Date: 2003/03/05 18:42:33 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/10 15:26:46 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -38,6 +38,8 @@ class HouseKeeper {
        Statement testStatement = null;
        try {
 
+           connectionPool.acquirePrimaryReadLock();
+
            // Right, now we know we're the right thread then we can carry on house keeping
            Connection connection = null;
            ProxyConnectionIF proxyConnection = null;
@@ -52,16 +54,20 @@ class HouseKeeper {
                proxyConnection = proxyConnections[i];
                connection = proxyConnection.getConnection();
 
+               if (!connectionPool.isConnectionPoolUp()) {
+                   break;
+               }
+
                // First lets check whether the connection still works. We should only validate
                // connections that are not is use!  SetOffline only succeeds if the connection
                // is available.
-               if (proxyConnection.fromAvailableToOffline()) {
+               if (proxyConnection.setStatus(ProxyConnectionIF.STATUS_AVAILABLE, ProxyConnectionIF.STATUS_OFFLINE)) {
                    try {
                        testStatement = connection.createStatement();
 
                        // Some DBs return an object even if DB is shut down
                        if (proxyConnection.isReallyClosed()) {
-                           proxyConnection.fromOfflineToNull();
+                           proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_NULL);
                            connectionPool.removeProxyConnection(proxyConnection, "it appears to be closed", ConnectionPool.FORCE_EXPIRY, true);
                        }
 
@@ -78,10 +84,10 @@ class HouseKeeper {
                            }
                        }
 
-                       proxyConnection.fromOfflineToAvailable();
+                       proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_AVAILABLE);
                    } catch (SQLException e) {
                        // There is a problem with this connection.  Let's remove it!
-                       proxyConnection.fromOfflineToNull();
+                       proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_NULL);
                        connectionPool.removeProxyConnection(proxyConnection, "it has problems: " + e, ConnectionPool.REQUEST_EXPIRY, true);
                    } finally {
                        try {
@@ -95,8 +101,8 @@ class HouseKeeper {
                if (proxyConnection.getAge() > definition.getMaximumConnectionLifetime()) {
                    final String reason = "age is " + proxyConnection.getAge() + "ms";
                    // Check whether we can make it offline
-                   if (proxyConnection.fromAvailableToOffline()) {
-                       if (proxyConnection.fromOfflineToNull()) {
+                   if (proxyConnection.setStatus(ProxyConnectionIF.STATUS_AVAILABLE, ProxyConnectionIF.STATUS_OFFLINE)) {
+                       if (proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_NULL)) {
                            // It is.  Expire it now .
                            connectionPool.expireProxyConnection(proxyConnection, reason, ConnectionPool.REQUEST_EXPIRY);
                        }
@@ -147,13 +153,12 @@ class HouseKeeper {
 
            }
 
-           PrototyperController.triggerSweep(definition.getAlias());
-
            calculateUpState(recentlyStartedActiveConnectionCountTemp);
-       } catch (RuntimeException e) {
+       } catch (Throwable e) {
            // We don't want the housekeeping thread to fall over!
            log.error("Housekeeping log.error( :", e);
        } finally {
+           connectionPool.releasePrimaryReadLock();
            timeLastSwept = System.currentTimeMillis();
            if (definition.isVerbose()) {
                if (log.isDebugEnabled()) {
@@ -161,6 +166,8 @@ class HouseKeeper {
                }
            }
        }
+
+       PrototyperController.triggerSweep(definition.getAlias());
 
    }
 
@@ -179,7 +186,12 @@ class HouseKeeper {
      * property.
      */
     protected boolean isSweepDue() {
-        return (getTimeSinceLastSweep() > connectionPool.getDefinition().getHouseKeepingSleepTime());
+        if (connectionPool.isConnectionPoolUp()) {
+            return (getTimeSinceLastSweep() > connectionPool.getDefinition().getHouseKeepingSleepTime());
+        } else {
+            LOG.warn("House keeper is still being asked to sweep despite the connection pool being down");
+            return false;
+        }
     }
 
     private void calculateUpState(int recentlyStartedActiveConnectionCount) {
@@ -241,6 +253,10 @@ class HouseKeeper {
 /*
  Revision history:
  $Log: HouseKeeper.java,v $
+ Revision 1.2  2003/03/10 15:26:46  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.1  2003/03/05 18:42:33  billhorsman
  big refactor of prototyping and house keeping to
  drastically reduce the number of threads when using

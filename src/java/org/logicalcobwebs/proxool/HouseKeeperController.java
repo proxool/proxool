@@ -9,13 +9,13 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.FastArrayList;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Schedules when to run the house keeper
- * @version $Revision: 1.1 $, $Date: 2003/03/05 18:42:33 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/10 15:26:46 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -105,6 +105,10 @@ public class HouseKeeperController {
 /*
  Revision history:
  $Log: HouseKeeperController.java,v $
+ Revision 1.2  2003/03/10 15:26:46  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.1  2003/03/05 18:42:33  billhorsman
  big refactor of prototyping and house keeping to
  drastically reduce the number of threads when using

@@ -10,11 +10,7 @@ import org.logicalcobwebs.logging.Log;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Responsible for resetting a Connection to its default state when it is
@@ -22,7 +18,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.12 $, $Date: 2003/03/03 11:11:57 $
+ * @version $Revision: 1.13 $, $Date: 2003/03/10 15:26:46 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -305,6 +301,10 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.13  2003/03/10 15:26:46  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.12  2003/03/03 11:11:57  billhorsman
  fixed licence
 

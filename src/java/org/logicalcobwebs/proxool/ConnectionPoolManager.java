@@ -8,15 +8,11 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
- * @version $Revision: 1.12 $, $Date: 2003/03/03 11:11:57 $
+ * @version $Revision: 1.13 $, $Date: 2003/03/10 15:26:45 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -114,6 +110,10 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.13  2003/03/10 15:26:45  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.12  2003/03/03 11:11:57  billhorsman
  fixed licence
 

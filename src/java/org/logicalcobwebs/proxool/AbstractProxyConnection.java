@@ -9,26 +9,32 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.DatabaseMetaData;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.Date;
+
+import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 
 /**
  * Contains most of the functionality that we require to manipilate the
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.14 $, $Date: 2003/03/05 18:42:32 $
+ * @version $Revision: 1.15 $, $Date: 2003/03/10 15:26:42 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 abstract class AbstractProxyConnection implements ProxyConnectionIF {
+
+    static final int STATUS_FORCE = -1;
+
+    WriterPreferenceReadWriteLock statusReadWriteLock = new WriterPreferenceReadWriteLock();
 
     private static final Log LOG = LogFactory.getLog(AbstractProxyConnection.class);
 
@@ -69,6 +75,8 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
         setId(id);
         this.connectionPool = connectionPool;
         setBirthTime(System.currentTimeMillis());
+
+        // initialise the connection as offline for now
         setStatus(STATUS_OFFLINE);
 
         // We only need to call this for the first connection we make. But it returns really
@@ -222,11 +230,40 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
         return status;
     }
 
-    private void setStatus(int status) {
-        if (this.status != status) {
-            connectionPool.changeStatus(this.status, status);
+    /**
+     * @see ProxyConnectionIF#setStatus(int)
+     */
+    public boolean setStatus(int newStatus) {
+        return setStatus(STATUS_FORCE, newStatus);
+    }
+
+    /**
+     * @see ProxyConnectionIF#setStatus(int, int)
+     */
+    public boolean setStatus(int oldStatus, int newStatus) {
+        boolean success = false;
+        try {
+            statusReadWriteLock.writeLock().acquire();
+            if (this.status == oldStatus || oldStatus == STATUS_FORCE) {
+                connectionPool.changeStatus(this.status, newStatus);
+                this.status = newStatus;
+                success = true;
+
+                if (newStatus == oldStatus) {
+                    LOG.warn("Unexpected attempt to change status from " + oldStatus + " to " + newStatus
+                            + ". Why would you want to do that?");
+                } else if (newStatus == STATUS_ACTIVE) {
+                    setTimeLastStartActive(System.currentTimeMillis());
+                } else if (oldStatus == STATUS_ACTIVE) {
+                    setTimeLastStopActive(System.currentTimeMillis());
+                }
+            }
+        } catch (InterruptedException e) {
+            LOG.error("Unable to acquire write lock for status");
+        } finally {
+            statusReadWriteLock.writeLock().release();
         }
-        this.status = status;
+        return success;
     }
 
     public long getId() {
@@ -306,118 +343,6 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
      */
     public void setRequester(String requester) {
         this.requester = requester;
-    }
-
-    /**
-     * @see ProxyConnectionIF#fromActiveToAvailable
-     */
-    public boolean fromActiveToAvailable() {
-        boolean success = false;
-        synchronized (this) {
-            if (isActive()) {
-                setStatus(STATUS_AVAILABLE);
-                setTimeLastStopActive(System.currentTimeMillis());
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    /**
-     * @see ProxyConnectionIF#fromAnythingToNull
-     */
-     public boolean fromAnythingToNull() {
-        synchronized (this) {
-            setStatus(STATUS_NULL);
-        }
-        return true;
-    }
-
-    /**
-     * @see ProxyConnectionIF#fromActiveToNull
-     */
-     public boolean fromActiveToNull() {
-        boolean success = false;
-        synchronized (this) {
-            if (isActive()) {
-                setStatus(STATUS_NULL);
-                setTimeLastStopActive(System.currentTimeMillis());
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    /**
-     * @see ProxyConnectionIF#fromAvailableToActive
-     */
-    public boolean fromAvailableToActive() {
-        boolean success = false;
-        synchronized (this) {
-            if (isAvailable()) {
-                setStatus(STATUS_ACTIVE);
-                setTimeLastStartActive(System.currentTimeMillis());
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    /**
-     * @see ProxyConnectionIF#fromOfflineToAvailable
-     */
-    public boolean fromOfflineToAvailable() {
-        boolean success = false;
-        synchronized (this) {
-            if (isOffline()) {
-                setStatus(STATUS_AVAILABLE);
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    /**
-     * @see ProxyConnectionIF#fromOfflineToNull
-     */
-    public boolean fromOfflineToNull() {
-        boolean success = false;
-        synchronized (this) {
-            if (isOffline()) {
-                setStatus(STATUS_NULL);
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    /**
-     * @see ProxyConnectionIF#fromOfflineToActive
-     */
-    public boolean fromOfflineToActive() {
-        boolean success = false;
-        synchronized (this) {
-            if (isOffline()) {
-                setStatus(STATUS_ACTIVE);
-                setTimeLastStartActive(System.currentTimeMillis());
-                success = true;
-            }
-        }
-        return success;
-    }
-
-    /**
-     * @see ProxyConnectionIF#fromAvailableToOffline
-     */
-    public boolean fromAvailableToOffline() {
-        boolean success = false;
-        synchronized (this) {
-            if (isAvailable()) {
-                setStatus(STATUS_OFFLINE);
-                success = true;
-            }
-        }
-        return success;
     }
 
     /**
@@ -514,6 +439,10 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.15  2003/03/10 15:26:42  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.14  2003/03/05 18:42:32  billhorsman
  big refactor of prototyping and house keeping to
  drastically reduce the number of threads when using

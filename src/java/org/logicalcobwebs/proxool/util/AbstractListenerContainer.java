@@ -8,9 +8,9 @@ package org.logicalcobwebs.proxool.util;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Implementation of {@link ListenerContainerIF} that uses a reads/write lock to handle concurrency in a safe and
@@ -38,7 +38,7 @@ import java.util.Iterator;
  </pre>
  </code>
  * </p>
- * @version $Revision: 1.5 $, $Date: 2003/03/03 11:12:01 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/10 15:26:55 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -122,6 +122,10 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF {
 /*
  Revision history:
  $Log: AbstractListenerContainer.java,v $
+ Revision 1.6  2003/03/10 15:26:55  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.5  2003/03/03 11:12:01  billhorsman
  fixed licence
 

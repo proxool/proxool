@@ -5,24 +5,24 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
+import org.apache.avalon.framework.activity.Disposable;
 import org.apache.avalon.framework.component.Component;
 import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.thread.ThreadSafe;
-import org.apache.avalon.framework.activity.Disposable;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Configurator for the <a href="http://jakarta.apache.org/avalon/framework/" target="_new">Avalon Framework</a>.
@@ -43,7 +43,7 @@ import java.util.Iterator;
  * <br>Legal values are <code>true</code> or <code>false</code>. Default: <code>true</code>.
  * </p>
  *
- * @version $Revision: 1.12 $, $Date: 2003/03/03 11:12:00 $
+ * @version $Revision: 1.13 $, $Date: 2003/03/10 15:26:53 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -184,6 +184,10 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe, 
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.13  2003/03/10 15:26:53  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.12  2003/03/03 11:12:00  billhorsman
  fixed licence
 

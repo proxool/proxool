@@ -5,17 +5,17 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import java.io.File;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.io.File;
 
 /**
  * <p>Allows you to configure Proxool using a servlet. There are three
@@ -82,7 +82,7 @@ import java.io.File;
  * <p>It will also automatically shutdown Proxool. See
  * {@link #destroy}.</p>
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/03 11:12:00 $
+ * @version $Revision: 1.6 $, $Date: 2003/03/10 15:26:54 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -170,6 +170,10 @@ public class ServletConfigurator extends HttpServlet  {
 /*
  Revision history:
  $Log: ServletConfigurator.java,v $
+ Revision 1.6  2003/03/10 15:26:54  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.5  2003/03/03 11:12:00  billhorsman
  fixed licence
 

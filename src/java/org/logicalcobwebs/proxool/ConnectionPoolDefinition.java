@@ -11,16 +11,12 @@ import org.logicalcobwebs.logging.LogFactory;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.12 $, $Date: 2003/03/05 23:28:56 $
+ * @version $Revision: 1.13 $, $Date: 2003/03/10 15:26:45 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -796,6 +792,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.13  2003/03/10 15:26:45  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.12  2003/03/05 23:28:56  billhorsman
  deprecated maximum-new-connections property in favour of
  more descriptive simultaneous-build-throttle

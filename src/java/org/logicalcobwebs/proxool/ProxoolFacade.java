@@ -7,22 +7,17 @@ package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.proxool.admin.StatisticsIF;
-import org.logicalcobwebs.proxool.admin.SnapshotIF;
 import org.logicalcobwebs.proxool.admin.Admin;
+import org.logicalcobwebs.proxool.admin.SnapshotIF;
+import org.logicalcobwebs.proxool.admin.StatisticsIF;
 import org.logicalcobwebs.proxool.admin.StatisticsListenerIF;
 
+import java.lang.reflect.Method;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Comparator;
-import java.util.Date;
-import java.lang.reflect.Method;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -33,7 +28,7 @@ import java.lang.reflect.Method;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.63 $, $Date: 2003/03/03 11:11:58 $
+ * @version $Revision: 1.64 $, $Date: 2003/03/10 15:26:49 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -546,45 +541,10 @@ public class ProxoolFacade {
         SnapshotIF snapshot = null;
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
 
-        Set connectionInfos = null;
         if (detail) {
-            connectionInfos = new TreeSet(new Comparator() {
-                        public int compare(Object o1, Object o2) {
-                            try {
-                                Date birth1 = ((ConnectionInfoIF) o1).getBirthDate();
-                                Date birth2 = ((ConnectionInfoIF) o2).getBirthDate();
-                                return birth1.compareTo(birth2);
-                            } catch (ClassCastException e) {
-                                LOG.error("Unexpected contents of connectionInfos Set: " + o1.getClass() + " and " + o2.getClass(), e);
-                                return String.valueOf(o1.hashCode()).compareTo(String.valueOf(o2.hashCode()));
-                            }
-                        }
-                    });
-            cp.lock();
-
-            Iterator i = getConnectionInfos(alias).iterator();
-            while (i.hasNext()) {
-                ConnectionInfoIF connectionInfo = (ConnectionInfoIF) i.next();
-                ConnectionInfo ci = new ConnectionInfo();
-                ci.setAge(connectionInfo.getAge());
-                ci.setBirthDate(connectionInfo.getBirthDate());
-                ci.setId(connectionInfo.getId());
-                ci.setMark(connectionInfo.getMark());
-                ci.setRequester(connectionInfo.getRequester());
-                ci.setStatus(connectionInfo.getStatus());
-                ci.setTimeLastStartActive(connectionInfo.getTimeLastStartActive());
-                ci.setTimeLastStopActive(connectionInfo.getTimeLastStopActive());
-                ci.setDelegateUrl(connectionInfo.getDelegateUrl());
-                ci.setProxyHashcode(connectionInfo.getProxyHashcode());
-                ci.setDelegateHashcode(connectionInfo.getDelegateHashcode());
-                connectionInfos.add(ci);
-            }
-        }
-
-        snapshot = Admin.getSnapshot(cp, cp.getDefinition(), connectionInfos);
-
-        if (detail) {
-            cp.unlock();
+            snapshot = Admin.getSnapshot(cp, cp.getDefinition(), getConnectionInfos(alias));
+        } else {
+            snapshot = Admin.getSnapshot(cp, cp.getDefinition(), null);
         }
 
         return snapshot;
@@ -631,6 +591,10 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.64  2003/03/10 15:26:49  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.63  2003/03/03 11:11:58  billhorsman
  fixed licence
 

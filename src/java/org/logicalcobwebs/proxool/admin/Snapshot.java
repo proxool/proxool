@@ -9,13 +9,13 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionInfoIF;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Implementation of SnapshotIF
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/03 11:11:59 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/10 15:26:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -40,7 +40,7 @@ class Snapshot implements SnapshotIF {
 
     private Date snapshotDate;
 
-    private Set connectionInfos;
+    private Collection connectionInfos;
 
     /**
      * @param snapshotDate see {@link org.logicalcobwebs.proxool.admin.SnapshotIF#getSnapshotDate}
@@ -164,7 +164,7 @@ class Snapshot implements SnapshotIF {
     /**
      * @see SnapshotIF#getConnectionInfos
      */
-    public void setConnectionInfos(Set connectionInfos) {
+    public void setConnectionInfos(Collection connectionInfos) {
         this.connectionInfos = connectionInfos;
     }
 
@@ -195,6 +195,10 @@ class Snapshot implements SnapshotIF {
 /*
  Revision history:
  $Log: Snapshot.java,v $
+ Revision 1.3  2003/03/10 15:26:51  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.2  2003/03/03 11:11:59  billhorsman
  fixed licence
 

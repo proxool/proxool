@@ -8,13 +8,11 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.sql.SQLException;
 
 /**
  * Controls the {@link Prototyper prototypers}
- * @version $Revision: 1.2 $, $Date: 2003/03/06 12:43:32 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/10 15:26:47 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -23,9 +21,11 @@ public class PrototyperController {
 
     private static final Log LOG = LogFactory.getLog(PrototyperController.class);
 
-    private static Map prototypers = new HashMap();
-
     private static PrototyperThread prototyperThread = new PrototyperThread("Prototyper");
+
+    static {
+        prototyperThread.start();
+    }
 
     private static boolean keepSweeping;
 
@@ -37,7 +37,16 @@ public class PrototyperController {
      */
     protected static void triggerSweep(String alias) {
         try {
-            getPrototyper(alias).triggerSweep();
+            // Ensure that we're not in the process of shutting down the pool
+            ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
+            try {
+                cp.acquirePrimaryReadLock();
+                cp.getPrototyper().triggerSweep();
+            } catch (InterruptedException e) {
+                LOG.error("Couldn't acquire primary read lock", e);
+            } finally {
+                cp.releasePrimaryReadLock();
+            }
         } catch (ProxoolException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Couldn't trigger prototyper triggerSweep for '" + alias + "'  - maybe it's just been shutdown");
@@ -51,7 +60,11 @@ public class PrototyperController {
             // If we aren't already started then this will start a new sweep
             prototyperThread.doNotify();
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Triggering " + prototyperThread.getName() + " sweep (threadCount=" + Thread.activeCount() + ", alive=" + alive + ")");
+                try {
+                    throw new RuntimeException("Trace");
+                } catch (RuntimeException e) {
+                    LOG.debug("Triggering " + prototyperThread.getName() + " sweep (threadCount=" + Thread.activeCount() + ", alive=" + alive + ")", e);
+                }
             }
         } catch (IllegalMonitorStateException e) {
             LOG.debug("Hmm", e);
@@ -64,16 +77,6 @@ public class PrototyperController {
         }
     }
 
-    protected synchronized static void register(ConnectionPool connectionPool) {
-        String alias = connectionPool.getDefinition().getAlias();
-        LOG.debug("Registering '" + alias + "' prototyper");
-        prototypers.put(alias, new Prototyper(connectionPool));
-
-        if (!prototyperThread.isAlive()) {
-            prototyperThread.start();
-        }
-    }
-
     /**
      * Build a new connection
      * @param alias identifies the pool
@@ -83,18 +86,14 @@ public class PrototyperController {
      * @param creator for log audit
      * @return the new connection
      * @throws SQLException if there was a problem building the connection
-     * @throws ProxoolException if the prototyper isn't {@link #register registered}
+     * @throws ProxoolException if the alias doesn't exist
      */
     protected static ProxyConnectionIF buildConnection(String alias, int state, String creator) throws SQLException, ProxoolException {
-        return getPrototyper(alias).buildConnection(state, creator);
+        return getConnectionPool(alias).getPrototyper().buildConnection(state, creator);
     }
 
-    private static Prototyper getPrototyper(String alias) throws ProxoolException {
-        Prototyper p = (Prototyper) prototypers.get(alias);
-        if (p == null) {
-            throw new ProxoolException("Tried to use an unregistered prototyper '"+ alias + "'");
-        }
-        return p;
+    private static ConnectionPool getConnectionPool(String alias) throws ProxoolException {
+        return ConnectionPoolManager.getInstance().getConnectionPool(alias);
     }
 
     /**
@@ -103,34 +102,27 @@ public class PrototyperController {
      * @throws SQLException if the throttle has been reached
      */
     protected static void checkSimultaneousBuildThrottle(String alias) throws SQLException, ProxoolException {
-        getPrototyper(alias).checkSimultaneousBuildThrottle();
+        getConnectionPool(alias).getPrototyper().checkSimultaneousBuildThrottle();
     }
 
     /**
-     * Cancel this prototyper and stop all prototyping immediately. To
-     * {@link #buildConnection use} it again you will have to
-     * {@link #register register}
+     * Cancel this prototyper and stop all prototyping immediately.
      * @param alias identifies the pool
      */
     public static void cancel(String alias)  {
         try {
-            getPrototyper(alias).cancel();
+            getConnectionPool(alias).getPrototyper().cancel();
         } catch (ProxoolException e) {
             LOG.error("Couldn't cancel prototyper", e);
         }
-        prototypers.remove(alias);
     }
 
     protected static void connectionRemoved(String alias) {
         try {
-            getPrototyper(alias).connectionRemoved();
+            getConnectionPool(alias).getPrototyper().connectionRemoved();
         } catch (ProxoolException e) {
             LOG.debug("Ignoring connection removed from cancelled prototyper");
         }
-    }
-
-    protected static synchronized Prototyper[] getPrototypers() {
-        return (Prototyper[]) prototypers.values().toArray(new Prototyper[prototypers.size()]);
     }
 
     public static boolean isKeepSweeping() {
@@ -147,6 +139,10 @@ public class PrototyperController {
 /*
  Revision history:
  $Log: PrototyperController.java,v $
+ Revision 1.3  2003/03/10 15:26:47  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.2  2003/03/06 12:43:32  billhorsman
  removed paranoid debug
 

@@ -14,7 +14,7 @@ import java.sql.Statement;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
 
- * @version $Revision: 1.3 $, $Date: 2003/03/03 11:11:58 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/10 15:26:49 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -22,68 +22,25 @@ import java.sql.Statement;
 public interface ProxyConnectionIF extends ConnectionInfoIF {
 
     /**
-     * Thread-safe way of changing the status. It will return false if the
-     * old status wasn't what was expected (and no change will be made).
-     * Hence, fromXToY only changes to Y if it is X to start with.
-     * @return true if it succeeded
+     * Changes the status and lets the ConnectionPool know so that it
+     * can keep count of how many connections are at each status.
+     * This method obtains a write lock.
+     * @param oldStatus the expected existing status. if the existing
+     * status is not this value then no change is made and false is returned.
+     * @param newStatus the status to change to
+     * @return true if status changed successfully, or false if no change made
+     * (because of unexpected existing status).
      */
-    boolean fromActiveToAvailable();
+    boolean setStatus(int oldStatus, int newStatus);
 
     /**
-     * Thread-safe way of changing the status. It will return false if the
-     * old status wasn't what was expected (and no change will be made).
-     * Hence, fromXToY only changes to Y if it is X to start with.
-     * @return true if it succeeded
+     * Forces the new status regardless of the old state
+     * @param newStatus the status to change to
+     * @return true if status changed successfully, or false if no change made (should
+     * always return true)
+     * @see #setStatus(int, int)
      */
-    boolean fromAnythingToNull();
-
-    /**
-     * Thread-safe way of changing the status. It will return false if the
-     * old status wasn't what was expected (and no change will be made).
-     * Hence, fromXToY only changes to Y if it is X to start with.
-     * @return true if it succeeded
-     */
-    boolean fromActiveToNull();
-
-    /**
-     * Thread-safe way of changing the status. It will return false if the
-     * old status wasn't what was expected (and no change will be made).
-     * Hence, fromXToY only changes to Y if it is X to start with.
-     * @return true if it succeeded
-     */
-    boolean fromAvailableToActive();
-
-    /**
-     * Thread-safe way of changing the status. It will return false if the
-     * old status wasn't what was expected (and no change will be made).
-     * Hence, fromXToY only changes to Y if it is X to start with.
-     * @return true if it succeeded
-     */
-    boolean fromOfflineToAvailable();
-
-    /**
-     * Thread-safe way of changing the status. It will return false if the
-     * old status wasn't what was expected (and no change will be made).
-     * Hence, fromXToY only changes to Y if it is X to start with.
-     * @return true if it succeeded
-     */
-    boolean fromOfflineToNull();
-
-    /**
-     * Thread-safe way of changing the status. It will return false if the
-     * old status wasn't what was expected (and no change will be made).
-     * Hence, fromXToY only changes to Y if it is X to start with.
-     * @return true if it succeeded
-     */
-    boolean fromOfflineToActive();
-
-    /**
-     * Thread-safe way of changing the status. It will return false if the
-     * old status wasn't what was expected (and no change will be made).
-     * Hence, fromXToY only changes to Y if it is X to start with.
-     * @return true if it succeeded
-     */
-    boolean fromAvailableToOffline();
+    boolean setStatus(int newStatus);
 
     /**
      * Mark this connection for expiry (destruction) as soon as it stops
@@ -172,6 +129,10 @@ public interface ProxyConnectionIF extends ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnectionIF.java,v $
+ Revision 1.4  2003/03/10 15:26:49  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.3  2003/03/03 11:11:58  billhorsman
  fixed licence
 

@@ -11,19 +11,12 @@ import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
 import org.logicalcobwebs.proxool.ProxoolException;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/03 11:11:58 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/10 15:26:50 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -125,7 +118,7 @@ public class Admin {
      * @param cpd used to help populate the snapshot
      * @return snapshot
      */
-    public static SnapshotIF getSnapshot(ConnectionPoolStatisticsIF cps, ConnectionPoolDefinitionIF cpd, Set connectionInfos) {
+    public static SnapshotIF getSnapshot(ConnectionPoolStatisticsIF cps, ConnectionPoolDefinitionIF cpd, Collection connectionInfos) {
         Snapshot snapshot = new Snapshot(new Date());
 
         snapshot.setDateStarted(cps.getDateStarted());
@@ -146,6 +139,10 @@ public class Admin {
 /*
  Revision history:
  $Log: Admin.java,v $
+ Revision 1.3  2003/03/10 15:26:50  billhorsman
+ refactoringn of concurrency stuff (and some import
+ optimisation)
+
  Revision 1.2  2003/03/03 11:11:58  billhorsman
  fixed licence
 
