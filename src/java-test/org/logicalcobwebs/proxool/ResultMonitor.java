@@ -12,7 +12,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Waits for a set of results to become true with timeout
  * functionality
  *
- * @version $Revision: 1.1 $, $Date: 2003/03/01 15:14:15 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/01 15:22:50 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -21,18 +21,39 @@ abstract public class ResultMonitor {
 
     private static final Log LOG = LogFactory.getLog(ResultMonitor.class);
 
+    /**
+     * This monitor is still waiting for the result to come true
+     */
     public static final int WAITING = 0;
 
+    /**
+     * The result has happened
+     */
     public static final int SUCCESS = 1;
 
+    /**
+     * There was a timeout waiting for the result to happen
+     * @see #setTimeout
+     */
     public static final int TIMEOUT = 3;
 
     private long timeout = 30000;
 
     private int result = WAITING;
 
+    /**
+     * Override this with your specific check
+     * @return true if the result has happened, else false
+     * @throws Exception if anything goes wrong
+     */
     abstract public boolean check() throws Exception;
 
+    /**
+     * Wait for the result to happen, or for a timeout
+     * @return {@link #SUCCESS} or {@link #TIMEOUT}
+     * @throws ProxoolException if the {@link #check} threw an exception
+     * @see #setTimeout
+     */
     public int getResult() throws ProxoolException {
 
         try {
@@ -60,6 +81,10 @@ abstract public class ResultMonitor {
         }
     }
 
+    /**
+     * Set the timeout
+     * @param timeout milliseconds
+     */
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
@@ -70,6 +95,9 @@ abstract public class ResultMonitor {
 /*
  Revision history:
  $Log: ResultMonitor.java,v $
+ Revision 1.2  2003/03/01 15:22:50  billhorsman
+ doc
+
  Revision 1.1  2003/03/01 15:14:15  billhorsman
  new ResultMonitor to help cope with test threads
 
