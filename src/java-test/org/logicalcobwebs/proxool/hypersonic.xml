@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE proxool PUBLIC
+          "-//Apache Software Foundation//DTD Tiles Configuration//EN"
+          "../../../../java/org/logicalcobwebs/proxool/proxool.dtd">
+
+<proxool>
+    <name>test</name>
+    <class>org.hsqldb.jdbcDriver</class>
+    <url>jdbc:hsqldb:test</url>
+    <maximum-connection-count>3</maximum-connection-count>
+    <delegate-properties>
+        <property name="user" value="sa"/>
+    </delegate-properties>
+</proxool>
