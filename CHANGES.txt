@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.36 $
-$Date: 2004/06/02 21:13:40 $
+$Revision: 1.37 $
+$Date: 2004/06/17 21:59:07 $
 $Author: billhorsman $
 
 0.9.0 
@@ -19,6 +19,13 @@ $Author: billhorsman $
   any of the interfaces that the driver object implements. You can only cast your exception
   into an interface - concrete classes aren't supported at this time.
 
+- You can now inject interfaces for proxied objects that expose public methods that aren't
+  declared in an interface.  So if your vendor Connection, Statement, PreparedStatement or
+  CallableStatement have any public methods that aren't declared in an interface (and therefore
+  not exposed automatically) you can just write your own interface that declares the same
+  signature. Even though the vendor object doesn't implement your interface directly, the
+  proxied object will behave as if it does.
+   
 - ProxoolFacade now has killConnection that accepts the Connection object
   itself, so you don't have to know the pool alias and connection ID.
 
