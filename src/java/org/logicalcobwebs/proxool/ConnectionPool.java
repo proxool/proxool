@@ -14,11 +14,12 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Vector;
+import java.util.List;
 
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.29 $, $Date: 2002/12/18 12:16:22 $
+ * @version $Revision: 1.30 $, $Date: 2003/01/15 00:07:43 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -34,7 +35,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             "Couldn't get connection because we are at maximum connection count and there are none available";
 
     /** This is the pool itself */
-    private Vector proxyConnections = new Vector();
+    private List proxyConnections;
 
     /** This allows us to have a unique ID for each connection */
     private long nextConnectionId = 0;
@@ -98,6 +99,14 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     private ConnectionResetter connectionResetter;
 
     protected ConnectionPool(ConnectionPoolDefinition definition) {
+
+        // Use the FastArrayList for performance and thread safe
+        // behaviour. We set its behaviour to "fast"  (meaning reads are
+        // unsynchronized, whilst writes are not).
+        FastArrayList fal = new FastArrayList();
+        fal.setFast(true);
+        proxyConnections = fal;
+
         reloadMonitor = new ReloadMonitor(definition.getName());
         log = LogFactory.getLog("org.logicalcobwebs.proxool." + definition.getName());
         connectionResetter = new ConnectionResetter(log, definition.getDriver());
@@ -161,10 +170,16 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     // By doing this in a try/catch we avoid needing to synch on the size().  We need to do be
                     // able to cope with connections being removed whilst we are going round this loop
                     try {
-                        proxyConnection = (ProxyConnection) proxyConnections.elementAt(nextAvailableConnection);
+                        proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
                     } catch (ArrayIndexOutOfBoundsException e) {
+                        // This is thrown by a Vector (which we no longer use), but is
+                        // kept here for a while.
                         nextAvailableConnection = 0;
-                        proxyConnection = (ProxyConnection) proxyConnections.elementAt(nextAvailableConnection);
+                        proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
+                    } catch (IndexOutOfBoundsException e) {
+                        // This is thrown by a true List
+                        nextAvailableConnection = 0;
+                        proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
                     }
                     // setActive() returns false if the ProxyConnection wasn't available.  You
                     // can't set it active twice (at least, not without making it available again
@@ -332,7 +347,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     /** Add a proxyConnection to the pool */
     private void addPoolableConnection(ProxyConnection proxyConnection) {
-        proxyConnections.addElement(proxyConnection);
+        proxyConnections.add(proxyConnection);
     }
 
     /**
@@ -388,7 +403,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     /** Get a ProxyConnection by index */
     private ProxyConnection getProxyConnection(int i) {
-        return (ProxyConnection) proxyConnections.elementAt(i);
+        return (ProxyConnection) proxyConnections.get(i);
     }
 
     /*
@@ -418,7 +433,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 log.error(e);
             }
 
-            proxyConnections.removeElement(proxyConnection);
+            proxyConnections.remove(proxyConnection);
 
             if (log.isDebugEnabled()) {
                 log.debug(displayStatistics() + " - #" + idFormat.format(proxyConnection.getId())
@@ -831,7 +846,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     protected void expireAllConnections(boolean merciful) {
         for (int i = proxyConnections.size() - 1; i >= 0; i--) {
-            expireConnectionAsSoonAsPossible((ProxyConnection) proxyConnections.elementAt(i), merciful);
+            expireConnectionAsSoonAsPossible((ProxyConnection) proxyConnections.get(i), merciful);
         }
     }
 
@@ -1042,10 +1057,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             // By doing this in a try/catch we avoid needing to synch on the size().  We need to do be
             // able to cope with connections being removed whilst we are going round this loop
             try {
-                proxyConnection = (ProxyConnection) proxyConnections.elementAt(nextAvailableConnection);
+                proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
             } catch (ArrayIndexOutOfBoundsException e) {
                 nextAvailableConnection = 0;
-                proxyConnection = (ProxyConnection) proxyConnections.elementAt(nextAvailableConnection);
+                proxyConnection = (ProxyConnection) proxyConnections.get(nextAvailableConnection);
             }
 
             if (proxyConnection.getId() == id) {
@@ -1101,6 +1116,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.30  2003/01/15 00:07:43  billhorsman
+ now uses FastArrayList instead of Vector for thread safe
+ improvements
+
  Revision 1.29  2002/12/18 12:16:22  billhorsman
  double checking of connection state counts
 
