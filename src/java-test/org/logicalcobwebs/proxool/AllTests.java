@@ -12,9 +12,9 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.26 $, $Date: 2004/03/18 17:10:01 $
+ * @version $Revision: 1.27 $, $Date: 2004/03/23 21:14:24 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class AllTests {
@@ -37,6 +37,7 @@ public class AllTests {
         suite.addTestSuite(HibernateTest.class);
         suite.addTestSuite(HouseKeeperTest.class);
         suite.addTestSuite(HypersonicTest.class);
+        suite.addTestSuite(KillTest.class);
         suite.addTestSuite(ManyPoolsTest.class);
         suite.addTestSuite(PropertyTest.class);
         suite.addTestSuite(PrototyperTest.class);
@@ -46,6 +47,7 @@ public class AllTests {
         suite.addTestSuite(RegistrationTest.class);
         suite.addTestSuite(StateListenerTest.class);
         suite.addTestSuite(UpdateDefinitionTest.class);
+        suite.addTestSuite(WrapperTest.class);
         // TODO Need more investigation into why this fails sometimes.
         // suite.addTestSuite(PerformanceTest.class);
 
@@ -64,6 +66,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.27  2004/03/23 21:14:24  billhorsman
+ new tests
+
  Revision 1.26  2004/03/18 17:10:01  chr32
  Renamed DataSourceTest -> ProxoolDataSourceTest. Added test for factory-configured mode.
 
