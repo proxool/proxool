@@ -9,16 +9,8 @@
         <param name="locationInfo" value="true"/>
     </appender>
 
-    <category name="org.logicalcobwebs.proxool">
-        <priority value="DEBUG"/>
-    </category>
-
-    <category name="org.logicalcobwebs.proxool.performance">
-        <priority value="INFO"/>
-    </category>
-
     <root>
-        <priority value="ERROR"/>
+        <priority value="INFO"/>
         <appender-ref ref="chainsaw"/>
     </root>
 
