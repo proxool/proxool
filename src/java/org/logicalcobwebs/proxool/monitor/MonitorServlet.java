@@ -42,7 +42,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.6 $, $Date: 2003/02/05 17:04:02 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/06 15:42:21 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -181,7 +181,7 @@ public class MonitorServlet extends HttpServlet {
     }
 
     private void drawBarChart(StringBuffer out, String[] colours, int[] lengths) throws IOException {
-        out.append("<table style=\"margin: 8px;\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr>");
+        out.append("<table style=\"margin: 8px; font-size: 50%;\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr>");
 
         // Calculate total length
         int totalLength = 0;
@@ -194,7 +194,7 @@ public class MonitorServlet extends HttpServlet {
             String colour = colours[j];
             int length = lengths[j];
             if (length > 0) {
-                out.append("<td style=\"font-size: 50%;\" bgcolor=\"#");
+                out.append("<td bgcolor=\"#");
                 out.append(colour);
                 out.append("\" width=\"");
                 out.append(100 * length / totalLength);
@@ -271,22 +271,16 @@ public class MonitorServlet extends HttpServlet {
             // connections
             StringBuffer connectionsBuffer = new StringBuffer();
             connectionsBuffer.append(snapshot.getActiveConnectionCount());
-            connectionsBuffer.append(" (<font color=\"");
-            connectionsBuffer.append(COLOR_ACTIVE);
-            connectionsBuffer.append("\">active</font>), ");
+            connectionsBuffer.append(" (active), ");
             connectionsBuffer.append(snapshot.getAvailableConnectionCount());
-            connectionsBuffer.append(" (<font color=\"");
-            connectionsBuffer.append(COLOR_AVAILABLE);
-            connectionsBuffer.append("\">available</font>), ");
+            connectionsBuffer.append(" (available), ");
             if (snapshot.getOfflineConnectionCount() > 0) {
                 connectionsBuffer.append(snapshot.getOfflineConnectionCount());
                 connectionsBuffer.append(" (offline), ");
             }
             connectionsBuffer.append(snapshot.getMaximumConnectionCount());
-            connectionsBuffer.append(" (<font color=\"");
-            connectionsBuffer.append(COLOR_SPARE);
-            connectionsBuffer.append("\">max</font>)<br/>");
-            String[] colours = {"ff0000", "00ff00", "eeeeee"};
+            connectionsBuffer.append(" (max)<br/>");
+            String[] colours = {"ff9999", "66cc66", "cccccc"};
             int[] lengths = {snapshot.getActiveConnectionCount(), snapshot.getAvailableConnectionCount(),
                              snapshot.getMaximumConnectionCount() - snapshot.getActiveConnectionCount() - snapshot.getAvailableConnectionCount()};
             drawBarChart(connectionsBuffer, colours, lengths);
@@ -489,6 +483,9 @@ public class MonitorServlet extends HttpServlet {
 /*
  Revision history:
  $Log: MonitorServlet.java,v $
+ Revision 1.7  2003/02/06 15:42:21  billhorsman
+ display changes
+
  Revision 1.6  2003/02/05 17:04:02  billhorsman
  fixed date format
 
