@@ -28,7 +28,7 @@ import java.util.TreeMap;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.8 $, $Date: 2002/11/13 12:32:38 $
+ * @version $Revision: 1.9 $, $Date: 2002/11/13 18:22:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -43,8 +43,6 @@ class ProxyStatement implements InvocationHandler {
     private Set resultSets = new HashSet();
 
     private static final String EXECUTE_FRAGMENT = "execute";
-
-    private static final String NOT_IMPLEMENTED = "not implemented";
 
     private static final String EQUALS_METHOD = "equals";
 
@@ -81,6 +79,8 @@ class ProxyStatement implements InvocationHandler {
         long startTime = System.currentTimeMillis();
         final int argCount = args != null ? args.length : 0;
 
+        boolean isTrace = connectionPool.isConnectionListenedTo() || (connectionPool.getDefinition().isTrace() && connectionPool.getLog().isDebugEnabled());
+
         // We need to remember an exceptions that get thrown so that we can optionally
         // pass them to the onExecute() call below
         Exception exception = null;
@@ -92,7 +92,7 @@ class ProxyStatement implements InvocationHandler {
             }
 
             // We only dump sql calls if we are in verbose mode and debug is enabled
-            if (LOG.isDebugEnabled() && connectionPool.getDefinition().isTrace()) {
+            if (isTrace) {
                 try {
 
                     // Lazily instantiate parameters if necessary
@@ -155,7 +155,7 @@ class ProxyStatement implements InvocationHandler {
             // If we executed something then we should tell the listener.
             if (method.getName().startsWith(EXECUTE_FRAGMENT)) {
 
-                if (connectionPool.isConnectionListenedTo() || connectionPool.getDefinition().isTrace()) {
+                if (isTrace) {
 
                     if (sqlStatement == null && argCount > 0 && args[0] instanceof String) {
                         sqlStatement = (String) args[0];
@@ -202,6 +202,9 @@ class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.9  2002/11/13 18:22:04  billhorsman
+ fix for trace output
+
  Revision 1.8  2002/11/13 12:32:38  billhorsman
  now correctly logs trace messages even with verbose off
 
