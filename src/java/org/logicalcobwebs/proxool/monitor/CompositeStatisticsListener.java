@@ -18,12 +18,12 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.1 $, $Date: 2003/02/07 01:49:04 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/07 17:20:17 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class CompositeStatisticsListener extends AbstractListenerContainer implements StatisticsListenerIF{
+public class CompositeStatisticsListener extends AbstractListenerContainer implements StatisticsListenerIF {
     static final Log LOG = LogFactory.getLog(CompositeStatisticsListener.class);
 
     /**
@@ -42,7 +42,7 @@ public class CompositeStatisticsListener extends AbstractListenerContainer imple
             }
         } catch (InterruptedException e) {
             LOG.error("Tried to aquire read lock for " + StatisticsListenerIF.class.getName()
-                + " iterator but was interrupted.");
+                    + " iterator but was interrupted.");
         } finally {
             releaseReadLock();
         }
@@ -52,6 +52,9 @@ public class CompositeStatisticsListener extends AbstractListenerContainer imple
 /*
  Revision history:
  $Log: CompositeStatisticsListener.java,v $
+ Revision 1.2  2003/02/07 17:20:17  billhorsman
+ checkstyle
+
  Revision 1.1  2003/02/07 01:49:04  chr32
  Initial revition.
 

@@ -19,19 +19,19 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.1 $, $Date: 2003/02/07 01:47:17 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/07 17:20:17 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class CompositeConfigurationListener extends AbstractListenerContainer implements ConfigurationListenerIF{
+public class CompositeConfigurationListener extends AbstractListenerContainer implements ConfigurationListenerIF {
     static final Log LOG = LogFactory.getLog(CompositeConfigurationListener.class);
 
     /**
      * @see ConfigurationListenerIF#defintionUpdated(ConnectionPoolDefinitionIF, Properties, Properties)
      */
     public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition,
-        Properties completeInfo, Properties changedInfo) {
+                                 Properties completeInfo, Properties changedInfo) {
         Iterator listenerIterator = null;
         try {
             listenerIterator = getListenerIterator();
@@ -44,7 +44,7 @@ public class CompositeConfigurationListener extends AbstractListenerContainer im
             }
         } catch (InterruptedException e) {
             LOG.error("Tried to aquire read lock for " + ConfigurationListenerIF.class.getName()
-                + " iterator but was interrupted.");
+                    + " iterator but was interrupted.");
         } finally {
             releaseReadLock();
         }
@@ -54,6 +54,9 @@ public class CompositeConfigurationListener extends AbstractListenerContainer im
 /*
  Revision history:
  $Log: CompositeConfigurationListener.java,v $
+ Revision 1.2  2003/02/07 17:20:17  billhorsman
+ checkstyle
+
  Revision 1.1  2003/02/07 01:47:17  chr32
  Initial revition.
 

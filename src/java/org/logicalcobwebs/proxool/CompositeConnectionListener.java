@@ -16,16 +16,16 @@ import java.sql.SQLException;
 /**
  * A {@link ConnectionListenerIF} that keeps a list of <code>ConnectionListenerIF</code>s
  * and notifies them in a thread safe manner.
- * It also implements {@link org.logicalcobwebs.proxool.util.ListenerContainerIF ListenerContainerIF} 
+ * It also implements {@link org.logicalcobwebs.proxool.util.ListenerContainerIF ListenerContainerIF}
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.1 $, $Date: 2003/02/07 01:47:17 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/07 17:20:16 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class CompositeConnectionListener extends AbstractListenerContainer implements ConnectionListenerIF{
+public class CompositeConnectionListener extends AbstractListenerContainer implements ConnectionListenerIF {
     static final Log LOG = LogFactory.getLog(CompositeConnectionListener.class);
 
     /**
@@ -44,7 +44,7 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
             }
         } catch (InterruptedException e) {
             LOG.error("Tried to aquire read lock for " + ConnectionListenerIF.class.getName()
-                + " iterator but was interrupted.");
+                    + " iterator but was interrupted.");
         } finally {
             releaseReadLock();
         }
@@ -66,7 +66,7 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
             }
         } catch (InterruptedException e) {
             LOG.error("Tried to aquire read lock for " + ConnectionListenerIF.class.getName()
-                + " iterator but was interrupted.");
+                    + " iterator but was interrupted.");
         } finally {
             releaseReadLock();
         }
@@ -88,7 +88,7 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
             }
         } catch (InterruptedException e) {
             LOG.error("Tried to aquire read lock for " + ConnectionListenerIF.class.getName()
-                + " iterator but was interrupted.");
+                    + " iterator but was interrupted.");
         } finally {
             releaseReadLock();
         }
@@ -110,7 +110,7 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
             }
         } catch (InterruptedException e) {
             LOG.error("Tried to aquire read lock for " + ConnectionListenerIF.class.getName()
-                + " iterator but was interrupted.");
+                    + " iterator but was interrupted.");
         } finally {
             releaseReadLock();
         }
@@ -120,6 +120,9 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
 /*
  Revision history:
  $Log: CompositeConnectionListener.java,v $
+ Revision 1.2  2003/02/07 17:20:16  billhorsman
+ checkstyle
+
  Revision 1.1  2003/02/07 01:47:17  chr32
  Initial revition.
 

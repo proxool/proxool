@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool.util;
 
-import org.logicalcobwebs.proxool.util.ReadWriteLock;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -24,26 +23,26 @@ import java.util.Iterator;
  * <code>
  * <pre>
  *      Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                // ... Iterate through the listeners and notify them
-            }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + MyClass.class.getName()
-                + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
-        }
+ try {
+ listenerIterator = getListenerIterator();
+ if (listenerIterator != null) {
+ // ... Iterate through the listeners and notify them
+ }
+ } catch (InterruptedException e) {
+ LOG.error("Tried to aquire read lock for " + MyClass.class.getName()
+ + " iterator but was interrupted.");
+ } finally {
+ releaseReadLock();
+ }
  </pre>
-  </code>
+ </code>
  * </p>
- * @version $Revision: 1.2 $, $Date: 2003/02/07 15:06:43 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/07 17:20:18 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public abstract class AbstractListenerContainer implements ListenerContainerIF{
+public abstract class AbstractListenerContainer implements ListenerContainerIF {
     static final Log LOG = LogFactory.getLog(AbstractListenerContainer.class);
     private List listeners;
     private ReadWriteLock readWriteLock = new ReadWriteLock();
@@ -107,21 +106,24 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF{
     /**
      * Release the read lock aquired by the {@link #getListenerIterator()} method.
      */
-    protected void releaseReadLock(){
+    protected void releaseReadLock() {
         this.readWriteLock.release();
     }
 
     /**
-     * @see ListenerContainerIF#isEmpty() 
+     * @see ListenerContainerIF#isEmpty()
      */
     public boolean isEmpty() {
-        return  this.listeners == null || this.listeners.size() < 1;
+        return this.listeners == null || this.listeners.size() < 1;
     }
 }
 
 /*
  Revision history:
  $Log: AbstractListenerContainer.java,v $
+ Revision 1.3  2003/02/07 17:20:18  billhorsman
+ checkstyle
+
  Revision 1.2  2003/02/07 15:06:43  billhorsman
  fixed isEmpty bug
 
