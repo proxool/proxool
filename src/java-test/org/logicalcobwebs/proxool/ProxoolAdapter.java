@@ -7,6 +7,8 @@
 package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.dbscript.ConnectionAdapterIF;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Properties;
 import java.sql.SQLException;
@@ -16,16 +18,20 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.8 $, $Date: 2002/11/13 20:23:38 $
+ * @version $Revision: 1.9 $, $Date: 2002/12/04 13:20:10 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
-public class ProxoolAdapter implements ConnectionAdapterIF {
+public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
+
+    private static final Log LOG = LogFactory.getLog(ProxoolAdapter.class);
 
     private String alias = String.valueOf(hashCode());
 
     private String fullUrl;
+
+    private ConnectionPoolDefinitionIF connectionPoolDefinition;
 
     /**
      * Use this constructor if you want to define the alias
@@ -39,6 +45,19 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
      * Default constructor. Will use the hashCode as the alias for the pool
      */
     public ProxoolAdapter() {
+    }
+
+    public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition) {
+        setConnectionPoolDefinition(connectionPoolDefinition);
+    }
+
+    public ConnectionPoolDefinitionIF getConnectionPoolDefinition() {
+        return connectionPoolDefinition;
+    }
+
+    public void setConnectionPoolDefinition(ConnectionPoolDefinitionIF connectionPoolDefinition) {
+        this.connectionPoolDefinition = connectionPoolDefinition;
+        LOG.debug("Setting cpd to " + this.connectionPoolDefinition);
     }
 
     public String getName() {
@@ -58,7 +77,7 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
         }
 
         fullUrl = TestHelper.buildProxoolUrl(alias, driver, url);
-        ProxoolFacade.registerConnectionPool(fullUrl, info);
+        ProxoolFacade.registerConnectionPool(fullUrl, info, this);
     }
 
     public Connection getConnection()
@@ -86,6 +105,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.9  2002/12/04 13:20:10  billhorsman
+ ConfiguratorIF test
+
  Revision 1.8  2002/11/13 20:23:38  billhorsman
  change method name, throw exceptions differently, trivial changes
 

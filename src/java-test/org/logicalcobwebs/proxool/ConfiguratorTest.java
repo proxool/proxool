@@ -9,16 +9,22 @@ package org.logicalcobwebs.proxool;
 import junit.framework.TestCase;
 
 import java.sql.SQLException;
+import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Tests that the various ways of configuring proxool work.
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/09 16:00:45 $
+ * @version $Revision: 1.4 $, $Date: 2002/12/04 13:20:11 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class ConfiguratorTest extends TestCase {
+
+    private static final Log LOG = LogFactory.getLog(ConfiguratorTest.class);
 
     private static final String TEST_TABLE = "test";
 
@@ -31,12 +37,43 @@ public class ConfiguratorTest extends TestCase {
 
     protected void setUp() throws Exception {
         AllTests.globalSetup();
-        TestHelper.createTable(TEST_TABLE);
+        try {
+            TestHelper.createTable(TEST_TABLE);
+        } catch (Exception e) {
+            LOG.debug("Problem creating table", e);
+        }
     }
 
     protected void tearDown() throws Exception {
         TestHelper.dropTable(TEST_TABLE);
         AllTests.globalTeardown();
+    }
+
+
+    public void testConfigurator() {
+
+        String testName = "template";
+        ProxoolAdapter adapter = null;
+        try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            Properties newInfo = new Properties();
+            newInfo.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "3");
+            adapter.update(newInfo);
+
+            assertNotNull("adapter.getConnectionPoolDefinition() is null", adapter.getConnectionPoolDefinition());
+            assertEquals("prototypeCount", 3, adapter.getConnectionPoolDefinition().getPrototypeCount());
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
+        }
+
     }
 
     /**
@@ -71,6 +108,9 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.4  2002/12/04 13:20:11  billhorsman
+ ConfiguratorIF test
+
  Revision 1.3  2002/11/09 16:00:45  billhorsman
  fix doc
 
