@@ -82,7 +82,7 @@ import java.io.File;
  * <p>It will also automatically shutdown Proxool. See
  * {@link #destroy}.</p>
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:05 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/07 17:26:25 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -161,7 +161,7 @@ public class ServletConfigurator extends HttpServlet  {
      */
     public void destroy() {
         if (autoShutdown) {
-            ProxoolFacade.removeAllConnectionPools(0);
+            ProxoolFacade.shutdown(0);
         }
     }
 }
@@ -170,6 +170,9 @@ public class ServletConfigurator extends HttpServlet  {
 /*
  Revision history:
  $Log: ServletConfigurator.java,v $
+ Revision 1.4  2003/02/07 17:26:25  billhorsman
+ use shutdown() instead of removeAllConnectionPools()
+
  Revision 1.3  2003/02/06 17:41:05  billhorsman
  now uses imported logging
 
