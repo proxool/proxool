@@ -24,7 +24,7 @@ import java.util.Iterator;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.54 $, $Date: 2003/02/28 10:10:25 $
+ * @version $Revision: 1.55 $, $Date: 2003/02/28 18:08:55 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -178,6 +178,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             }
             log.info(displayStatistics() + " - " + MSG_MAX_CONNECTION_COUNT);
             timeMillisOfLastRefusal = System.currentTimeMillis();
+            setUpState(StateListenerIF.STATE_OVERLOADED);
             throwSQLException(MSG_MAX_CONNECTION_COUNT);
         }
 
@@ -245,6 +246,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     admin.connectionRefused();
                 }
                 timeMillisOfLastRefusal = System.currentTimeMillis();
+                setUpState(StateListenerIF.STATE_OVERLOADED);
             }
         }
 
@@ -1195,6 +1197,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.55  2003/02/28 18:08:55  billhorsman
+ OVERLOAD state is now triggered immediately rather
+ than waiting for house keeper
+
  Revision 1.54  2003/02/28 10:10:25  billhorsman
  on death now gets called for connections killed during shutdown
 
