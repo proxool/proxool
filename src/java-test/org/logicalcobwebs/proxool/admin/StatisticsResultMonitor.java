@@ -14,7 +14,7 @@ import org.logicalcobwebs.proxool.ResultMonitor;
 /**
  * A ResultMonitor specifically for Snapshots
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/06 22:28:32 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/06 22:39:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -51,10 +51,10 @@ public class StatisticsResultMonitor extends ResultMonitor {
         if (statistics == null) {
             return false;
         } else if (oldStatistics == null) {
-            return true;
+            return check(statistics);
         } else {
             if (!statistics.getStartDate().equals(oldStatistics.getStartDate())) {
-                return true;
+                return check(statistics);
             } else {
                 return false;
             }
@@ -91,6 +91,9 @@ public class StatisticsResultMonitor extends ResultMonitor {
 /*
  Revision history:
  $Log: StatisticsResultMonitor.java,v $
+ Revision 1.9  2003/03/06 22:39:05  billhorsman
+ fix
+
  Revision 1.8  2003/03/06 22:28:32  billhorsman
  another go at statistics threading (in tests)
 
