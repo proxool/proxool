@@ -8,13 +8,19 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.5 $, $Date: 2002/12/11 01:47:12 $
+ * @version $Revision: 1.6 $, $Date: 2002/12/15 19:22:51 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
-interface ProxoolConstants {
+public interface ProxoolConstants {
 
     public final String PROXOOL = "proxool";
+
+    /**
+     * The namespace uri associated with namepace aware Proxool xml configurations.<br>
+     * Value: http://proxool.sourceforge.net/xml-namespace
+     */
+    public final String PROXOOL_XML_NAMESPACE_URI = "http://proxool.sourceforge.net/xml-namespace";
 
     public final String ALIAS_DELIMITER = ".";
 
@@ -101,7 +107,7 @@ interface ProxoolConstants {
     public final String MAXIMUM_ACTIVE_TIME_PROPERTY = PROPERTY_PREFIX + MAXIMUM_ACTIVE_TIME;
 
     /**
-     * Deprecated - use {@linkplain #VERBOSE_PROPERTY verbose} instead.
+     * Deprecated - use {@link #VERBOSE_PROPERTY verbose} instead.
      * @see ProxoolDriver#getPropertyInfo
      */
     public final String DEBUG_LEVEL_PROPERTY = PROPERTY_PREFIX + "debug-level";
@@ -129,6 +135,9 @@ interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.6  2002/12/15 19:22:51  chr32
+ Added constant for proxool xml namespace.
+
  Revision 1.5  2002/12/11 01:47:12  billhorsman
  extracted property names without proxool. prefix for use
  by XMLConfigurators.
