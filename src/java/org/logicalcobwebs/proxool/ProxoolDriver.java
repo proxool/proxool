@@ -14,7 +14,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.7 $, $Date: 2002/12/03 00:41:56 $
+ * @version $Revision: 1.8 $, $Date: 2002/12/04 13:19:43 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -60,7 +60,8 @@ public class ProxoolDriver implements Driver {
             cp = ConnectionPoolManager.getInstance().getConnectionPool(name);
         } else if (info != null) {
             // Perhaps we should be updating the definition?
-            ProxoolFacade.updateConnectionPool(url, info);
+            ConnectionPoolDefinition cpd = cp.getDefinition();
+            ProxoolFacade.updatePoolByDriver(cp, url, cpd, info);
         }
 
         connection = cp.getConnection();
@@ -182,6 +183,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.8  2002/12/04 13:19:43  billhorsman
+ draft ConfiguratorIF stuff for persistent configuration
+
  Revision 1.7  2002/12/03 00:41:56  billhorsman
  fixed getPropertyInfo() for TRACE property and better explanation of FATAL_SQL_EXCEPTION
 

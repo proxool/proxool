@@ -25,7 +25,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.15 $, $Date: 2002/11/13 19:12:24 $
+ * @version $Revision: 1.16 $, $Date: 2002/12/04 13:19:43 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -35,8 +35,17 @@ public class ProxoolFacade {
 
     private static Map infos = new HashMap();
 
-    /** Build a ConnectionPool based on this definition and then start it. */
-    public static String registerConnectionPool(String url, Properties info) throws SQLException {
+    private static Map configurators = new HashMap();
+
+    /**
+     * Build a ConnectionPool based on this definition and then start it.
+     * @param url defines the delegate driver and delegate url.
+     * @param info the properties used to configure Proxool (and any for the delegate driver too) - optional
+     * @param configurator used to configure this pool, it will be notified if any changes occur to the definition - optional
+     * @return the alias for this pool (or the full url if no alias is specified)
+     * @throws SQLException if anything goes wrong
+     */
+    public static String registerConnectionPool(String url, Properties info, ConfiguratorIF configurator) throws SQLException {
         ConnectionPool connectionPool = ConnectionPoolManager.getInstance().getConnectionPool(url);
         String name = null;
 
@@ -59,11 +68,32 @@ public class ProxoolFacade {
             connectionPool.start();
             name = cpd.getName();
 
+            // Associate this configurator with this pool
+            if (configurator != null) {
+                configurators.put(name, configurator);
+            }
+
         } else {
             throw new SQLException("Attempt to register duplicate pool");
         }
 
         return name;
+    }
+
+    /**
+     * With no configurator
+     * @see #registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfiguratorIF)
+     */
+    public static String registerConnectionPool(String url, Properties info) throws SQLException {
+        return registerConnectionPool(url, info,  null);
+    }
+
+    /**
+     * With no configurator or properties (using default values)
+     * @see #registerConnectionPool(java.lang.String, java.util.Properties, org.logicalcobwebs.proxool.ConfiguratorIF)
+     */
+    public static void registerConnectionPool(String url) throws SQLException {
+        registerConnectionPool(url, null, null);
     }
 
     /**
@@ -74,7 +104,7 @@ public class ProxoolFacade {
      *    proxool:driver:url -> proxool:driver:url
      *
      */
-    private static String getAlias(String url) throws SQLException {
+    protected static String getAlias(String url) throws SQLException {
         String name = url;
         final String prefix = ProxoolConstants.PROXOOL + ProxoolConstants.ALIAS_DELIMITER;
         try {
@@ -104,7 +134,7 @@ public class ProxoolFacade {
      * @return the name of the pool
      * @throws SQLException if there were any validation errors.
      */
-    private static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException {
+    protected static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException {
 
         Properties rememberedInfo = null;
         String rememberedKey = null;
@@ -252,11 +282,6 @@ public class ProxoolFacade {
         }
 
         return cpd.getName();
-    }
-
-    /** Build a ConnectionPool based on this definition and then start it. */
-    public static void registerConnectionPool(String url) throws SQLException {
-        registerConnectionPool(url, null);
     }
 
     /**
@@ -436,17 +461,37 @@ public class ProxoolFacade {
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(poolName);
         ConnectionPoolDefinition cpd = cp.getDefinition();
         definePool(cp, url, cpd, info);
+
+        ConfiguratorIF configurator = (ConfiguratorIF) configurators.get(cpd.getName());
+        if (configurator != null) {
+            configurator.defintionUpdated(cpd);
+        }
+
     }
 
     protected void finalize() throws Throwable {
         super.finalize();
         LOG.debug("Finalising");
     }
+
+    public static void updatePoolByDriver(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException {
+        definePool(cp, url, cpd, info);
+
+        ConfiguratorIF configurator = (ConfiguratorIF) configurators.get(cpd.getName());
+        if (configurator != null) {
+            cp.getLog().warn("The pool, which is associated with a configurator, has been updated on the fly. This is not recommended.");
+            configurator.defintionUpdated(cpd);
+        }
+
+    }
 }
 
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.16  2002/12/04 13:19:43  billhorsman
+ draft ConfiguratorIF stuff for persistent configuration
+
  Revision 1.15  2002/11/13 19:12:24  billhorsman
  fix where update properties weren't being recognised
  when the properties object was the same as the original
