@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.11 $, $Date: 2003/02/24 01:16:15 $
+ * @version $Revision: 1.12 $, $Date: 2003/02/24 18:02:24 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -153,6 +153,28 @@ public interface ProxoolConstants {
 
 
     /**
+     * Configuration attribute used to indicate that a pool should be registered with JMX.
+     */
+    public static final String JMX = "jmx";
+
+    /**
+     * "proxool." prefixed version of {@link #JMX}.
+     */
+    public final String JMX_PROPERTY = PROPERTY_PREFIX + JMX;
+
+    /**
+     * Configuration attribute for a list of jmx agent ids to register a
+     * {@link org.logicalcobwebs.proxool.admin.jmx.ConnectionPoolMBean} to.
+     * The list is comma separated.
+     */
+    public static final String JMX_AGENT_ID = "jmx-agent-id";
+
+    /**
+     * "proxool." prefixed version of {@link #JMX_AGENT_ID}.
+     */
+    public final String JMX_AGENT_PROPERTY = PROPERTY_PREFIX + JMX_AGENT_ID;
+
+    /**
      *  Un-prefixed propety name for the Proxool alias configuration property. Value: alias
      */
     public final String ALIAS = "alias";
@@ -178,6 +200,9 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.12  2003/02/24 18:02:24  chr32
+ Added JMX related constants.
+
  Revision 1.11  2003/02/24 01:16:15  chr32
  Added constant for "driver-properties" property.
 
