@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 /**
  * Controls the {@link Prototyper prototypers}
- * @version $Revision: 1.3 $, $Date: 2003/03/10 15:26:47 $
+ * @version $Revision: 1.4 $, $Date: 2003/03/10 16:28:02 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -59,13 +59,6 @@ public class PrototyperController {
             boolean alive = prototyperThread.isAlive();
             // If we aren't already started then this will start a new sweep
             prototyperThread.doNotify();
-            if (LOG.isDebugEnabled()) {
-                try {
-                    throw new RuntimeException("Trace");
-                } catch (RuntimeException e) {
-                    LOG.debug("Triggering " + prototyperThread.getName() + " sweep (threadCount=" + Thread.activeCount() + ", alive=" + alive + ")", e);
-                }
-            }
         } catch (IllegalMonitorStateException e) {
             LOG.debug("Hmm", e);
         } catch (IllegalThreadStateException e) {
@@ -139,6 +132,9 @@ public class PrototyperController {
 /*
  Revision history:
  $Log: PrototyperController.java,v $
+ Revision 1.4  2003/03/10 16:28:02  billhorsman
+ removed debug trace
+
  Revision 1.3  2003/03/10 15:26:47  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)
