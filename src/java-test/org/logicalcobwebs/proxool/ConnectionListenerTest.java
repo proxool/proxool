@@ -17,7 +17,7 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/18 16:51:20 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/18 16:58:12 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
@@ -41,7 +41,7 @@ public class ConnectionListenerTest extends TestCase {
      * and that they get the expected events.
      * @throws Exception if the test fails.
      */
-    public void testAddConnectionListener() throws Exception{
+    public void testAddConnectionListener() throws Exception {
         clear();
         Properties info = new Properties();
         info.setProperty("proxool.maximum-connection1-count", "2");
@@ -54,8 +54,8 @@ public class ConnectionListenerTest extends TestCase {
         String driverUrl = "jdbc:hsqldb:test";
         String url = "proxool." + alias + ":" + driverClass + ":" + driverUrl;
         Connection connection1 = DriverManager.getConnection(url, info);
-        ProxoolFacade.addConnectionListener(alias, new testConnectionListener());
-        ProxoolFacade.addConnectionListener(alias, new testConnectionListener());
+        ProxoolFacade.addConnectionListener(alias, new TestConnectionListener());
+        ProxoolFacade.addConnectionListener(alias, new TestConnectionListener());
         Connection connection2 = DriverManager.getConnection(url, info);
         boolean errorOccured = false;
         try {
@@ -81,7 +81,7 @@ public class ConnectionListenerTest extends TestCase {
      * and then removed, and that they do not receive events after they have been removed.
      * @throws Exception if the test fails.
      */
-    public void testRemoveConnectionListener() throws Exception{
+    public void testRemoveConnectionListener() throws Exception {
         clear();
         Properties info = new Properties();
         info.setProperty("proxool.maximum-connection1-count", "2");
@@ -94,8 +94,8 @@ public class ConnectionListenerTest extends TestCase {
         String driverUrl = "jdbc:hsqldb:test";
         String url = "proxool." + alias + ":" + driverClass + ":" + driverUrl;
         Connection connection1 = DriverManager.getConnection(url, info);
-        testConnectionListener testConnectionListener1 = new testConnectionListener();
-        testConnectionListener testConnectionListener2 = new testConnectionListener();
+        TestConnectionListener testConnectionListener1 = new TestConnectionListener();
+        TestConnectionListener testConnectionListener2 = new TestConnectionListener();
         ProxoolFacade.addConnectionListener(alias, testConnectionListener1);
         ProxoolFacade.addConnectionListener(alias, testConnectionListener2);
         assertTrue("Failed to remove testConnectionListener1", ProxoolFacade.removeConnectionListener(alias, testConnectionListener1));
@@ -145,7 +145,7 @@ public class ConnectionListenerTest extends TestCase {
         GlobalTest.globalTeardown();
     }
 
-    class testConnectionListener implements ConnectionListenerIF {
+    class TestConnectionListener implements ConnectionListenerIF {
         public void onBirth (Connection connection) throws SQLException {
             onBirthCalls++;
         }
@@ -167,6 +167,9 @@ public class ConnectionListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.2  2003/02/18 16:58:12  chr32
+ Checkstyle.
+
  Revision 1.1  2003/02/18 16:51:20  chr32
  Added tests for ConnectionListeners.
 
