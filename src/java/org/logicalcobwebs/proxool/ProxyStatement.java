@@ -18,7 +18,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.22 $, $Date: 2003/09/30 18:39:08 $
+ * @version $Revision: 1.23 $, $Date: 2003/10/18 20:44:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -27,6 +27,10 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
     private static final Log LOG = LogFactory.getLog(ProxyStatement.class);
 
     private static final String EXECUTE_FRAGMENT = "execute";
+
+    private static final String EXECUTE_BATCH_METHOD = "executeBatch";
+
+    private static final String ADD_BATCH_METHOD = "addBatch";
 
     private static final String EQUALS_METHOD = "equals";
 
@@ -92,11 +96,21 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
             throw e;
         } finally {
 
-            // If we executed something then we should tell the listener.
-            if (method.getName().startsWith(EXECUTE_FRAGMENT)) {
+            if (method.getName().equals(ADD_BATCH_METHOD)) {
+                // If we have just added a batch call then we need to update the sql log
                 if (argCount > 0 && args[0] instanceof String) {
                     setSqlStatementIfNull((String) args[0]);
                 }
+                appendToSqlLog();
+            } else if (method.getName().equals(EXECUTE_BATCH_METHOD)) {
+                // executing a batch should do a trace
+                trace(startTime, exception);
+            } else if (method.getName().startsWith(EXECUTE_FRAGMENT)) {
+                // executing should update the log and do a trace
+                if (argCount > 0 && args[0] instanceof String) {
+                    setSqlStatementIfNull((String) args[0]);
+                }
+                appendToSqlLog();
                 trace(startTime, exception);
             }
 
@@ -111,6 +125,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.23  2003/10/18 20:44:48  billhorsman
+ Better SQL logging (embed parameter values within SQL call) and works properly with batched statements now.
+
  Revision 1.22  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 

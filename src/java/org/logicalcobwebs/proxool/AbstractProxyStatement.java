@@ -19,8 +19,7 @@ import java.util.TreeMap;
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
-
- * @version $Revision: 1.12 $, $Date: 2003/09/30 18:39:07 $
+ * @version $Revision: 1.13 $, $Date: 2003/10/18 20:44:48 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -38,6 +37,8 @@ abstract class AbstractProxyStatement {
     private Map parameters;
 
     private String sqlStatement;
+
+    private StringBuffer sqlLog = new StringBuffer();
 
     /**
      * @param statement the real statement that we will delegate to
@@ -145,7 +146,7 @@ abstract class AbstractProxyStatement {
 
         Object key = new Integer(index);
         if (value == null) {
-            parameters.put(key, "*");
+            parameters.put(key, "NULL");
         } else if (value instanceof String) {
             parameters.put(key, "'" + value + "'");
         } else if (value instanceof Number) {
@@ -170,22 +171,49 @@ abstract class AbstractProxyStatement {
 
         // Log if configured to
         if (connectionPool.getLog().isDebugEnabled() && connectionPool.getDefinition().isTrace()) {
-            if (parameters != null) {
-                connectionPool.getLog().debug(parameters + " -> " + sqlStatement + " (" + (System.currentTimeMillis() - startTime) + " milliseconds)");
-            } else {
-                connectionPool.getLog().debug(sqlStatement + " (" + (System.currentTimeMillis() - startTime) + " milliseconds)");
-            }
+            connectionPool.getLog().debug(sqlLog.toString() + " (" + (System.currentTimeMillis() - startTime) + " milliseconds" + (exception != null ? ", threw " + exception.getMessage() + ")" : ")"));
         }
 
         // Send to any listener
-        connectionPool.onExecute(parameters + " -> " + sqlStatement, (System.currentTimeMillis() - startTime), exception);
+        connectionPool.onExecute(sqlLog.toString(), (System.currentTimeMillis() - startTime), exception);
 
         // Clear parameters for next time
         if (parameters != null) {
             parameters.clear();
         }
         sqlStatement = null;
+        sqlLog.setLength(0);
 
+    }
+
+    /**
+     * Get the parameters that have been built up and use them to fill in any parameters
+     * withing the sqlStatement and produce a log. If the log already exists (for instance,
+     * if a batch is being peformed) then it is appended to the end.
+     */
+    protected void appendToSqlLog() {
+        int parameterIndex = 0;
+        StringTokenizer st = new StringTokenizer(sqlStatement, "?");
+        while (st.hasMoreTokens()) {
+            if (parameterIndex > 0) {
+                if (parameters != null) {
+                    final Object value = parameters.get(new Integer(parameterIndex));
+                    if (value != null) {
+                        sqlLog.append(value);
+                    } else {
+                        sqlLog.append("?");
+                    }
+                } else {
+                        sqlLog.append("?");
+                }
+            }
+            parameterIndex++;
+            sqlLog.append(st.nextToken());
+        }
+        sqlLog.append("; ");
+        if (parameters != null) {
+            parameters.clear();
+        }
     }
 
     protected boolean isTrace() {
@@ -208,6 +236,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.13  2003/10/18 20:44:48  billhorsman
+ Better SQL logging (embed parameter values within SQL call) and works properly with batched statements now.
+
  Revision 1.12  2003/09/30 18:39:07  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 
