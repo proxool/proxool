@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.18 $, $Date: 2002/11/07 19:17:55 $
+ * @version $Revision: 1.19 $, $Date: 2002/11/07 19:31:25 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -240,6 +240,16 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         + getDefinition().getMaximumConnectionCount() + " cannot be exceeded.");
             }
             connectionCount++;
+
+            // Sanity check. Note that we can't check in much more detail. There might be other
+            // connections being made right now. They will each increment the connectionCount
+            // value but increment getXxxConnectionCount() a little later.
+            if (getActiveConnectionCount() + getAvailableConnectionCount() > getDefinition().getMaximumConnectionCount()) {
+                log.warn(displayStatistics() + " - We have possibly made too many connections: connectionCount=" + connectionCount
+                        + ", maximumConnectionCount=" + getDefinition().getMaximumConnectionCount()
+                        + ". If this persists then there has been an error within Proxool.");
+            }
+
         }
 
         ProxyConnection proxyConnection = null;
@@ -1055,6 +1065,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.19  2002/11/07 19:31:25  billhorsman
+ added sanity check against suspected situation where you
+ can make more connections than the maximumConnectionCount
+
  Revision 1.18  2002/11/07 19:17:55  billhorsman
  removed obsolete method
 
