@@ -33,9 +33,9 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.57 $, $Date: 2003/02/19 23:46:10 $
+ * @version $Revision: 1.58 $, $Date: 2003/02/24 01:15:33 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public class ProxoolFacade {
 
@@ -46,6 +46,8 @@ public class ProxoolFacade {
     private static Map completeInfos = new HashMap();
 
     private static Map configurators = new HashMap();
+
+    private static CompositeProxoolListener compositeProxoolListener = new CompositeProxoolListener();
 
     /**
      * Build a ConnectionPool based on this definition and then start it.
@@ -75,6 +77,7 @@ public class ProxoolFacade {
 
             ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
             connectionPool.start();
+            compositeProxoolListener.onRegistration(cpd, (Properties) completeInfos.get(alias));
         } else {
             throw new ProxoolException("Attempt to register duplicate pool called '" + alias + "'");
         }
@@ -415,6 +418,7 @@ public class ProxoolFacade {
         final String alias = connectionPool.getDefinition().getAlias();
         if (connectionPool != null) {
             try {
+                compositeProxoolListener.onShutdown(alias);
                 connectionPool.shutdown(delay, finalizer);
             } catch (Throwable t) {
                 LOG.error("Problem trying to shutdown '" + alias + "' connection pool", t);
@@ -558,6 +562,23 @@ public class ProxoolFacade {
      */
     public static boolean killConnecton(String alias, long id, boolean merciful) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias).expireConnection(id, merciful);
+    }
+
+    /**
+     * Add a listener that gets called everytime a global Proxool event ocours.
+     * @param proxoolListener the listener to add.
+     */
+    public static void addProxoolListener(ProxoolListenerIF proxoolListener) {
+        compositeProxoolListener.addListener(proxoolListener);
+    }
+
+    /**
+     * Remove a registered <code>ProxoolListenerIF</code>.
+     * @param proxoolListener the listener to remove.
+     * @return whether the listener was found or removed or not.
+     */
+    public static boolean removeProxoolListener(ProxoolListenerIF proxoolListener) {
+        return compositeProxoolListener.removeListener(proxoolListener);
     }
 
     /**
@@ -818,6 +839,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.58  2003/02/24 01:15:33  chr32
+ Added support for ProxoolListenerIF.
+
  Revision 1.57  2003/02/19 23:46:10  billhorsman
  renamed monitor package to admin
 
