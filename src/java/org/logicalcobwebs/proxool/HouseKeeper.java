@@ -9,13 +9,12 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
  * Responisble for house keeping one pool
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/10 15:26:46 $
+ * @version $Revision: 1.3 $, $Date: 2003/09/11 23:57:48 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -79,13 +78,13 @@ class HouseKeeper {
                                testResult = testStatement.execute(sql);
                            } finally {
                                if (log.isDebugEnabled() && definition.isVerbose()) {
-                                   log.debug(connectionPool.displayStatistics() + " - Testing connection " + proxyConnection.getId() + (testResult ? ": OK" : ": FAIL"));
+                                   log.debug(connectionPool.displayStatistics() + " - Testing connection " + proxyConnection.getId() + (testResult ? ": True" : ": False"));
                                }
                            }
                        }
 
                        proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_AVAILABLE);
-                   } catch (SQLException e) {
+                   } catch (Throwable e) {
                        // There is a problem with this connection.  Let's remove it!
                        proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_NULL);
                        connectionPool.removeProxyConnection(proxyConnection, "it has problems: " + e, ConnectionPool.REQUEST_EXPIRY, true);
@@ -253,6 +252,9 @@ class HouseKeeper {
 /*
  Revision history:
  $Log: HouseKeeper.java,v $
+ Revision 1.3  2003/09/11 23:57:48  billhorsman
+ Test SQL now traps Throwable, not just SQLException.
+
  Revision 1.2  2003/03/10 15:26:46  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)
