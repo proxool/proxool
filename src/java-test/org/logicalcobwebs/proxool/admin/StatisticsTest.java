@@ -25,7 +25,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/01 16:46:08 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/01 18:25:53 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -101,13 +101,15 @@ public class StatisticsTest extends TestCase {
             assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
             StatisticsIF statistics2 = srm.getStatistics();
 
-            if (statistics2.getServedCount() != 1) {
+            LOG.error("statistics1: " + statistics1.getStartDate() + " to " + statistics1.getStopDate() + ", served " + statistics1.getServedCount());
+            LOG.error("statistics2: " + statistics2.getStartDate() + " to " + statistics2.getStopDate() + ", served " + statistics2.getServedCount());
+
+            if (statistics2.getServedCount() == 0) {
                 LOG.error("Waiting for another set of statistics");
                 statistics2 = srm.getStatistics();
+                LOG.error("statistics3: " + statistics2.getStartDate() + " to " + statistics2.getStopDate() + ", served " + statistics2.getServedCount());
             }
 
-            LOG.error("statistics1: " + statistics1.getStartDate() + " to " + statistics1.getStopDate());
-            LOG.error("statistics2: " + statistics2.getStartDate() + " to " + statistics2.getStopDate());
             assertEquals("servedCount", 1L, statistics2.getServedCount());
             assertEquals("servedPerSecond", 0.09, 0.11, statistics2.getServedPerSecond());
             assertEquals("refusedCount", 0L, statistics2.getRefusedCount());
@@ -165,6 +167,9 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.12  2003/03/01 18:25:53  billhorsman
+ *** empty log message ***
+
  Revision 1.11  2003/03/01 16:46:08  billhorsman
  debug
 
