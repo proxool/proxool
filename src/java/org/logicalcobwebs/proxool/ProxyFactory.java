@@ -23,9 +23,9 @@ import java.util.Properties;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.23 $, $Date: 2003/09/10 22:21:04 $
+ * @version $Revision: 1.24 $, $Date: 2003/09/30 18:39:08 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 class ProxyFactory {
@@ -40,7 +40,7 @@ class ProxyFactory {
         realConnection = DriverManager.getConnection(url, info);
 
         Object delegate = Proxy.newProxyInstance(
-                        realConnection.getClass().getClassLoader(),
+                        null,
                         realConnection.getClass().getInterfaces(),
                         new ProxyConnection(realConnection, id, url, connectionPool, status));
 
@@ -55,7 +55,7 @@ class ProxyFactory {
      */
     protected static Connection getConnection(ProxyConnectionIF proxyConnection) {
         return (Connection) Proxy.newProxyInstance(
-                Connection.class.getClassLoader(),
+                null,
                 new Class[]{Connection.class},
                 (InvocationHandler) proxyConnection);
     }
@@ -102,7 +102,7 @@ class ProxyFactory {
             LOG.debug(delegate.getClass().getName() + " is being proxied using the " + interfaces[0]);
         }
 */
-        return (Statement) Proxy.newProxyInstance(delegate.getClass().getClassLoader(), interfaces, new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
+        return (Statement) Proxy.newProxyInstance(null, interfaces, new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
     }
 
     /**
@@ -113,7 +113,7 @@ class ProxyFactory {
      */
     protected static DatabaseMetaData getDatabaseMetaData(Connection connection, ProxyConnectionIF proxyConnection) throws SQLException {
         return (DatabaseMetaData) Proxy.newProxyInstance(
-          DatabaseMetaData.class.getClassLoader(),
+                null,
                 new Class[]{DatabaseMetaData.class},
                 new ProxyDatabaseMetaData(connection, proxyConnection)
         );
@@ -125,6 +125,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.24  2003/09/30 18:39:08  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.23  2003/09/10 22:21:04  chr32
  Removing > jdk 1.2 dependencies.
 

@@ -11,7 +11,6 @@ import org.logicalcobwebs.logging.LogFactory;
 import net.sf.cglib.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
@@ -19,7 +18,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.21 $, $Date: 2003/09/29 17:48:49 $
+ * @version $Revision: 1.22 $, $Date: 2003/09/30 18:39:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -79,22 +78,16 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
             }
         } catch (InvocationTargetException e) {
             exception = e;
-            if (e.getTargetException() instanceof SQLException) {
-                final SQLException sqlException = (SQLException) e.getTargetException();
-                if (testException(sqlException)) {
-                    // This is really a fatal one
-                    FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), sqlException);
-                }
+            if (testException(e.getTargetException())) {
+                // This is really a fatal one
+                FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), e.getTargetException());
             }
             throw e.getTargetException();
         } catch (Exception e) {
             exception = e;
-            if (e instanceof SQLException) {
-                final SQLException sqlException = (SQLException) e;
-                if (testException(sqlException)) {
-                    // This is really a fatal one
-                    FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), sqlException);
-                }
+            if (testException(e)) {
+                // This is really a fatal one
+                FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), e);
             }
             throw e;
         } finally {
@@ -118,6 +111,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.22  2003/09/30 18:39:08  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.21  2003/09/29 17:48:49  billhorsman
  New fatal-sql-exception-wrapper-class allows you to define what exception is used as a wrapper. This means that you
  can make it a RuntimeException if you need to.

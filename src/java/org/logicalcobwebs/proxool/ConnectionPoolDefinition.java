@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.23 $, $Date: 2003/09/29 17:48:08 $
+ * @version $Revision: 1.24 $, $Date: 2003/09/30 18:39:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -107,6 +107,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private String fatalSqlExceptionWrapper = null;
 
     private String houseKeepingTestSql;
+
+    private boolean testBeforeUse;
+
+    private boolean testAfterUse;
 
     /**
      * So we can set the values one by one if we want
@@ -277,20 +281,8 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                     setUrl(value);
                 }
             }
-        } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
-            if (getHouseKeepingSleepTime() != getInt(key, value)) {
-                changed = true;
-                if (!pretend) {
-                    setHouseKeepingSleepTime(getInt(key, value));
-                }
-            }
-        } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
-            if (isChanged(getHouseKeepingTestSql(), value)) {
-                changed = true;
-                if (!pretend) {
-                    setHouseKeepingTestSql(value);
-                }
-            }
+        } else if (setHouseKeeperProperty(key, value, pretend)) {
+            changed = true;
         } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY)) {
             if (getMaximumConnectionCount() != getInt(key, value)) {
                 changed = true;
@@ -446,6 +438,46 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     }
 
     /**
+     * Subset of {@link #setAnyProperty} to avoid overly long method.
+     * @see #setAnyProperty
+     */
+    private boolean setHouseKeeperProperty(String key, String value, boolean pretend) throws ProxoolException {
+        boolean changed = false;
+        if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
+            if (getHouseKeepingSleepTime() != getInt(key, value)) {
+                changed = true;
+                if (!pretend) {
+                    setHouseKeepingSleepTime(getInt(key, value));
+                }
+            }
+        } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
+            if (isChanged(getHouseKeepingTestSql(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setHouseKeepingTestSql(value);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.TEST_BEFORE_USE_PROPERTY)) {
+            final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
+            if (isTestBeforeUse() != valueAsBoolean) {
+                changed = true;
+                if (!pretend) {
+                    setTestBeforeUse(valueAsBoolean);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.TEST_AFTER_USE_PROPERTY)) {
+            final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
+            if (isTestAfterUse() != valueAsBoolean) {
+                changed = true;
+                if (!pretend) {
+                    setTestAfterUse(valueAsBoolean);
+                }
+            }
+        }
+        return changed;
+    }
+
+    /**
      * Subset of {@link #setAnyProperty} to avoid overly long method
      * @see #setAnyProperty
      */
@@ -537,6 +569,8 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         maximumConnectionCount = DEFAULT_MAXIMUM_CONNECTION_COUNT;
         houseKeepingSleepTime = DEFAULT_HOUSE_KEEPING_SLEEP_TIME;
         houseKeepingTestSql = null;
+        testAfterUse = false;
+        testBeforeUse = false;
         simultaneousBuildThrottle = DEFAULT_SIMULTANEOUS_BUILD_THROTTLE;
         recentlyStartedThreshold = DEFAULT_RECENTLY_STARTED_THRESHOLD;
         overloadWithoutRefusalLifetime = DEFAULT_OVERLOAD_WITHOUT_REFUSAL_THRESHOLD;
@@ -546,6 +580,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         statistics = null;
         statisticsLogLevel = null;
         fatalSqlExceptions.clear();
+        fatalSqlExceptionWrapper = null;
     }
 
     /**
@@ -946,6 +981,34 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     }
 
     /**
+     * @see ConnectionPoolDefinitionIF#isTestBeforeUse
+     */
+    public boolean isTestBeforeUse() {
+        return testBeforeUse;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isTestBeforeUse
+     */
+    public void setTestBeforeUse(boolean testBeforeUse) {
+        this.testBeforeUse = testBeforeUse;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isTestAfterUse
+     */
+    public boolean isTestAfterUse() {
+        return testAfterUse;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isTestAfterUse
+     */
+    public void setTestAfterUse(boolean testAfterUse) {
+        this.testAfterUse = testAfterUse;
+    }
+
+    /**
      * @see ConnectionPoolDefinitionIF#getStatistics
      */
     public String getStatistics() {
@@ -1063,6 +1126,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.24  2003/09/30 18:39:08  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.23  2003/09/29 17:48:08  billhorsman
  New fatal-sql-exception-wrapper-class allows you to define what exception is used as a wrapper. This means that you
  can make it a RuntimeException if you need to.

@@ -11,7 +11,6 @@ import org.logicalcobwebs.logging.LogFactory;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
@@ -21,7 +20,7 @@ import java.util.TreeMap;
  * statement. The subclass of this defines how we delegate to the
  * real statement.
 
- * @version $Revision: 1.11 $, $Date: 2003/09/05 16:26:50 $
+ * @version $Revision: 1.12 $, $Date: 2003/09/30 18:39:07 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -57,30 +56,27 @@ abstract class AbstractProxyStatement {
     /**
      * Check to see whether an exception is a fatal one. If it is, then throw the connection
      * away (and it won't be made available again)
-     * @param e the exception to test
+     * @param t the exception to test
      */
-    protected boolean testException(SQLException e) {
-        boolean fatalSqlExceptionDetected = false;
-        Iterator i = connectionPool.getDefinition().getFatalSqlExceptions().iterator();
-        while (i.hasNext()) {
-            if (e.getMessage().indexOf((String) i.next()) > -1) {
-                // This SQL exception indicates a fatal problem with this connection. We should probably
-                // just junk it.
-                fatalSqlExceptionDetected = true;
-                try {
-                    statement.close();
-                    connectionPool.throwConnection(proxyConnection, "Fatal SQL Exception has been detected");
+    protected boolean testException(Throwable t) {
+        if (FatalSqlExceptionHelper.testException(connectionPool.getDefinition(), t)) {
+            // This SQL exception indicates a fatal problem with this connection. We should probably
+            // just junk it.
+            try {
+                statement.close();
+                connectionPool.throwConnection(proxyConnection, "Fatal SQL Exception has been detected");
 
-                    // We should check all the existing connections as soon as possible
-                    HouseKeeperController.sweepNow(connectionPool.getDefinition().getAlias());
+                // We should check all the existing connections as soon as possible
+                HouseKeeperController.sweepNow(connectionPool.getDefinition().getAlias());
 
-                    LOG.warn("Connection has been thrown away because fatal exception was detected", e);
-                } catch (SQLException e2) {
-                    LOG.error("Problem trying to throw away suspect connection", e2);
-                }
+                LOG.warn("Connection has been thrown away because fatal exception was detected", t);
+            } catch (SQLException e2) {
+                LOG.error("Problem trying to throw away suspect connection", e2);
             }
+            return true;
+        } else {
+            return false;
         }
-        return fatalSqlExceptionDetected;
     }
 
     /**
@@ -212,6 +208,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.12  2003/09/30 18:39:07  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.11  2003/09/05 16:26:50  billhorsman
  testException() now returns true if a fatal exception was detected.
 

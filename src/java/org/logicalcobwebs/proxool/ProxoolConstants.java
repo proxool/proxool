@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.18 $, $Date: 2003/09/29 17:48:21 $
+ * @version $Revision: 1.19 $, $Date: 2003/09/30 18:39:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -60,6 +60,18 @@ public interface ProxoolConstants {
 
     /** @see ProxoolDriver#getPropertyInfo */
     public final String HOUSE_KEEPING_TEST_SQL_PROPERTY = PROPERTY_PREFIX + HOUSE_KEEPING_TEST_SQL;
+
+    /** @see #TEST_BEFORE_USE_PROPERTY */
+    public final String TEST_BEFORE_USE = "test-before-use";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String TEST_BEFORE_USE_PROPERTY = PROPERTY_PREFIX + TEST_BEFORE_USE;
+
+    /** @see #TEST_AFTER_USE_PROPERTY */
+    public final String TEST_AFTER_USE = "test-after-use";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String TEST_AFTER_USE_PROPERTY = PROPERTY_PREFIX + TEST_AFTER_USE;
 
     /** @see #MAXIMUM_CONNECTION_COUNT_PROPERTY */
     public final String MAXIMUM_CONNECTION_COUNT = "maximum-connection-count";
@@ -252,6 +264,9 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.19  2003/09/30 18:39:08  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.18  2003/09/29 17:48:21  billhorsman
  New fatal-sql-exception-wrapper-class allows you to define what exception is used as a wrapper. This means that you
  can make it a RuntimeException if you need to.

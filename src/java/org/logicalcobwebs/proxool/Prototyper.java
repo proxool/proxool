@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.6 $, $Date: 2003/09/11 10:44:54 $
+ * @version $Revision: 1.7 $, $Date: 2003/09/30 18:39:08 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -86,12 +86,13 @@ public class Prototyper {
                     break;
                 }
 
+                ProxyConnectionIF freshlyBuiltProxyConnection = null;
                 try {
                     // If it has been shutdown then we should just stop now.
                     if (!connectionPool.isConnectionPoolUp()) {
                         break;
                     }
-                    buildConnection(ProxyConnection.STATUS_AVAILABLE, reason);
+                    freshlyBuiltProxyConnection = buildConnection(ProxyConnection.STATUS_AVAILABLE, reason);
                     somethingDone = true;
                 } catch (Throwable e) {
                     log.error("Prototype", e);
@@ -102,6 +103,10 @@ public class Prototyper {
                     break;
                     // Don't wory, we'll start again the next time the
                     // housekeeping thread runs.
+                }
+                if (freshlyBuiltProxyConnection == null) {
+                    // That's strange. No double the buildConnection() method logged the
+                    // error, but we should have build a connection here.
                 }
             }
         } catch (Throwable t) {
@@ -180,13 +185,14 @@ public class Prototyper {
             throw e;
         } catch (RuntimeException e) {
             if (log.isDebugEnabled()) {
-                log.debug(e);
+                log.debug("Prototyping problem", e);
             }
             throw e;
         } catch (Throwable t) {
             if (log.isDebugEnabled()) {
-                log.debug(t);
+                log.debug("Prototyping problem", t);
             }
+            throw new ProxoolException("Unexpected prototyping problem", t);
         } finally {
             synchronized (lock) {
                 if (proxyConnection == null) {
@@ -260,6 +266,9 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.7  2003/09/30 18:39:08  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.6  2003/09/11 10:44:54  billhorsman
  Catch throwable not just exception during creation of connection
  (this will catch ClassNotFoundError too)

@@ -14,6 +14,7 @@ import org.logicalcobwebs.proxool.util.FastArrayList;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -26,7 +27,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.69 $, $Date: 2003/09/30 07:50:04 $
+ * @version $Revision: 1.70 $, $Date: 2003/09/30 18:39:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -198,8 +199,18 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 // can't set it active twice (at least, not without making it available again
                 // in between)
                 if (proxyConnection != null && proxyConnection.setStatus(ProxyConnectionIF.STATUS_AVAILABLE, ProxyConnectionIF.STATUS_ACTIVE)) {
-                    nextAvailableConnection++;
-                    break;
+
+                    // Okay. So we have it. But is it working ok?
+                    if (getDefinition().isTestBeforeUse()) {
+                        if (!testConnection(proxyConnection)) {
+                            // Oops. No it's not. Let's choose another.
+                            proxyConnection = null;
+                        }
+                    }
+                    if (proxyConnection != null) {
+                        nextAvailableConnection++;
+                        break;
+                    }
                 } else {
                     proxyConnection = null;
                 }
@@ -211,22 +222,25 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     // No!  Let's see if we can create one
                     proxyConnection = PrototyperController.buildConnection(
                             getDefinition().getAlias(), ProxyConnection.STATUS_ACTIVE, "on demand");
+                    // Okay. So we have it. But is it working ok?
+                    if (getDefinition().isTestBeforeUse()) {
+                        if (!testConnection(proxyConnection)) {
+                            // Oops. No it's not. There's not much more we can do for now
+                            throw new SQLException("Created a new connection but it failed its test");
+                        }
+                    }
                 } catch (SQLException e) {
-                    log.debug("Couldn't get connection", e);
                     throw e;
                 } catch (ProxoolException e) {
                     log.debug("Couldn't get connection", e);
                     throw new SQLException(e.toString());
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.error("Couldn't get connection", e);
                     throw new SQLException(e.toString());
                 }
             }
 
         } catch (SQLException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Problem getting connection", e);
-            }
             throw e;
         } catch (Throwable t) {
             log.error("Problem getting connection", t);
@@ -254,6 +268,32 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         }
 
         return ProxyFactory.getConnection(proxyConnection);
+    }
+
+    private boolean testConnection(ProxyConnectionIF proxyConnection) {
+        boolean success = false;
+        final String testSql = getDefinition().getHouseKeepingTestSql();
+        if (testSql != null && testSql.length() > 0) {
+            Statement s = null;
+            try {
+                s = proxyConnection.getConnection().createStatement();
+                s.execute(testSql);
+                success = true;
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " tested: OK");
+                }
+            } catch (Throwable t) {
+                proxyConnection.setStatus(ProxyConnectionIF.STATUS_NULL);
+                removeProxyConnection(proxyConnection, "it has problems: " + t, ConnectionPool.REQUEST_EXPIRY, true);
+            } finally {
+                try {
+                    s.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
+        }
+        return success;
     }
 
     /**
@@ -303,6 +343,12 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         } else {
             // Let's make it available for someone else
             proxyConnection.setStatus(ProxyConnectionIF.STATUS_ACTIVE, ProxyConnectionIF.STATUS_AVAILABLE);
+        }
+
+        // Optionally, test it to see if it is ok
+        if (getDefinition().isTestAfterUse()) {
+            // It will get removed by this call if it is no good
+            testConnection(proxyConnection);
         }
 
         if (log.isDebugEnabled() && getDefinition().isVerbose()) {
@@ -1048,6 +1094,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.70  2003/09/30 18:39:08  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.69  2003/09/30 07:50:04  billhorsman
  Smarter throwing of caught SQLExceptions without wrapping them up inside another (and losing the stack trace)
 

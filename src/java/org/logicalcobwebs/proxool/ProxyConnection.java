@@ -18,9 +18,9 @@ import java.sql.Statement;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.27 $, $Date: 2003/09/10 22:21:04 $
+ * @version $Revision: 1.28 $, $Date: 2003/09/30 18:39:08 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 class ProxyConnection extends AbstractProxyConnection implements InvocationHandler {
 
@@ -83,9 +83,16 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
             }
 
         } catch (InvocationTargetException e) {
+            // We might get a fatal exception here. Let's test for it.
+            if (FatalSqlExceptionHelper.testException(getConnectionPool().getDefinition(), e.getTargetException())) {
+                FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), e.getTargetException());
+            }
             throw e.getTargetException();
         } catch (Exception e) {
             LOG.error("Unexpected invocation exception", e);
+            if (FatalSqlExceptionHelper.testException(getConnectionPool().getDefinition(), e)) {
+                FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), e);
+            }
             throw new RuntimeException("Unexpected invocation exception: "
                     + e.getMessage());
         }
@@ -98,6 +105,9 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.28  2003/09/30 18:39:08  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.27  2003/09/10 22:21:04  chr32
  Removing > jdk 1.2 dependencies.
 

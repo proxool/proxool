@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.19 $, $Date: 2003/09/29 17:48:08 $
+ * @version $Revision: 1.20 $, $Date: 2003/09/30 18:39:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -167,15 +167,31 @@ public interface ConnectionPoolDefinitionIF {
      * and it is discarded. Regardless of what happens the exception
      * is always thrown back to the user.
      * @return the list of exception fragments (String)
-     * @see #FATAL_SQL_EXCEPTIONS_DELIMITER 
+     * @see #FATAL_SQL_EXCEPTIONS_DELIMITER
      */
     Set getFatalSqlExceptions();
 
     /**
-     *
-     * @return
+     * The test SQL that we perform to see if a connection is alright.
+     * Should be fast and robust.
+     * @return house keeping test SQL
      */
     String getHouseKeepingTestSql();
+
+    /**
+     * Whether we test each connection before it is served
+     * @return true if we do the test
+     * @see #getHouseKeepingTestSql
+     */
+    boolean isTestBeforeUse();
+
+    /**
+     * Whether we test each connection after it is closed
+     * (that is, returned to the pool)
+     * @return true if we do the test
+     * @see #getHouseKeepingTestSql
+     */
+    boolean isTestAfterUse();
 
    /**
     * The URL that was used to define this pool. For example:
@@ -278,6 +294,9 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.20  2003/09/30 18:39:08  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.19  2003/09/29 17:48:08  billhorsman
  New fatal-sql-exception-wrapper-class allows you to define what exception is used as a wrapper. This means that you
  can make it a RuntimeException if you need to.

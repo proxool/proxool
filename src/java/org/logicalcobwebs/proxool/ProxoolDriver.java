@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.24 $, $Date: 2003/09/05 16:59:42 $
+ * @version $Revision: 1.25 $, $Date: 2003/09/30 18:39:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -65,7 +65,6 @@ public class ProxoolDriver implements Driver {
      */
     public Connection connect(String url, Properties info)
             throws SQLException {
-
         if (!url.startsWith("proxool")) {
             return null;
         }
@@ -89,6 +88,21 @@ public class ProxoolDriver implements Driver {
             }
             return cp.getConnection();
 
+        } catch (SQLException e) {
+            LOG.error("Problem", e);
+            // Check to see if it's fatal. We might need to wrap it up.
+            try {
+                String alias = ProxoolFacade.getAlias(url);
+                cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
+                if (FatalSqlExceptionHelper.testException(cp.getDefinition(), e)) {
+                    FatalSqlExceptionHelper.throwFatalSQLException(cp.getDefinition().getFatalSqlExceptionWrapper(), e);
+                }
+                // This bit isn't reached if throwFatalSQLException() above throws another exception 
+                throw e;
+            } catch (ProxoolException e1) {
+                LOG.error("Problem", e);
+                throw new SQLException(e.toString());
+            }
         } catch (ProxoolException e) {
             LOG.error("Problem", e);
             throw new SQLException(e.toString());
@@ -211,6 +225,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.25  2003/09/30 18:39:08  billhorsman
+ New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
+
  Revision 1.24  2003/09/05 16:59:42  billhorsman
  Added wrap-fatal-sql-exceptions property
 
