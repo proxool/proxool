@@ -15,7 +15,7 @@ import java.sql.SQLException;
 /**
  * The simplest example of all. Just gets a Connection.
  * 
- * @version $Revision: 1.3 $, $Date: 2002/12/03 10:54:04 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/06 15:42:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -23,25 +23,13 @@ public class Simple {
 
     private static final Log LOG = LogFactory.getLog(Simple.class);
 
-    /**
-     * Configures a pool
-     */
-    public static void main(String[] args) {
+    private static void withoutProxool() {
 
         Connection connection = null;
         try {
-            Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
-
-            /* Get the connection. The URL format is:
-
-               proxool:delegate-class:delegate-url
-
-               where:
-                 delegare-class = org.gjt.mm.mysql.Driver
-                 delegate-url = jdbc:mysql://localhost/test
-            */
+            Class.forName("org.hsqldb.jdbcDriver");
             try {
-                connection = DriverManager.getConnection("proxool:org.hsqldb.jdbcDriver:jdbc:hsqldb:test");
+                connection = DriverManager.getConnection("jdbc:hsqldb:test");
             } catch (SQLException e) {
                 LOG.error("Problem getting connection", e);
             }
@@ -59,15 +47,54 @@ public class Simple {
                 // Check to see we actually got a connection before we
                 // attempt to close it.
                 if (connection != null) {
-                    // This doesn't really close the connection. It just makes it
-                    // available in the pool again.
                     connection.close();
                 }
             } catch (SQLException e) {
                 LOG.error("Problem closing connection", e);
             }
         }
+    }
 
+    private static void withProxool() {
+
+        Connection connection = null;
+        try {
+            // NOTE THIS LINE
+            Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
+            try {
+                // NOTE THIS LINE
+                connection = DriverManager.getConnection("proxool.example:org.hsqldb.jdbcDriver:jdbc:hsqldb:test");
+            } catch (SQLException e) {
+                LOG.error("Problem getting connection", e);
+            }
+
+            if (connection != null) {
+                LOG.info("Got connection :)");
+            } else {
+                LOG.error("Didn't get connection, which probably means that no Driver accepted the URL");
+            }
+
+        } catch (ClassNotFoundException e) {
+            LOG.error("Couldn't find driver", e);
+        } finally {
+            try {
+                // Check to see we actually got a connection before we
+                // attempt to close it.
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                LOG.error("Problem closing connection", e);
+            }
+        }
+    }
+
+    /**
+     * Tests getting a connection with and without Proxool
+     */
+    public static void main(String[] args) {
+        withoutProxool();
+        withProxool();
     }
 
 }
@@ -75,6 +102,9 @@ public class Simple {
 /*
  Revision history:
  $Log: Simple.java,v $
+ Revision 1.4  2003/02/06 15:42:48  billhorsman
+ updated (overdue!)
+
  Revision 1.3  2002/12/03 10:54:04  billhorsman
  use hypersonic driver
 
