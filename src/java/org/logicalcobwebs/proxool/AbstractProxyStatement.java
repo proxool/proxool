@@ -19,7 +19,7 @@ import java.util.TreeMap;
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
- * @version $Revision: 1.15 $, $Date: 2003/10/27 11:18:42 $
+ * @version $Revision: 1.16 $, $Date: 2003/10/27 12:21:59 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -169,13 +169,14 @@ abstract class AbstractProxyStatement {
      */
     protected void trace(long startTime, Exception exception) throws SQLException {
 
-        // Log if configured to
-        if (connectionPool.getLog().isDebugEnabled() && connectionPool.getDefinition().isTrace()) {
-            connectionPool.getLog().debug(sqlLog.toString() + " (" + (System.currentTimeMillis() - startTime) + " milliseconds" + (exception != null ? ", threw a " + exception.getClass().getName()  + ": " + exception.getMessage() + ")" : ")"));
+        if (isTrace()) {
+            // Log if configured to
+            if (connectionPool.getLog().isDebugEnabled() && connectionPool.getDefinition().isTrace()) {
+                connectionPool.getLog().debug(sqlLog.toString() + " (" + (System.currentTimeMillis() - startTime) + " milliseconds" + (exception != null ? ", threw a " + exception.getClass().getName()  + ": " + exception.getMessage() + ")" : ")"));
+            }
+            // Send to any listener
+            connectionPool.onExecute(sqlLog.toString(), (System.currentTimeMillis() - startTime), exception);
         }
-
-        // Send to any listener
-        connectionPool.onExecute(sqlLog.toString(), (System.currentTimeMillis() - startTime), exception);
 
         // Clear parameters for next time
         if (parameters != null) {
@@ -192,7 +193,7 @@ abstract class AbstractProxyStatement {
      * if a batch is being peformed) then it is appended to the end.
      */
     protected void appendToSqlLog() {
-        if (sqlStatement != null && sqlStatement.length() > 0) {
+        if (sqlStatement != null && sqlStatement.length() > 0 && isTrace()) {
             int parameterIndex = 0;
             StringTokenizer st = new StringTokenizer(sqlStatement, "?");
             while (st.hasMoreTokens()) {
@@ -212,9 +213,9 @@ abstract class AbstractProxyStatement {
                 sqlLog.append(st.nextToken());
             }
             sqlLog.append("; ");
-            if (parameters != null) {
-                parameters.clear();
-            }
+        }
+        if (parameters != null) {
+            parameters.clear();
         }
     }
 
@@ -238,6 +239,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.16  2003/10/27 12:21:59  billhorsman
+ Optimisation to avoid preparing sql log if tracing is off.
+
  Revision 1.15  2003/10/27 11:18:42  billhorsman
  Fix for sqlStatement being null.
 
