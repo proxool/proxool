@@ -19,7 +19,7 @@ import java.sql.SQLException;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/06 21:08:02 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/09 16:01:21 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -62,11 +62,15 @@ public class ConnectionResetterTest extends TestCase {
 
                 public boolean beforeCommand(Connection connection, CommandIF command) throws SQLException {
                     // TODO
-                    return false;
+                    return true;
                 }
 
                 public void afterCommand(Connection connection, CommandIF command) throws SQLException {
                     // TODO
+                }
+
+                public boolean catchException(CommandIF command, SQLException e) {
+                    return true;
                 }
 
             });
@@ -81,6 +85,9 @@ public class ConnectionResetterTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.2  2002/11/09 16:01:21  billhorsman
+ fixed CommandFilterIF implementation
+
  Revision 1.1  2002/11/06 21:08:02  billhorsman
  new ConnectionResetter test
 
