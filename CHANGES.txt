@@ -1,14 +1,14 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.18 $
-$Date: 2003/03/06 11:30:16 $
+$Revision: 1.19 $
+$Date: 2003/03/12 15:59:54 $
 $Author: billhorsman $
 
-0.8 - scheduled for March 2003
+0.7.1 - scheduled for March 2003
 
-- New JMX component so that you can control Proxool from your
-  favourite JMX Agent (like WebLogic, JBoss, MX4J)
+- Added a lot of concurrency code - mainly using concurrent package
+  written by Doug Lea. 
 
 - Fixed display bug in AdminServlet - average active time was being
   displayed in milliseconds instead of seconds.
