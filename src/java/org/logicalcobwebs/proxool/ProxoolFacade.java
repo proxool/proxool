@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.22 $, $Date: 2002/12/16 16:42:30 $
+ * @version $Revision: 1.23 $, $Date: 2002/12/16 16:47:22 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -366,11 +366,11 @@ public class ProxoolFacade {
 
     private static boolean isChanged(String oldValue, String newValue) {
         boolean changed = false;
-        if (oldValue == null || oldValue.length() == 0) {
-            if (newValue != null && newValue.length() > 0) {
+        if (oldValue == null) {
+            if (newValue != null) {
                 changed = true;
             }
-        } else if (newValue == null || newValue.length() == 0) {
+        } else if (newValue == null) {
             changed = true;
         } else if (!oldValue.equals(newValue)) {
             changed = true;
@@ -590,6 +590,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.23  2002/12/16 16:47:22  billhorsman
+ fix for updating properties with zero length strings
+
  Revision 1.22  2002/12/16 16:42:30  billhorsman
  allow URL updates to pool
 
