@@ -19,7 +19,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/27 18:01:48 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/28 17:41:13 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -65,7 +65,7 @@ public class StateListenerTest extends TestCase {
             Connection c1 = DriverManager.getConnection(url);
 
             // Test BUSY
-            assertEquals("upState", StateListenerIF.STATE_BUSY, stateListener.getNextState());
+            assertEquals("upState", StateListenerIF.STATE_BUSY, stateListener.getNextState(StateListenerIF.STATE_BUSY));
 
             assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
 
@@ -78,18 +78,18 @@ public class StateListenerTest extends TestCase {
             }
 
             // Test Overloaded
-            assertEquals("upState", StateListenerIF.STATE_OVERLOADED, stateListener.getNextState());
+            assertEquals("upState", StateListenerIF.STATE_OVERLOADED, stateListener.getNextState(StateListenerIF.STATE_OVERLOADED));
 
             // Test Busy again
-            assertEquals("upState", StateListenerIF.STATE_BUSY, stateListener.getNextState());
+            assertEquals("upState", StateListenerIF.STATE_BUSY, stateListener.getNextState(StateListenerIF.STATE_BUSY));
 
             // Test Quiet again
             c1.close();
-            assertEquals("upState", StateListenerIF.STATE_QUIET, stateListener.getNextState());
+            assertEquals("upState", StateListenerIF.STATE_QUIET, stateListener.getNextState(StateListenerIF.STATE_QUIET));
 
             // Bogus definition -> should be down
             ProxoolFacade.updateConnectionPool("proxool." + alias + ":blah:foo", null);
-            assertEquals("upState", StateListenerIF.STATE_DOWN, stateListener.getNextState());
+            assertEquals("upState", StateListenerIF.STATE_DOWN, stateListener.getNextState(StateListenerIF.STATE_DOWN));
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -143,10 +143,16 @@ public class StateListenerTest extends TestCase {
             somethingHappened = false;
         }
 
-        void waitForSomethingToHappen() {
+        void waitForSomethingToHappen(int stateToWaitFor) {
 
             long start = System.currentTimeMillis();
             while (!somethingHappened) {
+                if (upState == stateToWaitFor) {
+                    if (!somethingHappened) {
+                        LOG.error("Waiting for state = " + stateToWaitFor + " but it's already at that state") ;
+                        break;
+                    }
+                }
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -159,8 +165,8 @@ public class StateListenerTest extends TestCase {
 
         }
 
-        int getNextState() {
-            waitForSomethingToHappen();
+        int getNextState(int stateToWaitFor) {
+            waitForSomethingToHappen(stateToWaitFor);
             somethingHappened = false;
             return upState;
         }
@@ -170,6 +176,9 @@ public class StateListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.4  2003/02/28 17:41:13  billhorsman
+ more robust wait for state change
+
  Revision 1.3  2003/02/27 18:01:48  billhorsman
  completely rethought the test structure. it's now
  more obvious. no new tests yet though.
