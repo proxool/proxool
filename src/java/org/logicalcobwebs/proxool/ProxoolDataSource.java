@@ -8,18 +8,29 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
+import javax.naming.spi.ObjectFactory;
+import javax.naming.Name;
+import javax.naming.Context;
+import javax.naming.Reference;
+import javax.naming.RefAddr;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Hashtable;
+import java.io.PrintWriter;
 
 /**
  * A DataSource that is configurable via bean properties. Typically used in a J2EE environment.
- * @version $Revision: 1.1 $, $Date: 2004/03/15 23:54:25 $
+ * @version $Revision: 1.2 $, $Date: 2004/03/18 17:07:25 $
  * @author bill
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.9
  */
-public class ProxoolDataSource extends AbstractProxoolDataSource {
+public class ProxoolDataSource implements DataSource, ObjectFactory {
     private static final Log LOG = LogFactory.getLog(ProxoolDataSource.class);
+
+    private int loginTimeout;
+    private PrintWriter logWriter;
 
     private String alias;
     private String driver;
@@ -38,9 +49,13 @@ public class ProxoolDataSource extends AbstractProxoolDataSource {
     private String statistics;
     private String statisticsLogLevel;
     private boolean trace;
-    private String url;
+    private String driverUrl;
     private String user;
     private boolean verbose;
+    private boolean jmx;
+    private String jmxAgentId;
+    private boolean testBeforeUse;
+    private boolean testAfterUse;
 
     /**
      * A String of all the fatalSqlExceptions delimited by
@@ -50,6 +65,10 @@ public class ProxoolDataSource extends AbstractProxoolDataSource {
 
     public ProxoolDataSource() {
         reset();
+    }
+
+    public ProxoolDataSource (String alias) {
+        this.alias = alias;
     }
 
     /**
@@ -96,12 +115,33 @@ public class ProxoolDataSource extends AbstractProxoolDataSource {
             cpd.setStatistics(getStatistics());
             cpd.setStatisticsLogLevel(getStatisticsLogLevel());
             cpd.setTrace(isTrace());
-            cpd.setUrl(getUrl());
+            cpd.setUrl(getDriverUrl());
             cpd.setUser(getUser());
             cpd.setVerbose(isVerbose());
+            cpd.setJmx(isJmx());
+            cpd.setJmxAgentId(getJmxAgentId());
+            cpd.setTestAfterUse(isTestAfterUse());
+            cpd.setTestBeforeUse(isTestBeforeUse());
             ProxoolFacade.registerConnectionPool(cpd);
-
         }
+    }
+
+
+    public Object getObjectInstance(Object refObject, Name name, Context context, Hashtable hashtable) throws Exception {
+        // we only handle references
+        if (!(refObject instanceof Reference)) {
+            return null;
+        }
+        Reference reference = (Reference) refObject;
+        // check if this is relevant for us
+        if (!ProxoolDataSource.class.getName().equals(reference.getFactoryClassName())) {
+            return null;
+        }
+        // check if we've allready parsed the properties.
+        if (!ConnectionPoolManager.getInstance().isPoolExists(reference.get(ProxoolConstants.ALIAS_PROPERTY).toString())) {
+            populatePropertiesFromReference(reference);
+        }
+        return this;
     }
 
     /**
@@ -121,15 +161,15 @@ public class ProxoolDataSource extends AbstractProxoolDataSource {
     /**
      * @see ConnectionPoolDefinitionIF#getUrl
      */
-    public String getUrl() {
-        return url;
+    public String getDriverUrl() {
+        return driverUrl;
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getUrl
      */
-    public void setUrl(String url) {
-        this.url = url;
+    public void setDriverUrl(String url) {
+        this.driverUrl = url;
     }
 
     /**
@@ -399,10 +439,161 @@ public class ProxoolDataSource extends AbstractProxoolDataSource {
     }
 
     /**
+     * @see ConnectionPoolDefinitionIF#isJmx()
+     */
+    public boolean isJmx() {
+        return jmx;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isJmx()
+     */
+    public void setJmx(boolean jmx) {
+        this.jmx = jmx;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getJmxAgentId()
+     */
+    public String getJmxAgentId() {
+        return jmxAgentId;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getJmxAgentId()
+     */
+    public void setJmxAgentId(String jmxAgentId) {
+        this.jmxAgentId = jmxAgentId;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isTestBeforeUse
+     */
+    public boolean isTestBeforeUse() {
+        return testBeforeUse;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isTestBeforeUse
+     */
+    public void setTestBeforeUse(boolean testBeforeUse) {
+        this.testBeforeUse = testBeforeUse;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isTestAfterUse
+     */
+    public boolean isTestAfterUse() {
+        return testAfterUse;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isTestAfterUse
+     */
+    public void setTestAfterUse(boolean testAfterUse) {
+        this.testAfterUse = testAfterUse;
+    }
+
+    private void populatePropertiesFromReference(Reference reference) {
+        RefAddr property = reference.get(ProxoolConstants.ALIAS_PROPERTY);
+        if (property != null) {
+            setAlias(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.DRIVER_CLASS_PROPERTY);
+        if (property != null) {
+            setDriver(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY);
+        if (property != null) {
+            setFatalSqlExceptionWrapperClass(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY);
+        if (property != null) {
+            setHouseKeepingSleepTime(Integer.valueOf(property.getContent().toString()).intValue());
+        }
+        property = reference.get(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY);
+        if (property != null) {
+            setHouseKeepingTestSql(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY);
+        if (property != null) {
+            setMaximumConnectionCount(Integer.valueOf(property.getContent().toString()).intValue());
+        }
+        property = reference.get(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY);
+        if (property != null) {
+            setMaximumConnectionLifetime(Integer.valueOf(property.getContent().toString()).intValue());
+        }
+        property = reference.get(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY);
+        if (property != null) {
+            setMinimumConnectionCount(Integer.valueOf(property.getContent().toString()).intValue());
+        }
+        property = reference.get(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY);
+        if (property != null) {
+            setOverloadWithoutRefusalLifetime(Integer.valueOf(property.getContent().toString()).intValue());
+        }
+        property = reference.get(ProxoolConstants.PASSWORD_PROPERTY);
+        if (property != null) {
+            setPassword(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY);
+        if (property != null) {
+            setPrototypeCount(Integer.valueOf(property.getContent().toString()).intValue());
+        }
+        property = reference.get(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY);
+        if (property != null) {
+            setRecentlyStartedThreshold(Integer.valueOf(property.getContent().toString()).intValue());
+        }
+        property = reference.get(ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY);
+        if (property != null) {
+            setSimultaneousBuildThrottle(Integer.valueOf(property.getContent().toString()).intValue());
+        }
+        property = reference.get(ProxoolConstants.STATISTICS_PROPERTY);
+        if (property != null) {
+            setStatistics(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY);
+        if (property != null) {
+            setStatisticsLogLevel(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.TRACE_PROPERTY);
+        if (property != null) {
+            setTrace("true".equalsIgnoreCase(property.getContent().toString()));
+        }
+        property = reference.get(ProxoolConstants.DRIVER_URL_PROPERTY);
+        if (property != null) {
+            setDriverUrl(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.USER_PROPERTY);
+        if (property != null) {
+            setUser(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.VERBOSE_PROPERTY);
+        if (property != null) {
+            setVerbose("true".equalsIgnoreCase(property.getContent().toString()));
+        }
+        property = reference.get(ProxoolConstants.JMX_PROPERTY);
+        if (property != null) {
+            setJmx("true".equalsIgnoreCase(property.getContent().toString()));
+        }
+        property = reference.get(ProxoolConstants.JMX_AGENT_PROPERTY);
+        if (property != null) {
+            setJmxAgentId(property.getContent().toString());
+        }
+        property = reference.get(ProxoolConstants.TEST_BEFORE_USE_PROPERTY);
+        if (property != null) {
+            setTestBeforeUse("true".equalsIgnoreCase(property.getContent().toString()));
+        }
+        property = reference.get(ProxoolConstants.TEST_AFTER_USE_PROPERTY);
+        if (property != null) {
+            setTestAfterUse("true".equalsIgnoreCase(property.getContent().toString()));
+        }
+    }
+
+    /**
      * Reset all properties to their default values
      */
     private void reset() {
-        url = null;
+        driverUrl = null;
         driver = null;
         maximumConnectionLifetime = ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_CONNECTION_LIFETIME;
         prototypeCount = ConnectionPoolDefinitionIF.DEFAULT_PROTOTYPE_COUNT;
@@ -419,11 +610,35 @@ public class ProxoolDataSource extends AbstractProxoolDataSource {
         statistics = null;
         statisticsLogLevel = null;
     }
+
+    public PrintWriter getLogWriter() throws SQLException {
+        return this.logWriter;
+    }
+
+    public int getLoginTimeout() throws SQLException {
+        return this.loginTimeout;
+    }
+
+    public void setLogWriter(PrintWriter logWriter) throws SQLException {
+        this.logWriter = logWriter;
+    }
+
+    public void setLoginTimeout(int loginTimeout) throws SQLException {
+        this.loginTimeout = loginTimeout;
+    }
+
+    public Connection getConnection(String s, String s1) throws SQLException {
+        throw new UnsupportedOperationException("You should configure the username and password "
+                + "within the proxool configuration and just call getConnection() instead.");
+    }
 }
 
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.2  2004/03/18 17:07:25  chr32
+ Now supports all three modes: pre-configured, bean-configured and factory-configured.
+
  Revision 1.1  2004/03/15 23:54:25  chr32
  Initail Proxool J2EE-managed DataSource. Not quite complete yet.
 
