@@ -9,6 +9,7 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.dbscript.ScriptFacade;
+import org.logicalcobwebs.dbscript.ConnectionAdapterIF;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -18,7 +19,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.16 $, $Date: 2002/11/09 16:09:06 $
+ * @version $Revision: 1.17 $, $Date: 2002/11/13 18:04:22 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -350,6 +351,68 @@ public class GeneralTests extends TestCase {
     }
 
     /**
+     * Test that spare connections are made as we run out of them
+     */
+    public void testPrototyping() {
+
+        String testName = "maximumActiveTime";
+        ProxoolAdapter adapter = null;
+        try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
+            info.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "2");
+            info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "5000");
+            adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            Connection[] connections = new Connection[6];
+            ConnectionPoolStatisticsIF cps;
+
+            Thread.sleep(10000);
+            cps = ProxoolFacade.getConnectionPoolStatistics(alias);
+            assertEquals("activeConnectionCount", 0, cps.getActiveConnectionCount());
+            assertEquals("availableConnectionCount", 2, cps.getAvailableConnectionCount());
+
+            connections[0] = adapter.getConnection();
+
+            Thread.sleep(10000);
+            cps = ProxoolFacade.getConnectionPoolStatistics(alias);
+            assertEquals("activeConnectionCount", 1, cps.getActiveConnectionCount());
+            assertEquals("availableConnectionCount", 2, cps.getAvailableConnectionCount());
+
+            connections[1] = adapter.getConnection();
+            connections[2] = adapter.getConnection();
+            connections[3] = adapter.getConnection();
+
+            Thread.sleep(10000);
+            cps = ProxoolFacade.getConnectionPoolStatistics(alias);
+            assertEquals("activeConnectionCount", 4, cps.getActiveConnectionCount());
+            assertEquals("availableConnectionCount", 1, cps.getAvailableConnectionCount());
+
+            // Clean up
+            for (int i = 0; i < connections.length; i++) {
+                if (connections[i] != null && !connections[i].isClosed()) {
+                    adapter.closeConnection(connections[i]);
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            try {
+                adapter.teardown();
+            } catch (SQLException e) {
+                LOG.error(e);
+            }
+        }
+
+    }
+
+    /**
      * Can we have multiple pools?
      */
     public void testMultiple() throws SQLException, ClassNotFoundException {
@@ -391,6 +454,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.17  2002/11/13 18:04:22  billhorsman
+ new prototyping test
+
  Revision 1.16  2002/11/09 16:09:06  billhorsman
  checkstyle
 
