@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration>
+
+    <appender name="file" class="org.apache.log4j.ConsoleAppender">
+      <layout class="org.apache.log4j.PatternLayout">
+        <param name="ConversionPattern" value="%d{DATE} [%-5p] %c{4} - %m%n"/>
+      </layout>
+    </appender>
+
+    <root>
+        <priority value="ERROR"/>
+    </root>
+
+</log4j:configuration>

@@ -6,22 +6,21 @@
 package org.logicalcobwebs.proxool.configuration;
 
 import junit.framework.TestCase;
-
-import java.util.Properties;
-
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.proxool.TestHelper;
-import org.logicalcobwebs.proxool.ProxoolAdapter;
-import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.GlobalTest;
-import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
+import org.logicalcobwebs.proxool.GlobalTest;
+import org.logicalcobwebs.proxool.ProxoolConstants;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.TestConstants;
+import org.logicalcobwebs.proxool.TestHelper;
+
+import java.util.Properties;
 
 /**
  * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.11 $, $Date: 2003/02/19 15:14:26 $
+ * @version $Revision: 1.12 $, $Date: 2003/02/27 18:01:49 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -41,32 +40,29 @@ public class ConfiguratorTest extends TestCase {
 
     protected void setUp() throws Exception {
         GlobalTest.globalSetup();
-        try {
-            TestHelper.createTable(TEST_TABLE);
-        } catch (Exception e) {
-            LOG.debug("Problem creating table", e);
-        }
     }
 
     protected void tearDown() throws Exception {
-        TestHelper.dropTable(TEST_TABLE);
         GlobalTest.globalTeardown();
     }
 
 
-    public void testConfigurator() {
+    public void testConfigurator() throws Exception {
 
         String testName = "configurator";
-        ProxoolAdapter adapter = null;
+        String alias = testName;
         try {
-            String alias = testName;
-            Properties info = TestHelper.buildProperties();
-            adapter = new ProxoolAdapter(alias);
-            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+            ProxoolFacade.registerConnectionPool(url, info);
 
             Properties newInfo = new Properties();
             newInfo.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "3");
-            adapter.update(newInfo);
+            ProxoolFacade.updateConnectionPool(url, newInfo);
 
             final ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
             assertNotNull("definition is null", cpd);
@@ -74,9 +70,9 @@ public class ConfiguratorTest extends TestCase {
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
-            fail(e.getMessage());
+            throw e;
         } finally {
-            adapter.tearDown();
+            ProxoolFacade.removeConnectionPool(alias);
         }
 
     }
@@ -86,6 +82,10 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.12  2003/02/27 18:01:49  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.11  2003/02/19 15:14:26  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 import java.util.Properties;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.DriverManager;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
@@ -18,7 +19,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:50 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/27 18:01:48 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -26,8 +27,6 @@ import org.logicalcobwebs.logging.LogFactory;
 public class StateListenerTest extends TestCase {
 
     private static final Log LOG = LogFactory.getLog(StateListenerTest.class);
-
-    private int upState = -1;
 
     /**
      * @see TestCase#TestCase
@@ -40,14 +39,17 @@ public class StateListenerTest extends TestCase {
      * Test whether we can add a state listener and that it receives
      * notification of change of state
      */
-    public void testAddStateListener() {
+    public void testAddStateListener() throws Exception {
 
         String testName = "addStateListener";
-        ProxoolAdapter adapter = null;
+        String alias = testName;
         try {
-            String alias = testName;
-            String url = TestHelper.getFullUrl(alias);
-            Properties info = TestHelper.buildProperties();
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
             info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
             info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "5000");
             info.setProperty(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY, "5000");
@@ -55,22 +57,20 @@ public class StateListenerTest extends TestCase {
 
             assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
 
-            StateListenerIF stateListener = new TestStateListener();
+            TestStateListener stateListener = new TestStateListener();
             ProxoolFacade.addStateListener(alias, stateListener);
 
             assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
 
-            Connection c1 = TestHelper.getProxoolConnection(url, null);
+            Connection c1 = DriverManager.getConnection(url);
 
             // Test BUSY
-            Thread.sleep(6000);
-            assertEquals("upState", StateListenerIF.STATE_BUSY, upState);
+            assertEquals("upState", StateListenerIF.STATE_BUSY, stateListener.getNextState());
 
             assertEquals("maximumConnectionCount", 1, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
-            LOG.debug("maximumConnectionCount=" + ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
 
             try {
-                Connection c2 = TestHelper.getProxoolConnection(url, null);
+                Connection c2 = DriverManager.getConnection(url);
                 fail("Didn't expect second connection since maximumConnectionCount is 1");
             } catch (SQLException e) {
                 // We expect a refusal here
@@ -78,35 +78,28 @@ public class StateListenerTest extends TestCase {
             }
 
             // Test Overloaded
-            Thread.sleep(6000);
-            assertEquals("upState", StateListenerIF.STATE_OVERLOADED, upState);
+            assertEquals("upState", StateListenerIF.STATE_OVERLOADED, stateListener.getNextState());
 
             // Test Busy again
-            Thread.sleep(5000);
-            assertEquals("upState", StateListenerIF.STATE_BUSY, upState);
+            assertEquals("upState", StateListenerIF.STATE_BUSY, stateListener.getNextState());
 
             // Test Quiet again
             c1.close();
-            Thread.sleep(5000);
-            assertEquals("upState", StateListenerIF.STATE_QUIET, upState);
+            assertEquals("upState", StateListenerIF.STATE_QUIET, stateListener.getNextState());
 
             // Bogus definition -> should be down
             ProxoolFacade.updateConnectionPool("proxool." + alias + ":blah:foo", null);
-            ProxoolFacade.killAllConnections(alias);
-            Thread.sleep(5000);
-            assertEquals("upState", StateListenerIF.STATE_DOWN, upState);
+            assertEquals("upState", StateListenerIF.STATE_DOWN, stateListener.getNextState());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
-            fail(e.getMessage());
+            throw e;
+        } finally {
+            ProxoolFacade.removeConnectionPool(alias);
         }
 
     }
 
-
-    private void clear() {
-        upState = -1;
-    }
 
     /**
      * Calls {@link GlobalTest#globalSetup}
@@ -127,9 +120,49 @@ public class StateListenerTest extends TestCase {
 
     class TestStateListener implements StateListenerIF {
 
+        private boolean somethingHappened;
+
+        private int upState;
+
         public void upStateChanged(int newUpState) {
             LOG.debug("upState: " + upState + " -> " + newUpState);
             upState = newUpState;
+            somethingHappened = true;
+        }
+
+        boolean isSomethingHappened() {
+            return somethingHappened;
+        }
+
+        int getUpState() {
+            return upState;
+        }
+
+        void reset() {
+            upState = 0;
+            somethingHappened = false;
+        }
+
+        void waitForSomethingToHappen() {
+
+            long start = System.currentTimeMillis();
+            while (!somethingHappened) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    LOG.error("Awoken", e);
+                }
+                if (System.currentTimeMillis() - start > 30000) {
+                    fail("Timeout waiting for something to happen");
+                }
+            }
+
+        }
+
+        int getNextState() {
+            waitForSomethingToHappen();
+            somethingHappened = false;
+            return upState;
         }
     }
 }
@@ -137,6 +170,10 @@ public class StateListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.3  2003/02/27 18:01:48  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.2  2003/02/26 16:05:50  billhorsman
  widespread changes caused by refactoring the way we
  update and redefine pool definitions.

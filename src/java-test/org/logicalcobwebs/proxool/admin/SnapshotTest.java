@@ -14,14 +14,16 @@ import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ConnectionInfoIF;
+import org.logicalcobwebs.proxool.TestConstants;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Properties;
 
 /**
  * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:51 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/27 18:01:48 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -56,13 +58,17 @@ public class SnapshotTest extends TestCase {
     /**
      * Test whether the statistics we get back are roughly right.
      */
-    public void testStatistics() {
+    public void testStatistics() throws Exception {
 
         String testName = "statistics";
         String alias = testName;
         try {
-            String url = TestHelper.getFullUrl(alias);
-            Properties info = TestHelper.buildProperties();
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
             info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s,15s");
             info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
 
@@ -80,7 +86,7 @@ public class SnapshotTest extends TestCase {
             }
 
             {
-                Connection c = TestHelper.getProxoolConnection(url, null);
+                Connection c = DriverManager.getConnection(url);
                 c.close();
 
                 SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
@@ -96,7 +102,7 @@ public class SnapshotTest extends TestCase {
             }
 
             {
-                Connection c = TestHelper.getProxoolConnection(url, null);
+                Connection c = DriverManager.getConnection(url);
 
                 SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
 
@@ -114,13 +120,9 @@ public class SnapshotTest extends TestCase {
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
-            fail(e.getMessage());
+            throw e;
         } finally {
-            try {
-                ProxoolFacade.removeConnectionPool(alias);
-            } catch (ProxoolException e) {
-                LOG.error("Couldn't shutdown pool", e);
-            }
+            ProxoolFacade.removeConnectionPool(alias);
         }
 
     }
@@ -130,6 +132,10 @@ public class SnapshotTest extends TestCase {
 /*
  Revision history:
  $Log: SnapshotTest.java,v $
+ Revision 1.3  2003/02/27 18:01:48  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.2  2003/02/26 16:05:51  billhorsman
  widespread changes caused by refactoring the way we
  update and redefine pool definitions.

@@ -12,7 +12,7 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.15 $, $Date: 2003/02/19 23:25:28 $
+ * @version $Revision: 1.16 $, $Date: 2003/02/27 18:01:46 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -26,12 +26,21 @@ public class AllTests {
      */
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(HypersonicTest.class);
-        suite.addTestSuite(GeneralTests.class);
-        suite.addTestSuite(ConnectionResetterTest.class);
-        suite.addTestSuite(ConnectionListenerTest.class);
         suite.addTestSuite(ConfigurationListenerTest.class);
+        suite.addTestSuite(ConnectionInfoTest.class);
+        suite.addTestSuite(ConnectionListenerTest.class);
+        suite.addTestSuite(ConnectionResetterTest.class);
+        suite.addTestSuite(DriverTest.class);
+        suite.addTestSuite(ConnectionPoolTests.class);
+        suite.addTestSuite(HouseKeeperTest.class);
+        suite.addTestSuite(HypersonicTest.class);
+        suite.addTestSuite(PrototyperTest.class);
+        suite.addTestSuite(ProxyConnectionTest.class);
+        suite.addTestSuite(ProxyDatabaseMetaDataTest.class);
+        suite.addTestSuite(ProxyStatementTest.class);
+        suite.addTestSuite(RegistrationTest.class);
         suite.addTestSuite(StateListenerTest.class);
+        suite.addTestSuite(UpdateDefinitionTest.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -48,6 +57,10 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.16  2003/02/27 18:01:46  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.15  2003/02/19 23:25:28  billhorsman
  new StateListenerTest
 

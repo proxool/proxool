@@ -21,7 +21,7 @@ import org.xml.sax.InputSource;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/19 15:14:27 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/27 18:01:49 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -53,12 +53,12 @@ public class JAXPConfiguratorTest extends TestCase {
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-2"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         ProxoolFacade.removeConnectionPool("xml-test");
         ProxoolFacade.removeConnectionPool("xml-test-2");
@@ -82,12 +82,12 @@ public class JAXPConfiguratorTest extends TestCase {
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-ns"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-ns-2"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         ProxoolFacade.removeConnectionPool("xml-test-ns");
         ProxoolFacade.removeConnectionPool("xml-test-ns-2");
@@ -114,12 +114,12 @@ public class JAXPConfiguratorTest extends TestCase {
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-validating"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("xml-test-validating-2"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         ProxoolFacade.removeConnectionPool("xml-test-validating");
         ProxoolFacade.removeConnectionPool("xml-test-validating-2");
@@ -185,6 +185,10 @@ public class JAXPConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.8  2003/02/27 18:01:49  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.7  2003/02/19 15:14:27  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

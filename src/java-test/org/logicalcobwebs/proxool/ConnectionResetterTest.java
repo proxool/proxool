@@ -10,12 +10,13 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Properties;
 
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.9 $, $Date: 2003/02/19 15:14:22 $
+ * @version $Revision: 1.10 $, $Date: 2003/02/27 18:01:47 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -51,24 +52,26 @@ public class ConnectionResetterTest extends TestCase {
      * Test whether autoCommit is correctly reset when a connection is
      * returned to the pool.
      */
-    public void testAutoCommit() {
+    public void testAutoCommit() throws Exception {
 
         String testName = "autoCommit";
-        ProxoolAdapter adapter = null;
+        String alias = testName;
         try {
-            String alias = testName;
-            Properties info = TestHelper.buildProperties();
-            adapter = new ProxoolAdapter(alias);
-            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
-            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+            ProxoolFacade.registerConnectionPool(url, info);
 
-            Connection c1 = adapter.getConnection();
-            Connection c2 = adapter.getConnection();
+            Connection c1 = DriverManager.getConnection(url);;
+            Connection c2 = DriverManager.getConnection(url);;
 
             c1.setAutoCommit(false);
             c1.close();
 
-            c1 = adapter.getConnection();
+            c1 = DriverManager.getConnection(url);
             assertTrue("c1.getAutoCommit", c1.getAutoCommit());
 
             c2.close();
@@ -76,9 +79,9 @@ public class ConnectionResetterTest extends TestCase {
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
-            fail(e.getMessage());
+            throw e;
         } finally {
-            adapter.tearDown();
+            ProxoolFacade.removeConnectionPool(alias);
         }
 
     }
@@ -87,25 +90,28 @@ public class ConnectionResetterTest extends TestCase {
      * Test whether autoCommit is correctly reset when a connection is
      * returned to the pool.
      */
-    public void testReadOnly() {
+    public void testReadOnly() throws Exception {
 
         String testName = "readOnly";
-        ProxoolAdapter adapter = null;
+        String alias = testName;
         try {
-            String alias = testName;
-            Properties info = TestHelper.buildProperties();
-            adapter = new ProxoolAdapter(alias);
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
             info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
-            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+            ProxoolFacade.registerConnectionPool(url, info);
 
-            Connection c1 = adapter.getConnection();
-            Connection c2 = adapter.getConnection();
+            Connection c1 = DriverManager.getConnection(url);;
+            Connection c2 = DriverManager.getConnection(url);;
 
             boolean originalReadOnly = c1.isReadOnly();
             c1.setReadOnly(true);
             c1.close();
 
-            c1 = adapter.getConnection();
+            c1 = DriverManager.getConnection(url);;
             assertTrue("readOnly", c1.isReadOnly() == originalReadOnly);
 
             c2.close();
@@ -113,9 +119,9 @@ public class ConnectionResetterTest extends TestCase {
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
-            fail(e.getMessage());
+            throw e;
         } finally {
-            adapter.tearDown();
+            ProxoolFacade.removeConnectionPool(alias);
         }
 
     }
@@ -125,6 +131,10 @@ public class ConnectionResetterTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.10  2003/02/27 18:01:47  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.9  2003/02/19 15:14:22  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

@@ -15,7 +15,7 @@ import java.sql.SQLException;
 /**
  * Very basic test to see if Hypersonic test database is working
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/19 15:14:23 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/27 18:01:48 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -32,23 +32,21 @@ public class HypersonicTest extends TestCase {
 
     protected void setUp() throws Exception {
         GlobalTest.globalSetup();
-        TestHelper.createTable(TEST_TABLE);
     }
 
     protected void tearDown() throws Exception {
-        TestHelper.dropTable(TEST_TABLE);
         GlobalTest.globalTeardown();
     }
 
-    public void testInsert() throws SQLException, ClassNotFoundException {
+    public void testHypersonic() throws Exception {
 
-        Connection c;
-
-        c = TestHelper.getDirectConnection();
-        TestHelper.insertRow(c, TEST_TABLE);
-        TestHelper.insertRow(c, TEST_TABLE);
-        TestHelper.insertRow(c, TEST_TABLE);
-        assertEquals("Wrong number of rows added", 3, TestHelper.getCount(c, TEST_TABLE));
+        String testName = "hypersonic";
+        try {
+            TestHelper.getDirectConnection().close();
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            throw e;
+        }
 
     }
 
@@ -57,6 +55,10 @@ public class HypersonicTest extends TestCase {
 /*
  Revision history:
  $Log: HypersonicTest.java,v $
+ Revision 1.8  2003/02/27 18:01:48  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.7  2003/02/19 15:14:23  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

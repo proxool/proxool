@@ -17,7 +17,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Tests that the PropertyConfigurator works.
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/19 15:14:27 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/27 18:01:49 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -42,12 +42,12 @@ public class PropertyConfiguratorTest extends TestCase {
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("property-test"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("property-test-2"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         ProxoolFacade.removeConnectionPool("property-test");
         ProxoolFacade.removeConnectionPool("property-test-2");
@@ -72,6 +72,10 @@ public class PropertyConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: PropertyConfiguratorTest.java,v $
+ Revision 1.3  2003/02/27 18:01:49  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.2  2003/02/19 15:14:27  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)

@@ -13,14 +13,16 @@ import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.TestConstants;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Properties;
 
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/27 09:45:33 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/27 18:01:48 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -55,14 +57,18 @@ public class StatisticsListenerTest extends TestCase {
     /**
      * Can we listen to statistics
      */
-    public void testListener() {
+    public void testListener() throws Exception {
 
         String testName = "listener";
         String alias = testName;
         try {
-            String url = TestHelper.getFullUrl(alias);
-            Properties info = TestHelper.buildProperties();
-            info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s");
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+            info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "5s");
 
             // We don't test whether anything is logged, but this line should make something appear
             info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
@@ -71,64 +77,80 @@ public class StatisticsListenerTest extends TestCase {
             ProxoolFacade.registerConnectionPool(url, info);
 
             // Add listener
-            TestListener tl = new TestListener();
-            ProxoolFacade.addStatisticsListener(alias, tl);
+            TestListener testListener = new TestListener();
+            ProxoolFacade.addStatisticsListener(alias, testListener);
 
-            // Wait for prototyper to build connections
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                LOG.debug("Awoken", e);
-            }
+            // Wait for next statistics so we can guarantee that next set won't
+            // be produced whilst we are building connection
+            testListener.getNextStatistics();
 
-            Connection c = TestHelper.getProxoolConnection(url, null);
-            c.close();
+            DriverManager.getConnection(url).close();
+            StatisticsIF statistics = testListener.getNextStatistics();
 
-            long startWaiting = System.currentTimeMillis();
-            while (tl.getStatistics() == null) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    LOG.debug("Awoken", e);
-                }
-                if (System.currentTimeMillis() - startWaiting > 20000) {
-                    fail("Statistics didn't arrive within expected 20 seconds");
-                }
-            }
-
-            assertEquals("servedCount", 1L, tl.getStatistics().getServedCount());
-            LOG.debug("statistics().getServedCount()=" + tl.getStatistics().getServedCount());
+            assertEquals("servedCount", 1L, statistics.getServedCount());
+            LOG.debug("statistics().getServedCount()=" + statistics.getServedCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
-            fail(e.getMessage());
+            throw e;
         } finally {
-            try {
-                ProxoolFacade.removeConnectionPool(alias);
-            } catch (ProxoolException e) {
-                LOG.error("Couldn't shutdown pool", e);
-            }
+            ProxoolFacade.removeConnectionPool(alias);
         }
 
     }
 
     class TestListener implements StatisticsListenerIF {
 
-        private StatisticsIF statistics;;
+        private StatisticsIF statistics;
+
+        boolean somethingHappened;
 
         public void statistics(String alias, StatisticsIF statistics) {
             this.statistics = statistics;
+            somethingHappened = true;
+        }
+
+        void reset() {
+            statistics = null;
+            somethingHappened = false;
         }
 
         public StatisticsIF getStatistics() {
             return statistics;
         }
+
+        void waitForSomethingToHappen() {
+
+            long start = System.currentTimeMillis();
+            while (!somethingHappened) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    LOG.error("Awoken", e);
+                }
+                if (System.currentTimeMillis() - start > 30000) {
+                    fail("Timeout waiting for something to happen");
+                }
+            }
+
+        }
+
+        StatisticsIF getNextStatistics() {
+            waitForSomethingToHappen();
+            somethingHappened = false;
+            return statistics;
+        }
+
     }
 }
 
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.4  2003/02/27 18:01:48  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.3  2003/02/27 09:45:33  billhorsman
  sleep a little
 

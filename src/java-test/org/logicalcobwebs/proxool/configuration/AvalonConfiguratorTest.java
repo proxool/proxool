@@ -26,9 +26,9 @@ import org.apache.log.Priority;
 /**
  * Tests that the AvalonConfgiuration works.
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/19 16:52:00 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/27 18:01:49 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class AvalonConfiguratorTest extends TestCase {
@@ -54,12 +54,12 @@ public class AvalonConfiguratorTest extends TestCase {
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("avalon-test"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("avalon-test-2"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         this.componentManager.dispose();
     }
@@ -76,12 +76,12 @@ public class AvalonConfiguratorTest extends TestCase {
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("avalon-test-ns"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         try {
             TestHelper.equalsCompleteAlternativeProperties(ProxoolFacade.getConnectionPoolDefinition("avalon-test-ns-2"));
         } catch (ProxoolException e) {
-            fail(e.getMessage());
+            throw e;
         }
         ProxoolFacade.removeConnectionPool("avalon-test-ns");
         ProxoolFacade.removeConnectionPool("avalon-test-ns-2");
@@ -178,6 +178,10 @@ public class AvalonConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: AvalonConfiguratorTest.java,v $
+ Revision 1.5  2003/02/27 18:01:49  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.4  2003/02/19 16:52:00  chr32
  Added tests for close-on-dispose functionality.
 

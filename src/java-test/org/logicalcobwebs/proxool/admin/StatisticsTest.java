@@ -14,15 +14,17 @@ import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
+import org.logicalcobwebs.proxool.TestConstants;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Properties;
 import java.text.DecimalFormat;
 
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/26 23:45:18 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/27 18:01:49 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -59,13 +61,17 @@ public class StatisticsTest extends TestCase {
     /**
      * Test whether the statistics we get back are roughly right.
      */
-    public void testStatistics() {
+    public void testStatistics() throws Exception {
 
         String testName = "statistics";
         String alias = testName;
         try {
-            String url = TestHelper.getFullUrl(alias);
-            Properties info = TestHelper.buildProperties();
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
             info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s,15s");
             info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
 
@@ -81,7 +87,7 @@ public class StatisticsTest extends TestCase {
 
 
             Thread.sleep(1000);
-            Connection c = TestHelper.getProxoolConnection(url, null);
+            Connection c = DriverManager.getConnection(url);
             Thread.sleep(1000);
             c.close();
             Thread.sleep(1000);
@@ -95,23 +101,23 @@ public class StatisticsTest extends TestCase {
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
-            fail(e.getMessage());
+            throw e;
         } finally {
-            try {
-                ProxoolFacade.removeConnectionPool(alias);
-            } catch (ProxoolException e) {
-                LOG.error("Couldn't shutdown pool", e);
-            }
+            ProxoolFacade.removeConnectionPool(alias);
         }
 
     }
 
-    public void testOverhead() {
+    public void testOverhead() throws Exception {
         String testName = "overhead";
         String alias = testName;
         try {
-            String url = TestHelper.getFullUrl(alias);
-            Properties info = TestHelper.buildProperties();
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
             info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s");
             info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
 
@@ -134,13 +140,9 @@ public class StatisticsTest extends TestCase {
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
-            fail(e.getMessage());
+            throw e;
         } finally {
-            try {
-                ProxoolFacade.removeConnectionPool(alias);
-            } catch (ProxoolException e) {
-                LOG.error("Couldn't shutdown pool", e);
-            }
+            ProxoolFacade.removeConnectionPool(alias);
         }
     }
 
@@ -179,6 +181,10 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.5  2003/02/27 18:01:49  billhorsman
+ completely rethought the test structure. it's now
+ more obvious. no new tests yet though.
+
  Revision 1.4  2003/02/26 23:45:18  billhorsman
  add some sleep
 
