@@ -10,8 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.stats.SnapshotIF;
-import org.logicalcobwebs.proxool.stats.StatisticsIF;
+import org.logicalcobwebs.proxool.ConnectionInfoIF;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -46,12 +45,13 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/31 00:38:22 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 11:35:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class MonitorServlet extends HttpServlet {
+
     private static final Log LOG = LogFactory.getLog(MonitorServlet.class);
 
     private int width = 300;
@@ -74,6 +74,11 @@ public class MonitorServlet extends HttpServlet {
     private static final Color COLOR_ACTIVE = Color.red;
     private static final Color COLOR_AVAILABLE = Color.green;
     private static final Color COLOR_SPARE = Color.decode("#eeeeee");
+    private static final String LEVEL = "level";
+    private static final String LEVEL_MORE = "more";
+    private static final String LEVEL_LESS = "less";
+    private static final String ACTION = "action";
+    private static final String ALIAS = "alias";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
@@ -85,10 +90,11 @@ public class MonitorServlet extends HttpServlet {
         String link = request.getRequestURI();
 
         // Check the action, and default to stats
-        String action = request.getParameter("action");
+        String action = request.getParameter(ACTION);
         if (action == null) {
             action = ACTION_STATS;
         }
+        String level = request.getParameter(LEVEL);
 
         if (action.equals(ACTION_CHART)) {
             response.setContentType("image/png");
@@ -100,7 +106,7 @@ public class MonitorServlet extends HttpServlet {
 
             // Check the alias and if not defined and there is only one
             // then use that. Otherwise show the list.
-            String alias = request.getParameter("alias");
+            String alias = request.getParameter(ALIAS);
             String[] aliases = ProxoolFacade.getAliases();
             if (alias == null) {
                 if (aliases.length == 1) {
@@ -123,10 +129,12 @@ public class MonitorServlet extends HttpServlet {
             try {
                 if (action.equals(ACTION_LIST)) {
                     response.setContentType("text/html");
-                    doList(response.getOutputStream(), alias, link);
+                    openHtml(response.getOutputStream());
+                    doList(response.getOutputStream(), alias, link, level);
+                    closeHtml(response.getOutputStream());
                 } else if (action.equals(ACTION_STATS)) {
                     response.setContentType("text/html");
-                    doStats(response.getOutputStream(), alias, link);
+                    doStats(response.getOutputStream(), alias, link, level);
                 } else {
                     LOG.error("Unrecognised action '" + action + "'");
                 }
@@ -166,17 +174,18 @@ public class MonitorServlet extends HttpServlet {
         ImageIO.write(bufferedImage, "png", out);
     }
 
-    private void doStats(ServletOutputStream out, String alias, String link) throws ProxoolException, IOException {
+    private void doStats(ServletOutputStream out, String alias, String link, String level) throws ProxoolException, IOException {
         openHtml(out);
+        doList(out, alias, link, level);
         doDefinition(out, alias, link);
-        doSnapshot(out, alias, link);
+        doSnapshot(out, alias, link, level);
         doStatistics(out, alias, link);
         closeHtml(out);
     }
 
     private void doStatistics(ServletOutputStream out, String alias, String link) throws ProxoolException, IOException {
         StatisticsIF[] statisticsArray = ProxoolFacade.getStatistics(alias);
-        SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias);
+        SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, false);
         ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
 
         for (int i = 0; i < statisticsArray.length; i++) {
@@ -235,8 +244,8 @@ public class MonitorServlet extends HttpServlet {
         printDefintionEntry(out, "Connection Lifetime", timeFormat.format(new Date(cpd.getMaximumConnectionLifetime() - DATE_OFFSET)));
 
         // maximumActiveTime
-        printDefintionEntry(out, "Maximum active timeFormat", timeFormat.format(new Date(cpd.getMaximumActiveTime() - DATE_OFFSET)));
-        printDefintionEntry(out, "House keeping sleep timeFormat", (cpd.getHouseKeepingSleepTime() / 1000) + "s");
+        printDefintionEntry(out, "Maximum active time", timeFormat.format(new Date(cpd.getMaximumActiveTime() - DATE_OFFSET)));
+        printDefintionEntry(out, "House keeping sleep time", (cpd.getHouseKeepingSleepTime() / 1000) + "s");
 
         // houseKeepingTestSql
         printDefintionEntry(out, "House keeping test SQL", cpd.getHouseKeepingTestSql());
@@ -262,8 +271,9 @@ public class MonitorServlet extends HttpServlet {
 
     }
 
-    private void doSnapshot(ServletOutputStream out, String alias, String link) throws IOException, ProxoolException {
-        SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias);
+    private void doSnapshot(ServletOutputStream out, String alias, String link, String level) throws IOException, ProxoolException {
+        boolean detail = (level != null && level.equals(LEVEL_MORE));
+        SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, detail);
         ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
 
         out.print("<b>Snapshot</b> at ");
@@ -310,7 +320,120 @@ public class MonitorServlet extends HttpServlet {
         // refusedCount
         printDefintionEntry(out, "Refused", String.valueOf(snapshot.getRefusedCount()));
 
+        if (!detail) {
+            out.println("    <tr>");
+            out.print("<td colspan=\"2\" align=\"right\"><a href=\"");
+            out.print(link);
+            out.print("?");
+            out.print(ALIAS);
+            out.print("=");
+            out.print(alias);
+            out.print("&");
+            out.print(LEVEL);
+            out.print("=");
+            out.print(LEVEL_MORE);
+            out.println("\">more information</a></td>");
+            out.println("    </tr>");
+        } else {
+
+            out.println("    <tr>");
+            out.print("      <td width=\"200\" valign=\"top\" style=\"" + STYLE_CAPTION + "\">");
+            out.print("Details");
+            out.println("</td>");
+            out.print("      <td style=\"" + STYLE_NO_DATA + "\">");
+
+            doSnapshotDetails(out, snapshot, link);
+
+            out.println("</td>");
+            out.println("    </tr>");
+
+            out.println("    <tr>");
+            out.print("<td colspan=\"2\" align=\"right\"><a href=\"");
+            out.print(link);
+            out.print("?");
+            out.print(ALIAS);
+            out.print("=");
+            out.print(alias);
+            out.print("&");
+            out.print(LEVEL);
+            out.print("=");
+            out.print(LEVEL_LESS);
+            out.println("\">less information</a></td>");
+            out.println("    </tr>");
+        }
+
         closeTable(out);
+    }
+
+    private void doSnapshotDetails(ServletOutputStream out, SnapshotIF snapshot, String link) throws IOException {
+
+        if (snapshot.getConnectionInfos() != null && snapshot.getConnectionInfos().length > 0) {
+            out.println("<table cellpadding=\"2\" border=\"0\">");
+            out.println("  <tbody>");
+
+            out.print("<tr>");
+            out.print("<td style=\"font-size: 90%\">#</td>");
+            out.print("<td style=\"font-size: 90%\" align=\"center\">born</td>");
+            out.print("<td style=\"font-size: 90%\" align=\"center\">last<br>start</td>");
+            out.print("<td style=\"font-size: 90%\" align=\"center\">lap<br>(ms)</td>");
+            out.print("<td style=\"font-size: 90%\" width=\"90%\">&nbsp;thread</td>");
+            out.print("</tr>");
+
+            ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
+            for (int i = 0; i < connectionInfos.length; i++) {
+                ConnectionInfoIF connectionInfo = connectionInfos[i];
+
+                out.print("<tr>");
+
+                // id
+                out.print("<td bgcolor=\"#");
+                if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_ACTIVE) {
+                    out.print("ffcccc");
+                } else if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_AVAILABLE) {
+                    out.print("ccffcc");
+                } else if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_OFFLINE) {
+                    out.print("ccccff");
+                }
+                out.print("\">");
+                out.print(connectionInfo.getId());
+                out.print("</td>");
+
+                // birth
+                out.print("<td>&nbsp;");
+                out.print(timeFormat.format(connectionInfo.getBirthDate()));
+                out.print("</td>");
+
+                // started
+                out.print("<td>&nbsp;");
+                out.print(timeFormat.format(new Date(connectionInfo.getTimeLastStartActive())));
+                out.print("</td>");
+
+                // active
+                out.print("<td align=\"right\">");
+                if (connectionInfo.getTimeLastStopActive() > 0) {
+                    out.print((int) (connectionInfo.getTimeLastStopActive() - connectionInfo.getTimeLastStartActive()));
+                } else if (connectionInfo.getTimeLastStartActive() > 0) {
+                    out.print("<font color=\"red\">");
+                    out.print((int) (snapshot.getSnapshotDate().getTime() - connectionInfo.getTimeLastStartActive()));
+                    out.print("</font>");
+                } else {
+                    out.print("&nbsp;");
+                }
+                out.print("&nbsp;&nbsp;</td>");
+
+                // requester
+                out.print("<td>&nbsp;");
+                out.print(connectionInfo.getRequester());
+                out.print("</td>");
+
+                out.println("</tr>");
+            }
+            out.println("  </tbody>");
+            out.println("</table>");
+
+        } else {
+            out.println("No connections yet");
+        }
     }
 
     private void openHtml(ServletOutputStream out) throws IOException {
@@ -348,12 +471,10 @@ public class MonitorServlet extends HttpServlet {
         out.println("    </tr>");
     }
 
-    private void doList(ServletOutputStream out, String alias, String link) throws IOException, ProxoolException {
-        openHtml(out);
+    private void doList(ServletOutputStream out, String alias, String link, String level) throws IOException, ProxoolException {
 
-        out.print("<b>Choose</b> a pool");
-        out.println("<table cellpadding=\"2\" cellspacing=\"2\" border=\"0\" bgcolor=\"#EEEEEE\" style=\"border: 1px solid black\">");
-        out.println("  <tbody>");
+        out.print("<b>Pools</b>");
+        openTable(out);
 
         String[] aliases = ProxoolFacade.getAliases();
         for (int i = 0; i < aliases.length; i++) {
@@ -364,17 +485,21 @@ public class MonitorServlet extends HttpServlet {
             }
             ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(a);
             out.println("    <tr style=\"" + style + "\">");
-            out.print("      <td><a href=\"" + link + "?alias=" + a + "\">");
+
+            out.print("      <td width=\"200\" style=\""+ STYLE_CAPTION + "\">");
+            out.print(a.equals(alias) ? ">" : "&nbsp;");
+            out.println("</td>");
+
+            out.print("      <td><a href=\"" + link + "?" + ALIAS + "=" + a + "&" + LEVEL + "=" + level + "\">");
             out.print(a);
-            out.println("</a></td>");
-            out.print("      <td>");
+            out.println("</a> -> ");
             out.print(cpd.getUrl());
             out.println("</td>");
             out.println("    </tr>");
         }
 
         closeTable(out);
-        closeHtml(out);
+
     }
 }
 
@@ -382,6 +507,9 @@ public class MonitorServlet extends HttpServlet {
 /*
  Revision history:
  $Log: MonitorServlet.java,v $
+ Revision 1.2  2003/01/31 11:35:57  billhorsman
+ improvements to servlet (including connection details)
+
  Revision 1.1  2003/01/31 00:38:22  billhorsman
  *** empty log message ***
 
