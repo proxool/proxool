@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Log4JCategoryLog.java,v 1.3 2003/03/11 00:02:07 billhorsman Exp $
- * $Revision: 1.3 $
- * $Date: 2003/03/11 00:02:07 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/Log4JCategoryLog.java,v 1.4 2003/09/10 23:05:10 billhorsman Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/09/10 23:05:10 $
  *
  * ====================================================================
  *
@@ -61,10 +61,7 @@
 
 package org.logicalcobwebs.logging.impl;
 
-import org.apache.log4j.Category;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.Priority;
+import org.apache.log4j.*;
 import org.logicalcobwebs.logging.Log;
 
 import java.util.Enumeration;
@@ -78,7 +75,7 @@ import java.util.Enumeration;
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  * @author Rod Waldhoff
  * @author Robert Burrell Donkin
- * @version $Id: Log4JCategoryLog.java,v 1.3 2003/03/11 00:02:07 billhorsman Exp $
+ * @version $Id: Log4JCategoryLog.java,v 1.4 2003/09/10 23:05:10 billhorsman Exp $
  */
 public final class Log4JCategoryLog implements Log {
 
@@ -135,7 +132,7 @@ public final class Log4JCategoryLog implements Log {
             app.setName ("commons-logging");
 
             root.addAppender (app);
-            root.setPriority (Priority.INFO);
+            root.setLevel (Level.INFO);
         }
         initialized = true;
     }
