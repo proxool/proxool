@@ -28,7 +28,7 @@ import java.util.TreeMap;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.5 $, $Date: 2002/10/28 19:28:25 $
+ * @version $Revision: 1.6 $, $Date: 2002/10/29 23:20:55 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -171,6 +171,9 @@ class ProxyStatement implements InvocationHandler {
 
             // If we executed something then we should tell the listener.
             if (method.getName().startsWith(EXECUTE_FRAGMENT)) {
+                if (connectionPool.getLog().isDebugEnabled() && connectionPool.getDefinition().isVerbose()) {
+                    connectionPool.getLog().debug("Execute time: " + (System.currentTimeMillis() - startTime) + " milliseconds");
+                }
                 connectionPool.onExecute(NOT_IMPLEMENTED, (System.currentTimeMillis() - startTime), exception);
             }
 
@@ -191,6 +194,9 @@ class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.6  2002/10/29 23:20:55  billhorsman
+ logs execute time when debug is enabled and verbose is true
+
  Revision 1.5  2002/10/28 19:28:25  billhorsman
  checkstyle
 
