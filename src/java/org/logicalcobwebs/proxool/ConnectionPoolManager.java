@@ -13,12 +13,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
 
 /**
  *
- * @version $Revision: 1.4 $, $Date: 2002/12/15 19:21:42 $
+ * @version $Revision: 1.5 $, $Date: 2003/01/17 00:38:12 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPoolManager {
     private static final Object LOCK = new Object();
@@ -45,13 +46,33 @@ class ConnectionPoolManager {
     private ConnectionPoolManager() {
     }
 
-    protected ConnectionPool getConnectionPool(String alias) {
-        ConnectionPool cp = null;
-        if (alias == null) {
-            throw new RuntimeException(("You can't ask for a Connection without defining the alias"));
+    /**
+     * Get the pool by the alias
+     * @param alias what the pool is called
+     * @return the pool
+     * @throws ProxoolException if it couldn't be found
+     */
+    protected ConnectionPool getConnectionPool(String alias) throws ProxoolException {
+        ConnectionPool cp = (ConnectionPool) connectionPoolMap.get(alias);
+        if (cp == null) {
+            StringBuffer message = new StringBuffer("Couldn't find a pool called '" + alias + "'. Known pools are: ");
+            Iterator i = connectionPoolMap.keySet().iterator();
+            while (i.hasNext()) {
+                message.append((String) i.next());
+                message.append(i.hasNext() ? ", " : ".");
+            }
+            throw new ProxoolException(message.toString());
         }
-        cp = (ConnectionPool) connectionPoolMap.get(alias);
         return cp;
+    }
+
+    /**
+     * Whether the pool is already registered
+     * @param alias how we identify the pool
+     * @return true if it already exists, else false
+     */
+    protected boolean isPoolExists(String alias) {
+        return connectionPoolMap.containsKey(alias);
     }
 
     /** @return an array of the connection pools */
@@ -62,18 +83,14 @@ class ConnectionPoolManager {
     protected ConnectionPool createConnectionPool(ConnectionPoolDefinition connectionPoolDefinition) {
         ConnectionPool connectionPool = new ConnectionPool(connectionPoolDefinition);
         connectionPools.add(connectionPool);
-        connectionPoolMap.put("proxool." + connectionPoolDefinition.getName(), connectionPool);
-        connectionPoolMap.put(connectionPoolDefinition.getName(), connectionPool);
-        connectionPoolMap.put(connectionPoolDefinition.getCompleteUrl(), connectionPool);
+        connectionPoolMap.put(connectionPoolDefinition.getAlias(), connectionPool);
         return connectionPool;
     }
 
     protected void removeConnectionPool(String name) {
         ConnectionPool cp = (ConnectionPool) connectionPoolMap.get(name);
         if (cp != null) {
-            connectionPoolMap.remove("proxool." + cp.getDefinition().getName());
-            connectionPoolMap.remove(cp.getDefinition().getName());
-            connectionPoolMap.remove(cp.getDefinition().getCompleteUrl());
+            connectionPoolMap.remove(cp.getDefinition().getAlias());
         } else {
             LOG.error("Ignored attempt to remove non-existent connection pool " + name);
         }
@@ -87,6 +104,11 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.5  2003/01/17 00:38:12  billhorsman
+ wide ranging changes to clarify use of alias and url -
+ this has led to some signature changes (new exceptions
+ thrown) on the ProxoolFacade API.
+
  Revision 1.4  2002/12/15 19:21:42  chr32
  Changed @linkplain to @link (to preserve JavaDoc for 1.2/1.3 users).
 

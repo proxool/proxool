@@ -6,6 +6,8 @@
 */
 package org.logicalcobwebs.dbscript;
 
+import org.logicalcobwebs.proxool.ProxoolException;
+
 import java.util.Properties;
 import java.sql.SQLException;
 import java.sql.Connection;
@@ -15,7 +17,7 @@ import java.sql.Connection;
  * {@link java.sql.Driver Driver} because it has {@link #setup} and
  * {@link #tearDown} methods.
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/13 20:23:34 $
+ * @version $Revision: 1.6 $, $Date: 2003/01/17 00:38:12 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -31,7 +33,7 @@ public interface ConnectionAdapterIF {
      * @param info the properties to pass to the driver
      * @throws SQLException if anything goes wrong
      */
-    void setup(String driver, String url, Properties info) throws SQLException;
+    void setup(String driver, String url, Properties info) throws SQLException, ProxoolException;
 
     /**
      * Simply get a connection (using the definitions defined in {@link #setup}
@@ -53,7 +55,7 @@ public interface ConnectionAdapterIF {
      * Reclaim resources used by the adapter (for instance, close any
      * open connections)
      */
-    void tearDown();
+    void tearDown() throws ProxoolException;
 
     /**
      * Convenient name so we can identify this adapter in logs.
@@ -66,6 +68,11 @@ public interface ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ConnectionAdapterIF.java,v $
+ Revision 1.6  2003/01/17 00:38:12  billhorsman
+ wide ranging changes to clarify use of alias and url -
+ this has led to some signature changes (new exceptions
+ thrown) on the ProxoolFacade API.
+
  Revision 1.5  2002/11/13 20:23:34  billhorsman
  change method name, throw exceptions differently, trivial changes
 

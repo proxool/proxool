@@ -18,7 +18,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.11 $, $Date: 2002/12/16 16:41:59 $
+ * @version $Revision: 1.12 $, $Date: 2003/01/17 00:38:12 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -92,15 +92,15 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
         return "proxool";
     }
 
-    public void update(Properties info) throws SQLException {
+    public void update(Properties info) throws SQLException, ProxoolException {
         ProxoolFacade.updateConnectionPool(getFullUrl(), info);
     }
 
-    public void update(String url) throws SQLException {
+    public void update(String url) throws SQLException, ProxoolException {
         ProxoolFacade.updateConnectionPool(url, null);
     }
 
-    public void setup(String driver, String url, Properties info) throws SQLException {
+    public void setup(String driver, String url, Properties info) throws SQLException, ProxoolException {
 
         try {
             Class.forName(ProxoolDriver.class.getName());
@@ -128,8 +128,12 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
         }
     }
 
-    public void tearDown() {
-        ProxoolFacade.removeConnectionPool(alias);
+    public void tearDown()  {
+        try {
+            ProxoolFacade.removeConnectionPool(alias);
+        } catch (ProxoolException e) {
+            LOG.error("Problem tearing down " + alias, e);
+        }
     }
 
 }
@@ -137,6 +141,11 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfiguratorIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.12  2003/01/17 00:38:12  billhorsman
+ wide ranging changes to clarify use of alias and url -
+ this has led to some signature changes (new exceptions
+ thrown) on the ProxoolFacade API.
+
  Revision 1.11  2002/12/16 16:41:59  billhorsman
  allow URL updates to pool
 

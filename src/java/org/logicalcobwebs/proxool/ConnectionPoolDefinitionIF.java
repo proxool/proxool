@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.9 $, $Date: 2002/12/17 14:20:44 $
+ * @version $Revision: 1.10 $, $Date: 2003/01/17 00:38:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -81,8 +81,11 @@ public interface ConnectionPoolDefinitionIF {
     /** The minimum number of connections we will keep open, regardless of whether anyone needs them or not. */
     int getMinimumConnectionCount();
 
-    /** The name associated with this connection pool. This is how you identify this pool when you need to use it. */
+    /** @deprecated use {@link #getAlias} instead.  */
     String getName();
+
+    /** The name associated with this connection pool. This is how you identify this pool when you need to use it. */
+    String getAlias();
 
     /** The password to use to login to the database */
     String getPassword();
@@ -184,6 +187,11 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.10  2003/01/17 00:38:12  billhorsman
+ wide ranging changes to clarify use of alias and url -
+ this has led to some signature changes (new exceptions
+ thrown) on the ProxoolFacade API.
+
  Revision 1.9  2002/12/17 14:20:44  billhorsman
  doc
 

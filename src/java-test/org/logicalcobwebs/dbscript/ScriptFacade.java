@@ -11,6 +11,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.SAXException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.ProxoolException;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
@@ -23,7 +24,7 @@ import java.sql.SQLException;
 /**
  * Allows you to run scripts from file.
  *
- * @version $Revision: 1.7 $, $Date: 2002/11/13 20:23:35 $
+ * @version $Revision: 1.8 $, $Date: 2003/01/17 00:38:12 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -93,6 +94,8 @@ public class ScriptFacade {
             LOG.error("Problem running script " + scriptLocation, e);
         } catch (SQLException e) {
             LOG.error("Problem running script " + scriptLocation, e);
+        } catch (ProxoolException e) {
+            LOG.error("Problem running script " + scriptLocation, e);
         }
 
     }
@@ -102,6 +105,11 @@ public class ScriptFacade {
 /*
  Revision history:
  $Log: ScriptFacade.java,v $
+ Revision 1.8  2003/01/17 00:38:12  billhorsman
+ wide ranging changes to clarify use of alias and url -
+ this has led to some signature changes (new exceptions
+ thrown) on the ProxoolFacade API.
+
  Revision 1.7  2002/11/13 20:23:35  billhorsman
  change method name, throw exceptions differently, trivial changes
 

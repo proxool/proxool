@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.27 $, $Date: 2002/12/19 00:08:36 $
+ * @version $Revision: 1.28 $, $Date: 2003/01/17 00:38:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -50,36 +50,87 @@ public class GeneralTests extends TestCase {
     /**
      * Can we refer to the same pool by either the complete URL or the alias?
      */
-    public void testAlias() throws SQLException, ClassNotFoundException {
+    public void testAlias() {
 
-        String alias = "alias";
+        String testName = "alias";
 
-        // Register pool
-        {
-            String url = TestHelper.getFullUrl(alias);
-            Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.insertRow(c, TEST_TABLE);
+        try {
+            String alias = testName;
+            // Register pool
+            {
+                String url = TestHelper.getFullUrl(alias);
+                Connection c = TestHelper.getProxoolConnection(url);
+                TestHelper.insertRow(c, TEST_TABLE);
+            }
+
+            // Get it back by url
+            {
+                String url = TestHelper.getFullUrl(alias);
+                Connection c = TestHelper.getProxoolConnection(url);
+                TestHelper.insertRow(c, TEST_TABLE);
+            }
+
+            // Get it back by name
+            {
+                String url = TestHelper.getSimpleUrl(alias);
+                Connection c = TestHelper.getProxoolConnection(url);
+                TestHelper.insertRow(c, TEST_TABLE);
+            }
+
+            ConnectionPoolStatisticsIF connectionPoolStatistics = ProxoolFacade.getConnectionPoolStatistics(alias);
+
+            // If the above calls all used the same pool then it should have served exactly 3 connections.s
+            assertEquals(3L, connectionPoolStatistics.getConnectionsServedCount());
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
         }
+    }
 
-        // Get it back by url
-        {
-            String url = TestHelper.getFullUrl(alias);
-            Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.insertRow(c, TEST_TABLE);
+    /**
+     * Can we change the delegate URL of a pool
+     */
+    public void testChangeUrl() {
+
+        String testName = "changeUrl";
+
+        try {
+            String alias = testName;
+
+            String urlPrefix = ProxoolConstants.PROXOOL
+                    + ProxoolConstants.ALIAS_DELIMITER
+                    + alias
+                    + ProxoolConstants.URL_DELIMITER
+                    + TestHelper.HYPERSONIC_DRIVER
+                    + ProxoolConstants.URL_DELIMITER
+                    + "jdbc:hsqldb:db";
+
+            // Register pool and get one connection
+            {
+                Connection c = TestHelper.getProxoolConnection(urlPrefix + "1");
+                c.close();
+            }
+
+            // If the above calls all used the same pool then it should have served exactly 3 connections.s
+            assertEquals("connectionsServedCount", 1L, ProxoolFacade.getConnectionPoolStatistics(alias).getConnectionsServedCount());
+
+            ProxoolFacade.updateConnectionPool(urlPrefix + "2", null);
+            ProxoolFacade.killAllConnections(alias);
+            
+            // Get another connection
+            {
+                Connection c = TestHelper.getProxoolConnection(urlPrefix + "2");
+                c.close();
+            }
+
+            // If the above calls all used the same pool then it should have served exactly 3 connections.s
+            assertEquals("connectionsServedCount", 2L, ProxoolFacade.getConnectionPoolStatistics(alias).getConnectionsServedCount());
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
         }
-
-        // Get it back by name
-        {
-            String url = TestHelper.getSimpleUrl(alias);
-            Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.insertRow(c, TEST_TABLE);
-        }
-
-        ConnectionPoolStatisticsIF connectionPoolStatistics = ProxoolFacade.getConnectionPoolStatistics(alias);
-
-        // If the above calls all used the same pool then it should have served exactly 3 connections.s
-        assertEquals(3L, connectionPoolStatistics.getConnectionsServedCount());
-
     }
 
     /**
@@ -219,7 +270,7 @@ public class GeneralTests extends TestCase {
 
             // Update using facade
             info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
-            ProxoolFacade.updateConnectionPool(alias, info);
+            ProxoolFacade.updateConnectionPool(adapter.getFullUrl(), info);
             assertEquals("maximumConnectionCount", 2, ProxoolFacade.getConnectionPoolDefinition(alias).getMaximumConnectionCount());
 
             // Now do it on the fly
@@ -387,7 +438,7 @@ public class GeneralTests extends TestCase {
             c3.close();
             assertEquals("connectionInfo count", 3, ProxoolFacade.getConnectionInfos(alias).size());
 
-            Iterator i =  ProxoolFacade.getConnectionInfos(alias).iterator();
+            Iterator i = ProxoolFacade.getConnectionInfos(alias).iterator();
             ConnectionInfoIF ci1 = (ConnectionInfoIF) i.next();
             ConnectionInfoIF ci2 = (ConnectionInfoIF) i.next();
             ConnectionInfoIF ci3 = (ConnectionInfoIF) i.next();
@@ -555,6 +606,11 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.28  2003/01/17 00:38:12  billhorsman
+ wide ranging changes to clarify use of alias and url -
+ this has led to some signature changes (new exceptions
+ thrown) on the ProxoolFacade API.
+
  Revision 1.27  2002/12/19 00:08:36  billhorsman
  automatic closure of statements when a connection is closed
 

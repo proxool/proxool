@@ -11,6 +11,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.ProxoolException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,7 +86,7 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.8 $, $Date: 2002/12/26 11:31:49 $
+ * @version $Revision: 1.9 $, $Date: 2003/01/17 00:38:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -196,6 +197,8 @@ public class XMLConfigurator extends DefaultHandler {
                 ProxoolFacade.registerConnectionPool(url.toString(), properties);
             } catch (SQLException e) {
                 throw new SAXException(e);
+            } catch (ProxoolException e) {
+                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
             }
 
             // This ensures we ignore remaining XML until we come across another

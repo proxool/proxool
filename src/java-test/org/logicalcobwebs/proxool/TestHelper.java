@@ -124,15 +124,15 @@ public class TestHelper {
             checkProperty(name, String.valueOf(correctValue), String.valueOf(candidateValue));
     }
 
-    public static void registerPool(String alias) throws SQLException {
+    public static void registerPool(String alias) throws SQLException, ProxoolException {
         registerPool(alias, TestHelper.buildProperties());
     }
 
-    public static void registerPool(String alias, Properties info) throws SQLException {
+    public static void registerPool(String alias, Properties info) throws SQLException, ProxoolException {
         ProxoolFacade.registerConnectionPool(getFullUrl(alias), info);
     }
 
-    public static void registerOraclePool(String alias, Properties info) throws SQLException {
+    public static void registerOraclePool(String alias, Properties info) throws SQLException, ProxoolException {
         ProxoolFacade.registerConnectionPool(getFullOracleUrl(alias), info);
     }
 

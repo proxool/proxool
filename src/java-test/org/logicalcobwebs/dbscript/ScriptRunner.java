@@ -8,13 +8,14 @@ package org.logicalcobwebs.dbscript;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.ProxoolException;
 
 import java.sql.SQLException;
 
 /**
  * Run a {@link Script script}.
  *
- * @version $Revision: 1.7 $, $Date: 2002/11/09 16:00:34 $
+ * @version $Revision: 1.8 $, $Date: 2003/01/17 00:38:12 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -30,7 +31,7 @@ public class ScriptRunner {
      * @param adapter so we know where to connections from
      * @throws SQLException if anything goes wrong
      */
-    protected static final void runScript(Script script, ConnectionAdapterIF adapter, CommandFilterIF commandFilter) throws SQLException {
+    protected static final void runScript(Script script, ConnectionAdapterIF adapter, CommandFilterIF commandFilter) throws SQLException, ProxoolException {
         adapter.setup(script.getDriver(), script.getUrl(), script.getInfo());
 
         try {
@@ -91,6 +92,11 @@ public class ScriptRunner {
 /*
  Revision history:
  $Log: ScriptRunner.java,v $
+ Revision 1.8  2003/01/17 00:38:12  billhorsman
+ wide ranging changes to clarify use of alias and url -
+ this has led to some signature changes (new exceptions
+ thrown) on the ProxoolFacade API.
+
  Revision 1.7  2002/11/09 16:00:34  billhorsman
  fix doc
 

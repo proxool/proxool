@@ -16,11 +16,12 @@ import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ProxoolAdapter;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.GlobalTest;
+import org.logicalcobwebs.proxool.ProxoolException;
 
 /**
  * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.4 $, $Date: 2002/12/26 11:35:02 $
+ * @version $Revision: 1.5 $, $Date: 2003/01/17 00:38:12 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -84,6 +85,11 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.5  2003/01/17 00:38:12  billhorsman
+ wide ranging changes to clarify use of alias and url -
+ this has led to some signature changes (new exceptions
+ thrown) on the ProxoolFacade API.
+
  Revision 1.4  2002/12/26 11:35:02  billhorsman
  Removed test regarding property configurator.
 
