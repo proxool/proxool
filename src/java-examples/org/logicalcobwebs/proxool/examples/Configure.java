@@ -5,6 +5,9 @@
  */
 package org.logicalcobwebs.proxool.examples;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,15 +15,18 @@ import java.util.Properties;
 
 /**
  * Example showing you how to configure the pool behaviour if you don't like the default.
- * @version $Revision: 1.1 $, $Date: 2002/09/19 08:51:09 $
+ * @version $Revision: 1.2 $, $Date: 2002/09/19 10:01:37 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 public class Configure {
 
+    private static final Log LOG = LogFactory.getLog(Configure.class);
+
     /**
      * Configures a pool
-     * @param args
+     *
+     * @param args not relevant
      */
     public static void main(String[] args) {
 
@@ -37,17 +43,20 @@ public class Configure {
                  delegare-class = org.gjt.mm.mysql.Driver
                  delegate-url = jdbc:mysql://localhost/test
             */
-            connection = DriverManager.getConnection("proxool:org.gjt.mm.mysql.Driver:jdbc:mysql://localhost/test", properties);
+            try {
+                connection = DriverManager.getConnection("proxool:org.gjt.mm.mysql.Driver:jdbc:mysql://localhost/test", properties);
+            } catch (SQLException e) {
+                LOG.error("Problem getting connection", e);
+            }
 
             if (connection != null) {
-                System.out.println("Got connection :)");
+                LOG.info("Got connection :)");
             } else {
-                System.out.println("No connection :(");
+                LOG.error("Didn't get connection, which probably means that no Driver accepted the URL");
             }
+
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Couldm't find driver", e);
         } finally {
             try {
                 if (connection != null) {
@@ -56,7 +65,7 @@ public class Configure {
                     connection.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.error("Problem closing connection", e);
             }
         }
 
@@ -67,6 +76,9 @@ public class Configure {
 /*
  Revision history:
  $Log: Configure.java,v $
+ Revision 1.2  2002/09/19 10:01:37  billhorsman
+ improved error handling and logging
+
  Revision 1.1  2002/09/19 08:51:09  billhorsman
  created new examples package
 
