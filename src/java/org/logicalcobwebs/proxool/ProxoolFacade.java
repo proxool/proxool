@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.26 $, $Date: 2003/01/15 12:20:06 $
+ * @version $Revision: 1.27 $, $Date: 2003/01/15 14:51:40 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -199,145 +199,10 @@ public class ProxoolFacade {
             while (i.hasNext()) {
                 String key = (String) i.next();
                 String value = info.getProperty(key);
-                boolean isProxoolProperty = true;
 
                 completeInfo.setProperty(key, value);
 
-                if (key.equals(ProxoolConstants.USER_PROPERTY)) {
-                    isProxoolProperty = false;
-                    if (isChanged(cpd.getUser(), value)) {
-                        changedProperties.setProperty(key, value);
-                        cpd.setUser(value);
-                    }
-                } else if (key.equals(ProxoolConstants.PASSWORD_PROPERTY)) {
-                    isProxoolProperty = false;
-                    if (isChanged(cpd.getPassword(), value)) {
-                        changedProperties.setProperty(key, value);
-                        cpd.setPassword(value);
-                    }
-                } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        if (cpd.getHouseKeepingSleepTime() != valueAsInt) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setHouseKeepingSleepTime(valueAsInt);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-                    }
-                } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
-                    if (isChanged(cpd.getHouseKeepingTestSql(), value)) {
-                        changedProperties.setProperty(key, value);
-                        cpd.setHouseKeepingTestSql(value);
-                    }
-                } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        if (cpd.getMaximumConnectionCount() != valueAsInt) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setMaximumConnectionCount(valueAsInt);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-                    }
-                } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        if (cpd.getMaximumConnectionLifetime() != valueAsInt) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setMaximumConnectionLifetime(valueAsInt);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-                    }
-                } else if (key.equals(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        if (cpd.getMaximumNewConnections() != valueAsInt) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setMaximumNewConnections(valueAsInt);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-                    }
-                } else if (key.equals(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        if (cpd.getMinimumConnectionCount() != valueAsInt) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setMinimumConnectionCount(valueAsInt);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-                    }
-                } else if (key.equals(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        if (cpd.getPrototypeCount() != valueAsInt) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setPrototypeCount(valueAsInt);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-                    }
-                } else if (key.equals(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        if (cpd.getRecentlyStartedThreshold() != valueAsInt) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setRecentlyStartedThreshold(valueAsInt);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-                    }
-                } else if (key.equals(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        if (cpd.getOverloadWithoutRefusalLifetime() != valueAsInt) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setOverloadWithoutRefusalLifetime(valueAsInt);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-                    }
-                } else if (key.equals(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY)) {
-                    try {
-                        int valueAsInt = Integer.parseInt(value);
-                        if (cpd.getMaximumActiveTime() != valueAsInt) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setMaximumActiveTime(valueAsInt);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
-                    }
-                } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
-                    if (value != null && value.equals("1")) {
-                        earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
-                        if (!cpd.isVerbose()) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setVerbose(true);
-                        }
-                    } else {
-                        earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=0 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=false instead.");
-                        if (cpd.isVerbose()) {
-                            changedProperties.setProperty(key, value);
-                            cpd.setVerbose(false);
-                        }
-                    }
-                } else if (key.equals(ProxoolConstants.VERBOSE_PROPERTY)) {
-                    final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
-                    if (cpd.isVerbose() != valueAsBoolean) {
-                        changedProperties.setProperty(key, value);
-                        cpd.setVerbose(valueAsBoolean);
-                    }
-                } else if (key.equals(ProxoolConstants.TRACE_PROPERTY)) {
-                    cpd.setTrace(Boolean.valueOf(value).booleanValue());
-                } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
-                    cpd.setFatalSqlException(value);
-                } else {
-                    cpd.setProperty(key, value);
-                    isProxoolProperty = false;
-                }
+                boolean isProxoolProperty = setProperty(key, cpd, value, changedProperties, earlyLog);
 
                 if (earlyLog.isDebugEnabled()) {
                     if (isProxoolProperty) {
@@ -372,6 +237,146 @@ public class ProxoolFacade {
         }
 
         return cpd.getName();
+    }
+
+    private static boolean setProperty(String key, ConnectionPoolDefinition cpd, String value, Properties changedProperties, Log earlyLog) throws SQLException {
+        boolean isProxoolProperty = true;
+        if (key.equals(ProxoolConstants.USER_PROPERTY)) {
+            isProxoolProperty = false;
+            if (isChanged(cpd.getUser(), value)) {
+                changedProperties.setProperty(key, value);
+                cpd.setUser(value);
+            }
+        } else if (key.equals(ProxoolConstants.PASSWORD_PROPERTY)) {
+            isProxoolProperty = false;
+            if (isChanged(cpd.getPassword(), value)) {
+                changedProperties.setProperty(key, value);
+                cpd.setPassword(value);
+            }
+        } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
+            try {
+                int valueAsInt = Integer.parseInt(value);
+                if (cpd.getHouseKeepingSleepTime() != valueAsInt) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setHouseKeepingSleepTime(valueAsInt);
+                }
+            } catch (NumberFormatException e) {
+                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+            }
+        } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
+            if (isChanged(cpd.getHouseKeepingTestSql(), value)) {
+                changedProperties.setProperty(key, value);
+                cpd.setHouseKeepingTestSql(value);
+            }
+        } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY)) {
+            try {
+                int valueAsInt = Integer.parseInt(value);
+                if (cpd.getMaximumConnectionCount() != valueAsInt) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setMaximumConnectionCount(valueAsInt);
+                }
+            } catch (NumberFormatException e) {
+                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+            }
+        } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY)) {
+            try {
+                int valueAsInt = Integer.parseInt(value);
+                if (cpd.getMaximumConnectionLifetime() != valueAsInt) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setMaximumConnectionLifetime(valueAsInt);
+                }
+            } catch (NumberFormatException e) {
+                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+            }
+        } else if (key.equals(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY)) {
+            try {
+                int valueAsInt = Integer.parseInt(value);
+                if (cpd.getMaximumNewConnections() != valueAsInt) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setMaximumNewConnections(valueAsInt);
+                }
+            } catch (NumberFormatException e) {
+                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+            }
+        } else if (key.equals(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY)) {
+            try {
+                int valueAsInt = Integer.parseInt(value);
+                if (cpd.getMinimumConnectionCount() != valueAsInt) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setMinimumConnectionCount(valueAsInt);
+                }
+            } catch (NumberFormatException e) {
+                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+            }
+        } else if (key.equals(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY)) {
+            try {
+                int valueAsInt = Integer.parseInt(value);
+                if (cpd.getPrototypeCount() != valueAsInt) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setPrototypeCount(valueAsInt);
+                }
+            } catch (NumberFormatException e) {
+                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+            }
+        } else if (key.equals(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY)) {
+            try {
+                int valueAsInt = Integer.parseInt(value);
+                if (cpd.getRecentlyStartedThreshold() != valueAsInt) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setRecentlyStartedThreshold(valueAsInt);
+                }
+            } catch (NumberFormatException e) {
+                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+            }
+        } else if (key.equals(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY)) {
+            try {
+                int valueAsInt = Integer.parseInt(value);
+                if (cpd.getOverloadWithoutRefusalLifetime() != valueAsInt) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setOverloadWithoutRefusalLifetime(valueAsInt);
+                }
+            } catch (NumberFormatException e) {
+                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+            }
+        } else if (key.equals(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY)) {
+            try {
+                int valueAsInt = Integer.parseInt(value);
+                if (cpd.getMaximumActiveTime() != valueAsInt) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setMaximumActiveTime(valueAsInt);
+                }
+            } catch (NumberFormatException e) {
+                throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+            }
+        } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
+            if (value != null && value.equals("1")) {
+                earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
+                if (!cpd.isVerbose()) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setVerbose(true);
+                }
+            } else {
+                earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=0 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=false instead.");
+                if (cpd.isVerbose()) {
+                    changedProperties.setProperty(key, value);
+                    cpd.setVerbose(false);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.VERBOSE_PROPERTY)) {
+            final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
+            if (cpd.isVerbose() != valueAsBoolean) {
+                changedProperties.setProperty(key, value);
+                cpd.setVerbose(valueAsBoolean);
+            }
+        } else if (key.equals(ProxoolConstants.TRACE_PROPERTY)) {
+            cpd.setTrace(Boolean.valueOf(value).booleanValue());
+        } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
+            cpd.setFatalSqlException(value);
+        } else {
+            cpd.setProperty(key, value);
+            isProxoolProperty = false;
+        }
+        return isProxoolProperty;
     }
 
     private static boolean isChanged(String oldValue, String newValue) {
@@ -602,6 +607,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.27  2003/01/15 14:51:40  billhorsman
+ checkstyle
+
  Revision 1.26  2003/01/15 12:20:06  billhorsman
  deprecated getConnectionPoolStatisticsDump
 

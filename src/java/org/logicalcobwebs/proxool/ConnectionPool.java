@@ -19,7 +19,7 @@ import java.util.Date;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.31 $, $Date: 2003/01/15 12:01:37 $
+ * @version $Revision: 1.32 $, $Date: 2003/01/15 14:51:40 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -736,28 +736,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     }
 
                     // Let's see whether our counts agree
-                    if (getDefinition().isVerbose() && log.isDebugEnabled()) {
-                        if (verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE] != connectionCountByState[ProxyConnection.STATUS_ACTIVE]) {
-                            log.warn("Warning: ACTIVE connections = " + verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE] + ". not " + connectionCountByState[ProxyConnection.STATUS_ACTIVE] + " as expected.");
-                        }
-                        if (verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE] != connectionCountByState[ProxyConnection.STATUS_AVAILABLE]) {
-                            log.warn("Warning: AVAILABLE connections = " + verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE] + ". not " + connectionCountByState[ProxyConnection.STATUS_AVAILABLE] + " as expected.");
-                        }
-                        if (verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE] != connectionCountByState[ProxyConnection.STATUS_OFFLINE]) {
-                            log.warn("Warning: OFFLINE connections = " + verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE] + ". not " + connectionCountByState[ProxyConnection.STATUS_OFFLINE] + " as expected.");
-                        }
-
-                        int total = connectionCountByState[ProxyConnection.STATUS_ACTIVE]
-                            + connectionCountByState[ProxyConnection.STATUS_AVAILABLE]
-                            + connectionCountByState[ProxyConnection.STATUS_OFFLINE];
-                        int verifiedTotal = verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE]
-                            + verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE]
-                            + verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE];
-                        if (total != verifiedTotal) {
-                            log.warn("Warning: TOTAL connections = " + verifiedTotal + ". not " + total + " as expected.");
-                        }
-
-                    }
+                    verifyConnectionCountState(verifiedConnectionCountByState);
 
                     setRecentlyStartedActiveConnectionCount(recentlyStartedActiveConnectionCountTemp);
 
@@ -775,6 +754,34 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     }
                 }
             } // END while (connectionPoolUp)
+        }
+
+        private void verifyConnectionCountState(int[] verifiedConnectionCountByState) {
+            if (getDefinition().isVerbose() && log.isDebugEnabled()) {
+                if (verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE] != connectionCountByState[ProxyConnection.STATUS_ACTIVE]) {
+                    log.warn("Warning: ACTIVE connections = " + verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE]
+                            + ". not " + connectionCountByState[ProxyConnection.STATUS_ACTIVE] + " as expected.");
+                }
+                if (verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE] != connectionCountByState[ProxyConnection.STATUS_AVAILABLE]) {
+                    log.warn("Warning: AVAILABLE connections = " + verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE]
+                            + ". not " + connectionCountByState[ProxyConnection.STATUS_AVAILABLE] + " as expected.");
+                }
+                if (verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE] != connectionCountByState[ProxyConnection.STATUS_OFFLINE]) {
+                    log.warn("Warning: OFFLINE connections = " + verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE]
+                            + ". not " + connectionCountByState[ProxyConnection.STATUS_OFFLINE] + " as expected.");
+                }
+
+                int total = connectionCountByState[ProxyConnection.STATUS_ACTIVE]
+                    + connectionCountByState[ProxyConnection.STATUS_AVAILABLE]
+                    + connectionCountByState[ProxyConnection.STATUS_OFFLINE];
+                int verifiedTotal = verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE]
+                    + verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE]
+                    + verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE];
+                if (total != verifiedTotal) {
+                    log.warn("Warning: TOTAL connections = " + verifiedTotal + ". not " + total + " as expected.");
+                }
+
+            }
         }
     }
 
@@ -1123,6 +1130,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.32  2003/01/15 14:51:40  billhorsman
+ checkstyle
+
  Revision 1.31  2003/01/15 12:01:37  billhorsman
  added getDateStarted()
 

@@ -10,9 +10,9 @@
  */
 
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/proxool/Attic/FastArrayList.java,v 1.1 2003/01/15 00:05:47 billhorsman Exp $
- * $Revision: 1.1 $
- * $Date: 2003/01/15 00:05:47 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/proxool/Attic/FastArrayList.java,v 1.2 2003/01/15 14:51:14 billhorsman Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/01/15 14:51:14 $
  *
  * ====================================================================
  *
@@ -106,19 +106,20 @@ import java.util.ListIterator;
  *
  * <P><strong>NOTE</strong>: <I>This class is not cross-platform.
  * Using it may cause unexpected failures on some architectures.</I>
- * It suffers from the same problems as the double-checked locking idiom.  
- * In particular, the instruction that clones the internal collection and the 
- * instruction that sets the internal reference to the clone can be executed 
- * or perceived out-of-order.  This means that any read operation might fail 
+ * It suffers from the same problems as the double-checked locking idiom.
+ * In particular, the instruction that clones the internal collection and the
+ * instruction that sets the internal reference to the clone can be executed
+ * or perceived out-of-order.  This means that any read operation might fail
  * unexpectedly, as it may be reading the state of the internal collection
  * before the internal collection is fully formed.
  * For more information on the double-checked locking idiom, see the
  * <A Href="http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html">
  * Double-Checked Locking Idiom Is Broken Declartion</A>.</P>
  *
- * @since 1.0
+ * @since Proxool 0.6
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2003/01/15 00:05:47 $
+ * @author $Author: billhorsman $ (current maintainer)
+ * @version $Revision: 1.2 $ $Date: 2003/01/15 14:51:14 $
  */
 
 public class FastArrayList extends ArrayList {
@@ -172,7 +173,7 @@ public class FastArrayList extends ArrayList {
     /**
      * The underlying list we are managing.
      */
-    protected ArrayList list = null;
+    private ArrayList list = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -181,7 +182,7 @@ public class FastArrayList extends ArrayList {
     /**
      * Are we operating in "fast" mode?
      */
-    protected boolean fast = false;
+    private boolean fast = false;
 
 
     /**
@@ -424,10 +425,11 @@ public class FastArrayList extends ArrayList {
     public boolean equals(Object o) {
 
         // Simple tests that require no synchronization
-        if (o == this)
+        if (o == this) {
             return (true);
-        else if (!(o instanceof List))
+        } else if (!(o instanceof List)) {
             return (false);
+        }
         List lo = (List) o;
 
         // Compare the sets of elements for equality
@@ -437,8 +439,9 @@ public class FastArrayList extends ArrayList {
             while (li1.hasNext() && li2.hasNext()) {
                 Object o1 = li1.next();
                 Object o2 = li2.next();
-                if (!(o1 == null ? o2 == null : o1.equals(o2)))
+                if (!(o1 == null ? o2 == null : o1.equals(o2))) {
                     return (false);
+                }
             }
             return (!(li1.hasNext() || li2.hasNext()));
         } else {
@@ -448,8 +451,9 @@ public class FastArrayList extends ArrayList {
                 while (li1.hasNext() && li2.hasNext()) {
                     Object o1 = li1.next();
                     Object o2 = li2.next();
-                    if (!(o1 == null ? o2 == null : o1.equals(o2)))
+                    if (!(o1 == null ? o2 == null : o1.equals(o2))) {
                         return (false);
+                    }
                 }
                 return (!(li1.hasNext() || li2.hasNext()));
             }
@@ -857,7 +861,6 @@ public class FastArrayList extends ArrayList {
     }
 
 
-
     private class SubList implements List {
 
         private int first;
@@ -899,7 +902,9 @@ public class FastArrayList extends ArrayList {
                 synchronized (FastArrayList.this) {
                     ArrayList temp = (ArrayList) list.clone();
                     boolean r = get(temp).remove(o);
-                    if (r) last--;
+                    if (r) {
+                        last--;
+                    }
                     list = temp;
                     expected = temp;
                     return r;
@@ -917,7 +922,9 @@ public class FastArrayList extends ArrayList {
                     ArrayList temp = (ArrayList) list.clone();
                     List sub = get(temp);
                     boolean r = sub.removeAll(o);
-                    if (r) last = first + sub.size();
+                    if (r) {
+                        last = first + sub.size();
+                    }
                     list = temp;
                     expected = temp;
                     return r;
@@ -935,7 +942,9 @@ public class FastArrayList extends ArrayList {
                     ArrayList temp = (ArrayList) list.clone();
                     List sub = get(temp);
                     boolean r = sub.retainAll(o);
-                    if (r) last = first + sub.size();
+                    if (r) {
+                        last = first + sub.size();
+                    }
                     list = temp;
                     expected = temp;
                     return r;
@@ -1010,7 +1019,9 @@ public class FastArrayList extends ArrayList {
 
 
         public boolean equals(Object o) {
-            if (o == this) return true;
+            if (o == this) {
+                return true;
+            }
             if (fast) {
                 return get(expected).equals(o);
             } else {
@@ -1035,7 +1046,9 @@ public class FastArrayList extends ArrayList {
                 synchronized (FastArrayList.this) {
                     ArrayList temp = (ArrayList) list.clone();
                     boolean r = get(temp).add(o);
-                    if (r) last++;
+                    if (r) {
+                        last++;
+                    }
                     list = temp;
                     expected = temp;
                     return r;
@@ -1052,7 +1065,9 @@ public class FastArrayList extends ArrayList {
                 synchronized (FastArrayList.this) {
                     ArrayList temp = (ArrayList) list.clone();
                     boolean r = get(temp).addAll(o);
-                    if (r) last += o.size();
+                    if (r) {
+                        last += o.size();
+                    }
                     list = temp;
                     expected = temp;
                     return r;
@@ -1086,7 +1101,9 @@ public class FastArrayList extends ArrayList {
                     ArrayList temp = (ArrayList) list.clone();
                     boolean r = get(temp).addAll(i, o);
                     list = temp;
-                    if (r) last += o.size();
+                    if (r) {
+                        last += o.size();
+                    }
                     expected = temp;
                     return r;
                 }
@@ -1184,96 +1201,95 @@ public class FastArrayList extends ArrayList {
         }
 
 
-    private class SubListIter implements ListIterator {
+        private class SubListIter implements ListIterator {
 
-        private List expected;
-        private ListIterator iter;
-        private int lastReturnedIndex = -1;
+            private List expected;
+            private ListIterator iter;
+            private int lastReturnedIndex = -1;
 
 
-        public SubListIter(int i) {
-            this.expected = list;
-            this.iter = SubList.this.get(expected).listIterator(i);
-        }
-
-        private void checkMod() {
-            if (list != expected) {
-                throw new ConcurrentModificationException();
+            public SubListIter(int i) {
+                this.expected = list;
+                this.iter = SubList.this.get(expected).listIterator(i);
             }
-        }
 
-        List get() {
-            return SubList.this.get(expected);
-        }
-
-        public boolean hasNext() {
-            checkMod();
-            return iter.hasNext();     
-        }
-
-        public Object next() {
-            checkMod();
-            lastReturnedIndex = iter.nextIndex();
-            return iter.next();
-        }
-
-        public boolean hasPrevious() {
-            checkMod();
-            return iter.hasPrevious();
-        }
-
-        public Object previous() {
-            checkMod();
-            lastReturnedIndex = iter.previousIndex();
-            return iter.previous();
-        }
-
-        public int previousIndex() {
-            checkMod();
-            return iter.previousIndex();
-        }
-
-        public int nextIndex() {
-            checkMod();
-            return iter.nextIndex();
-        }
-
-        public void remove() {
-            checkMod();
-            if (lastReturnedIndex < 0) {
-                throw new IllegalStateException();
+            private void checkMod() {
+                if (list != expected) {
+                    throw new ConcurrentModificationException();
+                }
             }
-            get().remove(lastReturnedIndex);
-            last--;
-            expected = list;
-            iter = get().listIterator(previousIndex());
-            lastReturnedIndex = -1;
-        }
 
-        public void set(Object o) {
-            checkMod();
-            if (lastReturnedIndex < 0) {
-                throw new IllegalStateException();
+            List get() {
+                return SubList.this.get(expected);
             }
-            get().set(lastReturnedIndex, o);
-            expected = list;
-            iter = get().listIterator(previousIndex() + 1);
-        } 
 
-        public void add(Object o) {
-            checkMod();
-            int i = nextIndex();
-            get().add(i, o);
-            last++;
-            iter = get().listIterator(i + 1);
-            lastReturnedIndex = 1;
+            public boolean hasNext() {
+                checkMod();
+                return iter.hasNext();
+            }
+
+            public Object next() {
+                checkMod();
+                lastReturnedIndex = iter.nextIndex();
+                return iter.next();
+            }
+
+            public boolean hasPrevious() {
+                checkMod();
+                return iter.hasPrevious();
+            }
+
+            public Object previous() {
+                checkMod();
+                lastReturnedIndex = iter.previousIndex();
+                return iter.previous();
+            }
+
+            public int previousIndex() {
+                checkMod();
+                return iter.previousIndex();
+            }
+
+            public int nextIndex() {
+                checkMod();
+                return iter.nextIndex();
+            }
+
+            public void remove() {
+                checkMod();
+                if (lastReturnedIndex < 0) {
+                    throw new IllegalStateException();
+                }
+                get().remove(lastReturnedIndex);
+                last--;
+                expected = list;
+                iter = get().listIterator(previousIndex());
+                lastReturnedIndex = -1;
+            }
+
+            public void set(Object o) {
+                checkMod();
+                if (lastReturnedIndex < 0) {
+                    throw new IllegalStateException();
+                }
+                get().set(lastReturnedIndex, o);
+                expected = list;
+                iter = get().listIterator(previousIndex() + 1);
+            }
+
+            public void add(Object o) {
+                checkMod();
+                int i = nextIndex();
+                get().add(i, o);
+                last++;
+                iter = get().listIterator(i + 1);
+                lastReturnedIndex = 1;
+            }
+
         }
-
-   }
 
 
     }
-
 
 
     private class ListIter implements ListIterator {
@@ -1300,7 +1316,7 @@ public class FastArrayList extends ArrayList {
 
         public boolean hasNext() {
             checkMod();
-            return iter.hasNext();     
+            return iter.hasNext();
         }
 
         public Object next() {
@@ -1349,7 +1365,7 @@ public class FastArrayList extends ArrayList {
             get().set(lastReturnedIndex, o);
             expected = list;
             iter = get().listIterator(previousIndex() + 1);
-        } 
+        }
 
         public void add(Object o) {
             checkMod();
@@ -1359,5 +1375,13 @@ public class FastArrayList extends ArrayList {
             lastReturnedIndex = 1;
         }
 
-   }
+    }
 }
+
+/*
+ Revision history:
+ $Log: FastArrayList.java,v $
+ Revision 1.2  2003/01/15 14:51:14  billhorsman
+ checkstyle
+
+ */
