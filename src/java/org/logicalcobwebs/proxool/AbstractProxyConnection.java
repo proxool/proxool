@@ -23,7 +23,7 @@ import java.util.Date;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/11 00:30:45 $
+ * @version $Revision: 1.9 $, $Date: 2003/02/12 12:28:27 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -33,6 +33,8 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
     private static final Log LOG = LogFactory.getLog(AbstractProxyConnection.class);
 
     private Connection connection;
+
+    private String delegateUrl;
 
     private int mark;
 
@@ -59,8 +61,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
      */
     private boolean needToReset = false;
 
-    protected AbstractProxyConnection(Connection connection, long id, ConnectionPool connectionPool) throws SQLException {
+    protected AbstractProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool) throws SQLException {
         this.connection = connection;
+        this.delegateUrl = delegateUrl;
         setId(id);
         this.connectionPool = connectionPool;
         setBirthTime(System.currentTimeMillis());
@@ -478,12 +481,40 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
         return getId() + " is " + ConnectionPool.getStatusDescription(getStatus());
     }
 
+    /**
+     * @see ConnectionInfoIF#getDelegateUrl
+     */
+    public String getDelegateUrl() {
+        return delegateUrl;
+    }
+
+    /**
+     * @see ConnectionInfoIF#getProxyHashcode
+     */
+    public String getProxyHashcode() {
+        return Integer.toHexString(hashCode());
+    }
+
+    /**
+     * @see ConnectionInfoIF#getDelegateHashcode
+     */
+    public String getDelegateHashcode() {
+        if (connection != null) {
+            return Integer.toHexString(connection.hashCode());
+        } else {
+            return null;
+        }
+    }
 }
 
 
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.9  2003/02/12 12:28:27  billhorsman
+ added url, proxyHashcode and delegateHashcode to
+ ConnectionInfoIF
+
  Revision 1.8  2003/02/11 00:30:45  billhorsman
  fixed equals for jdk1.2
 

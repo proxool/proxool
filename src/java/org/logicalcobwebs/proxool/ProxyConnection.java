@@ -18,7 +18,7 @@ import java.sql.Statement;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.23 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.24 $, $Date: 2003/02/12 12:28:27 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -34,8 +34,8 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
 
     private static final String GET_META_DATA_METHOD = "getMetaData";
 
-    public ProxyConnection(Connection connection, long id, ConnectionPool connectionPool) throws SQLException {
-        super(connection, id, connectionPool);
+    public ProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool) throws SQLException {
+        super(connection, id, delegateUrl, connectionPool);
     }
 
     public Object invoke(Object proxy, Method m, Object[] args)
@@ -94,6 +94,10 @@ class ProxyConnection extends AbstractProxyConnection implements InvocationHandl
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.24  2003/02/12 12:28:27  billhorsman
+ added url, proxyHashcode and delegateHashcode to
+ ConnectionInfoIF
+
  Revision 1.23  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 

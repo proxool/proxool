@@ -12,7 +12,7 @@ import java.util.Date;
 /**
  * Provides a snapshot of a pool
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/31 11:35:57 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/12 12:28:28 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -78,6 +78,15 @@ public interface SnapshotIF {
     ConnectionInfoIF[] getConnectionInfos();
 
     /**
+     * The details of one connection.  Will be null if this is not a
+     * detailed snapshot or if this ID is not found.
+     * @param id the connection {@link ConnectionInfoIF#getId ID}
+     * @return connectionInfo
+     * @see #isDetail
+     */
+    ConnectionInfoIF getConnectionInfo(long id);
+
+    /**
      * Whether we have requested detailed information about each
      * connection
      * @return detail
@@ -90,6 +99,10 @@ public interface SnapshotIF {
 /*
  Revision history:
  $Log: SnapshotIF.java,v $
+ Revision 1.2  2003/02/12 12:28:28  billhorsman
+ added url, proxyHashcode and delegateHashcode to
+ ConnectionInfoIF
+
  Revision 1.1  2003/01/31 11:35:57  billhorsman
  improvements to servlet (including connection details)
 

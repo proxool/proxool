@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Implementation of SnapshotIF
  *
- * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:06 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/12 12:28:28 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -169,6 +169,20 @@ class Snapshot implements SnapshotIF {
     }
 
     /**
+     * @see SnapshotIF#getConnectionInfo
+     */
+    public ConnectionInfoIF getConnectionInfo(long id) {
+        ConnectionInfoIF connectionInfo = null;
+        ConnectionInfoIF[] connectionInfos = getConnectionInfos();
+        for (int i = 0; i < connectionInfos.length; i++) {
+            if (connectionInfos[i].getId() == id) {
+                connectionInfo = connectionInfos[i];
+            }
+        }
+        return connectionInfo;
+    }
+
+    /**
      * @see SnapshotIF#isDetail
      */
     public boolean isDetail() {
@@ -181,6 +195,10 @@ class Snapshot implements SnapshotIF {
 /*
  Revision history:
  $Log: Snapshot.java,v $
+ Revision 1.4  2003/02/12 12:28:28  billhorsman
+ added url, proxyHashcode and delegateHashcode to
+ ConnectionInfoIF
+
  Revision 1.3  2003/02/06 17:41:06  billhorsman
  now uses imported logging
 

@@ -11,7 +11,7 @@ import java.util.Date;
  * Implementation of ConnectionInfoIF. Unlike ConnectionPool it is
  * frozen and will not change. Used with a {@link org.logicalcobwebs.proxool.monitor.SnapshotIF snapshot}
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/31 16:53:15 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/12 12:28:27 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -33,6 +33,15 @@ class ConnectionInfo implements ConnectionInfoIF {
     private long timeLastStopActive;
 
     private String requester;
+
+    private String delegateDriver;
+
+    private String delegateUrl;
+
+    private String proxyHashcode;
+
+    private String delegateHashcode;
+
 
     public Date getBirthDate() {
         return birthDate;
@@ -101,12 +110,48 @@ class ConnectionInfo implements ConnectionInfoIF {
     public void setRequester(String requester) {
         this.requester = requester;
     }
+
+    public String getDelegateDriver() {
+        return delegateDriver;
+    }
+
+    public void setDelegateDriver(String delegateDriver) {
+        this.delegateDriver = delegateDriver;
+    }
+
+    public String getDelegateUrl() {
+        return delegateUrl;
+    }
+
+    public void setDelegateUrl(String delegateUrl) {
+        this.delegateUrl = delegateUrl;
+    }
+
+    public String getProxyHashcode() {
+        return proxyHashcode;
+    }
+
+    public void setProxyHashcode(String proxyHashcode) {
+        this.proxyHashcode = proxyHashcode;
+    }
+
+    public String getDelegateHashcode() {
+        return delegateHashcode;
+    }
+
+    public void setDelegateHashcode(String delegateHashcode) {
+        this.delegateHashcode = delegateHashcode;
+    }
 }
 
 
 /*
  Revision history:
  $Log: ConnectionInfo.java,v $
+ Revision 1.3  2003/02/12 12:28:27  billhorsman
+ added url, proxyHashcode and delegateHashcode to
+ ConnectionInfoIF
+
  Revision 1.2  2003/01/31 16:53:15  billhorsman
  checkstyle
 

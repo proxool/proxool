@@ -22,7 +22,7 @@ import java.util.Date;
  * }
  * </pre>
  *
- * @version $Revision: 1.7 $, $Date: 2003/01/31 11:38:57 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/12 12:28:27 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -125,11 +125,36 @@ public interface ConnectionInfoIF {
      */
     String getRequester();
 
+    /**
+     * The hashcode (in hex) of the ProxyConnection object. This
+     * uniquely identifies this proxy connection.
+     * @return proxyHashcode
+     */
+    String getProxyHashcode();
+
+    /**
+     * The hashcode (in hex) of the delegate connection object. This
+     * uniquely identifies the underlying connection.
+     * @return delegateHashcode
+     */
+    String getDelegateHashcode();
+
+    /**
+     * The URL that this connection is using (the definition
+     * might have changed since this connection was built).
+     * @return delegateUrl
+     */
+    String getDelegateUrl();
+
 }
 
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.8  2003/02/12 12:28:27  billhorsman
+ added url, proxyHashcode and delegateHashcode to
+ ConnectionInfoIF
+
  Revision 1.7  2003/01/31 11:38:57  billhorsman
  birthDate now stored as Date not long
 

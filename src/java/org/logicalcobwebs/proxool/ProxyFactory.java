@@ -23,7 +23,7 @@ import java.sql.DatabaseMetaData;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.13 $, $Date: 2003/02/06 17:41:04 $
+ * @version $Revision: 1.14 $, $Date: 2003/02/12 12:28:27 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -34,14 +34,15 @@ class ProxyFactory {
 
     protected static ProxyConnection buildProxyConnection(long id, ConnectionPool connectionPool) throws SQLException {
         Connection realConnection = null;
+        final String url = connectionPool.getDefinition().getUrl();
         realConnection = DriverManager.getConnection(
-                connectionPool.getDefinition().getUrl(),
+                url,
                 connectionPool.getDefinition().getProperties());
 
         Object delegate = Proxy.newProxyInstance(
                 realConnection.getClass().getClassLoader(),
                 realConnection.getClass().getInterfaces(),
-                new ProxyConnection(realConnection, id, connectionPool));
+                new ProxyConnection(realConnection, id, url, connectionPool));
 
         return (ProxyConnection) Proxy.getInvocationHandler(delegate);
     }
@@ -109,6 +110,10 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.14  2003/02/12 12:28:27  billhorsman
+ added url, proxyHashcode and delegateHashcode to
+ ConnectionInfoIF
+
  Revision 1.13  2003/02/06 17:41:04  billhorsman
  now uses imported logging
 

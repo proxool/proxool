@@ -33,7 +33,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.51 $, $Date: 2003/02/07 17:26:05 $
+ * @version $Revision: 1.52 $, $Date: 2003/02/12 12:28:27 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -740,6 +740,9 @@ public class ProxoolFacade {
                 ci.setStatus(connectionInfo.getStatus());
                 ci.setTimeLastStartActive(connectionInfo.getTimeLastStartActive());
                 ci.setTimeLastStopActive(connectionInfo.getTimeLastStopActive());
+                ci.setDelegateUrl(connectionInfo.getDelegateUrl());
+                ci.setProxyHashcode(connectionInfo.getProxyHashcode());
+                ci.setDelegateHashcode(connectionInfo.getDelegateHashcode());
                 connectionInfos.add(ci);
             }
         }
@@ -757,6 +760,10 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.52  2003/02/12 12:28:27  billhorsman
+ added url, proxyHashcode and delegateHashcode to
+ ConnectionInfoIF
+
  Revision 1.51  2003/02/07 17:26:05  billhorsman
  deprecated removeAllConnectionPools in favour of
  shutdown (and dropped unreliable finalize() method)

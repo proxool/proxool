@@ -18,7 +18,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.Color;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -43,7 +42,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.9 $, $Date: 2003/02/11 00:30:28 $
+ * @version $Revision: 1.10 $, $Date: 2003/02/12 12:28:27 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -51,10 +50,6 @@ import java.util.Iterator;
 public class MonitorServlet extends HttpServlet {
 
     private static final Log LOG = LogFactory.getLog(MonitorServlet.class);
-
-    private int width = 300;
-
-    private int height = 5;
 
     protected static final String ACTION_LIST = "list";
     private static final String ACTION_STATS = "stats";
@@ -69,14 +64,12 @@ public class MonitorServlet extends HttpServlet {
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
-    private static final Color COLOR_ACTIVE = Color.red;
-    private static final Color COLOR_AVAILABLE = Color.green;
-    private static final Color COLOR_SPARE = Color.decode("#eeeeee");
     private static final String LEVEL = "level";
     private static final String LEVEL_MORE = "more";
     private static final String LEVEL_LESS = "less";
     private static final String ACTION = "action";
     private static final String ALIAS = "alias";
+    private static final String CONNECTION_ID = "id";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
@@ -93,6 +86,7 @@ public class MonitorServlet extends HttpServlet {
             action = ACTION_STATS;
         }
         String level = request.getParameter(LEVEL);
+        String connectionId = request.getParameter(CONNECTION_ID);
 
         // Check the alias and if not defined and there is only one
         // then use that. Otherwise show the list.
@@ -123,7 +117,7 @@ public class MonitorServlet extends HttpServlet {
                 doList(response.getOutputStream(), alias, link, level);
             } else if (action.equals(ACTION_STATS)) {
                 response.setContentType("text/html");
-                doStats(response.getOutputStream(), alias, link, level);
+                doStats(response.getOutputStream(), alias, link, level, connectionId);
             } else {
                 LOG.error("Unrecognised action '" + action + "'");
             }
@@ -136,16 +130,15 @@ public class MonitorServlet extends HttpServlet {
 
     }
 
-    private void doStats(ServletOutputStream out, String alias, String link, String level) throws ProxoolException, IOException {
+    private void doStats(ServletOutputStream out, String alias, String link, String level, String connectionId) throws ProxoolException, IOException {
         doList(out, alias, link, level);
         doDefinition(out, alias, link);
-        doSnapshot(out, alias, link, level);
+        doSnapshot(out, alias, link, level, connectionId);
         doStatistics(out, alias, link);
     }
 
     private void doStatistics(ServletOutputStream out, String alias, String link) throws ProxoolException, IOException {
         StatisticsIF[] statisticsArray = ProxoolFacade.getStatistics(alias);
-        SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, false);
         ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
 
         for (int i = 0; i < statisticsArray.length; i++) {
@@ -180,7 +173,7 @@ public class MonitorServlet extends HttpServlet {
         }
     }
 
-    private void drawBarChart(StringBuffer out, String[] colours, int[] lengths) throws IOException {
+    private void drawBarChart(StringBuffer out, String[] colours, int[] lengths) {
         out.append("<table style=\"margin: 8px; font-size: 50%;\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr>");
 
         // Calculate total length
@@ -254,10 +247,9 @@ public class MonitorServlet extends HttpServlet {
 
     }
 
-    private void doSnapshot(ServletOutputStream out, String alias, String link, String level) throws IOException, ProxoolException {
+    private void doSnapshot(ServletOutputStream out, String alias, String link, String level, String connectionId) throws IOException, ProxoolException {
         boolean detail = (level != null && level.equals(LEVEL_MORE));
         SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, detail);
-        ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
 
         if (snapshot != null) {
 
@@ -314,10 +306,28 @@ public class MonitorServlet extends HttpServlet {
                 out.println("</td>");
                 out.print("      <td style=\"" + STYLE_NO_DATA + "\">");
 
-                doSnapshotDetails(out, snapshot, link);
+                doSnapshotDetails(out, alias, snapshot, link, connectionId);
 
                 out.println("</td>");
                 out.println("    </tr>");
+
+                long drillDownConnectionId = 0;
+                if (connectionId != null) {
+                    drillDownConnectionId = Long.valueOf(connectionId).longValue();
+                    ConnectionInfoIF drillDownConnection = snapshot.getConnectionInfo(drillDownConnectionId);
+                    if (drillDownConnection != null) {
+                        out.println("    <tr>");
+                        out.print("      <td width=\"200\" valign=\"top\" style=\"" + STYLE_CAPTION + "\">");
+                        out.print("Connection #" + connectionId);
+                        out.println("</td>");
+                        out.print("      <td style=\"" + STYLE_NO_DATA + "\">");
+
+                        doDrillDownConnection(out, drillDownConnection, link);
+
+                        out.println("</td>");
+                        out.println("    </tr>");
+                    }
+                }
 
                 out.println("    <tr>");
                 out.print("<td colspan=\"2\" align=\"right\"><a href=\"");
@@ -338,7 +348,12 @@ public class MonitorServlet extends HttpServlet {
         }
     }
 
-    private void doSnapshotDetails(ServletOutputStream out, SnapshotIF snapshot, String link) throws IOException {
+    private void doSnapshotDetails(ServletOutputStream out, String alias, SnapshotIF snapshot, String link, String connectionId) throws IOException {
+
+        long drillDownConnectionId = 0;
+        if (connectionId != null) {
+            drillDownConnectionId = Long.valueOf(connectionId).longValue();
+        }
 
         if (snapshot.getConnectionInfos() != null && snapshot.getConnectionInfos().length > 0) {
             out.println("<table cellpadding=\"2\" border=\"0\">");
@@ -360,7 +375,7 @@ public class MonitorServlet extends HttpServlet {
 
                     out.print("<tr>");
 
-                    // id
+                    // drillDownConnectionId
                     out.print("<td bgcolor=\"#");
                     if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_ACTIVE) {
                         out.print("ffcccc");
@@ -369,8 +384,32 @@ public class MonitorServlet extends HttpServlet {
                     } else if (connectionInfo.getStatus() == ConnectionInfoIF.STATUS_OFFLINE) {
                         out.print("ccccff");
                     }
-                    out.print("\">");
-                    out.print(connectionInfo.getId());
+                    out.print("\" style=\"");
+
+                    if (drillDownConnectionId == connectionInfo.getId()) {
+                        out.print("border: 1px solid black;");
+                        out.print("\">");
+                        out.print(connectionInfo.getId());
+                    } else {
+                        out.print("border: 1px solid transparent;");
+                        out.print("\"><a href=\"");
+                        out.print(link);
+                        out.print("?");
+                        out.print(ALIAS);
+                        out.print("=");
+                        out.print(alias);
+                        out.print("&");
+                        out.print(LEVEL);
+                        out.print("=");
+                        out.print(LEVEL_MORE);
+                        out.print("&");
+                        out.print(CONNECTION_ID);
+                        out.print("=");
+                        out.print(connectionInfo.getId());
+                        out.print("\">");
+                        out.print(connectionInfo.getId());
+                        out.print("</a>");
+                    }
                     out.print("</td>");
 
                     // birth
@@ -410,6 +449,28 @@ public class MonitorServlet extends HttpServlet {
         } else {
             out.println("No connections yet");
         }
+    }
+
+    private void doDrillDownConnection(ServletOutputStream out, ConnectionInfoIF drillDownConnection, String link) throws IOException {
+
+        // proxy
+        out.print("<div style=\"font-size: 90%\">");
+        out.print("proxy = ");
+        out.print(drillDownConnection.getProxyHashcode());
+        out.print("</div>");
+
+        // delegate
+        out.print("<div style=\"font-size: 90%\">");
+        out.print("delegate = ");
+        out.print(drillDownConnection.getDelegateHashcode());
+        out.print("</div>");
+
+        // url
+        out.print("<div style=\"font-size: 90%\">");
+        out.print("url = ");
+        out.print(drillDownConnection.getDelegateUrl());
+        out.print("</div>");
+
     }
 
     private void openHtml(ServletOutputStream out) throws IOException {
@@ -483,6 +544,10 @@ public class MonitorServlet extends HttpServlet {
 /*
  Revision history:
  $Log: MonitorServlet.java,v $
+ Revision 1.10  2003/02/12 12:28:27  billhorsman
+ added url, proxyHashcode and delegateHashcode to
+ ConnectionInfoIF
+
  Revision 1.9  2003/02/11 00:30:28  billhorsman
  add version
 
