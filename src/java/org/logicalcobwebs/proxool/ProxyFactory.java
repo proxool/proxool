@@ -17,12 +17,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.DatabaseMetaData;
+import java.util.Properties;
 
 /**
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.16 $, $Date: 2003/03/03 11:11:58 $
+ * @version $Revision: 1.17 $, $Date: 2003/03/05 18:42:33 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -34,14 +35,14 @@ class ProxyFactory {
     protected static ProxyConnection buildProxyConnection(long id, ConnectionPool connectionPool) throws SQLException {
         Connection realConnection = null;
         final String url = connectionPool.getDefinition().getUrl();
-        realConnection = DriverManager.getConnection(
-                url,
-                connectionPool.getDefinition().getProperties());
+
+        Properties info = connectionPool.getDefinition().getDelegateProperties();
+        realConnection = DriverManager.getConnection(url, info);
 
         Object delegate = Proxy.newProxyInstance(
-                realConnection.getClass().getClassLoader(),
-                realConnection.getClass().getInterfaces(),
-                new ProxyConnection(realConnection, id, url, connectionPool));
+                        realConnection.getClass().getClassLoader(),
+                        realConnection.getClass().getInterfaces(),
+                        new ProxyConnection(realConnection, id, url, connectionPool));
 
         return (ProxyConnection) Proxy.getInvocationHandler(delegate);
     }
@@ -109,6 +110,11 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.17  2003/03/05 18:42:33  billhorsman
+ big refactor of prototyping and house keeping to
+ drastically reduce the number of threads when using
+ many pools
+
  Revision 1.16  2003/03/03 11:11:58  billhorsman
  fixed licence
 

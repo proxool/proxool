@@ -16,11 +16,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.Enumeration;
 
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.10 $, $Date: 2003/03/03 11:11:57 $
+ * @version $Revision: 1.11 $, $Date: 2003/03/05 18:42:32 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -774,6 +775,11 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.11  2003/03/05 18:42:32  billhorsman
+ big refactor of prototyping and house keeping to
+ drastically reduce the number of threads when using
+ many pools
+
  Revision 1.10  2003/03/03 11:11:57  billhorsman
  fixed licence
 

@@ -21,7 +21,7 @@ import java.util.TreeMap;
  * statement. The subclass of this defines how we delegate to the
  * real statement.
 
- * @version $Revision: 1.7 $, $Date: 2003/03/03 11:11:56 $
+ * @version $Revision: 1.8 $, $Date: 2003/03/05 18:42:32 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -70,7 +70,7 @@ abstract class AbstractProxyStatement {
                     connectionPool.throwConnection(proxyConnection, "Fatal SQL Exception has been detected");
 
                     // We should check all the existing connections as soon as possible
-                    connectionPool.wakehouseKeeper();
+                    HouseKeeperController.sweepNow(connectionPool.getDefinition().getAlias());
                     
                     LOG.warn("Connection has been thrown away because fatal exception was detected", e);
                 } catch (SQLException e2) {
@@ -209,6 +209,11 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.8  2003/03/05 18:42:32  billhorsman
+ big refactor of prototyping and house keeping to
+ drastically reduce the number of threads when using
+ many pools
+
  Revision 1.7  2003/03/03 11:11:56  billhorsman
  fixed licence
 

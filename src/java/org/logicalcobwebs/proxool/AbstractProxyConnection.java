@@ -23,7 +23,7 @@ import java.util.Date;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.13 $, $Date: 2003/03/03 11:11:56 $
+ * @version $Revision: 1.14 $, $Date: 2003/03/05 18:42:32 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -203,7 +203,7 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
                 // means keeping track when they change and that might be even
                 // slower
                 if (!connectionPool.resetConnection(connection, "#" + getId())) {
-                    connectionPool.removeProxyConnection(this, "it couldn't be reset", true);
+                    connectionPool.removeProxyConnection(this, "it couldn't be reset", true, true);
                 }
                 needToReset = false;
             }
@@ -225,9 +225,6 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
     private void setStatus(int status) {
         if (this.status != status) {
             connectionPool.changeStatus(this.status, status);
-        }
-        if (this.status == ProxyConnection.STATUS_NULL && status != ProxyConnection.STATUS_NULL) {
-            connectionPool.incrementConnectedConnectionCount();
         }
         this.status = status;
     }
@@ -517,6 +514,11 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.14  2003/03/05 18:42:32  billhorsman
+ big refactor of prototyping and house keeping to
+ drastically reduce the number of threads when using
+ many pools
+
  Revision 1.13  2003/03/03 11:11:56  billhorsman
  fixed licence
 
