@@ -1,11 +1,20 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.9 $
-$Date: 2002/12/03 16:10:43 $
+$Revision: 1.10 $
+$Date: 2002/12/06 16:08:57 $
 $Author: billhorsman $
 
-0.5 (scheduled for November 22, 2002)
+0.6 (scheduled for December 12, 2002)
+
+- New ConfiguratorIF interface allows you to implement persistent
+  configuration
+
+- Bug fix for JDBC drivers that implement the Statement interface
+  indirectly (that is, extend a class that implements it rather than 
+  implementing it directly). (Credit to Martin Crawford).
+
+0.5 (December 3, 2002)
 
 - Fix finalisation of old instances. If you deploy to some environments in
   a certain way then it is possible for the class to be reloaded without the
@@ -25,7 +34,7 @@ $Author: billhorsman $
   logging is handled by Jakarta Commons's Logging anyway.
 
 - Fix when removing pools that meant that when you tried to add them again
-  Proxool thought it was a duplicate (credit to Dan Milstein).
+  Proxool thought it was a duplicate (Credit to Dan Milstein).
 
 - Improvements to the way Proxool detects changes to the pool definition
   when resending the Properties object when you get a connection. Now
@@ -34,7 +43,7 @@ $Author: billhorsman $
   as they are set or updated).
 
 - Fix to the ProxyConnection within the equals() method that was causing
-  identical conections to be incorrectly reported as unequals (which leads to
+  identical conections to be incorrectly reported as unequal (which leads to
   problems when adding them to some collections).
 
 - Improvements to test classes. Lots more tests.
