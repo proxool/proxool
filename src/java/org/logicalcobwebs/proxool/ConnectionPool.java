@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.59 $, $Date: 2003/03/10 15:26:44 $
+ * @version $Revision: 1.60 $, $Date: 2003/03/10 16:26:35 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -826,19 +826,24 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      */
     protected void acquirePrimaryReadLock() throws InterruptedException {
         if (LOG.isDebugEnabled()) {
+            /*
             try {
                 throw new RuntimeException("TRACE ONLY");
             } catch (RuntimeException e) {
                 LOG.debug("About to acquire primary read lock", e);
             }
+            */
+            LOG.debug("About to acquire primary read lock");
         }
         primaryReadWriteLock.readLock().acquire();
         if (LOG.isDebugEnabled()) {
+            /*
             try {
                 throw new RuntimeException("TRACE ONLY");
             } catch (RuntimeException e) {
-                LOG.debug("Acquired primary read lock", e);
             }
+            */
+            LOG.debug("Acquired primary read lock");
         }
     }
 
@@ -846,11 +851,14 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * @see #acquirePrimaryReadLock
      */
     protected void releasePrimaryReadLock() {
+        /*
         try {
             throw new RuntimeException("TRACE ONLY");
         } catch (RuntimeException e) {
             LOG.debug("Released primary read lock", e);
         }
+        */
+        LOG.debug("Released primary read lock");
         primaryReadWriteLock.readLock().release();
     }
 
@@ -864,28 +872,37 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         boolean success = false;
         try {
             if (LOG.isDebugEnabled()) {
+                /*
                 try {
                     throw new RuntimeException("TRACE ONLY");
                 } catch (RuntimeException e) {
                     LOG.debug("About to acquire primary write lock", e);
                 }
+                */
+                LOG.debug("About to acquire primary write lock");
             }
             primaryReadWriteLock.writeLock().acquire();
             success = true;
             if (LOG.isDebugEnabled()) {
+                /*
                 try {
                     throw new RuntimeException("TRACE ONLY");
                 } catch (RuntimeException e) {
                     LOG.debug("Acquired primary write lock", e);
                 }
+                */
+                LOG.debug("Acquired primary write lock");
             }
         } finally {
             if (LOG.isDebugEnabled() && !success) {
+                /*
                 try {
                     throw new RuntimeException("TRACE ONLY");
                 } catch (RuntimeException e) {
                     LOG.debug("Failed to acquire primary write lock", e);
                 }
+                */
+                LOG.debug("Failed to acquire primary write lock");
             }
         }
     }
@@ -895,11 +912,14 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      */
     protected void releasePrimaryWriteLock() {
         primaryReadWriteLock.writeLock().release();
+        /*
         try {
             throw new RuntimeException("TRACE ONLY");
         } catch (RuntimeException e) {
             LOG.debug("Released primary write lock", e);
         }
+        */
+        LOG.debug("Released primary write lock");
     }
 
     /**
@@ -943,6 +963,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.60  2003/03/10 16:26:35  billhorsman
+ removed debug traces
+
  Revision 1.59  2003/03/10 15:26:44  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)
