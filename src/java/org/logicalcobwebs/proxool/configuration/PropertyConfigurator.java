@@ -1,9 +1,8 @@
 /*
-* Copyright 2002, Findexa AS (http://www.findexa.no)
-*
-* This software is the proprietary information of Findexa AS.
-* Use is subject to license terms.
-*/
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
+ */
 package org.logicalcobwebs.proxool.configuration;
 
 import org.apache.commons.logging.Log;
@@ -71,7 +70,7 @@ import java.util.Properties;
  * delegate JDBC driver.
  * </p>
  *
- * @version $Revision: 1.6 $, $Date: 2003/01/27 18:26:43 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/05 14:46:31 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -79,7 +78,7 @@ import java.util.Properties;
 public class PropertyConfigurator {
     private static final Log LOG = LogFactory.getLog(PropertyConfigurator.class);
 
-    private static final String PREFIX = "jdbc";
+    protected static final String PREFIX = "jdbc";
 
     private static final String DOT = ".";
 
@@ -171,6 +170,10 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.7  2003/02/05 14:46:31  billhorsman
+ fixed copyright and made PREFIX protected for
+ use by ServletConfigurator
+
  Revision 1.6  2003/01/27 18:26:43  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch
