@@ -14,7 +14,7 @@ import java.util.Stack;
 
 /**
  * Provides common code for all Proxool tests
- * @version $Revision: 1.4 $, $Date: 2003/09/30 19:09:46 $
+ * @version $Revision: 1.5 $, $Date: 2004/03/26 16:00:23 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -39,20 +39,23 @@ public abstract class AbstractProxoolTest extends TestCase {
      */
     protected void setUp() throws Exception {
         GlobalTest.globalSetup();
-        testLock.writeLock().acquire();
         threadNames.push(Thread.currentThread().getName());
         LOG.debug("Thread '" + Thread.currentThread().getName() + "' -> '" + alias + "'");
         Thread.currentThread().setName(alias);
+        testLock.writeLock().acquire();
     }
 
     /**
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception {
-        GlobalTest.globalTeardown(alias);
-        testLock.writeLock().release();
-        Thread.currentThread().setName((String) threadNames.pop());
-        LOG.debug("Thread '" + alias + "' -> '" + Thread.currentThread().getName() + "'");
+        try {
+            GlobalTest.globalTeardown(alias);
+            Thread.currentThread().setName((String) threadNames.pop());
+            LOG.debug("Thread '" + alias + "' -> '" + Thread.currentThread().getName() + "'");
+        } finally {
+            testLock.writeLock().release();
+        }
     }
 
 }
@@ -61,6 +64,9 @@ public abstract class AbstractProxoolTest extends TestCase {
 /*
  Revision history:
  $Log: AbstractProxoolTest.java,v $
+ Revision 1.5  2004/03/26 16:00:23  billhorsman
+ Make sure we release lock on tearDown. I don't think this was a problem, but it was unrobust.
+
  Revision 1.4  2003/09/30 19:09:46  billhorsman
  Now uses a readwrite lock to make sure that each test runs sequentially. This should be true all the time, but sometimes
  tests fail and it is always because of some timing issue that is very hard to track down. This is an attempt to
