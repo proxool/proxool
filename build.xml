@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.4 $
-    $Date: 2002/09/19 09:44:02 $
+    $Revision: 1.5 $
+    $Date: 2002/10/23 21:06:03 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -115,7 +115,7 @@
 
             <property key="checkstyle.require.version" value="true"/>
             <property key="checkstyle.javadoc.scope" value="nothing"/>
-            <property key="checkstyle.maxlinelen" value="500"/>
+            <property key="checkstyle.maxlinelen" value="200"/>
             <property key="checkstyle.tab.width" value="4"/>
 
         </checkstyle>
