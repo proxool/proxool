@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.15 $, $Date: 2003/03/05 23:28:56 $
+ * @version $Revision: 1.16 $, $Date: 2003/07/23 06:54:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -152,6 +152,40 @@ public interface ProxoolConstants {
     /** @see ProxoolDriver#getPropertyInfo */
     public final String STATISTICS_LOG_LEVEL_PROPERTY = PROPERTY_PREFIX + STATISTICS_LOG_LEVEL;
 
+// Start JNDI
+
+    public static final String JNDI_NAME = "jndi-name";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String JNDI_NAME_PROPERTY = PROPERTY_PREFIX + JNDI_NAME;
+
+    public static final String INITIAL_CONTEXT_FACTORY = "initial-context-factory";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String INITIAL_CONTEXT_FACTORY_PROPERTY = PROPERTY_PREFIX + INITIAL_CONTEXT_FACTORY;
+
+    public static final String PROVIDER_URL = "provider-url";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String PROVIDER_URL_PROPERTY = PROPERTY_PREFIX + PROVIDER_URL;
+
+    public static final String SECURITY_AUTHENTICATION = "security-authentication";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String SECURITY_AUTHENTICATION_PROPERTY = PROPERTY_PREFIX + SECURITY_AUTHENTICATION;
+
+    public static final String SECURITY_PRINCIPAL = "security-principal";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String SECURITY_PRINCIPAL_PROPERTY = PROPERTY_PREFIX + SECURITY_PRINCIPAL;
+
+    public static final String SECURITY_CREDENTIALS = "security-credentials";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String SECURITY_CREDENTIALS_PROPERTY = PROPERTY_PREFIX + SECURITY_CREDENTIALS;
+
+// End JNDI
+
     public static final String STATISTICS_LOG_LEVEL_TRACE = "TRACE";
 
     public static final String STATISTICS_LOG_LEVEL_DEBUG = "DEBUG";
@@ -212,6 +246,9 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.16  2003/07/23 06:54:48  billhorsman
+ draft JNDI changes (shouldn't effect normal operation)
+
  Revision 1.15  2003/03/05 23:28:56  billhorsman
  deprecated maximum-new-connections property in favour of
  more descriptive simultaneous-build-throttle

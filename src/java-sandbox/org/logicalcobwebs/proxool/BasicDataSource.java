@@ -15,6 +15,7 @@ import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.StringRefAddr;
 import javax.naming.BinaryRefAddr;
+import javax.naming.InitialContext;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.io.PrintWriter;
@@ -27,7 +28,7 @@ import java.util.Properties;
 
 /**
  * Basic implementation of DataSource
- * @version $Revision: 1.1 $, $Date: 2003/04/19 12:59:17 $
+ * @version $Revision: 1.2 $, $Date: 2003/07/23 06:54:48 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -37,6 +38,22 @@ public class BasicDataSource implements DataSource {
     private static final Log LOG = LogFactory.getLog(BasicDataSource.class);
 
     private Properties jndiEnvironment;
+
+    // JNDI properties
+
+    private Context context;
+
+    private String contextFactory;
+
+    private String providerUrl;
+
+    private String securityAuthentication;
+
+    private String securityPrincipal;
+
+    private String securityCredentials;
+
+    // Main proxool properties
 
     private String alias;
 
@@ -102,6 +119,9 @@ public class BasicDataSource implements DataSource {
         } catch (ProxoolException e) {
             LOG.error("Problem getting connection", e);
             throw new SQLException(e.toString());
+        } catch (NamingException e) {
+            LOG.error("JNDI Problem whilst getting connection", e);
+            throw new SQLException(e.toString());
         }
     }
 
@@ -110,7 +130,7 @@ public class BasicDataSource implements DataSource {
      * exists first)
      * @throws org.logicalcobwebs.proxool.ProxoolException if the pool couldn't be registered
      */
-    private synchronized void registerPool() throws ProxoolException {
+    private synchronized void registerPool() throws ProxoolException, NamingException {
         if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
             ConnectionPoolDefinition cpd = new ConnectionPoolDefinition();
             cpd.setAlias(getAlias());
@@ -122,7 +142,7 @@ public class BasicDataSource implements DataSource {
             cpd.setMaximumConnectionCount(getMaximumConnectionCount());
             cpd.setMaximumConnectionLifetime(getMaximumConnectionLifetime());
             cpd.setMinimumConnectionCount(getMinimumConnectionCount());
-            cpd.setOverloadWithoutRefusalLifetime(cpd.getOverloadWithoutRefusalLifetime());
+            cpd.setOverloadWithoutRefusalLifetime(getOverloadWithoutRefusalLifetime());
             cpd.setPassword(getPassword());
             cpd.setPrototypeCount(getPrototypeCount());
             cpd.setRecentlyStartedThreshold(getRecentlyStartedThreshold());
@@ -134,7 +154,58 @@ public class BasicDataSource implements DataSource {
             cpd.setUser(getUser());
             cpd.setVerbose(isVerbose());
             ProxoolFacade.registerConnectionPool(cpd);
+
         }
+
+        Hashtable env = new Hashtable();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, getContextFactory());
+        env.put(Context.PROVIDER_URL, getProviderUrl());
+        env.put(Context.SECURITY_AUTHENTICATION, getSecurityAuthentication());
+        env.put(Context.SECURITY_PRINCIPAL, getSecurityPrincipal());
+        env.put(Context.SECURITY_CREDENTIALS, getSecurityCredentials());
+        context = new InitialContext(env);
+        context.bind("java:/comp/env/jdbc/proxool." + getAlias(), this);
+
+    }
+
+    public String getContextFactory() {
+        return contextFactory;
+    }
+
+    public void setContextFactory(String contextFactory) {
+        this.contextFactory = contextFactory;
+    }
+
+    public String getProviderUrl() {
+        return providerUrl;
+    }
+
+    public void setProviderUrl(String providerUrl) {
+        this.providerUrl = providerUrl;
+    }
+
+    public String getSecurityAuthentication() {
+        return securityAuthentication;
+    }
+
+    public void setSecurityAuthentication(String securityAuthentication) {
+        this.securityAuthentication = securityAuthentication;
+    }
+
+    public String getSecurityPrincipal() {
+        return securityPrincipal;
+    }
+
+    public void setSecurityPrincipal(String securityPrincipal) {
+        this.securityPrincipal = securityPrincipal;
+    }
+
+    public String getSecurityCredentials() {
+        return securityCredentials;
+    }
+
+    public void setSecurityCredentials(String securityCredentials) {
+        this.securityCredentials = securityCredentials;
     }
 
     /**

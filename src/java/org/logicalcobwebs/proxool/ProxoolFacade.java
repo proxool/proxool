@@ -12,12 +12,16 @@ import org.logicalcobwebs.proxool.admin.SnapshotIF;
 import org.logicalcobwebs.proxool.admin.StatisticsIF;
 import org.logicalcobwebs.proxool.admin.StatisticsListenerIF;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.lang.reflect.Method;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Hashtable;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -28,7 +32,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.66 $, $Date: 2003/04/10 21:49:34 $
+ * @version $Revision: 1.67 $, $Date: 2003/07/23 06:54:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -80,6 +84,23 @@ public class ProxoolFacade {
         if (isConfiguredForJMX(connectionPoolDefinition.getCompleteInfo())) {
             registerForJmx(connectionPoolDefinition.getAlias(), connectionPoolDefinition.getCompleteInfo());
         }
+// Start JNDI
+        if (connectionPoolDefinition.getJndiName() != null) {
+            try {
+                Hashtable env = new Hashtable();
+                env.put(Context.INITIAL_CONTEXT_FACTORY, connectionPoolDefinition.getInitialContextFactory());
+                env.put(Context.PROVIDER_URL, connectionPoolDefinition.getProviderUrl());
+                env.put(Context.SECURITY_AUTHENTICATION, connectionPoolDefinition.getSecurityAuthentication());
+                env.put(Context.SECURITY_PRINCIPAL, connectionPoolDefinition.getSecurityPrincipal());
+                env.put(Context.SECURITY_CREDENTIALS, connectionPoolDefinition.getSecurityCredentials());
+                Context context = new InitialContext(env);
+                ProxoolDataSource proxoolDataSource = new ProxoolDataSource(connectionPoolDefinition.getAlias());
+                context.bind(connectionPoolDefinition.getJndiName(), proxoolDataSource);
+            } catch (NamingException e) {
+                throw new ProxoolException("Problem registering with JNDI", e);
+            }
+        }
+// End JNDI
     }
 
     /**
@@ -614,6 +635,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.67  2003/07/23 06:54:48  billhorsman
+ draft JNDI changes (shouldn't effect normal operation)
+
  Revision 1.66  2003/04/10 21:49:34  billhorsman
  refactored registration slightly to allow DataSource access
 

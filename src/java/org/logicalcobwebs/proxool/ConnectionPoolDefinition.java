@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.18 $, $Date: 2003/04/27 15:42:21 $
+ * @version $Revision: 1.19 $, $Date: 2003/07/23 06:54:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -36,6 +36,20 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private Log poolLog = LOG;;
 
     private String alias;
+
+    // JNDI properties
+
+    private String jndiName;
+
+    private String initialContextFactory;
+
+    private String providerUrl;
+
+    private String securityAuthentication;
+
+    private String securityPrincipal;
+
+    private String securityCredentials;
 
     private Properties delegateProperties = new Properties();
 
@@ -393,6 +407,50 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                     setStatisticsLogLevel(value);
                 }
             }
+// Start JNDI
+        } else if (key.equals(ProxoolConstants.JNDI_NAME_PROPERTY)) {
+            if (isChanged(getJndiName(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setJndiName(value);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.INITIAL_CONTEXT_FACTORY_PROPERTY)) {
+            if (isChanged(getInitialContextFactory(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setInitialContextFactory(value);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.PROVIDER_URL_PROPERTY)) {
+            if (isChanged(getProviderUrl(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setProviderUrl(value);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.SECURITY_AUTHENTICATION)) {
+            if (isChanged(getSecurityAuthentication(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setSecurityAuthentication(value);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.SECURITY_PRINCIPAL_PROPERTY)) {
+            if (isChanged(getSecurityPrincipal(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setSecurityPrincipal(value);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.SECURITY_CREDENTIALS_PROPERTY)) {
+            if (isChanged(getSecurityCredentials(), value)) {
+                changed = true;
+                if (!pretend) {
+                    setSecurityCredentials(value);
+                }
+            }
+// End JNDI
         } else {
             if (isChanged(getDelegateProperty(key), value)) {
                 changed = true;
@@ -862,6 +920,57 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         this.statisticsLogLevel = statisticsLogLevel;
     }
 
+// Start JNDI
+    public String getJndiName() {
+        return jndiName;
+    }
+
+    public void setJndiName(String jndiName) {
+        this.jndiName = jndiName;
+    }
+
+    public String getInitialContextFactory() {
+        return initialContextFactory;
+    }
+
+    public void setInitialContextFactory(String initialContextFactory) {
+        this.initialContextFactory = initialContextFactory;
+    }
+
+    public String getProviderUrl() {
+        return providerUrl;
+    }
+
+    public void setProviderUrl(String providerUrl) {
+        this.providerUrl = providerUrl;
+    }
+
+    public String getSecurityAuthentication() {
+        return securityAuthentication;
+    }
+
+    public void setSecurityAuthentication(String securityAuthentication) {
+        this.securityAuthentication = securityAuthentication;
+    }
+
+    public String getSecurityPrincipal() {
+        return securityPrincipal;
+    }
+
+    public void setSecurityPrincipal(String securityPrincipal) {
+        this.securityPrincipal = securityPrincipal;
+    }
+
+    public String getSecurityCredentials() {
+        return securityCredentials;
+    }
+
+    public void setSecurityCredentials(String securityCredentials) {
+        this.securityCredentials = securityCredentials;
+    }
+
+// End JNDI
+
     /**
      * Returns true if {@link #redefine redefining} the pool using
      * these parameters would not change the definition. You can
@@ -901,6 +1010,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.19  2003/07/23 06:54:48  billhorsman
+ draft JNDI changes (shouldn't effect normal operation)
+
  Revision 1.18  2003/04/27 15:42:21  billhorsman
  fix to condition that meant configuration change was getting sent too often (and sometimes not at all)
 

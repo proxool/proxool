@@ -12,18 +12,17 @@ import org.logicalcobwebs.logging.LogFactory;
  * Tells you the version. You can tell what sort of release it is
  * from the version. For instance:
  *
- * 1.0 (1 January
+ * 1.0.0 (1 January)
  *   A proper released binary file at version 1.0.
  *
- * 1.0.*
+ * 1.0.0+
  *   Built from the source based on version 1.0 (but there is no
  *   way of knowing whether the source has been altered).
  *
- * 1.0.2003.1.2
- *   A snapshot release built on January 2nd. This comes after the
- *   version 1.0 and before 1.1.
+ * 1.0.1 (2 January)
+ *   A bug fix release built on January 2nd.
  *
- * @version $Revision: 1.10 $, $Date: 2003/06/18 10:04:47 $
+ * @version $Revision: 1.11 $, $Date: 2003/07/23 06:54:48 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -77,6 +76,9 @@ public class Version {
 /*
  Revision history:
  $Log: Version.java,v $
+ Revision 1.11  2003/07/23 06:54:48  billhorsman
+ draft JNDI changes (shouldn't effect normal operation)
+
  Revision 1.10  2003/06/18 10:04:47  billhorsman
  versioning
 

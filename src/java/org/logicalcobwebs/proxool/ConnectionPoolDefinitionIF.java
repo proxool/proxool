@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.16 $, $Date: 2003/03/05 23:28:56 $
+ * @version $Revision: 1.17 $, $Date: 2003/07/23 06:54:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -227,11 +227,26 @@ public interface ConnectionPoolDefinitionIF {
 
     String getDelegateProperty(String name);
 
+    String getInitialContextFactory();
+
+    String getProviderUrl();
+
+    String getSecurityAuthentication();
+
+    String getSecurityPrincipal();
+
+    String getSecurityCredentials();
+
+    String getJndiName();
+
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.17  2003/07/23 06:54:48  billhorsman
+ draft JNDI changes (shouldn't effect normal operation)
+
  Revision 1.16  2003/03/05 23:28:56  billhorsman
  deprecated maximum-new-connections property in favour of
  more descriptive simultaneous-build-throttle
