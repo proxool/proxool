@@ -12,13 +12,14 @@ import org.apache.commons.logging.LogFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.Properties;
 import java.util.Iterator;
 
 /**
  * Various tests
  *
- * @version $Revision: 1.20 $, $Date: 2002/11/14 16:19:02 $
+ * @version $Revision: 1.21 $, $Date: 2002/12/03 12:25:05 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -402,11 +403,49 @@ public class GeneralTests extends TestCase {
             adapter2.tearDown();
         }
     }
+
+    public void testFatalSqlException() {
+
+        String testName = "fatalSqlException";
+        ProxoolAdapter adapter = null;
+        try {
+            String alias = testName;
+            Properties info = TestHelper.buildProperties();
+            info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "not found");
+            adapter = new ProxoolAdapter(alias);
+            adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
+
+            Connection c = adapter.getConnection();
+            Statement s = c.createStatement();
+            try {
+                s.execute("drop table foo");
+            } catch (SQLException e) {
+                // Expected exception (foo doesn't exist)
+                LOG.debug("Excepted exception", e);
+            }
+
+            c.close();
+            
+            assertEquals("availableConnectionCount", 0L, ProxoolFacade.getConnectionPoolStatistics(alias).getAvailableConnectionCount());
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
+            adapter.tearDown();
+        }
+
+    }
+
+
 }
 
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.21  2002/12/03 12:25:05  billhorsman
+ new fatal sql exception test
+
  Revision 1.20  2002/11/14 16:19:02  billhorsman
  test thread name
 
