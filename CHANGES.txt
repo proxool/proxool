@@ -1,11 +1,14 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.24 $
-$Date: 2003/08/27 18:19:21 $
+$Revision: 1.25 $
+$Date: 2003/08/30 11:44:54 $
 $Author: billhorsman $
 
-0.7.3 - (coming soon)
+0.7.3 - (30 August, 2003)
+
+- Fix to documentation. Defining more than one type of fatal SQL exception
+  is done with a comma delimited list.
 
 - New getDelegateConnection() method on ProxoolFacade gives you access
   to the delegate (third party) driver if you really need it. This makes
@@ -17,9 +20,9 @@ $Author: billhorsman $
   control) then we no longer shutdown the pool it relates to.
 
 - AdminServlet now displays times for maximum-conneciton-lifetime,
-   house-keeping-sleep-time, and  maximum-active-time properly
-   regardless of your timezone. This was a display bug only and didn't
-   effect the behaviour of the pool itself.
+  house-keeping-sleep-time, and  maximum-active-time properly
+  regardless of your timezone. This was a display bug only and didn't
+  effect the behaviour of the pool itself.
    
 - Connections that are about to be expired no longer bother to reset
   themselves (because they'll never be used again anyway). This was
