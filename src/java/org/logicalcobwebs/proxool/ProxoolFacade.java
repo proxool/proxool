@@ -27,7 +27,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.33 $, $Date: 2003/01/30 17:22:23 $
+ * @version $Revision: 1.34 $, $Date: 2003/01/30 17:48:50 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -123,10 +123,10 @@ public class ProxoolFacade {
         Properties rememberedInfo = null;
         Properties changedProperties = null;
         String rememberedKey = null;
-        if (cp != null) {
-            rememberedKey = cp.getDefinition().getCompleteUrl();
+        if (cpd != null) {
+            rememberedKey = cpd.getAlias();
         } else {
-            rememberedKey = url;
+            rememberedKey = getAlias(url);
         }
         rememberedInfo = (Properties) infos.get(rememberedKey);
 
@@ -642,6 +642,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.34  2003/01/30 17:48:50  billhorsman
+ configuration listener now linked to alias not url
+
  Revision 1.33  2003/01/30 17:22:23  billhorsman
  add statistics support
 
