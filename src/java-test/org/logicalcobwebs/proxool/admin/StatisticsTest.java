@@ -25,7 +25,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/01 16:04:45 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/01 16:14:32 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -86,7 +86,7 @@ public class StatisticsTest extends TestCase {
             // of the 10s period.
             StatisticsResultMonitor srm = new StatisticsResultMonitor(alias, "10s");
             assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
-            StatisticsIF statistics = srm.getStatistics();
+            StatisticsIF statistics1 = srm.getStatistics();
 
 
             Connection c = DriverManager.getConnection(url);
@@ -99,12 +99,14 @@ public class StatisticsTest extends TestCase {
             c.close();
 
             assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
-            statistics = srm.getStatistics();
+            StatisticsIF statistics2 = srm.getStatistics();
 
-            assertEquals("servedCount", 1L, statistics.getServedCount());
-            assertEquals("servedPerSecond", 0.09, 0.11, statistics.getServedPerSecond());
-            assertEquals("refusedCount", 0L, statistics.getRefusedCount());
-            assertTrue("averageActiveTime > 0", statistics.getAverageActiveTime() > 0);
+            LOG.error("statistics1: " + statistics1.getStartDate() + " to " + statistics1.getStopDate());
+            LOG.error("statistics2: " + statistics2.getStartDate() + " to " + statistics2.getStopDate());
+            assertEquals("servedCount", 1L, statistics2.getServedCount());
+            assertEquals("servedPerSecond", 0.09, 0.11, statistics2.getServedPerSecond());
+            assertEquals("refusedCount", 0L, statistics2.getRefusedCount());
+            assertTrue("averageActiveTime > 0", statistics2.getAverageActiveTime() > 0);
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -158,6 +160,9 @@ public class StatisticsTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.10  2003/03/01 16:14:32  billhorsman
+ debug
+
  Revision 1.9  2003/03/01 16:04:45  billhorsman
  fix
 
