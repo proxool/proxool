@@ -16,7 +16,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.7 $, $Date: 2002/11/09 16:09:06 $
+ * @version $Revision: 1.8 $, $Date: 2002/11/13 20:23:38 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -24,6 +24,8 @@ import java.sql.DriverManager;
 public class ProxoolAdapter implements ConnectionAdapterIF {
 
     private String alias = String.valueOf(hashCode());
+
+    private String fullUrl;
 
     /**
      * Use this constructor if you want to define the alias
@@ -43,6 +45,10 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
         return "proxool";
     }
 
+    public void update(Properties info) throws SQLException {
+        ProxoolFacade.updateConnectionPool(alias, info);
+    }
+
     public void setup(String driver, String url, Properties info) throws SQLException {
 
         try {
@@ -51,7 +57,7 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
             throw new SQLException("Couldn't find " + driver);
         }
 
-        String fullUrl = TestHelper.buildProxoolUrl(alias, driver, url);
+        fullUrl = TestHelper.buildProxoolUrl(alias, driver, url);
         ProxoolFacade.registerConnectionPool(fullUrl, info);
     }
 
@@ -61,13 +67,17 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
                 + ProxoolConstants.ALIAS_DELIMITER + alias);
     }
 
+    public String getFullUrl() {
+        return fullUrl;
+    }
+
     public void closeConnection(Connection connection) throws SQLException {
         if (connection != null) {
             connection.close();
         }
     }
 
-    public void teardown() throws SQLException {
+    public void tearDown() {
         ProxoolFacade.removeConnectionPool(alias);
     }
 
@@ -76,6 +86,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.8  2002/11/13 20:23:38  billhorsman
+ change method name, throw exceptions differently, trivial changes
+
  Revision 1.7  2002/11/09 16:09:06  billhorsman
  checkstyle
 

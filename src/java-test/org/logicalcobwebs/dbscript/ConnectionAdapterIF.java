@@ -13,9 +13,9 @@ import java.sql.Connection;
 /**
  * An interface that will provide connections. It differs from a real
  * {@link java.sql.Driver Driver} because it has {@link #setup} and
- * {@link #teardown} methods.
+ * {@link #tearDown} methods.
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/09 15:59:34 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/13 20:23:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -52,9 +52,8 @@ public interface ConnectionAdapterIF {
     /**
      * Reclaim resources used by the adapter (for instance, close any
      * open connections)
-     * @throws SQLException if anything goes wrong
      */
-    void teardown() throws SQLException;
+    void tearDown();
 
     /**
      * Convenient name so we can identify this adapter in logs.
@@ -67,6 +66,9 @@ public interface ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ConnectionAdapterIF.java,v $
+ Revision 1.5  2002/11/13 20:23:34  billhorsman
+ change method name, throw exceptions differently, trivial changes
+
  Revision 1.4  2002/11/09 15:59:34  billhorsman
  fix doc
 

@@ -23,7 +23,7 @@ import java.sql.SQLException;
 /**
  * Allows you to run scripts from file.
  *
- * @version $Revision: 1.6 $, $Date: 2002/11/09 16:00:21 $
+ * @version $Revision: 1.7 $, $Date: 2002/11/13 20:23:35 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -97,26 +97,14 @@ public class ScriptFacade {
 
     }
 
-    /**
-     * Call the adapter's {@link ConnectionAdapterIF#teardown teardown}
-     * method without throwing any exceptions
-     * @param adapter the adapter to teardown
-     */
-    public static void tearDownAdapter(ConnectionAdapterIF adapter) {
-        if (adapter != null) {
-            try {
-                adapter.teardown();
-            } catch (Exception e) {
-                LOG.error("Problem tearing down " + adapter.getName() + " adapter", e);
-            }
-        }
-    }
-
 }
 
 /*
  Revision history:
  $Log: ScriptFacade.java,v $
+ Revision 1.7  2002/11/13 20:23:35  billhorsman
+ change method name, throw exceptions differently, trivial changes
+
  Revision 1.6  2002/11/09 16:00:21  billhorsman
  fix doc
 

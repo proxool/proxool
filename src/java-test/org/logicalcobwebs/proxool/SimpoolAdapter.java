@@ -22,7 +22,7 @@ import java.util.Properties;
  *
  * Provides Simpool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/09 16:02:20 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/13 20:23:38 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -68,9 +68,13 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
         // Do nothing !
     }
 
-    public void teardown() throws SQLException {
-        for (int i = 0; i < connections.length; i++) {
-            connections[i].close();
+    public void tearDown()  {
+        try {
+            for (int i = 0; i < connections.length; i++) {
+                connections[i].close();
+            }
+        } catch (SQLException e) {
+            LOG.error("Problem tearing down " + getName() + " adapter", e);
         }
     }
 
@@ -79,6 +83,9 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: SimpoolAdapter.java,v $
+ Revision 1.5  2002/11/13 20:23:38  billhorsman
+ change method name, throw exceptions differently, trivial changes
+
  Revision 1.4  2002/11/09 16:02:20  billhorsman
  fix doc
 
