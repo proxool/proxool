@@ -1,8 +1,8 @@
 About Proxool
 ------------
 
-$Revision: 1.3 $
-$Date: 2002/11/19 11:54:19 $
+$Revision: 1.4 $
+$Date: 2002/11/19 12:14:58 $
 $Author: billhorsman $
 
 A Java SQL Driver that provides a connection pool wrapper around another
@@ -15,7 +15,6 @@ have better luck looking at the documentation at doc/index.html.
 
 I would welcome any comments you would like to make on Proxool. Good or
 bad.
-
 
 Bill Horsman
 19 September 2002
