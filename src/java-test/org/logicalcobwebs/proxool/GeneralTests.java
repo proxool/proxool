@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.8 $, $Date: 2002/10/25 10:41:07 $
+ * @version $Revision: 1.9 $, $Date: 2002/10/27 12:03:33 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -30,13 +30,13 @@ public class GeneralTests extends TestCase {
     }
 
     protected void setUp() throws Exception {
-        AllTests.setup();
+        AllTests.globalSetup();
         TestHelper.setupDatabase();
     }
 
     protected void tearDown() throws Exception {
         TestHelper.tearDownDatabase();
-        AllTests.teardown();
+        AllTests.globalTeardown();
     }
 
     /**
@@ -147,14 +147,15 @@ public class GeneralTests extends TestCase {
                 if (info == null) {
                     info = TestHelper.buildProperties();
                 }
-                connections[i] = TestHelper.getProxoolConnection(alias, info);
+                String url = TestHelper.getSimpleUrl(alias);
+                connections[i] = TestHelper.getProxoolConnection(url, info);
 
                 TestHelper.testConnection(connections[i]);
                 goodHits++;
             } catch (ClassNotFoundException e) {
                 LOG.error("Problem finding driver?", e);
             } catch (SQLException e) {
-                LOG.debug("Ignorable SQLException", e);
+                LOG.debug(e.getMessage(), e);
             } catch (Exception e) {
                 LOG.error("Unexpected Exception", e);
             }
@@ -266,6 +267,12 @@ public class GeneralTests extends TestCase {
             String url = TestHelper.getFullUrl(alias2);
             Connection c = TestHelper.getProxoolConnection(url);
             TestHelper.testConnection(c);
+        }
+
+        // #2
+        {
+            String url = TestHelper.getFullUrl(alias2);
+            Connection c = TestHelper.getProxoolConnection(url);
             TestHelper.testConnection(c);
         }
 
@@ -282,8 +289,11 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.9  2002/10/27 12:03:33  billhorsman
+ clear up of tests
+
  Revision 1.8  2002/10/25 10:41:07  billhorsman
- draft changes to test setup
+ draft changes to test globalSetup
 
  Revision 1.7  2002/10/23 21:04:54  billhorsman
  checkstyle fixes (reduced max line width and lenient naming convention

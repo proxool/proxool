@@ -14,7 +14,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 /**
  * Run all tests
  *
- * @version $Revision: 1.1 $, $Date: 2002/10/25 10:41:07 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/27 12:03:33 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -31,30 +31,29 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(Configurators.class);
+        suite.addTestSuite(Performance.class);
+        suite.addTestSuite(GeneralTests.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
             public void setUp() throws Exception {
-                AllTests.setup();
-            }
-
-            protected void tearDown() throws Exception {
-                AllTests.teardown();
+                AllTests.globalSetup();
             }
         };
 
         return wrapper;
     }
 
-    public synchronized static void setup() {
+    public synchronized static void globalSetup() {
         if (!initialised) {
-            DOMConfigurator.configure("src/java-test/org/logicalcobwebs/proxool/log4j.xml");
+            String log4jPath = System.getProperty("log4jPath");
+            System.out.println(log4jPath);
+            DOMConfigurator.configure(log4jPath);
             initialised = true;
         }
     }
 
-    public static void teardown() {
-
+    public synchronized static void globalTeardown() {
     }
 
 }
@@ -62,7 +61,10 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.2  2002/10/27 12:03:33  billhorsman
+ clear up of tests
+
  Revision 1.1  2002/10/25 10:41:07  billhorsman
- draft changes to test setup
+ draft changes to test globalSetup
 
 */

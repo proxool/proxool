@@ -55,7 +55,7 @@ public class TestHelper {
     }
 
     protected static Connection getProxoolConnection(String url) throws ClassNotFoundException, SQLException {
-        return getProxoolConnection(url, null);
+        return getProxoolConnection(url, buildProperties());
     }
 
     protected static Connection getProxoolConnection(String url, Properties info) throws ClassNotFoundException, SQLException {

@@ -7,7 +7,7 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-import org.logicalcobwebs.proxool.ext.PropertyConfigurator;
+import org.logicalcobwebs.proxool.PropertyConfigurator;
 
 import java.sql.SQLException;
 
@@ -16,7 +16,7 @@ import java.sql.SQLException;
  *
  * Tests that the various ways of configuring proxool work.
  *
- * @version $Revision: 1.1 $, $Date: 2002/10/25 10:41:07 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/27 12:03:33 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -31,13 +31,13 @@ public class Configurators extends TestCase {
     }
 
     protected void setUp() throws Exception {
-        AllTests.setup();
+        AllTests.globalSetup();
         TestHelper.setupDatabase();
     }
 
     protected void tearDown() throws Exception {
         TestHelper.tearDownDatabase();
-        AllTests.teardown();
+        AllTests.globalTeardown();
     }
 
     /**
@@ -72,7 +72,10 @@ public class Configurators extends TestCase {
 /*
  Revision history:
  $Log: Configurators.java,v $
+ Revision 1.2  2002/10/27 12:03:33  billhorsman
+ clear up of tests
+
  Revision 1.1  2002/10/25 10:41:07  billhorsman
- draft changes to test setup
+ draft changes to test globalSetup
 
 */
