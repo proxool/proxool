@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.25 $, $Date: 2003/09/30 18:39:08 $
+ * @version $Revision: 1.26 $, $Date: 2003/10/16 18:53:21 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -74,7 +74,7 @@ public class ProxoolDriver implements Driver {
             String alias = ProxoolFacade.getAlias(url);
 
             if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
-                ProxoolFacade.registerConnectionPool(url, info);
+                ProxoolFacade.registerConnectionPool(url, info, false);
                 cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
             } else if (info != null && info.size() > 0) {
                 // Perhaps we should be redefining the definition?
@@ -225,6 +225,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.26  2003/10/16 18:53:21  billhorsman
+ When registering a new pool on the fly, indicate that it is implicit (for exception message handling)
+
  Revision 1.25  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 
