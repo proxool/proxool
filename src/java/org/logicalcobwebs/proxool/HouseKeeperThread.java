@@ -11,7 +11,7 @@ import org.logicalcobwebs.logging.LogFactory;
 /**
  * Responsible for running {@link HouseKeeper#sweep sweep}
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/10 15:26:47 $
+ * @version $Revision: 1.3 $, $Date: 2003/04/19 12:57:29 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -33,9 +33,9 @@ public class HouseKeeperThread extends Thread {
             HouseKeeper hk = HouseKeeperController.getHouseKeeperToRun();
             while (hk != null) {
                 try {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("About to sweep " + hk.getAlias());
-                    }
+//                    if (LOG.isDebugEnabled()) {
+//                        LOG.debug("About to sweep " + hk.getAlias());
+//                    }
                     hk.sweep();
                 } catch (ProxoolException e) {
                     LOG.error("Couldn't sweep " + hk.getAlias(), e);
@@ -61,6 +61,9 @@ public class HouseKeeperThread extends Thread {
 /*
  Revision history:
  $Log: HouseKeeperThread.java,v $
+ Revision 1.3  2003/04/19 12:57:29  billhorsman
+ removed redundant debug
+
  Revision 1.2  2003/03/10 15:26:47  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)
