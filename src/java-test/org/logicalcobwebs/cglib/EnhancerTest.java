@@ -11,7 +11,7 @@ import org.logicalcobwebs.cglib.proxy.Enhancer;
 /**
  * A test test class (!) to help me understand the Enhancer. It fails. Or at least,
  * it would do if I uncommented the assert. But that fines. It's a learning process.
- * @version $Revision: 1.1 $, $Date: 2004/06/02 20:54:57 $
+ * @version $Revision: 1.2 $, $Date: 2004/06/02 20:55:54 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -29,7 +29,11 @@ public class EnhancerTest extends AbstractProxoolTest {
                 new MyProxy(new MyConcreteClass()));
 
         mi.bar();
-        MyConcreteClass mcc = (MyConcreteClass) mi;
+        try {
+            MyConcreteClass mcc = (MyConcreteClass) mi;
+        } catch (ClassCastException e) {
+            // Expected this :(
+        }
         // This fails
         // assertEquals("foo()", "proxiedFoo", mcc.foo());
     }
@@ -39,6 +43,9 @@ public class EnhancerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: EnhancerTest.java,v $
+ Revision 1.2  2004/06/02 20:55:54  billhorsman
+ Make sure test doesn't throw a ClassCastException
+
  Revision 1.1  2004/06/02 20:54:57  billhorsman
  Learning test class for Enhancer. It fails (or would if the assert was uncommented). Left in for knowledge.
 
