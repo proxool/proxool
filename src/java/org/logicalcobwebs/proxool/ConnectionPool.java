@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.17 $, $Date: 2002/11/06 20:27:30 $
+ * @version $Revision: 1.18 $, $Date: 2002/11/07 19:17:55 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -136,18 +136,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * then an exception is thrown and something written to the log
      */
     protected Connection getConnection() throws SQLException {
-        return getConnection(null);
-    }
 
-    /**
-     * Get a connection from the pool.  If none are available or there was an Exception
-     * then an exception is thrown and something written to the log
-     */
-    protected Connection getConnection(String requester) throws SQLException {
-
-        if (requester == null) {
-            requester = Thread.currentThread().getName();
-        }
+        String requester = Thread.currentThread().getName();
 
         /* If we're busy, we need to return as quickly as possible. */
 
@@ -1065,6 +1055,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.18  2002/11/07 19:17:55  billhorsman
+ removed obsolete method
+
  Revision 1.17  2002/11/06 20:27:30  billhorsman
  supports the ConnectionResetter
 
