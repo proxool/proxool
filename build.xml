@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.25 $
-    $Date: 2003/02/07 09:37:31 $
+    $Revision: 1.26 $
+    $Date: 2003/02/07 17:27:16 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -132,7 +132,7 @@
         >
         <checkstyle>
 
-            <fileset dir="src/java" includes="**/*.java"/>
+            <fileset dir="src/java" includes="**/*.java" excludes="**/ReadWriteLock.java,**/logging/**"/>
             <fileset dir="src/java-examples" includes="**/*.java"/>
             <fileset dir="src/java-sandbox" includes="**/*.java"/>
             <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
