@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.68 $
-    $Date: 2003/12/13 12:21:54 $
+    $Revision: 1.69 $
+    $Date: 2003/12/13 12:39:08 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -128,7 +128,7 @@
         >
         <checkstyle>
 
-            <fileset dir="src/java" includes="**/*.java" excludes="**/concurrent/*"/>
+            <fileset dir="src/java" includes="**/*.java" excludes="**/concurrent/*,**/asm/**,**/cglib/**"/>
             <fileset dir="src/java-examples" includes="**/*.java"/>
             <fileset dir="src/java-sandbox" includes="**/*.java"/>
             <fileset dir="src/java-test" includes="**/*.java"/>
