@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.16 $, $Date: 2002/11/12 20:18:23 $
+ * @version $Revision: 1.17 $, $Date: 2002/11/12 20:24:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -382,8 +382,14 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.17  2002/11/12 20:24:12  billhorsman
+ checkstyle
+
  Revision 1.16  2002/11/12 20:18:23  billhorsman
- Made connection resetter a bit more friendly. Now, if it encounters any problems during reset then that connection is thrown away. This is going to cause you problems if you always close connections in an unstable state (e.g. with transactions open=. But then again, it's better to know about that as soon as possible, right?
+ Made connection resetter a bit more friendly. Now, if it encounters any problems
+ during reset then that connection is thrown away. This is going to cause you
+ problems if you always close connections in an unstable state (e.g. with transactions
+ open. But then again, it's better to know about that as soon as possible, right?
 
  Revision 1.15  2002/11/07 18:56:22  billhorsman
  fixed NullPointerException introduced yesterday on isClose() method

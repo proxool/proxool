@@ -7,15 +7,13 @@ package org.logicalcobwebs.proxool;
 
 import org.apache.commons.logging.Log;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
+import java.sql.Connection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Responsible for resetting a Connection to its default state when it is
@@ -23,7 +21,7 @@ import java.util.HashSet;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/12 20:18:23 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/12 20:24:12 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -172,7 +170,7 @@ public class ConnectionResetter {
                         // Just test that the mutator works too. Otherwise it's going to fall over
                         // everytime we close a connection
                         try {
-                            Object[] args= {value};
+                            Object[] args = {value};
                             mutator.invoke(connection, args);
                         } catch (Throwable t) {
                             log.debug(driverName + " does not support " + mutator.getName() + ". Proxool doesn't mind.");
@@ -236,9 +234,11 @@ public class ConnectionResetter {
 
         if (errorsEncountered) {
 
-            log.warn(id + " - There were some problems resetting the connection. It will not be used again (just in case). The thread that is responsible is named '" + Thread.currentThread().getName() + "'");
+            log.warn(id + " - There were some problems resetting the connection. It will not be used again (just in case). "
+                    + "The thread that is responsible is named '" + Thread.currentThread().getName() + "'");
             if (!autoCommit) {
-                log.warn(id + " - The connection was closed with autoCommit=false. That is fine, but it might indicate that the problems that happened whilst trying to reset it were because a transaction is still in progress.");
+                log.warn(id + " - The connection was closed with autoCommit=false. That is fine, but it might indicate that "
+                        + "the problems that happened whilst trying to reset it were because a transaction is still in progress.");
             }
         }
 
@@ -261,8 +261,14 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.5  2002/11/12 20:24:12  billhorsman
+ checkstyle
+
  Revision 1.4  2002/11/12 20:18:23  billhorsman
- Made connection resetter a bit more friendly. Now, if it encounters any problems during reset then that connection is thrown away. This is going to cause you problems if you always close connections in an unstable state (e.g. with transactions open=. But then again, it's better to know about that as soon as possible, right?
+ Made connection resetter a bit more friendly. Now, if it encounters any problems during
+ reset then that connection is thrown away. This is going to cause you problems if you
+ always close connections in an unstable state (e.g. with transactions open. But then
+ again, it's better to know about that as soon as possible, right?
 
  Revision 1.3  2002/11/07 18:55:40  billhorsman
  demoted log message from info to debug
