@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.25 $, $Date: 2003/01/14 23:50:58 $
+ * @version $Revision: 1.26 $, $Date: 2003/01/15 12:20:06 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -456,8 +456,10 @@ public class ProxoolFacade {
         }
     }
 
-    /**ls
+    /**
      * Get real-time statistical information about how a pool is performing.
+     * @deprecated this will not be present in version 1.0. Better to use {@link #getConnectionPoolStatistics}
+     * and extract the information piece by piece.
      */
     public static String getConnectionPoolStatisticsDump(String alias) throws SQLException {
         try {
@@ -600,6 +602,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.26  2003/01/15 12:20:06  billhorsman
+ deprecated getConnectionPoolStatisticsDump
+
  Revision 1.25  2003/01/14 23:50:58  billhorsman
  logs version
 
