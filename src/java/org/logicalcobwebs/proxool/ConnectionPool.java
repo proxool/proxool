@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.34 $, $Date: 2003/01/30 17:22:21 $
+ * @version $Revision: 1.35 $, $Date: 2003/01/31 00:20:05 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -121,8 +121,12 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         setDefinition(definition);
         connectionPoolUp = true;
 
-        if (definition.getStatistics() > 0) {
-            stats = new Stats(definition.getAlias(), definition.getStatistics());
+        if (definition.getStatistics() != null) {
+            try {
+                stats = new Stats(definition.getAlias(), definition.getStatistics());
+            } catch (ProxoolException e) {
+                log.error("Failed to initialise statistics", e);
+            }
         }
     }
 
@@ -503,12 +507,16 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             try {
                 try {
                     wakeThread(houseKeepingThread);
+                } catch (NullPointerException e) {
+                    log.error("HouseKeepingThread already dead", e);
                 } catch (Exception e) {
                     log.error("Can't wake houseKeepingThread", e);
                 }
 
                 try {
                     wakeThread(prototypingThread);
+                } catch (NullPointerException e) {
+                    log.error("PrototypingThread already dead", e);
                 } catch (Exception e) {
                     log.error("Can't wake prototypingThread", e);
                 }
@@ -1161,6 +1169,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.35  2003/01/31 00:20:05  billhorsman
+ statistics is now a string to allow multiple,
+ comma-delimited values (plus better logging of errors
+ during destruction)
+
  Revision 1.34  2003/01/30 17:22:21  billhorsman
  add statistics support
 
