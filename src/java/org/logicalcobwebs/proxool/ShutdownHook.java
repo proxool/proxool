@@ -15,9 +15,9 @@ import java.lang.reflect.InvocationTargetException;
  * This is instantiated statically by ProxoolFacade. It will automatically
  * close down all the connections when teh JVM stops.
  *
- * @version $Revision: 1.9 $, $Date: 2003/10/27 12:32:06 $
+ * @version $Revision: 1.10 $, $Date: 2003/11/16 18:19:14 $
  * @author bill
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
  */
 class ShutdownHook implements Runnable {
@@ -36,8 +36,8 @@ class ShutdownHook implements Runnable {
     protected static void remove(Thread t) {
         Runtime runtime = Runtime.getRuntime();
         try {
-            Method addShutdownHookMethod = Runtime.class.getMethod("removeShutdownHook", new Class[] {Thread.class});
-            addShutdownHookMethod.invoke(runtime, new Object[] {t});
+            final Method removeShutdownHookMethod = Runtime.class.getMethod("removeShutdownHook", new Class[] {Thread.class});
+            removeShutdownHookMethod.invoke(runtime, new Object[] {t});
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Removed shutdownHook");
             }
@@ -48,11 +48,18 @@ class ShutdownHook implements Runnable {
         } catch (IllegalAccessException e) {
             LOG.error("Problem removing shutdownHook", e);
         } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof IllegalStateException) {
-                // This is probably because a shutdown is in progress. We can
-                // safely ignore that.
-            } else {
-                LOG.error("Problem removing shutdownHook", e);
+            final Object o;
+            try {
+                final Method getCauseMethod = Runtime.class.getMethod("getCause", null);
+                o = getCauseMethod.invoke(e, null);
+                if (o != null && o instanceof IllegalStateException) {
+                    // This is probably because a shutdown is in progress. We can
+                    // safely ignore that.
+                } else {
+                    LOG.error("Problem removing shutdownHook", e);
+                }
+            } catch (Exception ex) {
+                LOG.error("Problem calling \"get cause\" on IllegalStateException.", e);
             }
         }
     }
@@ -98,6 +105,9 @@ class ShutdownHook implements Runnable {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.10  2003/11/16 18:19:14  chr32
+ Started calling to Exception.getCause() via refletion to maintain compilability with < jdk 1.4 compilers.
+
  Revision 1.9  2003/10/27 12:32:06  billhorsman
  Fixed typos and silently ignore IllegalStateException during shutdownHook removal (it's probably because
  the JVM is shutting down).
