@@ -8,11 +8,14 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * This is instantiated statically by ProxoolFacade. It will automatically
  * close down all the connections when teh JVM stops.
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/03 17:07:58 $
+ * @version $Revision: 1.8 $, $Date: 2003/09/07 22:05:15 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -30,12 +33,48 @@ class ShutdownHook implements Runnable {
         }
     }
 
+    protected static void remove(Thread t) {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Method addShutdownHookMethod = Runtime.class.getMethod("removeShutdownHook", new Class[] {Thread.class});
+            addShutdownHookMethod.invoke(runtime, new Object[] {t});
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Removed shutdownHook");
+            }
+        } catch (NoSuchMethodException e) {
+            LOG.warn("Proxool will have to be shutdown manually with ProxoolFacade.shutdown() because this version of the JDK does not support Runtime.getRuntime().addShutdownHook()");
+        } catch (SecurityException e) {
+            LOG.error("Probelm registering sutdownHook", e);
+        } catch (IllegalAccessException e) {
+            LOG.error("Probelm registering sutdownHook", e);
+        } catch (InvocationTargetException e) {
+            LOG.error("Probelm registering sutdownHook", e);
+        }
+    }
+
     /**
      * Registers this ShutdownHook with Runtime
      */
     private ShutdownHook() {
         Thread t = new Thread(this);
-        t.setName("ShutdownHook");        Runtime.getRuntime().addShutdownHook(t);
+        t.setName("ShutdownHook");
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Method addShutdownHookMethod = Runtime.class.getMethod("addShutdownHook", new Class[] {Thread.class});
+            addShutdownHookMethod.invoke(runtime, new Object[] {t});
+            ProxoolFacade.setShutdownHook(t);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Registered shutdownHook");
+            }
+        } catch (NoSuchMethodException e) {
+            LOG.warn("Proxool will have to be shutdown manually with ProxoolFacade.shutdown() because this version of the JDK does not support Runtime.getRuntime().addShutdownHook()");
+        } catch (SecurityException e) {
+            LOG.error("Probelm registering sutdownHook", e);
+        } catch (IllegalAccessException e) {
+            LOG.error("Probelm registering sutdownHook", e);
+        } catch (InvocationTargetException e) {
+            LOG.error("Probelm registering sutdownHook", e);
+        }
     }
 
     /**
@@ -54,6 +93,11 @@ class ShutdownHook implements Runnable {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.8  2003/09/07 22:05:15  billhorsman
+ Now uses reflection to add ShutdownHook to Runtime so that it is JDK independent. Using JDK1.2
+ will disable the shutdownHook and simply log a warning message that Proxool must be shutdown
+ explicitly.
+
  Revision 1.7  2003/03/03 17:07:58  billhorsman
  name thread
 
