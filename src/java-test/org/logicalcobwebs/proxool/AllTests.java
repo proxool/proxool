@@ -13,9 +13,9 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.9 $, $Date: 2002/12/16 17:35:42 $
+ * @version $Revision: 1.10 $, $Date: 2003/01/23 11:13:57 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class AllTests {
@@ -28,7 +28,6 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(HypersonicTest.class);
-        suite.addTestSuite(PerformanceTest.class);
         suite.addTestSuite(GeneralTests.class);
         suite.addTestSuite(ConnectionResetterTest.class);
         suite.addTestSuite(ThreadTest.class);
@@ -48,6 +47,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.10  2003/01/23 11:13:57  billhorsman
+ remove PerformanceTest from suite
+
  Revision 1.9  2002/12/16 17:35:42  chr32
  Removed redundant imports.
 
