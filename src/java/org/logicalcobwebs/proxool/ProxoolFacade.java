@@ -29,7 +29,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.72 $, $Date: 2003/09/07 22:09:21 $
+ * @version $Revision: 1.73 $, $Date: 2003/10/16 18:52:35 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -57,6 +57,19 @@ public class ProxoolFacade {
      * @throws ProxoolException if anything goes wrong
      */
     public static synchronized String registerConnectionPool(String url, Properties info) throws ProxoolException {
+        return registerConnectionPool(url, info, true);
+    }
+
+    /**
+     * Build a ConnectionPool based on this definition and then start it.
+     * @param url defines the delegate driver and delegate url.
+     * @param info the properties used to configure Proxool (and any for the delegate driver too) - optional
+     * @param explicitRegister set to true if we are registering a new pool explicitly, or false
+     * if it's just because we are serving a url that we haven't come across before
+     * @return the alias for this pool (or the full url if no alias is specified)
+     * @throws ProxoolException if anything goes wrong
+     */
+    protected static synchronized String registerConnectionPool(String url, Properties info, boolean explicitRegister) throws ProxoolException {
         String alias = getAlias(url);
 
         if (!versionLogged) {
@@ -71,7 +84,7 @@ public class ProxoolFacade {
         }
 
         if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
-            ConnectionPoolDefinition cpd = new ConnectionPoolDefinition(url, info);
+            ConnectionPoolDefinition cpd = new ConnectionPoolDefinition(url, info, explicitRegister);
             registerConnectionPool(cpd);
         } else {
             throw new ProxoolException("Attempt to register duplicate pool called '" + alias + "'");
@@ -492,7 +505,7 @@ public class ProxoolFacade {
     private static final boolean MERCIFUL = true;
 
     /**
-     * Redfine the behaviour of the pool. All existing properties (for Proxool
+     * Redefine the behaviour of the pool. All existing properties (for Proxool
      * and the delegate driver are reset to their default) and reapplied
      * based on the parameters sent here.
      *
@@ -504,7 +517,7 @@ public class ProxoolFacade {
         String alias = getAlias(url);
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
         ConnectionPoolDefinition cpd = cp.getDefinition();
-        cpd.update(url, info);
+        cpd.redefine(url, info);
     }
 
 
@@ -690,6 +703,11 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.73  2003/10/16 18:52:35  billhorsman
+ Fixed a bug: the redefine() method was actually calling the update() method. Also, added checks to make the
+ "Attempt to use a pool with incomplete definition" exception a bit more descriptive. It's often because you
+ are referring to an unregistered pool simply by using an alias.
+
  Revision 1.72  2003/09/07 22:09:21  billhorsman
  Remove any registered ShutdownHooks during shutdown.
 
