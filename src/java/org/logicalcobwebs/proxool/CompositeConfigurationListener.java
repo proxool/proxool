@@ -5,12 +5,11 @@
  */
 package org.logicalcobwebs.proxool;
 
+import java.util.Properties;
+
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
-
-import java.util.Iterator;
-import java.util.Properties;
 
 /**
  * A {@link ConfigurationListenerIF} that keeps a list of <code>ConfigurationListenerIF</code>s
@@ -19,9 +18,10 @@ import java.util.Properties;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.5 $, $Date: 2003/03/10 15:26:43 $
+ * 
+ * @version $Revision: 1.6 $, $Date: 2004/03/16 08:48:32 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.7
  */
 public class CompositeConfigurationListener extends AbstractListenerContainer implements ConfigurationListenerIF {
@@ -30,23 +30,20 @@ public class CompositeConfigurationListener extends AbstractListenerContainer im
     /**
      * @see ConfigurationListenerIF#definitionUpdated(ConnectionPoolDefinitionIF, Properties, Properties)
      */
-    public void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition,
-                                 Properties completeInfo, Properties changedInfo) {
-        Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                ConfigurationListenerIF configurationListener = null;
-                while (listenerIterator.hasNext()) {
-                    configurationListener = (ConfigurationListenerIF) listenerIterator.next();
-                    configurationListener.definitionUpdated(connectionPoolDefinition, (Properties) completeInfo.clone(), (Properties) changedInfo.clone());
-                }
+    public void definitionUpdated( ConnectionPoolDefinitionIF connectionPoolDefinition,
+                                   Properties completeInfo, 
+                                   Properties changedInfo) 
+    {
+        Object[] listeners = getListeners();
+            
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                ConfigurationListenerIF configurationListener = (ConfigurationListenerIF) listeners[i];
+                configurationListener.definitionUpdated(connectionPoolDefinition, (Properties) completeInfo.clone(), (Properties) changedInfo.clone());
+            } 
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching event", re);
             }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + ConfigurationListenerIF.class.getName()
-                    + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
         }
     }
 }
@@ -54,6 +51,11 @@ public class CompositeConfigurationListener extends AbstractListenerContainer im
 /*
  Revision history:
  $Log: CompositeConfigurationListener.java,v $
+ Revision 1.6  2004/03/16 08:48:32  brenuart
+ Changes in the AbstractListenerContainer:
+ - provide more efficient concurrent handling;
+ - better handling of RuntimeException thrown by external listeners.
+
  Revision 1.5  2003/03/10 15:26:43  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

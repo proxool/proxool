@@ -9,8 +9,6 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
 
-import java.util.Iterator;
-
 /**
  * A {@link StateListenerIF} that keeps a list of <code>StateListenerIF</code>s
  * and notifies them in a thread safe manner.
@@ -18,9 +16,10 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.4 $, $Date: 2003/03/10 15:26:44 $
+ * 
+ * @version $Revision: 1.5 $, $Date: 2004/03/16 08:48:32 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.7
  */
 public class CompositeStateListener extends AbstractListenerContainer implements StateListenerIF {
@@ -29,22 +28,18 @@ public class CompositeStateListener extends AbstractListenerContainer implements
     /**
      * @see StateListenerIF#upStateChanged(int)
      */
-    public void upStateChanged(int upState) {
-        Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                StateListenerIF stateListener = null;
-                while (listenerIterator.hasNext()) {
-                    stateListener = (StateListenerIF) listenerIterator.next();
-                    stateListener.upStateChanged(upState);
-                }
+    public void upStateChanged(int upState) 
+    {
+        Object[] listeners = getListeners();
+        
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                StateListenerIF stateListener = (StateListenerIF) listeners[i];
+                stateListener.upStateChanged(upState);
             }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + StateListenerIF.class.getName()
-                    + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching upStateChanged event", re);
+            }
         }
     }
 }
@@ -52,6 +47,11 @@ public class CompositeStateListener extends AbstractListenerContainer implements
 /*
  Revision history:
  $Log: CompositeStateListener.java,v $
+ Revision 1.5  2004/03/16 08:48:32  brenuart
+ Changes in the AbstractListenerContainer:
+ - provide more efficient concurrent handling;
+ - better handling of RuntimeException thrown by external listeners.
+
  Revision 1.4  2003/03/10 15:26:44  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

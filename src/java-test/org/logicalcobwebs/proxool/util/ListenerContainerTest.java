@@ -7,14 +7,12 @@ package org.logicalcobwebs.proxool.util;
 
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
 
-import java.util.Iterator;
-
 /**
  * Test {@link AbstractListenerContainer}.
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/04 10:58:45 $
+ * @version $Revision: 1.6 $, $Date: 2004/03/16 08:48:32 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.7
  */
 public class ListenerContainerTest extends AbstractProxoolTest {
@@ -73,19 +71,11 @@ class CompositeTestListener extends AbstractListenerContainer implements TestLis
     private int numberOfNotifications;
 
     public void onEvent() {
-        try {
-            Iterator listeners = getListenerIterator();
-            if (listeners != null) {
-                TestListenerIF testListener = null;
-                while (listeners.hasNext()) {
-                    testListener = (TestListenerIF) listeners.next();
-                    notification();
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e.getMessage());
-        } finally {
-            releaseReadLock();
+        Object[] listeners = getListeners();
+        
+        for(int i=0; i<listeners.length; i++) {
+            TestListenerIF testListener = (TestListenerIF) listeners[i];
+            notification();
         }
     }
 
@@ -106,6 +96,11 @@ class TestListener implements TestListenerIF {
 /*
  Revision history:
  $Log: ListenerContainerTest.java,v $
+ Revision 1.6  2004/03/16 08:48:32  brenuart
+ Changes in the AbstractListenerContainer:
+ - provide more efficient concurrent handling;
+ - better handling of RuntimeException thrown by external listeners.
+
  Revision 1.5  2003/03/04 10:58:45  billhorsman
  checkstyle
 

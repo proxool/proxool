@@ -9,8 +9,6 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
 
-import java.util.Iterator;
-
 /**
  * A {@link StatisticsListenerIF} that keeps a list of <code>StatisticsListenerIF</code>s
  * and notifies them in a thread safe manner.
@@ -18,9 +16,10 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.3 $, $Date: 2003/03/10 15:26:51 $
+ * 
+ * @version $Revision: 1.4 $, $Date: 2004/03/16 08:48:32 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.7
  */
 public class CompositeStatisticsListener extends AbstractListenerContainer implements StatisticsListenerIF {
@@ -29,22 +28,18 @@ public class CompositeStatisticsListener extends AbstractListenerContainer imple
     /**
      * @see StatisticsListenerIF#statistics(String, StatisticsIF)
      */
-    public void statistics(String alias, StatisticsIF statistics) {
-        Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                StatisticsListenerIF statisticsListener = null;
-                while (listenerIterator.hasNext()) {
-                    statisticsListener = (StatisticsListenerIF) listenerIterator.next();
-                    statisticsListener.statistics(alias, statistics);
-                }
+    public void statistics(String alias, StatisticsIF statistics) 
+    {
+        Object[] listeners = getListeners();
+        
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                StatisticsListenerIF statisticsListener = (StatisticsListenerIF) listeners[i];
+                statisticsListener.statistics(alias, statistics);
             }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + StatisticsListenerIF.class.getName()
-                    + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching statistics event", re);
+            }
         }
     }
 }
@@ -52,6 +47,11 @@ public class CompositeStatisticsListener extends AbstractListenerContainer imple
 /*
  Revision history:
  $Log: CompositeStatisticsListener.java,v $
+ Revision 1.4  2004/03/16 08:48:32  brenuart
+ Changes in the AbstractListenerContainer:
+ - provide more efficient concurrent handling;
+ - better handling of RuntimeException thrown by external listeners.
+
  Revision 1.3  2003/03/10 15:26:51  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

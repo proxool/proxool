@@ -5,13 +5,12 @@
  */
 package org.logicalcobwebs.proxool;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Iterator;
 
 /**
  * A {@link ConnectionListenerIF} that keeps a list of <code>ConnectionListenerIF</code>s
@@ -20,9 +19,10 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.4 $, $Date: 2003/03/10 15:26:43 $
+ * 
+ * @version $Revision: 1.5 $, $Date: 2004/03/16 08:48:32 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.7
  */
 public class CompositeConnectionListener extends AbstractListenerContainer implements ConnectionListenerIF {
@@ -31,88 +31,80 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
     /**
      * @see ConnectionListenerIF#onBirth(Connection)
      */
-    public void onBirth(Connection connection) throws SQLException {
-        Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                ConnectionListenerIF connectionListener = null;
-                while (listenerIterator.hasNext()) {
-                    connectionListener = (ConnectionListenerIF) listenerIterator.next();
-                    connectionListener.onBirth(connection);
-                }
+    public void onBirth(Connection connection) throws SQLException 
+    {
+        Object[] listeners = getListeners();
+        
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                ConnectionListenerIF connectionListener = (ConnectionListenerIF) listeners[i];
+                connectionListener.onBirth(connection);
             }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + ConnectionListenerIF.class.getName()
-                    + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching onBirth event", re);
+            }
+            catch(SQLException se) {
+                LOG.warn("SQLException received from listener "+listeners[i]+" when dispatching onBirth event - event dispatching cancelled");
+                throw se;
+            }
         }
     }
 
     /**
      * @see ConnectionListenerIF#onDeath(Connection)
      */
-    public void onDeath(Connection connection) throws SQLException {
-        Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                ConnectionListenerIF connectionListener = null;
-                while (listenerIterator.hasNext()) {
-                    connectionListener = (ConnectionListenerIF) listenerIterator.next();
-                    connectionListener.onDeath(connection);
-                }
+    public void onDeath(Connection connection) throws SQLException 
+    {
+        Object[] listeners = getListeners();
+        
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                ConnectionListenerIF connectionListener = (ConnectionListenerIF) listeners[i];
+                connectionListener.onDeath(connection);
             }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + ConnectionListenerIF.class.getName()
-                    + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching onDeath event", re);
+            }
+            catch(SQLException se) {
+                LOG.warn("SQLException received from listener "+listeners[i]+" when dispatching onDeath event - event dispatching cancelled");
+                throw se;
+            }
         }
     }
 
     /**
      * @see ConnectionListenerIF#onExecute(String, long)
      */
-    public void onExecute(String command, long elapsedTime) {
-        Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                ConnectionListenerIF connectionListener = null;
-                while (listenerIterator.hasNext()) {
-                    connectionListener = (ConnectionListenerIF) listenerIterator.next();
-                    connectionListener.onExecute(command, elapsedTime);
-                }
+    public void onExecute(String command, long elapsedTime) 
+    {
+        Object[] listeners = getListeners();
+        
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                ConnectionListenerIF connectionListener = (ConnectionListenerIF) listeners[i];
+                connectionListener.onExecute(command, elapsedTime);
             }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + ConnectionListenerIF.class.getName()
-                    + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching onExecute event", re);
+            }
         }
     }
 
     /**
      * @see ConnectionListenerIF#onFail(String, Exception)
      */
-    public void onFail(String command, Exception exception) {
-        Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                ConnectionListenerIF connectionListener = null;
-                while (listenerIterator.hasNext()) {
-                    connectionListener = (ConnectionListenerIF) listenerIterator.next();
-                    connectionListener.onFail(command, exception);
-                }
+    public void onFail(String command, Exception exception) 
+    {
+        Object[] listeners = getListeners();
+        
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                ConnectionListenerIF connectionListener = (ConnectionListenerIF) listeners[i];
+                connectionListener.onFail(command, exception);
             }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + ConnectionListenerIF.class.getName()
-                    + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching onFail event", re);
+            }
         }
     }
 }
@@ -120,6 +112,11 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
 /*
  Revision history:
  $Log: CompositeConnectionListener.java,v $
+ Revision 1.5  2004/03/16 08:48:32  brenuart
+ Changes in the AbstractListenerContainer:
+ - provide more efficient concurrent handling;
+ - better handling of RuntimeException thrown by external listeners.
+
  Revision 1.4  2003/03/10 15:26:43  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

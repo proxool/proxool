@@ -5,12 +5,11 @@
  */
 package org.logicalcobwebs.proxool;
 
+import java.util.Properties;
+
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
-
-import java.util.Iterator;
-import java.util.Properties;
 
 /**
  * A {@link ProxoolListenerIF} that keeps a list of <code>ProxoolListenerIF</code>s
@@ -19,9 +18,10 @@ import java.util.Properties;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.4 $, $Date: 2003/03/10 15:26:44 $
+ * 
+ * @version $Revision: 1.5 $, $Date: 2004/03/16 08:48:32 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.8
  */
 public class CompositeProxoolListener extends AbstractListenerContainer implements ProxoolListenerIF {
@@ -30,45 +30,37 @@ public class CompositeProxoolListener extends AbstractListenerContainer implemen
     /**
      * @see ProxoolListenerIF#onRegistration(ConnectionPoolDefinitionIF, Properties)
      */
-    public void onRegistration(ConnectionPoolDefinitionIF connectionPoolDefinition,
-                                 Properties completeInfo) {
-        Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                ProxoolListenerIF proxoolListener = null;
-                while (listenerIterator.hasNext()) {
-                    proxoolListener = (ProxoolListenerIF) listenerIterator.next();
-                    proxoolListener.onRegistration(connectionPoolDefinition, (Properties) completeInfo.clone());
-                }
+    public void onRegistration( ConnectionPoolDefinitionIF connectionPoolDefinition,
+                                Properties 				   completeInfo) 
+    {
+        Object[] listeners = getListeners();
+        
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                ProxoolListenerIF proxoolListener = (ProxoolListenerIF) listeners[i];
+                proxoolListener.onRegistration(connectionPoolDefinition, (Properties) completeInfo.clone());
             }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + ProxoolListenerIF.class.getName()
-                    + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching onRegistration event", re);
+            }
         }
     }
 
     /**
      * @see ProxoolListenerIF#onShutdown(String)
      */
-    public void onShutdown(String alias) {
-        Iterator listenerIterator = null;
-        try {
-            listenerIterator = getListenerIterator();
-            if (listenerIterator != null) {
-                ProxoolListenerIF proxoolListener = null;
-                while (listenerIterator.hasNext()) {
-                    proxoolListener = (ProxoolListenerIF) listenerIterator.next();
-                    proxoolListener.onShutdown(alias);
-                }
+    public void onShutdown(String alias) 
+    {
+        Object[] listeners = getListeners();
+        
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                ProxoolListenerIF proxoolListener = (ProxoolListenerIF) listeners[i];
+                proxoolListener.onShutdown(alias);
             }
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire read lock for " + ProxoolListenerIF.class.getName()
-                    + " iterator but was interrupted.");
-        } finally {
-            releaseReadLock();
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching onShutdown event", re);
+            }
         }
     }
 }
@@ -76,6 +68,11 @@ public class CompositeProxoolListener extends AbstractListenerContainer implemen
 /*
  Revision history:
  $Log: CompositeProxoolListener.java,v $
+ Revision 1.5  2004/03/16 08:48:32  brenuart
+ Changes in the AbstractListenerContainer:
+ - provide more efficient concurrent handling;
+ - better handling of RuntimeException thrown by external listeners.
+
  Revision 1.4  2003/03/10 15:26:44  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

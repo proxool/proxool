@@ -5,124 +5,123 @@
  */
 package org.logicalcobwebs.proxool.util;
 
-import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Implementation of {@link ListenerContainerIF} that uses a reads/write lock to handle concurrency in a safe and
  * fast way.
  * <p>
- * The registered listeners are offered to subclasses through the protected {@link #getListenerIterator} method. This
- * method aquires a read lock before it returns the iterator, but <b>it is the subclass responsibility to
- * release this lock by calling the {@link #releaseReadLock} method</b>. Failing to do this will prevent any more
- * listeneres to be added or removed. Your code sould look like this:
+ * The registered listeners are offered to subclasses through the protected {@link #getListeners} method. This
+ * method returns a reference to an array containing the registered listeners. A new array holding the listeners
+ * is created everytime a modification on the registration list is required (add/remove listener). Therefore, 
+ * subclasses can safely iterate over the received array. 
+ * 
+ * Your code sould look like this:
  * <code>
  * <pre>
- *
-     Iterator listenerIterator = null;
-     try {
-         listenerIterator = getListenerIterator();
-         if (listenerIterator != null) {
-            // ... Iterate through the listeners and notify them
-         }
-     } catch (InterruptedException e) {
-         LOG.error("Tried to aquire read lock for " + MyClass.class.getName()
-             + " iterator but was interrupted.");
-     } finally {
-         releaseReadLock();
+     Object[] listeners = getListeners();
+     for(int i=0; i<listeners.length; i++) {
+         // do something
      }
  </pre>
  </code>
  * </p>
- * @version $Revision: 1.7 $, $Date: 2003/03/11 00:12:11 $
+ * 
+ * @version $Revision: 1.8 $, $Date: 2004/03/16 08:48:33 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.7
  */
 public abstract class AbstractListenerContainer implements ListenerContainerIF {
-    static final Log LOG = LogFactory.getLog(AbstractListenerContainer.class);
-    private List listeners;
-    private WriterPreferenceReadWriteLock readWriteLock = new WriterPreferenceReadWriteLock();
+        
+    private Object[] listeners = EMPTY_LISTENERS;
+    private static final Object[] EMPTY_LISTENERS = new Object[]{};
 
+    
     /**
      * @see ListenerContainerIF#addListener(Object)
      */
-    public void addListener(Object listener) {
-        if (listener == null) {
-            return;
-        }
-        try {
-            readWriteLock.writeLock().acquire();
-            if (this.listeners == null) {
-                this.listeners = new ArrayList(3);
-            }
-            this.listeners.add(listener);
-        } catch (InterruptedException e) {
-            LOG.error("Tried to aquire write lock for storing " + listener.getClass().getName() + " but was interrupted.");
-        } finally {
-            readWriteLock.writeLock().release();
-        }
+    public synchronized void addListener(Object listener) 
+    {
+        if(listener==null)
+            throw new NullPointerException("Unexpected NULL listener argument received");
+        
+        // create a new array
+        Object[] newListeners = new Object[listeners.length+1];
+        
+        // copy listeners currently registered
+        System.arraycopy(listeners, 0, newListeners, 0, listeners.length);
+        
+        // add the new one
+        newListeners[listeners.length] = listener;
+        
+        // commit changes
+        listeners = newListeners;
     }
-
+    
+    
     /**
      * @see ListenerContainerIF#removeListener(Object)
      */
-    public boolean removeListener(Object listener) {
-        if (listener == null || isEmpty()) {
-            return false;
-        } else {
-            boolean listenerRemoved = false;
-            try {
-                this.readWriteLock.readLock().acquire();
-                listenerRemoved = this.listeners.remove(listener);
-            } catch (InterruptedException e) {
-                LOG.error("Tried to aquire write lock for removing " + listener.getClass().getName() + " but was interrupted.");
-            } finally {
-                this.readWriteLock.readLock().release();
+    public synchronized boolean removeListener(Object listener) 
+    {
+        if(listener==null)
+            throw new NullPointerException("Unexpected NULL listener argument received");
+        
+        // find listener to remove in the list
+        int index=-1;
+        for(int i=0; i<listeners.length; i++) {
+            if( listeners[i]==listener ) {
+                index = i;
+                break;
             }
-            return listenerRemoved;
         }
+        
+        // not found ?
+        if( index==-1 )
+            return false;
+        
+        // create a new array of the right size
+        Object[] newListeners = new Object[listeners.length-1];
+        
+        // copy registered listeners minus the one to remove
+        if( index > 0 )
+            System.arraycopy(listeners, 0, newListeners, 0, index);
+        
+        if( index < listeners.length-1 )
+            System.arraycopy(listeners, index+1, newListeners, index, listeners.length-index-1);
+        
+        // commit
+        listeners = newListeners;
+        return true;
     }
 
+    
     /**
-     * Get an iterator containing the listeners in this container. Will return <code>null</code>
-     * if this container is empty.
-     * <p><b>Important:</b> See class documentation regarding releasing of read lock.</p>
-     * @return an iterator containing the listeners in this container or <code>null</code> if it is empty.
-     * @throws InterruptedException if the read lock can't be obtained.
+     * Get a reference to the array of registered listeners. 
+     * 
+     * @return reference to the array containing registered listeners (always not NULL)
      */
-    protected Iterator getListenerIterator() throws InterruptedException {
-        this.readWriteLock.readLock().acquire();
-        if (!isEmpty()) {
-            return this.listeners.iterator();
-        } else {
-            return null;
-        }
+    protected Object[] getListeners() {
+        return listeners;
     }
 
-    /**
-     * Release the read lock aquired by the {@link #getListenerIterator()} method.
-     */
-    protected void releaseReadLock() {
-        this.readWriteLock.readLock().release();
-    }
 
     /**
      * @see ListenerContainerIF#isEmpty()
      */
     public boolean isEmpty() {
-        return this.listeners == null || this.listeners.size() < 1;
+        return listeners.length==0;
     }
 }
 
 /*
  Revision history:
  $Log: AbstractListenerContainer.java,v $
+ Revision 1.8  2004/03/16 08:48:33  brenuart
+ Changes in the AbstractListenerContainer:
+ - provide more efficient concurrent handling;
+ - better handling of RuntimeException thrown by external listeners.
+
  Revision 1.7  2003/03/11 00:12:11  billhorsman
  switch to concurrent package
 
