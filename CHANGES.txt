@@ -1,11 +1,14 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.10 $
-$Date: 2002/12/06 16:08:57 $
+$Revision: 1.11 $
+$Date: 2002/12/19 00:27:00 $
 $Author: billhorsman $
 
 0.6 (scheduled for December 12, 2002)
+
+- New XMLConfigurator and PropertyConfigurator to make it easy
+  to configure proxool from a file.
 
 - New ConfiguratorIF interface allows you to implement persistent
   configuration
@@ -13,6 +16,16 @@ $Author: billhorsman $
 - Bug fix for JDBC drivers that implement the Statement interface
   indirectly (that is, extend a class that implements it rather than 
   implementing it directly). (Credit to Martin Crawford).
+
+- Unclosed Statements are now automatically closed when the
+  Connection is closed, in accordance with the JDBC spec.
+
+- New ProxoolFacade#getDelegateStatement allows you to get to
+  the underlying JDBC Driver's original Statement if you really need
+  to. (This isn't recommended unless you have no other choice).
+
+- You can now update the URL for a pool, not just the properties.
+  See ProxoolFacade#updateConnectionPool.
 
 0.5 (December 3, 2002)
 
