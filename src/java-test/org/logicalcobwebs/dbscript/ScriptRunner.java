@@ -10,15 +10,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.SQLException;
-import java.sql.Connection;
-import java.sql.Statement;
 
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
  *
  * Run a {@link Script script}.
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/06 21:07:14 $
+ * @version $Revision: 1.6 $, $Date: 2002/11/09 14:45:07 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -48,43 +46,34 @@ public class ScriptRunner {
             Command command = commands[i];
             long start = System.currentTimeMillis();
 
-            for (int loop = 0; loop < command.getLoops(); loop++) {
+            // Execute the SQL
+            Commander[] commanders = new Commander[command.getLoad()];
+            for (int load = 0; load < command.getLoad(); load++) {
+                commanders[load] = new Commander(adapter, command, commandFilter);
+                Thread t = new Thread(commanders[load]);
+                t.setName(script.getName() + "." + command.getName() + "." + load);
+                t.start();
+            }
 
-                // Open some connections
-                Connection[] connections = new Connection[command.getLoad()];
-                for (int load = 0; load < command.getLoad(); load++) {
-                    connections[load] = adapter.getConnection();
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    LOG.error("Awoken from sleep", e);
                 }
 
-                // Execute the SQL
+                int remaining = command.getLoad();
                 for (int load = 0; load < command.getLoad(); load++) {
-
-                    boolean executeCommand = true;
-                    if (commandFilter != null) {
-                            executeCommand = commandFilter.beforeCommand(connections[load], command);
+                    if (commanders[load].isFinished()) {
+                        remaining--;
                     }
-                    try {
-                        if (executeCommand) {
-                            execute(connections[load], command.getSql());
-                        }
-                    } catch (SQLException e) {
-                        if (command.isIgnoreException()) {
-                            LOG.debug("Ignoring exception in " + command.getName(), e);
-                        } else {
-                            throw e;
-                        }
-                    }
-                    if (commandFilter != null) {
-                            commandFilter.afterCommand(connections[load], command);
-                    }
-
                 }
 
-                // Close the connections again
-                for (int load = 0; load < command.getLoad(); load++) {
-                    adapter.closeConnection(connections[load]);
+                if (remaining > 0) {
+                    // LOG.debug("Waiting for " + remaining + " threads to complete.");
+                } else {
+                    break;
                 }
-
             }
 
             long elapsed = System.currentTimeMillis() - start;
@@ -99,35 +88,14 @@ public class ScriptRunner {
         }
     }
 
-    /**s
-     * Execute and SQL statement
-     * @param connection used to execute statement
-     * @param sql the SQL to perform
-     * @throws SQLException if anything goes wrong
-     */
-    private static final void execute(Connection connection, String sql) throws SQLException {
-        Statement statement = null;
-        try {
-            statement = connection.createStatement();
-            statement.execute(sql);
-        } finally {
-            if (statement != null) {
-                try {
-                    if (statement != null) {
-                        statement.close();
-                    }
-                } catch (SQLException e) {
-                    LOG.error("Couldn't close statement", e);
-                }
-            }
-        }
-    }
-
 }
 
 /*
  Revision history:
  $Log: ScriptRunner.java,v $
+ Revision 1.6  2002/11/09 14:45:07  billhorsman
+ now threaded and better exception handling
+
  Revision 1.5  2002/11/06 21:07:14  billhorsman
  Support for CommandFilterIF
 

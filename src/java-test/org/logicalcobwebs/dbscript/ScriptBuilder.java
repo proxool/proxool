@@ -17,7 +17,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * Parser to get {@link org.logicalcobwebs.dbscript.Script} from XML source
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/09 14:45:07 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -58,9 +58,9 @@ class ScriptBuilder extends DefaultHandler {
                 int loops = Integer.parseInt(attributes.getValue("loops"));
                 command.setLoops(loops);
             }
-            if (attributes.getValue("ignoreException") != null) {
-                boolean ignoreException = Boolean.valueOf(attributes.getValue("ignoreException")).booleanValue();
-                command.setIgnoreException(ignoreException);
+            if (attributes.getValue("exception") != null) {
+                String exception = attributes.getValue("exception");
+                command.setException(exception);
             }
             script.addCommand(command);
         }
@@ -80,6 +80,9 @@ class ScriptBuilder extends DefaultHandler {
 /*
  Revision history:
  $Log: ScriptBuilder.java,v $
+ Revision 1.4  2002/11/09 14:45:07  billhorsman
+ now threaded and better exception handling
+
  Revision 1.3  2002/11/02 14:22:16  billhorsman
  Documentation
 

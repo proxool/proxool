@@ -6,6 +6,9 @@
 */
 package org.logicalcobwebs.dbscript;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
  *
@@ -13,12 +16,14 @@ package org.logicalcobwebs.dbscript;
  * or {@link #getLoops loops} are configured then it might run more than
  * once.
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/06 21:07:03 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/09 14:45:07 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 class Command implements CommandIF {
+
+    private static final Log LOG = LogFactory.getLog(Command.class);
 
     private String name;
 
@@ -28,7 +33,25 @@ class Command implements CommandIF {
 
     private int loops = 1;
 
-    private boolean ignoreException;
+    private String exception;
+
+    /**
+     * If this command encounters an exception it will stop executing (and if
+     * it is in a loop it will break out of the loop)
+     */
+    protected static final String EXCEPTION_STOP = "stop";
+
+    /**
+     * If this command encounters an exception it will log it at DEBUG
+     * level and continue
+     */
+    protected static final String EXCEPTION_LOG = "log";
+
+    /**
+     * If this command encounters an exception it will silently ignore the
+     * exception and continue. But it still calls the
+     */
+    protected static final String EXCEPTION_IGNORE = "ignore";
 
     /**
      * @see CommandIF#getSql
@@ -76,14 +99,31 @@ class Command implements CommandIF {
      * @see CommandIF#isIgnoreException
      */
     public boolean isIgnoreException() {
-        return ignoreException;
+        return exception != null && exception.equals(EXCEPTION_IGNORE);
+    }
+
+    /**
+     * @see CommandIF#isIgnoreException
+     */
+    public boolean isLogException() {
+        return exception != null && exception.equals(EXCEPTION_LOG);
     }
 
     /**
      * @see #isIgnoreException
      */
-    public void setIgnoreException(boolean ignoreException) {
-        this.ignoreException = ignoreException;
+    public void setException(String exception) {
+        if (exception == null) {
+            this.exception = EXCEPTION_STOP;
+            LOG.debug("Setting exception to default " + EXCEPTION_STOP);
+        } else if (exception.equals(EXCEPTION_IGNORE)
+                || exception.equals(EXCEPTION_LOG)
+                || exception.equals(EXCEPTION_STOP)) {
+            this.exception = exception;
+            LOG.debug("Setting exception to " + exception);
+        } else {
+            throw new RuntimeException("Unknown exception value: " + exception);
+        }
     }
 
     /**
@@ -99,12 +139,15 @@ class Command implements CommandIF {
     public void setName(String name) {
         this.name = name;
     }
-    
+
 }
 
 /*
  Revision history:
  $Log: Command.java,v $
+ Revision 1.4  2002/11/09 14:45:07  billhorsman
+ now threaded and better exception handling
+
  Revision 1.3  2002/11/06 21:07:03  billhorsman
  Now supports the CommandIF interface
 

@@ -11,7 +11,7 @@ package org.logicalcobwebs.dbscript;
  *
  * TODO
  *
- * @version $Revision: 1.1 $, $Date: 2002/11/06 21:07:42 $
+ * @version $Revision: 1.2 $, $Date: 2002/11/09 14:45:07 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -39,11 +39,18 @@ public interface CommandIF {
     int getLoops();
 
     /**
-     * If true then errors that occur during this command are logged as debug
-     * messages but do not stop the {@link org.logicalcobwebs.dbscript.Script script} running.
+     * If true then errors that occur during this command are ignored silently
+     * and do not stop the {@link org.logicalcobwebs.dbscript.Script script} running.
      * @return true if exceptions should be ignored
      */
     boolean isIgnoreException();
+
+    /**
+     * If true then errors that occur during this command are logged as debug
+     * messages but do not stop the {@link org.logicalcobwebs.dbscript.Script script} running.
+     * @return true if exceptions should be logged
+     */
+    boolean isLogException();
 
     /**
      * A convenient name to call this command to help logging.
@@ -56,6 +63,9 @@ public interface CommandIF {
 /*
  Revision history:
  $Log: CommandIF.java,v $
+ Revision 1.2  2002/11/09 14:45:07  billhorsman
+ now threaded and better exception handling
+
  Revision 1.1  2002/11/06 21:07:42  billhorsman
  New interfaces to allow filtering of commands
 
