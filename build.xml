@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.21 $
-    $Date: 2003/01/16 11:45:40 $
+    $Revision: 1.22 $
+    $Date: 2003/01/16 12:00:35 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -223,21 +223,8 @@
         >
         <java fork="yes" classpathref="classpath" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}" />
-            <sysproperty key="script" value="${script}" />
+            <sysproperty key="script" value="src/java-test/org/logicalcobwebs/proxool/script.xml" />
             <arg value="org.logicalcobwebs.proxool.GlobalTest" />
-        </java>
-    </target>
-
-    <target
-        name="run-script"
-        description="Runs the script.xml"
-        depends="init,build-test"
-        if="script"
-        >
-        <java fork="yes" classpathref="classpath" classname="junit.textui.TestRunner" >
-            <sysproperty key="log4jPath" value="${log4jPath}" />
-            <sysproperty key="script" value="${script}" />
-            <arg value="org.logicalcobwebs.proxool.PerformanceTest" />
         </java>
     </target>
 
