@@ -19,6 +19,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * <p>This provides some nice-to-have features that can't be provided by the
@@ -29,9 +32,9 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.75 $, $Date: 2004/02/12 12:54:49 $
+ * @version $Revision: 1.76 $, $Date: 2004/03/15 02:45:19 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public class ProxoolFacade {
 
@@ -94,42 +97,16 @@ public class ProxoolFacade {
     }
 
     protected static void registerConnectionPool(ConnectionPoolDefinition connectionPoolDefinition) throws ProxoolException {
+        Properties jndiProperties = extractJndiProperties(connectionPoolDefinition);
         ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(connectionPoolDefinition);
         connectionPool.start();
         compositeProxoolListener.onRegistration(connectionPoolDefinition, connectionPoolDefinition.getCompleteInfo());
         if (isConfiguredForJMX(connectionPoolDefinition.getCompleteInfo())) {
             registerForJmx(connectionPoolDefinition.getAlias(), connectionPoolDefinition.getCompleteInfo());
         }
-/*
-// Start JNDI
-        if (connectionPoolDefinition.getJndiName() != null) {
-            try {
-                Hashtable env = new Hashtable();
-                if (connectionPoolDefinition.getInitialContextFactory() != null) {
-                    env.put(Context.INITIAL_CONTEXT_FACTORY, connectionPoolDefinition.getInitialContextFactory());
-                }
-                if (connectionPoolDefinition.getProviderUrl() != null) {
-                    env.put(Context.PROVIDER_URL, connectionPoolDefinition.getProviderUrl());
-                }
-                if (connectionPoolDefinition.getSecurityAuthentication() != null) {
-                    env.put(Context.SECURITY_AUTHENTICATION, connectionPoolDefinition.getSecurityAuthentication());
-                }
-                if (connectionPoolDefinition.getSecurityPrincipal() != null) {
-                    env.put(Context.SECURITY_PRINCIPAL, connectionPoolDefinition.getSecurityPrincipal());
-                }
-                if (connectionPoolDefinition.getSecurityCredentials() != null) {
-                    env.put(Context.SECURITY_CREDENTIALS, connectionPoolDefinition.getSecurityCredentials());
-                }
-                Context context = new InitialContext(env);
-                ProxoolDataSource proxoolDataSource = new ProxoolDataSource(connectionPoolDefinition.getAlias());
-                context.bind(connectionPoolDefinition.getJndiName(), proxoolDataSource);
-            } catch (NamingException e) {
-                LOG.error("Couldn't bind " + connectionPoolDefinition.getJndiName() + " to JNDI context", e);
-                throw new ProxoolException("Problem registering with JNDI", e);
-            }
+        if (jndiProperties != null) {
+            registerDataSource(connectionPoolDefinition.getAlias(), jndiProperties);
         }
-// End JNDI
-*/
     }
 
     /**
@@ -679,6 +656,60 @@ public class ProxoolFacade {
         return success;
     }
 
+    // all JNDI operations are done through reflection
+    // to avoid making the facade dependant on the JNDI classes
+    private static boolean registerDataSource(String alias, Properties jndiProperties) {
+        boolean success = false;
+        try {
+            Class jndiHelperClass = Class.forName("org.logicalcobwebs.proxool.admin.jndi.ProxoolJNDIHelper");
+            Method registerMethod = jndiHelperClass.getDeclaredMethod("registerDatasource", new Class[]{String.class,
+                Properties.class});
+            registerMethod.invoke(null, new Object[]{alias, jndiProperties});
+            success = true;
+        } catch (Exception e) {
+            LOG.error("JNDI DataSource binding of " + alias + " pool failed.", e);
+        }
+        return success;
+    }
+
+    /**
+     * Get the JNDI properties for the given pool definition if it is configured for JNDI registration.
+     * Will remove generic JNDI properties from the delegate properties so that they will not be passed to the
+     * delegate driver.
+     * @param connectionPoolDefinition the pool definition to get the eventual JNDI configuration from.
+     * @return the JNDI properties, or <code>null</code> if the given definition was not configured for JNDI.
+     */
+    private static Properties extractJndiProperties(ConnectionPoolDefinition connectionPoolDefinition) {
+        if (connectionPoolDefinition.getJndiName() == null) {
+            return null;
+        }
+        Properties jndiProperties = new Properties();
+        jndiProperties.setProperty(ProxoolConstants.JNDI_NAME, connectionPoolDefinition.getJndiName());
+        if (connectionPoolDefinition.getDelegateProperties() != null) {
+            Properties delegateProperties = connectionPoolDefinition.getDelegateProperties();
+            // we must retrieve all the relevant property names before removing them from
+            // the given properties to avoid ConcurrentModificationException
+            String propertyName = null;
+            List propertyNamesList = new ArrayList(10);
+            Iterator keySetIterator = delegateProperties.keySet().iterator();
+            while (keySetIterator.hasNext()) {
+                propertyName = (String) keySetIterator.next();
+                if (propertyName.startsWith(ProxoolConstants.JNDI_PROPERTY_PREFIX)) {
+                    propertyNamesList.add(propertyName);
+                }
+            }
+            for (int i = 0; i < propertyNamesList.size(); i++) {
+                propertyName = (String) propertyNamesList.get(i);
+                if (propertyName.startsWith(ProxoolConstants.JNDI_PROPERTY_PREFIX)) {
+                    jndiProperties.setProperty(propertyName.substring(ProxoolConstants.JNDI_PROPERTY_PREFIX.length()),
+                        (String) delegateProperties.getProperty(propertyName));
+                    delegateProperties.remove(propertyName);
+                }
+            }
+        }
+        return jndiProperties;
+    }
+
     /**
      * Get wether the given pool properties contains configuration for JMX instrumentation of the pool.
      * @param poolProperties the properties to check for JMX configuration.
@@ -710,6 +741,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.76  2004/03/15 02:45:19  chr32
+ Added handling of Proxool managed JNDI DataSources.
+
  Revision 1.75  2004/02/12 12:54:49  billhorsman
  Fix merciful/forceExpiry confusion
 
