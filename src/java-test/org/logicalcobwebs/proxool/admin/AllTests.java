@@ -13,7 +13,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Run all in admin package tests
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/20 00:33:15 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/26 11:53:17 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -27,6 +27,8 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(StatisticsListenerTest.class);
+        suite.addTestSuite(StatisticsTest.class);
+        suite.addTestSuite(SnapshotTest.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -42,6 +44,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.2  2003/02/26 11:53:17  billhorsman
+ added StatisticsTest and SnapshotTest
+
  Revision 1.1  2003/02/20 00:33:15  billhorsman
  renamed monitor package -> admin
 
