@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.25 $, $Date: 2002/12/12 10:48:47 $
+ * @version $Revision: 1.26 $, $Date: 2002/12/12 12:28:34 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -141,7 +141,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         /* If we're busy, we need to return as quickly as possible. */
 
-        if (connectionCount >= getDefinition().getMaximumConnectionCount() && getAvailableConnectionCount() == 0) {
+        if (connectionCount >= getDefinition().getMaximumConnectionCount() && getAvailableConnectionCount() < 1) {
             connectionsRefusedCount++;
             log.info(displayStatistics() + " - " + MSG_MAX_CONNECTION_COUNT);
             timeMillisOfLastRefusal = System.currentTimeMillis();
@@ -1069,6 +1069,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.26  2002/12/12 12:28:34  billhorsman
+ just in case: changed == 0 to < 1
+
  Revision 1.25  2002/12/12 10:48:47  billhorsman
  checkstyle
 
