@@ -1,12 +1,20 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.22 $
-$Date: 2003/07/08 22:15:35 $
+$Revision: 1.23 $
+$Date: 2003/08/15 10:14:32 $
 $Author: billhorsman $
 
 0.7.3 - (coming soon)
 
+- If ProxoolDriver gets garbage collected for any reason (outside our
+  control) then we no longer shutdown the pool it relates to.
+
+- AdminServlet now displays times for maximum-conneciton-lifetime,
+   house-keeping-sleep-time, and  maximum-active-time properly
+   regardless of your timezone. This was a display bug only and didn't
+   effect the behaviour of the pool itself.
+   
 - Connections that are about to be expired no longer bother to reset
   themselves (because they'll never be used again anyway). This was
   causing problems if the connection had connectivity problems to the
