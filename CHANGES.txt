@@ -1,11 +1,11 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.27 $
-$Date: 2003/10/18 20:45:05 $
+$Revision: 1.28 $
+$Date: 2003/10/26 15:23:53 $
 $Author: billhorsman $
 
-0.8.0 - (October, 2003)
+0.8.0 - (26 October, 2003)
 
 - We now use Cglib's proxy library. Together with dropping the use of Timer
   and only referencing ShutdownHooks at runtime we are now able to support
@@ -17,7 +17,7 @@ $Author: billhorsman $
 - New getDelegateConnection() method on ProxoolFacade gives you access
   to the delegate (third party) driver if you really need it. This makes
   your project dependent on both Proxool (to a small extent) and your
-  third party driver (to a bigger extent) so should be done on if
+  third party driver (to a bigger extent) so should be done only if
   necessary.
   
 - If ProxoolDriver gets garbage collected for any reason (outside our
@@ -35,7 +35,7 @@ $Author: billhorsman $
 
 - Added fatal-sql-exception-wrapper-class property. If a fatal exception is
   detected then it is wrapped up inside the exception defined by this
-  property. This can make exception handling easier is frameworks like
+  property. This can make exception handling easier in   frameworks like
   Struts. Two wrappers are provided (FataSQLException and FatalRuntimeException)
   but you can also define your own.
 
@@ -61,7 +61,7 @@ $Author: billhorsman $
   redefine. This didn't have any consequences unless you were calling this method
   explicitly in your code.
 
-- Made the 'Attempt to use a pool with incomplete definition' exception a but more
+- Made the 'Attempt to use a pool with incomplete definition' exception a bit more
   informative. It is often because you are refering to an unregistered pool by its
   alias.
 
