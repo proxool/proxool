@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.74 $, $Date: 2004/02/12 13:02:17 $
+ * @version $Revision: 1.75 $, $Date: 2004/02/23 17:38:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -353,10 +353,19 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
             // Let's make it available for someone else
             if (!proxyConnection.setStatus(ProxyConnectionIF.STATUS_ACTIVE, ProxyConnectionIF.STATUS_AVAILABLE)) {
-                log.warn("Unable to set status of connection " + proxyConnection.getId()
-                        + " from " + getStatusDescription(ProxyConnectionIF.STATUS_ACTIVE)
-                        + " to " + getStatusDescription(ProxyConnectionIF.STATUS_AVAILABLE)
-                        + ". It remains " + getStatusDescription(proxyConnection.getStatus()));
+                if (proxyConnection.getStatus() == ProxyConnectionIF.STATUS_AVAILABLE) {
+                    // This is *probably* because the connection has been closed twice.
+                    // Although we can't tell for sure. We'll have to refactor this to use
+                    // throw away wrappers to avoid this problem.
+                    log.warn("Unable to close connection " + proxyConnection.getId()
+                            + " - I suspect that it has been closed already. Closing it more"
+                            + " than once is unwise and should be avoided.");
+                } else {
+                    log.warn("Unable to set status of connection " + proxyConnection.getId()
+                            + " from " + getStatusDescription(ProxyConnectionIF.STATUS_ACTIVE)
+                            + " to " + getStatusDescription(ProxyConnectionIF.STATUS_AVAILABLE)
+                            + ". It remains " + getStatusDescription(proxyConnection.getStatus()));
+                }
             }
         }
 
@@ -1092,6 +1101,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.75  2004/02/23 17:38:58  billhorsman
+ Improved message that gets logged if you close a connection more than once.
+
  Revision 1.74  2004/02/12 13:02:17  billhorsman
  Catch correct exception when iterating through list.
 
