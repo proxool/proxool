@@ -5,7 +5,6 @@
  */
 package org.logicalcobwebs.proxool;
 
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -14,17 +13,30 @@ import java.sql.SQLException;
  * want to perform a task when the connection is born or dies. Actually,
  * the reason why we originally did this is no obsolete. But the code
  * remains here just in case.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:12:34 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/16 11:45:52 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ConnectionListenerIF {
 
+    /**
+     * Happens everytime we create a new connection. You can use this
+     * to allocate resources to a connection that might be useful during
+     * the lifetime of the connection.
+     *
+     * @param connection the connection that has just been created
+     * @throws SQLException if anything goes wrong (which will then be logged but ignored)
+     */ 
     void onBirth(Connection connection) throws SQLException;
 
+    /**
+     * Happens just before we expire a connection. You can use this to
+     * reclaim resources from a connection.
+     *
+     * @param connection the connection that is about to expire
+     * @throws SQLException if anything goes wrong (which will then be logged but ignored)
+     */
     void onDeath(Connection connection) throws SQLException;
-
-    void cleanupClob(Connection connection, Clob clob) throws SQLException;
 
     /**
      * Happens after every successful execute. Note that the command
@@ -52,8 +64,11 @@ public interface ConnectionListenerIF {
 /*
  Revision history:
  $Log: ConnectionListenerIF.java,v $
- Revision 1.1  2002/09/13 08:12:34  billhorsman
- Initial revision
+ Revision 1.2  2002/10/16 11:45:52  billhorsman
+ removed obsolete cleanupClob method and added more javadoc
+
+ Revision 1.1.1.1  2002/09/13 08:12:34  billhorsman
+ new
 
  Revision 1.5  2002/08/24 19:43:04  billhorsman
  new execute events
