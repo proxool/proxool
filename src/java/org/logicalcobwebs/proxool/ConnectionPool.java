@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.72 $, $Date: 2003/11/04 13:52:01 $
+ * @version $Revision: 1.73 $, $Date: 2003/12/09 18:54:55 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -285,10 +285,13 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 proxyConnection.setStatus(ProxyConnectionIF.STATUS_NULL);
                 removeProxyConnection(proxyConnection, "it has problems: " + t, ConnectionPool.REQUEST_EXPIRY, true);
             } finally {
-                try {
-                    s.close();
-                } catch (SQLException e) {
-                    // Ignore
+                if (s != null) {
+                    try {
+                        s.close();
+                    } catch (Throwable t) {
+                        // Ignore
+                        success = false;
+                    }
                 }
             }
         }
@@ -1089,6 +1092,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.73  2003/12/09 18:54:55  billhorsman
+ Make closure of statement during connection test more robust - credit to John Hume
+
  Revision 1.72  2003/11/04 13:52:01  billhorsman
  Fixed warning message
 
