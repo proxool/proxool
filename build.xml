@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.47 $
-    $Date: 2003/03/07 14:45:01 $
+    $Revision: 1.48 $
+    $Date: 2003/03/10 17:05:05 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -144,7 +144,7 @@
         >
         <checkstyle>
 
-            <fileset dir="src/java" includes="**/*.java"/>
+            <fileset dir="src/java" includes="**/*.java" excludes="**/concurrent/*"/>
             <fileset dir="src/java-examples" includes="**/*.java"/>
             <fileset dir="src/java-sandbox" includes="**/*.java"/>
             <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
@@ -265,6 +265,7 @@
         <echo level="info" message="Using JDK1.4"/>
         <copy todir="${build-dir}/src/java" preservelastmodified="yes">
             <fileset dir="src/java" includes="**/*.java"/>
+            <fileset dir="src/java-sandbox" includes="**/*.java"/>
         </copy>
     </target>
 
