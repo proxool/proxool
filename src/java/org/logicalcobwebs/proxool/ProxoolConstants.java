@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/09 15:50:49 $
+ * @version $Revision: 1.5 $, $Date: 2002/12/11 01:47:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -40,35 +40,65 @@ interface ProxoolConstants {
     /** Used to build up URL */
     public final String DELEGATE_URL_PROPERTY = PROPERTY_PREFIX + "url";
 
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String HOUSE_KEEPING_SLEEP_TIME_PROPERTY = PROPERTY_PREFIX + "house-keeping-sleep-time";
+    /** @see #HOUSE_KEEPING_SLEEP_TIME_PROPERTY */
+    public final String HOUSE_KEEPING_SLEEP_TIME = "house-keeping-sleep-time";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String HOUSE_KEEPING_TEST_SQL_PROPERTY = PROPERTY_PREFIX + "house-keeping-test-sql";
+     public final String HOUSE_KEEPING_SLEEP_TIME_PROPERTY = PROPERTY_PREFIX + HOUSE_KEEPING_SLEEP_TIME;
+
+    /** @see #HOUSE_KEEPING_TEST_SQL_PROPERTY */
+    public final String HOUSE_KEEPING_TEST_SQL = "house-keeping-test-sql";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String MAXIMUM_CONNECTION_COUNT_PROPERTY = PROPERTY_PREFIX + "maximum-connection-count";
+    public final String HOUSE_KEEPING_TEST_SQL_PROPERTY = PROPERTY_PREFIX + HOUSE_KEEPING_TEST_SQL;
+
+    /** @see #MAXIMUM_CONNECTION_COUNT_PROPERTY */
+    public final String MAXIMUM_CONNECTION_COUNT = "maximum-connection-count";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String MAXIMUM_CONNECTION_LIFETIME_PROPERTY = PROPERTY_PREFIX + "maximum-connection-lifetime";
+    public final String MAXIMUM_CONNECTION_COUNT_PROPERTY = PROPERTY_PREFIX + MAXIMUM_CONNECTION_COUNT;
+
+    /** @see #MAXIMUM_CONNECTION_LIFETIME_PROPERTY */
+    public final String MAXIMUM_CONNECTION_LIFETIME = "maximum-connection-lifetime";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String MAXIMUM_NEW_CONNECTIONS_PROPERTY = PROPERTY_PREFIX + "maximum-new-connections";
+    public final String MAXIMUM_CONNECTION_LIFETIME_PROPERTY = PROPERTY_PREFIX + MAXIMUM_CONNECTION_LIFETIME;
+
+    /** @see #MAXIMUM_NEW_CONNECTIONS_PROPERTY */
+    public final String MAXIMUM_NEW_CONNECTIONS = "maximum-new-connections";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String MINIMUM_CONNECTION_COUNT_PROPERTY = PROPERTY_PREFIX + "minimum-connection-count";
+    public final String MAXIMUM_NEW_CONNECTIONS_PROPERTY = PROPERTY_PREFIX + MAXIMUM_NEW_CONNECTIONS;
+
+    /** @see #MINIMUM_CONNECTION_COUNT_PROPERTY */
+    public final String MINIMUM_CONNECTION_COUNT = "minimum-connection-count";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String PROTOTYPE_COUNT_PROPERTY = PROPERTY_PREFIX + "prototype-count";
+    public final String MINIMUM_CONNECTION_COUNT_PROPERTY = PROPERTY_PREFIX + MINIMUM_CONNECTION_COUNT;
+
+    /** @see #PROTOTYPE_COUNT_PROPERTY */
+    public final String PROTOTYPE_COUNT = "prototype-count";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String RECENTLY_STARTED_THRESHOLD_PROPERTY = PROPERTY_PREFIX + "recently-started-threshold";
+    public final String PROTOTYPE_COUNT_PROPERTY = PROPERTY_PREFIX + PROTOTYPE_COUNT;
+
+    /** @see #RECENTLY_STARTED_THRESHOLD_PROPERTY */
+    public final String RECENTLY_STARTED_THRESHOLD = "recently-started-threshold";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY = PROPERTY_PREFIX + "overload-without-refusal-lifetime";
+    public final String RECENTLY_STARTED_THRESHOLD_PROPERTY = PROPERTY_PREFIX + RECENTLY_STARTED_THRESHOLD;
+
+    /** @see #OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY */
+    public final String OVERLOAD_WITHOUT_REFUSAL_LIFETIME = "overload-without-refusal-lifetime";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String MAXIMUM_ACTIVE_TIME_PROPERTY = PROPERTY_PREFIX + "maximum-active-time";
+    public final String OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY = PROPERTY_PREFIX + OVERLOAD_WITHOUT_REFUSAL_LIFETIME;
+
+    /** @see #MAXIMUM_ACTIVE_TIME_PROPERTY */
+    public final String MAXIMUM_ACTIVE_TIME = "maximum-active-time";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String MAXIMUM_ACTIVE_TIME_PROPERTY = PROPERTY_PREFIX + MAXIMUM_ACTIVE_TIME;
 
     /**
      * Deprecated - use {@linkplain #VERBOSE_PROPERTY verbose} instead.
@@ -76,32 +106,33 @@ interface ProxoolConstants {
      */
     public final String DEBUG_LEVEL_PROPERTY = PROPERTY_PREFIX + "debug-level";
 
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String VERBOSE_PROPERTY = PROPERTY_PREFIX + "verbose";
+    /** @see #VERBOSE_PROPERTY */
+    public final String VERBOSE = "verbose";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String TRACE_PROPERTY = PROPERTY_PREFIX + "trace";
+    public final String VERBOSE_PROPERTY = PROPERTY_PREFIX + VERBOSE;
+
+    /** @see #TRACE_PROPERTY */
+    public final String TRACE = "trace";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String FATAL_SQL_EXCEPTION_PROPERTY = PROPERTY_PREFIX + "fatal-sql-exception";
+    public final String TRACE_PROPERTY = PROPERTY_PREFIX + TRACE;
+
+    /** @see #FATAL_SQL_EXCEPTION_PROPERTY **/
+    public final String FATAL_SQL_EXCEPTION = "fatal-sql-exception";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String LOG_PROPERTY = PROPERTY_PREFIX + "log";
-
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String LOG_DEBUG_PROPERTY = PROPERTY_PREFIX + "log.debug";
-
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String LOG_INFO_PROPERTY = PROPERTY_PREFIX + "log.info";
-
-    /** @see ProxoolDriver#getPropertyInfo */
-    public final String LOG_AUTO_FLUSH_PROPERTY = PROPERTY_PREFIX + "log.autoFlush";
+    public final String FATAL_SQL_EXCEPTION_PROPERTY = PROPERTY_PREFIX + FATAL_SQL_EXCEPTION;
 
 }
 
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.5  2002/12/11 01:47:12  billhorsman
+ extracted property names without proxool. prefix for use
+ by XMLConfigurators.
+
  Revision 1.4  2002/11/09 15:50:49  billhorsman
  new trace constant
 
