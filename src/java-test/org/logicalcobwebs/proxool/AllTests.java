@@ -12,7 +12,7 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.17 $, $Date: 2003/03/03 11:12:03 $
+ * @version $Revision: 1.18 $, $Date: 2003/03/11 14:58:30 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -41,6 +41,7 @@ public class AllTests {
         suite.addTestSuite(RegistrationTest.class);
         suite.addTestSuite(StateListenerTest.class);
         suite.addTestSuite(UpdateDefinitionTest.class);
+        suite.addTestSuite(PerformanceTest.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -57,6 +58,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.18  2003/03/11 14:58:30  billhorsman
+ put PerformanceTest back in the global test
+
  Revision 1.17  2003/03/03 11:12:03  billhorsman
  fixed licence
 

@@ -20,7 +20,7 @@ import java.text.DecimalFormat;
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.15 $, $Date: 2003/03/11 14:51:43 $
+ * @version $Revision: 1.16 $, $Date: 2003/03/11 14:58:32 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -34,8 +34,8 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
     private Thread waitingThead;
 
     private StatisticsIF statistics;
-    private static final int PERIOD = 10;
-    private static final int COUNT = 20;
+    private static final int PERIOD = 5;
+    private static final int COUNT = 6;
 
     public PerformanceTest(String s) {
         super(s);
@@ -301,6 +301,9 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.16  2003/03/11 14:58:32  billhorsman
+ put PerformanceTest back in the global test
+
  Revision 1.15  2003/03/11 14:51:43  billhorsman
  more concurrency fixes relating to snapshots
 
