@@ -6,9 +6,9 @@
 package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.util.ReadWriteLock;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 
 import java.util.Calendar;
 
@@ -17,7 +17,7 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/06 13:06:14 $
+ * @version $Revision: 1.3 $, $Date: 2003/03/11 00:49:01 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -26,7 +26,7 @@ public class StatsRoller {
 
     private static final Log LOG = LogFactory.getLog(StatsRoller.class);
 
-    private ReadWriteLock readWriteLock = new ReadWriteLock();
+    private WriterPreferenceReadWriteLock readWriteLock = new WriterPreferenceReadWriteLock();
 
     private Statistics completeStatistics;
 
@@ -113,7 +113,7 @@ public class StatsRoller {
 
     private void roll() {
         try {
-            readWriteLock.aquireWrite();
+            readWriteLock.writeLock().acquire();
             if (!isCurrent()) {
                 currentStatistics.setStopDate(nextRollDate.getTime());
                 completeStatistics = currentStatistics;
@@ -124,7 +124,7 @@ public class StatsRoller {
         } catch (InterruptedException e) {
             LOG.error("Unable to roll statistics log", e);
         } finally {
-            readWriteLock.release();
+            readWriteLock.writeLock().release();
         }
     }
 
@@ -140,13 +140,13 @@ public class StatsRoller {
             roll();
         }
         try {
-            readWriteLock.aquireRead();
+            readWriteLock.readLock().acquire();
             currentStatistics.connectionReturned(activeTime);
             LOG.debug("Logging connectionReturned to stats starting at " + currentStatistics.getStartDate());
         } catch (InterruptedException e) {
             LOG.error("Unable to log connectionReturned", e);
         } finally {
-            readWriteLock.release();
+            readWriteLock.readLock().release();
         }
     }
 
@@ -158,12 +158,12 @@ public class StatsRoller {
             roll();
         }
         try {
-            readWriteLock.aquireRead();
+            readWriteLock.readLock().acquire();
             currentStatistics.connectionRefused();
         } catch (InterruptedException e) {
             LOG.error("Unable to log connectionRefused", e);
         } finally {
-            readWriteLock.release();
+            readWriteLock.readLock().release();
         }
     }
 
@@ -173,13 +173,13 @@ public class StatsRoller {
      */
     public Statistics getCompleteStatistics() {
         try {
-            readWriteLock.aquireRead();
+            readWriteLock.readLock().acquire();
             return completeStatistics;
         } catch (InterruptedException e) {
             LOG.error("Couldn't read statistics", e);
             return null;
         } finally {
-            readWriteLock.release();
+            readWriteLock.readLock().release();
         }
     }
     
@@ -189,6 +189,9 @@ public class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.3  2003/03/11 00:49:01  billhorsman
+ switched to concurrent package
+
  Revision 1.2  2003/03/06 13:06:14  billhorsman
  replicated readWriteLock fix just made to src/java
 
