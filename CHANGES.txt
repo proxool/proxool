@@ -1,9 +1,19 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.20 $
-$Date: 2003/04/19 13:02:01 $
+$Revision: 1.21 $
+$Date: 2003/04/27 22:11:58 $
 $Author: billhorsman $
+
+0.7.2 - April 28, 2003
+
+- Moved DataSourceTest into Sandbox so that the Ant test target
+  runs correctly.
+
+- Fixed a bug in ConfigurationListener that meant that if you passed
+  a Properties object to the Driver when asking for a connection to an
+  existing pool it incorrectly called ConfigurationListenerIF.definitionUpdated
+  when there was no change, and didn't call it when there was.
 
 0.7.1 - April 19, 2003
 
