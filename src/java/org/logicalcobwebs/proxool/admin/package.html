@@ -9,19 +9,3 @@
 <li>servedPerSecond</li>
 <li>refusedPerSecond</li>
 
-<p>The MonitorServlet provides information about running pools. This is only
-relevant if you are using Proxool inside a web application. You can
-configure the servlet in any way you like, but this is an example
-web.xml fragment:</p>
-
- <pre>
-   &lt;servlet&gt;
-       &lt;servlet-name&gt;Monitor&lt;/servlet-name&gt;
-       &lt;servlet-class&gt;org.logicalcobwebs.proxool.admin.AdminServlet&lt;/servlet-class&gt;
-   &lt;/servlet&gt;
-
-   &lt;servlet-mapping&gt;
-       &lt;servlet-name&gt;Monitor&lt;/servlet-name&gt;
-       &lt;url-pattern&gt;/monitor&lt;/url-pattern&gt;
-   &lt;/servlet-mapping&gt;
- </pre>

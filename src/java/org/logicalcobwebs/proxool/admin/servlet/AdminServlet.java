@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.admin;
+package org.logicalcobwebs.proxool.admin.servlet;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
@@ -12,6 +12,8 @@ import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.Version;
+import org.logicalcobwebs.proxool.admin.StatisticsIF;
+import org.logicalcobwebs.proxool.admin.SnapshotIF;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -33,7 +35,7 @@ import java.util.Iterator;
  * <pre>
  *   &lt;servlet&gt;
  *       &lt;servlet-name&gt;Admin&lt;/servlet-name&gt;
- *       &lt;servlet-class&gt;org.logicalcobwebs.proxool.admin.AdminServlet&lt;/servlet-class&gt;
+ *       &lt;servlet-class&gt;org.logicalcobwebs.proxool.admin.servlet.AdminServlet&lt;/servlet-class&gt;
  *   &lt;/servlet&gt;
  *
  *   &lt;servlet-mapping&gt;
@@ -42,7 +44,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/24 10:19:44 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -544,6 +546,9 @@ public class AdminServlet extends HttpServlet {
 /*
  Revision history:
  $Log: AdminServlet.java,v $
+ Revision 1.1  2003/02/24 10:19:44  billhorsman
+ moved AdminServlet into servlet package
+
  Revision 1.1  2003/02/19 23:36:51  billhorsman
  renamed monitor package to admin
 
