@@ -22,7 +22,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.9 $, $Date: 2002/11/13 20:53:16 $
+ * @version $Revision: 1.10 $, $Date: 2003/01/07 17:21:11 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -222,6 +222,27 @@ public class ConnectionResetter {
             log.warn(id + " - Problem calling connection.getAutoCommit()", e);
         }
 
+/*
+         Automatically rollback if autocommit is off. If there are no pending
+         transactions then this will have no effect.
+
+         From Database Language SQL (Proposed revised text of DIS 9075),
+        July 1992 - http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt
+
+            "The execution of a <rollback statement> may be initiated implicitly by
+            an implementation when it detects unrecoverable errors. When such an
+            error occurs, an exception condition is raised: transaction rollback
+            with an implementation-defined subclass code".
+
+*/
+        if (!autoCommit) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                log.error("Unexpected exception whilst calling rollback during connection reset", e);
+            }
+        }
+
         // Now let's reset each property in turn. With a bit of luck, if there is a
         // transaction pending then setting one of these properties will throw an
         // exception (e.g. "operation not possible when transaction is in progress"
@@ -284,6 +305,9 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.10  2003/01/07 17:21:11  billhorsman
+ If autoCommit is off, all connections are rollbacked.
+
  Revision 1.9  2002/11/13 20:53:16  billhorsman
  now checks to see whether is necessary for each property (better logging)
 
