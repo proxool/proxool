@@ -1,11 +1,32 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.16 $
-$Date: 2003/02/21 11:50:51 $
+$Revision: 1.17 $
+$Date: 2003/02/26 17:00:11 $
 $Author: billhorsman $
 
-0.7 - scheduled for February, 2003
+0.8 - scheduled for March 2003
+
+- New JMX component so that you can control Proxool from your
+  favourite JMX Agent (like WebLogic, JBoss, MX4J)
+
+- Fixed display bug in AdminServlet - average active time was being
+  displayed in milliseconds instead of seconds.
+
+- Refactoring of how definitions are updated and redefined. Use
+  ProxoolFacade.updateConnectionPool  to make incremental changes
+  and ProxoolFacade.redefineConnectionPool to reset the definition
+  and start again. (If you pass a Properties object to the DriverManager
+  when asking for a connection this will call redefineConnectionPool.)
+
+- if you change the url or any of the delegate properties for a pool's
+  definition then all existing connections are automatically killed so that
+  new ones are created that conform to the new definition.
+
+- Change to ConfigurationListenerIF API. defintionChanged is now
+  called definitionChanged (stupid spelling error).
+
+0.7 - February 21, 2003
 
 - We have dropped the dependency on commons-logging.jar
   by copying the code into our own project (retaining credit to
