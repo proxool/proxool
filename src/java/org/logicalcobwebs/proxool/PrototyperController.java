@@ -14,7 +14,7 @@ import java.sql.SQLException;
 
 /**
  * Controls the {@link Prototyper prototypers}
- * @version $Revision: 1.1 $, $Date: 2003/03/05 18:42:33 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/06 12:43:32 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -130,9 +130,7 @@ public class PrototyperController {
     }
 
     protected static synchronized Prototyper[] getPrototypers() {
-        final Prototyper[] prototyperArray = (Prototyper[]) prototypers.values().toArray(new Prototyper[prototypers.size()]);
-        LOG.debug("Building array[" + prototyperArray.length + "] from list(" + prototypers.size() + ")");
-        return prototyperArray;
+        return (Prototyper[]) prototypers.values().toArray(new Prototyper[prototypers.size()]);
     }
 
     public static boolean isKeepSweeping() {
@@ -149,6 +147,9 @@ public class PrototyperController {
 /*
  Revision history:
  $Log: PrototyperController.java,v $
+ Revision 1.2  2003/03/06 12:43:32  billhorsman
+ removed paranoid debug
+
  Revision 1.1  2003/03/05 18:42:33  billhorsman
  big refactor of prototyping and house keeping to
  drastically reduce the number of threads when using
