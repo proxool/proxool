@@ -24,7 +24,7 @@ import java.util.Set;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.18 $, $Date: 2003/06/18 10:05:25 $
+ * @version $Revision: 1.19 $, $Date: 2003/07/08 22:04:22 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -202,8 +202,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
             } else {
                 // Close any open statements, as specified in JDBC
                 Iterator i = openStatements.iterator();
-                while (i.hasNext()) {
-                    Statement statement = (Statement) i.next();
+                Statement[] statements = (Statement[]) openStatements.toArray(new Statement[openStatements.size()]);
+                for (int j = 0; j < statements.length; j++) {
+                    Statement statement = statements[j];
                     statement.close();
                     if (connectionPool.getLog().isDebugEnabled()) {
                         connectionPool.getLog().debug("Closing statement " + Integer.toHexString(statement.hashCode()) + " automatically");
@@ -448,6 +449,13 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.19  2003/07/08 22:04:22  billhorsman
+ attempt to fix possible ConcurrentModificationException
+ except I can't reproduce it in this environment. It now
+ builds an array before it loops through it and closes
+ each one. The iterator it used before wasn't thread-safe
+ in some environments.
+
  Revision 1.18  2003/06/18 10:05:25  billhorsman
  don't bother resetting connections that are marked for expiry
 
