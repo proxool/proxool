@@ -8,7 +8,9 @@ package org.logicalcobwebs.proxool;
 import org.apache.commons.logging.Log;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,7 +23,7 @@ import java.util.HashSet;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/07 18:55:40 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/12 20:18:23 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -52,21 +54,22 @@ public class ConnectionResetter {
      */
     protected static final String MUTATOR_PREFIX = "set";
 
+    private String driverName;
+
     /**
      * Pass in the log to use
      * @param log debug information sent here
      */
-    protected ConnectionResetter(Log log) {
+    protected ConnectionResetter(Log log, String driverName) {
         this.log = log;
+        this.driverName = driverName;
 
         // Map all the reset methods
-        addReset("getAutoCommit", "setAutoCommit");
         addReset("getCatalog", "setCatalog");
         addReset("isReadOnly", "setReadOnly");
         addReset("getTransactionIsolation", "setTransactionIsolation");
         addReset("getTypeMap", "setTypeMap");
         addReset("getHoldability", "setHoldability");
-
     }
 
     /**
@@ -148,8 +151,9 @@ public class ConnectionResetter {
                     while (i.hasNext()) {
                         Method accessor = (Method) i.next();
                         Method mutator = (Method) accessorMutatorMap.get(accessor);
+                        Object value = null;
                         try {
-                            final Object value = accessor.invoke(connection, null);
+                            value = accessor.invoke(connection, null);
                             // It's perfectly ok for the default value to be null, we just
                             // don't want to add it to the map.
                             if (value != null) {
@@ -158,11 +162,24 @@ public class ConnectionResetter {
                             if (log.isDebugEnabled()) {
                                 log.debug("Remembering default value: " + accessor.getName() + "() = " + value);
                             }
+
                         } catch (Throwable t) {
-                            log.debug("Problem getting default value from " + accessor.getName() + ". This method will not be reset.", t);
+                            log.debug(driverName + " does not support " + accessor.getName() + ". Proxool doesn't mind.");
                             // We will remove this later (to avoid ConcurrentModifcation)
                             accessorsToRemove.add(accessor);
                         }
+
+                        // Just test that the mutator works too. Otherwise it's going to fall over
+                        // everytime we close a connection
+                        try {
+                            Object[] args= {value};
+                            mutator.invoke(connection, args);
+                        } catch (Throwable t) {
+                            log.debug(driverName + " does not support " + mutator.getName() + ". Proxool doesn't mind.");
+                            // We will remove this later (to avoid ConcurrentModifcation)
+                            accessorsToRemove.add(accessor);
+                        }
+
                     }
 
                     // Remove all the reset methods that we had trouble configuring
@@ -184,21 +201,59 @@ public class ConnectionResetter {
      * Reset this connection to its default values. If anything goes wrong, it is logged
      * as a warning or info but it silently continues.
      * @param connection to be reset
+     * @param id used in log messages
+     * @return true if the reset was error free, or false if it encountered errors. (in which case it should probably not be reused)
      */
-    protected void reset(Connection connection) {
+    protected boolean reset(Connection connection, String id) {
+        boolean errorsEncountered = false;
+
+        // Now let's reset each property in turn
         Iterator i = accessorMutatorMap.values().iterator();
         while (i.hasNext()) {
             Method mutator = (Method) i.next();
             Object[] args = {defaultValues.get(mutator)};
             try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Resetting: " + mutator.getName() + "(" + args[0] + ")");
-                }
                 mutator.invoke(connection, args);
+                if (log.isDebugEnabled()) {
+                    log.debug(id + " - Reset: " + mutator.getName() + "(" + args[0] + ")");
+                }
             } catch (Throwable t) {
-                log.warn("Problem resetting default value to " + mutator.getName() + "( + " + args[0] + "). Ignoring.", t);
+                errorsEncountered = true;
+                if (log.isDebugEnabled()) {
+                    log.debug(id + " - Problem resetting: " + mutator.getName() + "(" + args[0] + ").", t);
+                }
             }
         }
+
+        // Let's see the state of autoCommit. It will help us give better advice in the log messages
+        boolean autoCommit = true;
+        try {
+            autoCommit = connection.getAutoCommit();
+        } catch (Throwable t) {
+            errorsEncountered = true;
+            log.warn(id + " - Problem calling connection.getAutoCommit()", t);
+        }
+
+        if (errorsEncountered) {
+
+            log.warn(id + " - There were some problems resetting the connection. It will not be used again (just in case). The thread that is responsible is named '" + Thread.currentThread().getName() + "'");
+            if (!autoCommit) {
+                log.warn(id + " - The connection was closed with autoCommit=false. That is fine, but it might indicate that the problems that happened whilst trying to reset it were because a transaction is still in progress.");
+            }
+        }
+
+        // Finally. reset autoCommit.
+        if (!autoCommit) {
+            try {
+                connection.setAutoCommit(true);
+                log.debug(id + " - autoCommit reset back to true");
+            } catch (Throwable t) {
+                errorsEncountered = true;
+                log.warn(id + " - Problem calling connection.setAutoCommit(true)", t);
+            }
+        }
+
+        return !errorsEncountered;
     }
 
 }
@@ -206,6 +261,9 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.4  2002/11/12 20:18:23  billhorsman
+ Made connection resetter a bit more friendly. Now, if it encounters any problems during reset then that connection is thrown away. This is going to cause you problems if you always close connections in an unstable state (e.g. with transactions open=. But then again, it's better to know about that as soon as possible, right?
+
  Revision 1.3  2002/11/07 18:55:40  billhorsman
  demoted log message from info to debug
 

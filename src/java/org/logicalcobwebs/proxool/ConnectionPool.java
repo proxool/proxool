@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.21 $, $Date: 2002/11/09 15:48:55 $
+ * @version $Revision: 1.22 $, $Date: 2002/11/12 20:18:23 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -100,7 +100,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     protected ConnectionPool(ConnectionPoolDefinition definition) {
         reloadMonitor = new ReloadMonitor(definition.getName());
         log = LogFactory.getLog("org.logicalcobwebs.proxool." + definition.getName());
-        connectionResetter = new ConnectionResetter(log);
+        connectionResetter = new ConnectionResetter(log, definition.getDriver());
         setDefinition(definition);
         connectionPoolUp = true;
     }
@@ -1063,8 +1063,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * original state.
      * @param connection the one to reset
      */
-    protected void resetConnection(Connection connection) {
-        connectionResetter.reset(connection);
+    protected boolean resetConnection(Connection connection, String id) {
+        return connectionResetter.reset(connection, id);
     }
 
     private static final boolean FORCE_EXPIRY = true;
@@ -1076,6 +1076,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.22  2002/11/12 20:18:23  billhorsman
+ Made connection resetter a bit more friendly. Now, if it encounters any problems during reset then that connection is thrown away. This is going to cause you problems if you always close connections in an unstable state (e.g. with transactions open=. But then again, it's better to know about that as soon as possible, right?
+
  Revision 1.21  2002/11/09 15:48:55  billhorsman
  new isConnectionListenedTo() to stop unnecessary processing
  if nobody is listening

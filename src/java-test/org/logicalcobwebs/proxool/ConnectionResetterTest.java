@@ -19,7 +19,7 @@ import java.sql.SQLException;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/09 16:01:21 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/12 20:18:26 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -61,7 +61,7 @@ public class ConnectionResetterTest extends TestCase {
             ScriptFacade.runScript(scriptLocation, new ProxoolAdapter(), new CommandFilterIF() {
 
                 public boolean beforeCommand(Connection connection, CommandIF command) throws SQLException {
-                    // TODO
+                    connection.setAutoCommit(false);
                     return true;
                 }
 
@@ -85,6 +85,9 @@ public class ConnectionResetterTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.3  2002/11/12 20:18:26  billhorsman
+ Made connection resetter a bit more friendly. Now, if it encounters any problems during reset then that connection is thrown away. This is going to cause you problems if you always close connections in an unstable state (e.g. with transactions open=. But then again, it's better to know about that as soon as possible, right?
+
  Revision 1.2  2002/11/09 16:01:21  billhorsman
  fixed CommandFilterIF implementation
 
