@@ -12,13 +12,15 @@ import junit.framework.TestSuite;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.configuration.ConfiguratorTest;
+import org.logicalcobwebs.proxool.configuration.JAXPConfiguratorTest;
 
 /**
  * Run all tests
  *
- * @version $Revision: 1.6 $, $Date: 2002/11/07 18:53:41 $
+ * @version $Revision: 1.7 $, $Date: 2002/12/15 19:16:58 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
  */
 public class AllTests {
@@ -35,6 +37,7 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(ConfiguratorTest.class);
+        suite.addTestSuite(JAXPConfiguratorTest.class);
         suite.addTestSuite(PerformanceTest.class);
         suite.addTestSuite(GeneralTests.class);
 
@@ -70,6 +73,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.7  2002/12/15 19:16:58  chr32
+ Added JAXPConfigurator test.
+
  Revision 1.6  2002/11/07 18:53:41  billhorsman
  slight improvement to setup
 
