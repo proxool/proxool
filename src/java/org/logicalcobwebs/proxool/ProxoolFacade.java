@@ -33,7 +33,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.53 $, $Date: 2003/02/14 13:26:23 $
+ * @version $Revision: 1.54 $, $Date: 2003/02/14 14:19:42 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -57,6 +57,12 @@ public class ProxoolFacade {
     public static synchronized String registerConnectionPool(String url, Properties info) throws ProxoolException {
         String alias = getAlias(url);
 
+        try {
+            Class.forName(ProxoolDriver.class.getName());
+        } catch (ClassNotFoundException e) {
+            LOG.error("Couldn't load " + ProxoolDriver.class.getName());
+        }
+
         if (!ConnectionPoolManager.getInstance().isPoolExists(alias)) {
             ConnectionPoolDefinition cpd = new ConnectionPoolDefinition();
             cpd.setAlias(alias);
@@ -66,7 +72,7 @@ public class ProxoolFacade {
             if (cpd.getUrl() == null || cpd.getDriver() == null) {
                 throw new ProxoolException("The URL is not defined properly.");
             }
-            
+
             ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
             connectionPool.start();
         } else {
@@ -766,6 +772,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.54  2003/02/14 14:19:42  billhorsman
+ automatically load ProxoolDriver
+
  Revision 1.53  2003/02/14 13:26:23  billhorsman
  better exception for incorrect url
 
