@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.61 $, $Date: 2003/03/10 23:39:51 $
+ * @version $Revision: 1.62 $, $Date: 2003/03/11 00:32:13 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -412,8 +412,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         try {
                             long endWait = startFinalize + delay;
                             while (true) {
-                                synchronized (Thread.currentThread()) {
-                                    Thread.currentThread().wait(endWait - System.currentTimeMillis());
+                                long timeout = endWait - System.currentTimeMillis();
+                                if (timeout > 0) {
+                                    synchronized (Thread.currentThread()) {
+                                        Thread.currentThread().wait(timeout);
+                                    }
                                 }
                                 int activeCount = connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE];
                                 if (activeCount == 0) {
@@ -984,6 +987,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.62  2003/03/11 00:32:13  billhorsman
+ fixed negative timeout
+
  Revision 1.61  2003/03/10 23:39:51  billhorsman
  shutdown is now notified when active count reaches
  zero
