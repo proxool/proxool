@@ -15,6 +15,7 @@ import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.ResultMonitor;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,7 +25,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/01 15:27:25 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/01 16:04:45 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -83,7 +84,9 @@ public class StatisticsTest extends TestCase {
 
             // Skip past the first set because they will probably be for only part
             // of the 10s period.
-            StatisticsIF statistics = waitForNextStatistics(alias, "10s", null, 20000);
+            StatisticsResultMonitor srm = new StatisticsResultMonitor(alias, "10s");
+            assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
+            StatisticsIF statistics = srm.getStatistics();
 
 
             Connection c = DriverManager.getConnection(url);
@@ -95,7 +98,8 @@ public class StatisticsTest extends TestCase {
             }
             c.close();
 
-            statistics = waitForNextStatistics(alias, "10s", statistics, 20000);
+            assertEquals("Timeout", ResultMonitor.SUCCESS,  srm.getResult());
+            statistics = srm.getStatistics();
 
             assertEquals("servedCount", 1L, statistics.getServedCount());
             assertEquals("servedPerSecond", 0.09, 0.11, statistics.getServedPerSecond());
@@ -149,29 +153,14 @@ public class StatisticsTest extends TestCase {
         }
     }
 
-    private StatisticsIF waitForNextStatistics(String alias, String token, StatisticsIF oldStatistics, int timeout) throws ProxoolException {
-        long startWaiting = System.currentTimeMillis();
-        StatisticsIF statistics = null;
-        while (statistics == null || statistics == oldStatistics) {
-            if (System.currentTimeMillis() - startWaiting > timeout) {
-                fail("Statistics didn't arrive within expected 20 seconds");
-            }
-            statistics = ProxoolFacade.getStatistics(alias, token);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                LOG.debug("Awoken", e);
-            }
-        }
-        LOG.debug("Got stats after " + DECIMAL_FORMAT.format((double) (System.currentTimeMillis() - startWaiting) / 1000) + " seconds");
-        return statistics;
-    }
-
 }
 
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.9  2003/03/01 16:04:45  billhorsman
+ fix
+
  Revision 1.8  2003/03/01 15:27:25  billhorsman
  checkstyle
 
