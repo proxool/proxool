@@ -1,18 +1,20 @@
-/**
- * Clever Little Trader
- *
- * Jubilee Group and Logical Cobwebs, 2002
+/*
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.logging.impl;
 
 import java.security.PrivilegedAction;
 
 /**
- * TODO
- * @version $Revision: 1.1 $, $Date: 2003/02/10 15:15:00 $
+ * This used to be an anonymous class in LogFactoryImpl but it
+ * was causing bizarre compilation failures in JDK1.2.
+ *
+ * @version $Revision: 1.2 $, $Date: 2003/02/10 15:49:23 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @since TODO
+ * @since Proxool 0.7
  */
 public class MyPrivilegedAction implements PrivilegedAction {
 
@@ -46,7 +48,7 @@ public class MyPrivilegedAction implements PrivilegedAction {
 /*
  Revision history:
  $Log: MyPrivilegedAction.java,v $
- Revision 1.1  2003/02/10 15:15:00  billhorsman
+ Revision 1.2  2003/02/10 15:49:23  billhorsman
  extracted anonymous PrivilegedAction class to fix
  bizarre compilation problem with jdk1.2
 

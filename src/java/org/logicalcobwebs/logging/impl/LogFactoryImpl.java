@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/LogFactoryImpl.java,v 1.3 2003/02/10 15:15:00 billhorsman Exp $
- * $Revision: 1.3 $
- * $Date: 2003/02/10 15:15:00 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/LogFactoryImpl.java,v 1.4 2003/02/10 15:47:41 billhorsman Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/02/10 15:47:41 $
  *
  * ====================================================================
  *
@@ -67,7 +67,6 @@ import org.logicalcobwebs.logging.LogFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -103,7 +102,7 @@ import java.util.Vector;
  *
  * @author Rod Waldhoff
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2003/02/10 15:15:00 $
+ * @version $Revision: 1.4 $ $Date: 2003/02/10 15:47:41 $
  */
 
 public class LogFactoryImpl extends LogFactory {
