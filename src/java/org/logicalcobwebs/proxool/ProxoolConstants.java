@@ -8,9 +8,9 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.20 $, $Date: 2004/03/15 02:43:47 $
+ * @version $Revision: 1.21 $, $Date: 2004/06/02 20:39:17 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ProxoolConstants {
 
@@ -131,6 +131,30 @@ public interface ProxoolConstants {
     /** @see ProxoolDriver#getPropertyInfo */
     public final String MAXIMUM_ACTIVE_TIME_PROPERTY = PROPERTY_PREFIX + MAXIMUM_ACTIVE_TIME;
 
+    /** @see #INJECTABLE_CONNECTION_INTERFACE_NAME_PROPERTY */
+    public final String INJECTABLE_CONNECTION_INTERFACE_NAME = "injectable-connection-interface";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String INJECTABLE_CONNECTION_INTERFACE_NAME_PROPERTY = PROPERTY_PREFIX + INJECTABLE_CONNECTION_INTERFACE_NAME;
+
+    /** @see #INJECTABLE_STATEMENT_INTERFACE_NAME_PROPERTY */
+    public final String INJECTABLE_STATEMENT_INTERFACE_NAME = "injectable-statement-interface";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String INJECTABLE_STATEMENT_INTERFACE_NAME_PROPERTY = PROPERTY_PREFIX + INJECTABLE_STATEMENT_INTERFACE_NAME;
+
+    /** @see #INJECTABLE_PREPARED_STATEMENT_INTERFACE_NAME_PROPERTY */
+    public final String INJECTABLE_PREPARED_STATEMENT_INTERFACE_NAME = "injectable-prepared-statement-interface";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String INJECTABLE_PREPARED_STATEMENT_INTERFACE_NAME_PROPERTY = PROPERTY_PREFIX + INJECTABLE_PREPARED_STATEMENT_INTERFACE_NAME;
+
+    /** @see #INJECTABLE_CALLABLE_STATEMENT_INTERFACE_NAME_PROPERTY */
+    public final String INJECTABLE_CALLABLE_STATEMENT_INTERFACE_NAME = "injectable-callable-statement-interface";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String INJECTABLE_CALLABLE_STATEMENT_INTERFACE_NAME_PROPERTY = PROPERTY_PREFIX + INJECTABLE_CALLABLE_STATEMENT_INTERFACE_NAME;
+
     /**
      * @deprecated use {@link #VERBOSE_PROPERTY verbose} instead.
      */
@@ -240,6 +264,9 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.21  2004/06/02 20:39:17  billhorsman
+ New injectable interface constants
+
  Revision 1.20  2004/03/15 02:43:47  chr32
  Removed explicit JNDI properties. Going for a generic approach instead.
  Added constant for JNDI properties prefix.
