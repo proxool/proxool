@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.7 $
-$Date: 2002/11/13 17:35:40 $
+$Revision: 1.8 $
+$Date: 2002/12/03 10:54:28 $
 $Author: billhorsman $
 
 0.5 (scheduled for November 22, 2002)
@@ -54,8 +54,8 @@ $Author: billhorsman $
 
 - Prototyping is now off by default. To enable prototyping you need to set the
   proxool.prototype-count property to something sensible (like 5, for instance).
-  [Prototyping is where spare connections are made when the active count
-  approaches the number currently available.]
+  [Prototyping is where spare connections are when the number of available
+  connections approaches zero.]
 
 0.4 - September 19, 2002
 
