@@ -1,8 +1,8 @@
 Proxool's Licence
 --------------
 
-$Revision: 1.3 $
-$Date: 2003/02/26 09:28:28 $
+$Revision: 1.4 $
+$Date: 2003/03/03 09:20:13 $
 $Author: billhorsman $
 
  ====================================================================
@@ -24,7 +24,7 @@ distribution.
 must display the following acknowledgment:
 
     "This product includes software developed by the
-    Proxool project (http://proxool.sourceforge.net/)."
+    Proxool project (The latest version is available at http://proxool.sourceforge.net/)."
 
 4. The name "Proxool" must not be used to endorse or promote
 products derived from this software without prior written permission.
@@ -38,7 +38,7 @@ permission of the Proxool Project.
 acknowledgment:
 
     "This product includes software developed by the
-    Proxool project (http://proxool.sourceforge.net/)."
+    Proxool project (The latest version is available at http://proxool.sourceforge.net/)."
 
 THIS SOFTWARE IS PROVIDED BY THE PROXOOL PROJECT ``AS IS'' AND ANY
 EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -56,5 +56,5 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
 This software consists of voluntary contributions made by many
 individuals on behalf of the Proxool Project. For more information
-on the Proxool Project please see http://proxool.sourceforge.net.
+on the Proxool Project please see The latest version is available at http://proxool.sourceforge.net.
 
