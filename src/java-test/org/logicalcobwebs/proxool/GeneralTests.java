@@ -8,6 +8,7 @@ package org.logicalcobwebs.proxool;
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.dbscript.ScriptFacade;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.13 $, $Date: 2002/11/07 18:53:19 $
+ * @version $Revision: 1.14 $, $Date: 2002/11/07 19:08:55 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -124,13 +125,13 @@ public class GeneralTests extends TestCase {
     public void testMaximumActiveTime() {
 
         String testName = "maximumActiveTime";
-
+        ProxoolAdapter adapter = null;
         try {
-            String alias = "load";
+            String alias = testName;
             Properties info = TestHelper.buildProperties();
             info.setProperty(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY, "5000");
             info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "5000");
-            ProxoolAdapter adapter = new ProxoolAdapter(alias);
+            adapter = new ProxoolAdapter(alias);
             adapter.setup(TestHelper.HYPERSONIC_DRIVER, TestHelper.HYPERSONIC_URL, info);
 
             assertEquals("Shuoldn't be any active connections yet", ProxoolFacade.getConnectionPoolStatistics(alias).getActiveConnectionCount(), 0);
@@ -154,7 +155,10 @@ public class GeneralTests extends TestCase {
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
             fail(e.getMessage());
+        } finally {
+            ScriptFacade.tearDownAdapter(adapter);
         }
+
     }
 
     /**
@@ -163,50 +167,58 @@ public class GeneralTests extends TestCase {
      */
     public void testLoad() throws SQLException {
 
-        String alias = "load";
+        String testName = "load";
+        try {
+            String alias = testName;;
 
-        Properties info = TestHelper.buildProperties();
-        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
-        TestHelper.registerPool(alias, info);
+            Properties info = TestHelper.buildProperties();
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
+            TestHelper.registerPool(alias, info);
 
-        final int load = 6;
-        final int count = 20;
-        int goodHits = 0;
-        final int expectedGoodHits = 17;
+            final int load = 6;
+            final int count = 20;
+            int goodHits = 0;
+            final int expectedGoodHits = 17;
 
-        Connection[] connections = new Connection[count];
-        for (int i = 0; i < count; i++) {
+            Connection[] connections = new Connection[count];
+            for (int i = 0; i < count; i++) {
 
-            if (i >= load && connections[i - load] != null) {
-                connections[i - load].close();
-            }
-
-            connections[i] = null;
-            try {
-                if (info == null) {
-                    info = TestHelper.buildProperties();
+                if (i >= load && connections[i - load] != null) {
+                    connections[i - load].close();
                 }
-                String url = TestHelper.getSimpleUrl(alias);
-                connections[i] = TestHelper.getProxoolConnection(url, info);
 
-                TestHelper.insertRow(connections[i], TEST_TABLE);
-                goodHits++;
-            } catch (ClassNotFoundException e) {
-                LOG.error("Problem finding driver?", e);
-            } catch (SQLException e) {
-                LOG.debug(e.getMessage(), e);
-            } catch (Exception e) {
-                LOG.error("Unexpected Exception", e);
+                connections[i] = null;
+                try {
+                    if (info == null) {
+                        info = TestHelper.buildProperties();
+                    }
+                    String url = TestHelper.getSimpleUrl(alias);
+                    connections[i] = TestHelper.getProxoolConnection(url, info);
+
+                    TestHelper.insertRow(connections[i], TEST_TABLE);
+                    goodHits++;
+                } catch (ClassNotFoundException e) {
+                    LOG.error("Problem finding driver?", e);
+                } catch (SQLException e) {
+                    LOG.debug(e.getMessage(), e);
+                } catch (Exception e) {
+                    LOG.error("Unexpected Exception", e);
+                }
+
             }
 
+            ConnectionPoolStatisticsIF cps = ProxoolFacade.getConnectionPoolStatistics(alias);
+            LOG.info("Served: " + cps.getConnectionsServedCount());
+            LOG.info("Refused: " + cps.getConnectionsRefusedCount());
+            assertEquals(count, cps.getConnectionsServedCount() + cps.getConnectionsRefusedCount());
+            assertEquals(goodHits, cps.getConnectionsServedCount());
+            assertEquals(goodHits, expectedGoodHits);
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        } finally {
         }
-
-        ConnectionPoolStatisticsIF cps = ProxoolFacade.getConnectionPoolStatistics(alias);
-        LOG.info("Served: " + cps.getConnectionsServedCount());
-        LOG.info("Refused: " + cps.getConnectionsRefusedCount());
-        assertEquals(count, cps.getConnectionsServedCount() + cps.getConnectionsRefusedCount());
-        assertEquals(goodHits, cps.getConnectionsServedCount());
-        assertEquals(goodHits, expectedGoodHits);
+        
     }
 
     /**
@@ -330,6 +342,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.14  2002/11/07 19:08:55  billhorsman
+ Fixed up tests a bit
+
  Revision 1.13  2002/11/07 18:53:19  billhorsman
  Slight improvement to setup
 

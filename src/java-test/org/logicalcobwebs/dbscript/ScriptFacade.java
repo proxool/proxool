@@ -25,7 +25,7 @@ import java.sql.SQLException;
  *
  * Allows you to run scripts from file.
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/06 21:06:21 $
+ * @version $Revision: 1.5 $, $Date: 2002/11/07 19:08:54 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -99,11 +99,29 @@ public class ScriptFacade {
 
     }
 
+    /**
+     * Call the adapter's {@link ConnectionAdapterIF#teardown teardown}
+     * method without throwing any exceptions
+     * @param adapter the adapter to teardown
+     */
+    public static void tearDownAdapter(ConnectionAdapterIF adapter) {
+        if (adapter != null) {
+            try {
+                adapter.teardown();
+            } catch (Exception e) {
+                LOG.error("Problem tearing down " + adapter.getName() + " adapter", e);
+            }
+        }
+    }
+
 }
 
 /*
  Revision history:
  $Log: ScriptFacade.java,v $
+ Revision 1.5  2002/11/07 19:08:54  billhorsman
+ Fixed up tests a bit
+
  Revision 1.4  2002/11/06 21:06:21  billhorsman
  Support for CommandFilterIF
 
