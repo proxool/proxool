@@ -22,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/06 10:11:11 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/06 11:31:17 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -70,7 +70,7 @@ public class SnapshotTest extends AbstractProxoolTest {
             assertEquals("activeConnectionCount", 0, snapshot.getActiveConnectionCount());
 
             ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
-            assertEquals("connectionInfos.length", 1, connectionInfos.length);
+            assertTrue("connectionInfos.length != 0",  connectionInfos.length != 0);
             assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_AVAILABLE, connectionInfos[0].getStatus());
         }
 
@@ -84,7 +84,7 @@ public class SnapshotTest extends AbstractProxoolTest {
             assertEquals("activeConnectionCount", 1, snapshot.getActiveConnectionCount());
 
             ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
-            assertEquals("connectionInfos.length", 1, connectionInfos.length);
+            assertTrue("connectionInfos.length != 0",  connectionInfos.length != 0);
             assertEquals("connectionInfos[0].getStatus()", ConnectionInfoIF.STATUS_ACTIVE, connectionInfos[0].getStatus());
 
             c.close();
@@ -97,8 +97,8 @@ public class SnapshotTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: SnapshotTest.java,v $
- Revision 1.9  2003/03/06 10:11:11  billhorsman
- fixes
+ Revision 1.10  2003/03/06 11:31:17  billhorsman
+ fix for unlikely prototyper situation
 
  Revision 1.8  2003/03/04 10:58:44  billhorsman
  checkstyle
