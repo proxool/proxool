@@ -83,13 +83,13 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.7 $, $Date: 2003/03/05 23:28:56 $
+ * @version $Revision: 1.1 $, $Date: 2003/03/07 16:35:17 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, NotificationBroadcaster,
-    ProxoolListenerIF, ConfigurationListenerIF {
+        ProxoolListenerIF, ConfigurationListenerIF {
     /**
      * Notification type emitted when the pool definition is updated.
      */
@@ -127,7 +127,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see DynamicMBean#getAttribute(String)
+     * @see javax.management.DynamicMBean#getAttribute(java.lang.String)
      */
     public Object getAttribute (String attributeName) throws AttributeNotFoundException, MBeanException, ReflectionException {
         if (attributeName == null) {
@@ -143,10 +143,10 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see DynamicMBean#setAttribute(Attribute)
+     * @see javax.management.DynamicMBean#setAttribute(javax.management.Attribute)
      */
     public void setAttribute (Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException,
-        MBeanException, ReflectionException {
+            MBeanException, ReflectionException {
         if (attribute == null) {
             final String message = "Cannot invoke a setter of " + CLASS_NAME + " with null attribute";
             LOG.error(message);
@@ -162,7 +162,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see DynamicMBean#getAttributes(String[])
+     * @see javax.management.DynamicMBean#getAttributes(java.lang.String[])
      */
     public AttributeList getAttributes (String[] attributeNames) {
         if (attributeNames == null) {
@@ -245,7 +245,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see DynamicMBean#setAttributes(AttributeList)
+     * @see javax.management.DynamicMBean#setAttributes(javax.management.AttributeList)
      */
     public AttributeList setAttributes (AttributeList attributes) {
 
@@ -355,7 +355,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see DynamicMBean#invoke(String, Object[], String[])
+     * @see javax.management.DynamicMBean#invoke(java.lang.String, java.lang.Object[], java.lang.String[])
      */
     public Object invoke (String operationName, Object params[], String signature[]) throws MBeanException, ReflectionException {
         if (operationName == null) {
@@ -374,7 +374,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see DynamicMBean#getMBeanInfo()
+     * @see javax.management.DynamicMBean#getMBeanInfo()
      */
     public MBeanInfo getMBeanInfo () {
         return mBeanInfo;
@@ -546,7 +546,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 
     /**
      * Not used.
-     * @see ProxoolListenerIF#onRegistration(ConnectionPoolDefinitionIF, Properties)
+     * @see org.logicalcobwebs.proxool.ProxoolListenerIF#onRegistration(org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF, java.util.Properties)
      */
     public void onRegistration(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo) {
         // Not used.
@@ -554,7 +554,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 
     /**
      * If the given alias equals this pools alias: Unregister this JMX bean.
-     * @see ProxoolListenerIF#onShutdown(String)
+     * @see org.logicalcobwebs.proxool.ProxoolListenerIF#onShutdown(java.lang.String)
      */
     public void onShutdown(String alias) {
         if (alias.equals(this.poolDefinition.getAlias())) {
@@ -568,7 +568,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 
     /**
      * Update the attributes of this MBean and emit a {@link #NOTIFICATION_TYPE_DEFINITION_UPDATED} event.
-     * @see ConfigurationListenerIF#definitionUpdated(ConnectionPoolDefinitionIF, Properties, Properties)
+     * @see org.logicalcobwebs.proxool.ConfigurationListenerIF#definitionUpdated(org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF, java.util.Properties, java.util.Properties)
      */
     public void definitionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo,
         Properties changedInfo) {
@@ -580,7 +580,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see NotificationBroadcaster#addNotificationListener(NotificationListener, NotificationFilter, Object)
+     * @see javax.management.NotificationBroadcaster#addNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     public void addNotificationListener(NotificationListener notificationListener, NotificationFilter notificationFilter,
         Object handBack) throws IllegalArgumentException {
@@ -588,21 +588,21 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see NotificationBroadcaster#removeNotificationListener(NotificationListener)
+     * @see javax.management.NotificationBroadcaster#removeNotificationListener(javax.management.NotificationListener)
      */
     public void removeNotificationListener(NotificationListener notificationListener) throws ListenerNotFoundException {
         this.notificationHelper.removeNotificationListener(notificationListener);
     }
 
     /**
-     * @see NotificationBroadcaster#getNotificationInfo()
+     * @see javax.management.NotificationBroadcaster#getNotificationInfo()
      */
     public MBeanNotificationInfo[] getNotificationInfo() {
         return NOTIFICATION_INFOS;
     }
 
     /**
-     * @see MBeanRegistration#preRegister(MBeanServer, ObjectName)
+     * @see javax.management.MBeanRegistration#preRegister(javax.management.MBeanServer, javax.management.ObjectName)
      */
     public ObjectName preRegister(MBeanServer mBeanServer, ObjectName objectName) throws Exception {
         if (objectName == null) {
@@ -613,7 +613,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see MBeanRegistration#postRegister(Boolean)
+     * @see javax.management.MBeanRegistration#postRegister(java.lang.Boolean)
      */
     public void postRegister(Boolean success) {
         if (success.booleanValue() == true) {
@@ -622,14 +622,14 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
     }
 
     /**
-     * @see MBeanRegistration#preDeregister()
+     * @see javax.management.MBeanRegistration#preDeregister()
      */
     public void preDeregister() throws Exception {
         this.active = false;
     }
 
     /**
-     * @see MBeanRegistration#postDeregister()
+     * @see javax.management.MBeanRegistration#postDeregister()
      */
     public void postDeregister() {
     }
@@ -638,6 +638,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.1  2003/03/07 16:35:17  billhorsman
+ moved jmx stuff into sandbox until it is tested
+
  Revision 1.7  2003/03/05 23:28:56  billhorsman
  deprecated maximum-new-connections property in favour of
  more descriptive simultaneous-build-throttle

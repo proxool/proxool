@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * Utilities for Proxool JMX instrumentation.
- * @version $Revision: 1.4 $, $Date: 2003/03/05 15:14:15 $
+ * @version $Revision: 1.1 $, $Date: 2003/03/07 16:35:18 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -35,10 +35,10 @@ public class ProxoolJMXHelper {
     }
 
     /**
-     * Create and register a {@link ConnectionPoolMBean} to the given agents.
+     * Create and register a {@link org.logicalcobwebs.proxool.admin.jmx.ConnectionPoolMBean} to the given agents.
      * Will log errors instead of throwing exceptions if one or more of the registrations fails.
      * @param poolPropeties the complete pool properties.
-     * @throws ProxoolException if the pool can not be found.
+     * @throws org.logicalcobwebs.proxool.ProxoolException if the pool can not be found.
      */
     public static void registerPool(String alias, Properties poolPropeties) throws ProxoolException {
         ConnectionPoolDefinitionIF connectionPoolDefinition =
@@ -66,7 +66,7 @@ public class ProxoolJMXHelper {
     }
 
     /**
-     * Unregister a {@link ConnectionPoolMBean} from the given agents.
+     * Unregister a {@link org.logicalcobwebs.proxool.admin.jmx.ConnectionPoolMBean} from the given agents.
      * Will log errors instead of throwing exceptions if one or more of the unregistrations fails.
      * @param poolPropeties the complete pool properties.
      */
@@ -95,7 +95,7 @@ public class ProxoolJMXHelper {
      * Get the prefered JMX object name for a Proxool pool.
      * @param alias the alias of the pool.
      * @return the generated object name.
-     * @throws MalformedObjectNameException if the creation of the object name fails.
+     * @throws javax.management.MalformedObjectNameException if the creation of the object name fails.
      */
     public static ObjectName getObjectName(String alias) throws MalformedObjectNameException {
         return new ObjectName("Proxool:type=Pool, name=" + alias);
@@ -143,6 +143,9 @@ public class ProxoolJMXHelper {
 /*
  Revision history:
  $Log: ProxoolJMXHelper.java,v $
+ Revision 1.1  2003/03/07 16:35:18  billhorsman
+ moved jmx stuff into sandbox until it is tested
+
  Revision 1.4  2003/03/05 15:14:15  billhorsman
  fix for jdk 1.2
 

@@ -13,7 +13,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Run all in admin package tests
  *
- * @version $Revision: 1.4 $, $Date: 2003/03/03 11:12:05 $
+ * @version $Revision: 1.5 $, $Date: 2003/03/07 16:35:09 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -29,7 +29,6 @@ public class AllTests {
         suite.addTestSuite(StatisticsListenerTest.class);
         suite.addTestSuite(StatisticsTest.class);
         suite.addTestSuite(SnapshotTest.class);
-        suite.addTest(org.logicalcobwebs.proxool.admin.jmx.AllTests.suite());
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -45,6 +44,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.5  2003/03/07 16:35:09  billhorsman
+ moved jmx stuff into sandbox until it is tested
+
  Revision 1.4  2003/03/03 11:12:05  billhorsman
  fixed licence
 

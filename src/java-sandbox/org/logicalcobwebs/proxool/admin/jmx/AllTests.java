@@ -13,7 +13,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Run all tests in the jmx package.
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/03 11:12:06 $
+ * @version $Revision: 1.1 $, $Date: 2003/03/07 16:35:17 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -42,6 +42,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.1  2003/03/07 16:35:17  billhorsman
+ moved jmx stuff into sandbox until it is tested
+
  Revision 1.2  2003/03/03 11:12:06  billhorsman
  fixed licence
 

@@ -29,9 +29,9 @@ import java.util.Properties;
 
 
 /**
- * Test {@link ConnectionPoolMBean}.
+ * Test {@link org.logicalcobwebs.proxool.admin.jmx.ConnectionPoolMBean}.
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/04 10:58:45 $
+ * @version $Revision: 1.1 $, $Date: 2003/03/07 16:35:18 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -41,7 +41,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
     private boolean notified;
 
     /**
-     * @see junit.framework.TestCase#TestCase(String)
+     * @see junit.framework.TestCase#TestCase(java.lang.String)
      */
     public ConnectionPoolMBeanTest(String s) {
         super(s);
@@ -49,7 +49,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
 
     /**
      * Test that an attribute can be fetched from the MBean.
-     * @throws Exception if an error occours.
+     * @throws java.lang.Exception if an error occours.
      */
     public void testGetAttribute() throws Exception {
         final String alias = "testGetAttribute";
@@ -64,7 +64,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
 
     /**
      * Test that a list attributes can be fetched from the MBean.
-     * @throws Exception if an error occours.
+     * @throws java.lang.Exception if an error occours.
      */
     public void testGetAttributes() throws Exception {
         final String alias = "testGetAttributes";
@@ -98,7 +98,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
 
     /**
      * Test that an attribute can be fetched from the MBean.
-     * @throws Exception if an error occours.
+     * @throws java.lang.Exception if an error occours.
      */
     public void testSetAttribute() throws Exception {
         String alias = "testSetAttribute";
@@ -219,7 +219,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
     }
 
     /**
-     * Calls {@link AbstractProxoolTest#setUp}
+     * Calls {@link org.logicalcobwebs.proxool.AbstractProxoolTest#setUp}
      * @see TestCase#setUp
      */
     protected void setUp() throws Exception {
@@ -230,7 +230,7 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
     }
 
     /**
-     * Calls {@link AbstractProxoolTest#tearDown}
+     * Calls {@link org.logicalcobwebs.proxool.AbstractProxoolTest#tearDown}
      * @see TestCase#setUp
      */
     protected void tearDown() throws Exception {
@@ -243,6 +243,9 @@ public class ConnectionPoolMBeanTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionPoolMBeanTest.java,v $
+ Revision 1.1  2003/03/07 16:35:18  billhorsman
+ moved jmx stuff into sandbox until it is tested
+
  Revision 1.7  2003/03/04 10:58:45  billhorsman
  checkstyle
 
