@@ -48,8 +48,8 @@
 
     <command
         name="insert"
-        loops="2"
-        load="5"
+        loops="2500"
+        load="4"
         sql="insert into test values(1)"
         />
 
