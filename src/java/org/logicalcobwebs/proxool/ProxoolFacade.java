@@ -23,7 +23,7 @@ import java.util.Properties;
  * <p>You need to use this class wisely. It is obviously specfic to proxool so it will
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>.
- * @version $Revision: 1.4 $, $Date: 2002/10/24 17:40:31 $
+ * @version $Revision: 1.5 $, $Date: 2002/10/25 10:12:52 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -235,10 +235,10 @@ public class ProxoolFacade {
      * @param connectionPool the pool to remove
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
      */
-    private static void removeConnectionPool(ConnectionPool connectionPool, int delay) {
+    private static void removeConnectionPool(String finalizer, ConnectionPool connectionPool, int delay) {
         if (connectionPool != null) {
             try {
-                connectionPool.finalize(delay, "External");
+                connectionPool.finalize(delay, finalizer);
             } catch (Throwable t) {
                 LOG.error("Problem trying to remove " + connectionPool.getDefinition().getName() + " connection pool", t);
             }
@@ -253,7 +253,7 @@ public class ProxoolFacade {
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
      */
     public static void removeConnectionPool(String name, int delay) {
-        removeConnectionPool(ConnectionPoolManager.getInstance().getConnectionPool(name), delay);
+        removeConnectionPool(Thread.currentThread().getName(), ConnectionPoolManager.getInstance().getConnectionPool(name), delay);
     }
 
     /**
@@ -261,15 +261,22 @@ public class ProxoolFacade {
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
      */
     public static void removeAllConnectionPools(int delay) {
+        removeAllConnectionPools(Thread.currentThread().getName(), delay);
+    }
+
+    /**
+     * Removes all connection pools. Kills all the connections. Resets everything.
+     * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
+     */
+    protected static void removeAllConnectionPools(String finalizer, int delay) {
 
         Iterator connectionPools = ConnectionPoolManager.getInstance().getConnectionPoolMap().iterator();
         while (connectionPools.hasNext()) {
             ConnectionPool cp = (ConnectionPool) connectionPools.next();
-            removeConnectionPool(cp, delay);
+            removeConnectionPool(finalizer, cp, delay);
         }
 
     }
-
     /**
      * Like {@link #removeConnectionPool(java.lang.String, int)} but uses no delay. (Kills
      * everything as quickly as possible).
@@ -401,6 +408,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.5  2002/10/25 10:12:52  billhorsman
+ Improvements and fixes to the way connection pools close down. Including new ReloadMonitor to detect when a class is reloaded. Much better logging too.
+
  Revision 1.4  2002/10/24 17:40:31  billhorsman
  Fixed recognition of existing pool (which was resulting in an extra configuration step - but which didn't cause any problems)
 

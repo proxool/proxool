@@ -19,13 +19,15 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.7 $, $Date: 2002/10/24 17:25:20 $
+ * @version $Revision: 1.8 $, $Date: 2002/10/25 10:12:52 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private Log log;
+
+    private ReloadMonitor reloadMonitor;
 
     private static final String[] STATUS_DESCRIPTIONS = {"NULL", "AVAILABLE", "ACTIVE", "OFFLINE"};
 
@@ -92,6 +94,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     private static boolean loggedLegend;
 
     protected ConnectionPool(ConnectionPoolDefinition definition) {
+        reloadMonitor = new ReloadMonitor(definition.getName());
         log = LogFactory.getLog("org.logicalcobwebs.proxool." + definition.getName());
         setDefinition(definition);
         connectionPoolUp = true;
@@ -384,13 +387,15 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     /** Get a ProxyConnection by index */
-    private ProxyConnection getConnection(int i) {
+    private ProxyConnection getProxyConnection(int i) {
         return (ProxyConnection) proxyConnections.elementAt(i);
     }
 
+    /*
     private ProxyConnection getProxyConnection(int i) {
-        return (ProxyConnection) Proxy.getInvocationHandler(getConnection(i));
+        return (ProxyConnection) Proxy.getInvocationHandler(getProxyConnection(i));
     }
+    */
 
     protected void removeProxyConnection(ProxyConnection proxyConnection, String reason, boolean forceExpiry) {
         // Just check that it is null
@@ -443,16 +448,20 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         if (connectionPoolUp == true) {
 
             connectionPoolUp = false;
+            long startFinalize = System.currentTimeMillis();
 
             if (delay > 0) {
-                log.info("Closing down connection pool - waiting for " + delay
-                        + " milliseconds for everything to stop by " + finalizerName);
+                log.info("Closing down instance started at "
+                        + reloadMonitor.getLoadDate() + " - waiting for " + delay
+                        + " milliseconds for everything to stop.  [ "
+                        + finalizerName + "]");
             } else {
-                log.info("Closing down connection pool immediately by " + finalizerName);
+                log.info("Closing down connection pool immediately [" + finalizerName + "]");
             }
 
             /* Interrupt the threads (in case they're sleeping) */
 
+            boolean connectionClosedManually = false;
             try {
                 try {
                     wakeThread(houseKeepingThread);
@@ -469,25 +478,49 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 /* Patience, patience. */
 
                 try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException e) {
-                    // Oh well
+                    long sleepTime = Math.max(0, delay + startFinalize - System.currentTimeMillis());
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e1) {
+                    log.debug("Interrupted whilst sleeping. Snooze.", e1);
+                    try {
+                        long sleepTime = Math.max(0, delay + startFinalize - System.currentTimeMillis());
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e2) {
+                        log.debug("Interrupted whilst sleeping. Snooze.", e2);
+                        try {
+                            long sleepTime = Math.max(0, delay + startFinalize - System.currentTimeMillis());
+                            Thread.sleep(sleepTime);
+                        } catch (InterruptedException e3) {
+                            log.warn("Interrupted whilst sleeping. Waking up.", e3);
+                        }
+                    }
                 }
 
                 // Silently close all connections
                 for (int i = proxyConnections.size() - 1; i >= 0; i--) {
+                    long id = getProxyConnection(i).getId();
                     try {
+                        connectionClosedManually = true;
+                        getProxyConnection(i).close();
                         if (log.isDebugEnabled()) {
-                            log.debug("Closing connection #" + getProxyConnection(i).getId());
+                            log.debug("Connection #" + id + " closed manually");
                         }
-                        getConnection(i).close();
                     } catch (Throwable t) {
-                        // Ignore
+                        if (log.isDebugEnabled()) {
+                            log.debug("Problem closing connection #" + id, t);
+                        }
+
                     }
                 }
+            } catch (Throwable t) {
+                log.error("Unknown problem finalizing pool", t);
             } finally {
                 if (log.isDebugEnabled()) {
-                    log.debug("Connection pool has been finalized (stopped) by " + finalizerName);
+                    log.debug("Connection pool has been closed down by " + finalizerName
+                        + " in " + (System.currentTimeMillis() - startFinalize) + " milliseconds.");
+                    if (!connectionClosedManually) {
+                        log.debug("No connections required manual removal.");
+                    }
                 }
                 super.finalize();
             }
@@ -501,7 +534,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     // In theory, this gets called by the JVM.  Never actually does though.
     protected void finalize() throws Throwable {
         /* No delay! */
-
         finalize(0, "JVM");
     }
 
@@ -572,6 +604,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         return;
                     }
 
+                    if (reloadMonitor.isProxoolReloaded()) {
+                        return;
+                    }
+
                     // Right, now we know we're the right thread then we can carry on house keeping
                     Connection connection = null;
                     ProxyConnection proxyConnection = null;
@@ -584,7 +620,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     // matter at all).  If an element is added then it is added to the end and we
                     // will miss it on this house keeping run (but we'll get it next time).
                     for (int i = proxyConnections.size() - 1; i >= 0; i--) {
-                        proxyConnection = getConnection(i);
+                        proxyConnection = getProxyConnection(i);
                         connection = proxyConnection.getConnection();
                         // First lets check whether the connection still works. We should only validate
                         // connections that are not is use!  SetOffline only succeeds if the connection
@@ -997,6 +1033,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.8  2002/10/25 10:12:52  billhorsman
+ Improvements and fixes to the way connection pools close down. Including new ReloadMonitor to detect when a class is reloaded. Much better logging too.
+
  Revision 1.7  2002/10/24 17:25:20  billhorsman
  cleaned up logging and made it more informative
 
