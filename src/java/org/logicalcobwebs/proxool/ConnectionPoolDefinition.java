@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.7 $, $Date: 2003/01/31 00:17:05 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/06 15:41:17 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -54,6 +54,8 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private boolean trace;
 
     private String statistics;
+
+    private String statisticsLogLevel;
 
     private Set fatalSqlExceptions = new HashSet();
 
@@ -406,11 +408,29 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     public void setStatistics(String statistics) {
         this.statistics = statistics;
     }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getStatisticsLogLevel
+     */
+    public String getStatisticsLogLevel() {
+        return statisticsLogLevel;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getStatisticsLogLevel
+     */
+    public void setStatisticsLogLevel(String statisticsLogLevel) {
+        this.statisticsLogLevel = statisticsLogLevel;
+    }
+
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.8  2003/02/06 15:41:17  billhorsman
+ add statistics-log-level
+
  Revision 1.7  2003/01/31 00:17:05  billhorsman
  statistics is now a string to allow multiple,
  comma-delimited values

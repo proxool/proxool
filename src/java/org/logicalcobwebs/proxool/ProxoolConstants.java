@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.9 $, $Date: 2003/01/30 17:22:03 $
+ * @version $Revision: 1.10 $, $Date: 2003/02/06 15:41:17 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -134,6 +134,18 @@ public interface ProxoolConstants {
 
     /** @see ProxoolDriver#getPropertyInfo */
     public final String STATISTICS_PROPERTY = PROPERTY_PREFIX + STATISTICS;
+
+    public static final String STATISTICS_LOG_LEVEL = "statistics-log-level";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String STATISTICS_LOG_LEVEL_PROPERTY = PROPERTY_PREFIX + STATISTICS_LOG_LEVEL;
+
+    public static final String STATISTICS_LOG_LEVEL_TRACE = "TRACE";
+
+    public static final String STATISTICS_LOG_LEVEL_DEBUG = "DEBUG";
+
+    public static final String STATISTICS_LOG_LEVEL_INFO = "INFO";
+
     /**
      *  Un-prefixed propety name for the Proxool alias configuration property. Value: alias
      */
@@ -160,6 +172,9 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.10  2003/02/06 15:41:17  billhorsman
+ add statistics-log-level
+
  Revision 1.9  2003/01/30 17:22:03  billhorsman
  new statistics property
 

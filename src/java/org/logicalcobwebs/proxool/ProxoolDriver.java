@@ -17,7 +17,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.13 $, $Date: 2003/01/31 00:28:38 $
+ * @version $Revision: 1.14 $, $Date: 2003/02/06 15:41:16 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -93,7 +93,7 @@ public class ProxoolDriver implements Driver {
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
             throws SQLException {
 
-        DriverPropertyInfo[] dpi = new DriverPropertyInfo[14];
+        DriverPropertyInfo[] dpi = new DriverPropertyInfo[15];
         ConnectionPool cp = null;
         try {
             cp = ConnectionPoolManager.getInstance().getConnectionPool(url);
@@ -163,6 +163,10 @@ public class ProxoolDriver implements Driver {
                 + "every 15 minutes. Valid units are s(econds), m(inutes), h(ours) and d(ays). " 
                 + "Default is null (no statistics).");
 
+        dpi[14] = new DriverPropertyInfo(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY,
+                "Whether statistics are logged as they are produced. Range: DEBUG, INFO, WARN, ERROR, FATAL." 
+                + "Default is null (no logging).");
+
         return dpi;
     }
 
@@ -202,6 +206,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.14  2003/02/06 15:41:16  billhorsman
+ add statistics-log-level
+
  Revision 1.13  2003/01/31 00:28:38  billhorsman
  updated doc for statistics
 

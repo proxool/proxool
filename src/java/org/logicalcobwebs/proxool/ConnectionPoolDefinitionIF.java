@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.12 $, $Date: 2003/01/31 00:17:04 $
+ * @version $Revision: 1.13 $, $Date: 2003/02/06 15:41:17 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -192,11 +192,22 @@ public interface ConnectionPoolDefinitionIF {
      */
     String getStatistics();
 
+    /**
+     * Whether statistics are logged as they are produced.
+     * Range: DEBUG, INFO, WARN, ERROR, FATAL.
+     * Default is null (no logging)
+     * @return statisticsLogLevel
+     */
+    String getStatisticsLogLevel();
+
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.13  2003/02/06 15:41:17  billhorsman
+ add statistics-log-level
+
  Revision 1.12  2003/01/31 00:17:04  billhorsman
  statistics is now a string to allow multiple,
  comma-delimited values

@@ -8,6 +8,8 @@ package org.logicalcobwebs.proxool.monitor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.ProxoolConstants;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -21,7 +23,7 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/04 17:17:03 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/06 15:41:18 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -46,8 +48,11 @@ class StatsRoller {
 
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
+    private String logLevel;
+
     public StatsRoller(String alias, String token) throws ProxoolException {
         log = LogFactory.getLog("org.logicalcobwebs.proxool.stats." + alias);
+        logLevel = ProxoolFacade.getConnectionPoolDefinition(alias).getStatisticsLogLevel();
 
         nextRollDate = Calendar.getInstance();
         if (token.endsWith("s")) {
@@ -119,7 +124,8 @@ class StatsRoller {
 
     private void logStats(StatisticsIF statistics) {
 
-        if (statistics != null) {
+        if (statistics != null && logLevel != null) {
+
             StringBuffer out = new StringBuffer();
 
             out.append(TIME_FORMAT.format(statistics.getStartDate()));
@@ -140,7 +146,14 @@ class StatsRoller {
             out.append("ms/");
             out.append(DECIMAL_FORMAT.format(statistics.getAverageActiveCount()));
 
-            log.info(out.toString());
+            if (logLevel.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_TRACE)) {
+                log.trace(out.toString());
+            } else if (logLevel.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG)) {
+                log.debug(out.toString());
+            } else if (logLevel.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_INFO)) {
+                log.info(out.toString());
+            }
+
         }
     }
 
@@ -177,6 +190,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.8  2003/02/06 15:41:18  billhorsman
+ add statistics-log-level
+
  Revision 1.7  2003/02/04 17:17:03  billhorsman
  make Timer a daemon
 

@@ -32,7 +32,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.42 $, $Date: 2003/02/05 17:05:02 $
+ * @version $Revision: 1.43 $, $Date: 2003/02/06 15:41:16 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -374,6 +374,11 @@ public class ProxoolFacade {
                 changedProperties.setProperty(key, value);
                 cpd.setStatistics(value);
             }
+        } else if (key.equals(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY)) {
+            if (isChanged(cpd.getStatistics(), value)) {
+                changedProperties.setProperty(key, value);
+                cpd.setStatistics(value);
+            }
         } else {
             cpd.setProperty(key, value);
             isProxoolProperty = false;
@@ -702,6 +707,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.43  2003/02/06 15:41:16  billhorsman
+ add statistics-log-level
+
  Revision 1.42  2003/02/05 17:05:02  billhorsman
  registerConnectionPool is now synchronized
 
