@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  *
- * @version $Revision: 1.7 $, $Date: 2003/01/27 18:26:36 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/06 17:41:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -114,6 +114,9 @@ class ConnectionPoolManager {
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
+ Revision 1.8  2003/02/06 17:41:04  billhorsman
+ now uses imported logging
+
  Revision 1.7  2003/01/27 18:26:36  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch

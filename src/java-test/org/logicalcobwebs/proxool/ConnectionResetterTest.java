@@ -7,8 +7,8 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.7 $, $Date: 2002/12/16 17:05:38 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/06 17:41:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -126,6 +126,9 @@ public class ConnectionResetterTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.8  2003/02/06 17:41:02  billhorsman
+ now uses imported logging
+
  Revision 1.7  2002/12/16 17:05:38  billhorsman
  new test structure
 

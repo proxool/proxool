@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -17,7 +17,7 @@ import java.sql.SQLException;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/31 16:53:13 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:03 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -81,6 +81,9 @@ public abstract class AbstractDatabaseMetaData {
 /*
  Revision history:
  $Log: AbstractDatabaseMetaData.java,v $
+ Revision 1.3  2003/02/06 17:41:03  billhorsman
+ now uses imported logging
+
  Revision 1.2  2003/01/31 16:53:13  billhorsman
  checkstyle
 

@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.monitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ProxoolConstants;
@@ -23,7 +23,7 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/06 15:41:18 $
+ * @version $Revision: 1.9 $, $Date: 2003/02/06 17:41:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -190,6 +190,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.9  2003/02/06 17:41:06  billhorsman
+ now uses imported logging
+
  Revision 1.8  2003/02/06 15:41:18  billhorsman
  add statistics-log-level
 

@@ -13,7 +13,7 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.10 $, $Date: 2003/01/23 11:13:57 $
+ * @version $Revision: 1.11 $, $Date: 2003/02/06 17:41:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -30,7 +30,6 @@ public class AllTests {
         suite.addTestSuite(HypersonicTest.class);
         suite.addTestSuite(GeneralTests.class);
         suite.addTestSuite(ConnectionResetterTest.class);
-        suite.addTestSuite(ThreadTest.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -47,6 +46,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.11  2003/02/06 17:41:02  billhorsman
+ now uses imported logging
+
  Revision 1.10  2003/01/23 11:13:57  billhorsman
  remove PerformanceTest from suite
 

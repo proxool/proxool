@@ -6,8 +6,8 @@
 */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.dbscript.ConnectionAdapterIF;
 
 import java.sql.Connection;
@@ -22,7 +22,7 @@ import java.util.Properties;
  *
  * Provides Simpool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.6 $, $Date: 2003/01/27 23:32:10 $
+ * @version $Revision: 1.7 $, $Date: 2003/02/06 17:41:03 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -83,6 +83,9 @@ public class SimpoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: SimpoolAdapter.java,v $
+ Revision 1.7  2003/02/06 17:41:03  billhorsman
+ now uses imported logging
+
  Revision 1.6  2003/01/27 23:32:10  billhorsman
  encoding fix (no idea how that happened)
 

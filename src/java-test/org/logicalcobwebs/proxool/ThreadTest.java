@@ -7,8 +7,8 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.dbscript.CommandFilterIF;
 import org.logicalcobwebs.dbscript.CommandIF;
 import org.logicalcobwebs.dbscript.ScriptFacade;
@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * Test how well Proxool works in a threaded test.
  *
- * @version $Revision: 1.3 $, $Date: 2002/12/16 17:04:37 $
+ * @version $Revision: 1.4 $, $Date: 2003/02/06 17:41:03 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -104,6 +104,9 @@ public class ThreadTest extends TestCase {
 /*
  Revision history:
  $Log: ThreadTest.java,v $
+ Revision 1.4  2003/02/06 17:41:03  billhorsman
+ now uses imported logging
+
  Revision 1.3  2002/12/16 17:04:37  billhorsman
  new test structure
 

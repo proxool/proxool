@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -17,7 +17,7 @@ import java.sql.SQLException;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.2 $, $Date: 2003/01/31 16:53:18 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -61,6 +61,9 @@ class ProxyDatabaseMetaData extends AbstractDatabaseMetaData implements Invocati
 /*
  Revision history:
  $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.3  2003/02/06 17:41:04  billhorsman
+ now uses imported logging
+
  Revision 1.2  2003/01/31 16:53:18  billhorsman
  checkstyle
 

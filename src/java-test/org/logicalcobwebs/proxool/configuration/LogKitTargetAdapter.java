@@ -9,16 +9,16 @@ import org.apache.log.Priority;
 import org.apache.log.LogEvent;
 import org.apache.log.output.AbstractOutputTarget;
 import org.apache.avalon.framework.CascadingThrowable;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 /**
- * An Avalon LogKit target that delegates to a Jakarta Commons <code>org.apache.commons.logging.Log</code>.
+ * An Avalon LogKit target that delegates to a Jakarta Commons <code>org.logicalcobwebs.logging.Log</code>.
  * Can be used to make Avalons internal logging go the same output as
  * the Proxool internal logging.
- * @version $Revision: 1.1 $, $Date: 2002/12/23 02:39:43 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/06 17:41:03 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class LogKitTargetAdapter extends AbstractOutputTarget {
@@ -104,6 +104,9 @@ public class LogKitTargetAdapter extends AbstractOutputTarget {
 /*
  Revision history:
  $Log: LogKitTargetAdapter.java,v $
+ Revision 1.2  2003/02/06 17:41:03  billhorsman
+ now uses imported logging
+
  Revision 1.1  2002/12/23 02:39:43  chr32
  Needed by the AvalonConfigurator tests.
 

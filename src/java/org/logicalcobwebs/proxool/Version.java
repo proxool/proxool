@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 /**
  * Tells you the version. You can tell what sort of release it is
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  *   A snapshot release built on January 2nd. This comes after the
  *   version 1.0 and before 1.1.
  *
- * @version $Revision: 1.4 $, $Date: 2003/01/21 10:56:40 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/06 17:41:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -77,6 +77,9 @@ public class Version {
 /*
  Revision history:
  $Log: Version.java,v $
+ Revision 1.5  2003/02/06 17:41:05  billhorsman
+ now uses imported logging
+
  Revision 1.4  2003/01/21 10:56:40  billhorsman
  new version approach
 

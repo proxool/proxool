@@ -10,8 +10,8 @@ import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.thread.ThreadSafe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -28,7 +28,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * component in your bootstrap code to make this happen.
  * </p>
  *
- * @version $Revision: 1.9 $, $Date: 2003/01/27 18:26:42 $
+ * @version $Revision: 1.10 $, $Date: 2003/02/06 17:41:05 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -121,6 +121,9 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.10  2003/02/06 17:41:05  billhorsman
+ now uses imported logging
+
  Revision 1.9  2003/01/27 18:26:42  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch

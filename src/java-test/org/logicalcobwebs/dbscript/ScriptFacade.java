@@ -9,8 +9,8 @@ package org.logicalcobwebs.dbscript;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.SAXException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
 
 import javax.xml.parsers.SAXParserFactory;
@@ -24,7 +24,7 @@ import java.sql.SQLException;
 /**
  * Allows you to run scripts from file.
  *
- * @version $Revision: 1.8 $, $Date: 2003/01/17 00:38:12 $
+ * @version $Revision: 1.9 $, $Date: 2003/02/06 17:41:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -105,6 +105,9 @@ public class ScriptFacade {
 /*
  Revision history:
  $Log: ScriptFacade.java,v $
+ Revision 1.9  2003/02/06 17:41:02  billhorsman
+ now uses imported logging
+
  Revision 1.8  2003/01/17 00:38:12  billhorsman
  wide ranging changes to clarify use of alias and url -
  this has led to some signature changes (new exceptions

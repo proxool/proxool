@@ -5,14 +5,14 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 /**
  * This is instantiated statically by ProxoolFacade. It will automatically
  * close down all the connections when teh JVM stops.
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/04 17:19:11 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -54,6 +54,9 @@ class ShutdownHook implements Runnable {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.3  2003/02/06 17:41:05  billhorsman
+ now uses imported logging
+
  Revision 1.2  2003/02/04 17:19:11  billhorsman
  ShutdownHook now initialises
 

@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -21,7 +21,7 @@ import java.util.TreeMap;
  * statement. The subclass of this defines how we delegate to the
  * real statement.
 
- * @version $Revision: 1.2 $, $Date: 2003/01/28 11:47:08 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:04 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -196,6 +196,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.3  2003/02/06 17:41:04  billhorsman
+ now uses imported logging
+
  Revision 1.2  2003/01/28 11:47:08  billhorsman
  new isTrace() and made close() public
 

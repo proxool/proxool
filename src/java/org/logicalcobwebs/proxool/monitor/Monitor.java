@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.monitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
 import org.logicalcobwebs.proxool.ProxoolException;
@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.5 $, $Date: 2003/02/05 00:20:27 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/06 17:41:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -135,6 +135,9 @@ public class Monitor {
 /*
  Revision history:
  $Log: Monitor.java,v $
+ Revision 1.6  2003/02/06 17:41:05  billhorsman
+ now uses imported logging
+
  Revision 1.5  2003/02/05 00:20:27  billhorsman
  getSnapshot is now static (because it can be)
 

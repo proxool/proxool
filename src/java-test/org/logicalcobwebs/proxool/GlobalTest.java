@@ -6,8 +6,8 @@
 package org.logicalcobwebs.proxool;
 
 import org.apache.log4j.xml.DOMConfigurator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import junit.extensions.TestSetup;
@@ -16,7 +16,7 @@ import junit.extensions.TestSetup;
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.4 $, $Date: 2003/01/31 16:38:05 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/06 17:41:03 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -78,6 +78,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.5  2003/02/06 17:41:03  billhorsman
+ now uses imported logging
+
  Revision 1.4  2003/01/31 16:38:05  billhorsman
  doc
 

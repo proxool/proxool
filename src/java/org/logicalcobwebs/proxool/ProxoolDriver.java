@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -17,7 +17,7 @@ import java.util.Properties;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.14 $, $Date: 2003/02/06 15:41:16 $
+ * @version $Revision: 1.15 $, $Date: 2003/02/06 17:41:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -160,11 +160,11 @@ public class ProxoolDriver implements Driver {
         dpi[13] = new DriverPropertyInfo(ProxoolConstants.STATISTICS_PROPERTY,
                 "The sample length when taking statistical information, comma-delimited. "
                 + "For example: '10s,15m' would mean take samples every 10 seconds and "
-                + "every 15 minutes. Valid units are s(econds), m(inutes), h(ours) and d(ays). " 
+                + "every 15 minutes. Valid units are s(econds), m(inutes), h(ours) and d(ays). "
                 + "Default is null (no statistics).");
 
         dpi[14] = new DriverPropertyInfo(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY,
-                "Whether statistics are logged as they are produced. Range: DEBUG, INFO, WARN, ERROR, FATAL." 
+                "Whether statistics are logged as they are produced. Range: DEBUG, INFO, WARN, ERROR, FATAL."
                 + "Default is null (no logging).");
 
         return dpi;
@@ -206,6 +206,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.15  2003/02/06 17:41:04  billhorsman
+ now uses imported logging
+
  Revision 1.14  2003/02/06 15:41:16  billhorsman
  add statistics-log-level
 

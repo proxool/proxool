@@ -5,7 +5,7 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
+import org.logicalcobwebs.logging.Log;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -22,7 +22,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.10 $, $Date: 2003/01/07 17:21:11 $
+ * @version $Revision: 1.11 $, $Date: 2003/02/06 17:41:04 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -305,6 +305,9 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.11  2003/02/06 17:41:04  billhorsman
+ now uses imported logging
+
  Revision 1.10  2003/01/07 17:21:11  billhorsman
  If autoCommit is off, all connections are rollbacked.
 

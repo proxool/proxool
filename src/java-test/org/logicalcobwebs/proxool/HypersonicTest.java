@@ -7,8 +7,8 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,7 +16,7 @@ import java.sql.SQLException;
 /**
  * Very basic test to see if Hypersonic test database is working
  *
- * @version $Revision: 1.5 $, $Date: 2002/12/16 17:04:55 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/06 17:41:03 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -58,6 +58,9 @@ public class HypersonicTest extends TestCase {
 /*
  Revision history:
  $Log: HypersonicTest.java,v $
+ Revision 1.6  2003/02/06 17:41:03  billhorsman
+ now uses imported logging
+
  Revision 1.5  2002/12/16 17:04:55  billhorsman
  new test structure
 

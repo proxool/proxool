@@ -7,8 +7,8 @@ package org.logicalcobwebs.proxool.configuration;
 
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletConfig;
@@ -82,7 +82,7 @@ import java.io.File;
  * <p>It will also automatically shutdown Proxool. See
  * {@link #destroy}.</p>
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/06 15:45:26 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/06 17:41:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -170,6 +170,9 @@ public class ServletConfigurator extends HttpServlet  {
 /*
  Revision history:
  $Log: ServletConfigurator.java,v $
+ Revision 1.3  2003/02/06 17:41:05  billhorsman
+ now uses imported logging
+
  Revision 1.2  2003/02/06 15:45:26  billhorsman
  trivial doc changes
 

@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.monitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionInfoIF;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ProxoolException;
@@ -42,7 +42,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.7 $, $Date: 2003/02/06 15:42:21 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/06 17:41:05 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -483,6 +483,9 @@ public class MonitorServlet extends HttpServlet {
 /*
  Revision history:
  $Log: MonitorServlet.java,v $
+ Revision 1.8  2003/02/06 17:41:05  billhorsman
+ now uses imported logging
+
  Revision 1.7  2003/02/06 15:42:21  billhorsman
  display changes
 

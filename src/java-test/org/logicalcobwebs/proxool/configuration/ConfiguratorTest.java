@@ -10,8 +10,8 @@ import junit.framework.TestCase;
 
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ProxoolAdapter;
 import org.logicalcobwebs.proxool.ProxoolConstants;
@@ -20,7 +20,7 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.7 $, $Date: 2003/01/22 17:35:03 $
+ * @version $Revision: 1.8 $, $Date: 2003/02/06 17:41:03 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -84,6 +84,9 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.8  2003/02/06 17:41:03  billhorsman
+ now uses imported logging
+
  Revision 1.7  2003/01/22 17:35:03  billhorsman
  checkstyle
 

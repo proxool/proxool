@@ -6,8 +6,8 @@
 */
 package org.logicalcobwebs.dbscript;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -15,7 +15,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * Parser to get {@link org.logicalcobwebs.dbscript.Script} from XML source
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/09 16:00:08 $
+ * @version $Revision: 1.6 $, $Date: 2003/02/06 17:41:02 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -78,6 +78,9 @@ class ScriptBuilder extends DefaultHandler {
 /*
  Revision history:
  $Log: ScriptBuilder.java,v $
+ Revision 1.6  2003/02/06 17:41:02  billhorsman
+ now uses imported logging
+
  Revision 1.5  2002/11/09 16:00:08  billhorsman
  fix doc
 

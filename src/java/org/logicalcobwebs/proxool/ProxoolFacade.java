@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 import org.logicalcobwebs.proxool.monitor.StatisticsIF;
 import org.logicalcobwebs.proxool.monitor.SnapshotIF;
 import org.logicalcobwebs.proxool.monitor.Monitor;
@@ -32,7 +32,7 @@ import java.util.Date;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.44 $, $Date: 2003/02/06 15:46:43 $
+ * @version $Revision: 1.45 $, $Date: 2003/02/06 17:41:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -707,6 +707,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.45  2003/02/06 17:41:04  billhorsman
+ now uses imported logging
+
  Revision 1.44  2003/02/06 15:46:43  billhorsman
  checkstyle
 

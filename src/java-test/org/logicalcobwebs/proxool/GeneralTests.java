@@ -6,8 +6,8 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,7 +20,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.33 $, $Date: 2003/01/31 14:33:09 $
+ * @version $Revision: 1.34 $, $Date: 2003/02/06 17:41:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -739,6 +739,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.34  2003/02/06 17:41:02  billhorsman
+ now uses imported logging
+
  Revision 1.33  2003/01/31 14:33:09  billhorsman
  fix for DatabaseMetaData
 

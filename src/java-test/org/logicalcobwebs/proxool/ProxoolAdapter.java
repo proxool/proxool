@@ -7,8 +7,8 @@
 package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.dbscript.ConnectionAdapterIF;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
 
 import java.util.Properties;
 import java.sql.SQLException;
@@ -18,7 +18,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.14 $, $Date: 2003/01/23 11:13:40 $
+ * @version $Revision: 1.15 $, $Date: 2003/02/06 17:41:03 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -142,6 +142,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.15  2003/02/06 17:41:03  billhorsman
+ now uses imported logging
+
  Revision 1.14  2003/01/23 11:13:40  billhorsman
  use new setConfiguratorListener method
 
