@@ -27,7 +27,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.35 $, $Date: 2003/01/30 17:50:28 $
+ * @version $Revision: 1.36 $, $Date: 2003/01/31 00:18:27 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -365,10 +365,9 @@ public class ProxoolFacade {
         } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
             cpd.setFatalSqlException(value);
         } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
-            int valueAsInt = Integer.parseInt(value);
-            if (cpd.getStatistics() != valueAsInt) {
+            if (isChanged(cpd.getStatistics(), value)) {
                 changedProperties.setProperty(key, value);
-                cpd.setStatistics(valueAsInt);
+                cpd.setStatistics(value);
             }
         } else {
             cpd.setProperty(key, value);
@@ -618,12 +617,23 @@ public class ProxoolFacade {
     }
 
     /**
-     * Get the lastest performance statistics for this pool
+     * Get a particular set of performance statistics for this pool
+     * @param alias identifies the pool
+     * @param token identifies which set, as defined in the configuration (see {@link ConnectionPoolDefinitionIF#getStatistics definition})
+     * @return a sample containing the statistics
+     * @throws ProxoolException if we couldn't find the pool
+     */
+    public static StatisticsIF getStatistics(String alias, String token) throws ProxoolException {
+        return ConnectionPoolManager.getInstance().getConnectionPool(alias).getStats().getStatistics(token);
+    }
+
+    /**
+     * Get all the lastest performance statistics for this pool
      * @param alias identifies the pool
      * @return a sample containing the statistics
      * @throws ProxoolException if we couldn't find the pool
      */
-    public static StatisticsIF getStatistics(String alias) throws ProxoolException {
+    public static StatisticsIF[] getStatistics(String alias) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias).getStats().getStatistics();
     }
 
@@ -642,6 +652,11 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.36  2003/01/31 00:18:27  billhorsman
+ statistics is now a string to allow multiple,
+ comma-delimited values (plus allow access to all
+ statistics)
+
  Revision 1.35  2003/01/30 17:50:28  billhorsman
  spelling
 
