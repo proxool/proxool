@@ -26,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.75 $, $Date: 2004/02/23 17:38:58 $
+ * @version $Revision: 1.76 $, $Date: 2004/02/23 17:47:32 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -364,7 +364,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     log.warn("Unable to set status of connection " + proxyConnection.getId()
                             + " from " + getStatusDescription(ProxyConnectionIF.STATUS_ACTIVE)
                             + " to " + getStatusDescription(ProxyConnectionIF.STATUS_AVAILABLE)
-                            + ". It remains " + getStatusDescription(proxyConnection.getStatus()));
+                            + " because it's state was " + getStatusDescription(proxyConnection.getStatus()));
                 }
             }
         }
@@ -1101,6 +1101,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.76  2004/02/23 17:47:32  billhorsman
+ Improved message that gets logged if the state change of a connection fails.
+
  Revision 1.75  2004/02/23 17:38:58  billhorsman
  Improved message that gets logged if you close a connection more than once.
 
