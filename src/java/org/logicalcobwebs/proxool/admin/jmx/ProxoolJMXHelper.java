@@ -18,21 +18,20 @@ import javax.management.ObjectName;
 import javax.management.MalformedObjectNameException;
 import java.util.Properties;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.List;
 
 /**
  * Utilities for Proxool JMX instrumentation.
- * @version $Revision: 1.1 $, $Date: 2003/02/24 18:01:29 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/26 19:05:03 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ProxoolJMXHelper {
-    private static final Log LOG = LogFactory.getLog (ProxoolJMXHelper.class);
+    private static final Log LOG = LogFactory.getLog(ProxoolJMXHelper.class);
 
-    private ProxoolJMXHelper () {
+    private ProxoolJMXHelper() {
     }
 
     /**
@@ -41,29 +40,26 @@ public class ProxoolJMXHelper {
      * @param poolPropeties the complete pool properties.
      * @throws ProxoolException if the pool can not be found.
      */
-    public static void registerPool (String alias, Properties poolPropeties) throws ProxoolException {
+    public static void registerPool(String alias, Properties poolPropeties) throws ProxoolException {
         ConnectionPoolDefinitionIF connectionPoolDefinition =
-            ProxoolFacade.getConnectionPoolDefinition(alias);
+                ProxoolFacade.getConnectionPoolDefinition(alias);
         String[] agentIds = getAgentIds(poolPropeties);
         ArrayList servers = null;
         for (int i = 0; i < agentIds.length; i++) {
             servers = MBeanServerFactory.findMBeanServer(agentIds[i]);
             if (servers == null || servers.size() < 1) {
                 LOG.error("Could not register pool " + connectionPoolDefinition.getAlias() + " for JMX instrumentation"
-                    + " because lookup of MBeanServer using agent id " + agentIds[i] + " failed.");
+                        + " because lookup of MBeanServer using agent id " + agentIds[i] + " failed.");
             } else {
-                final Iterator serverIterator = servers.iterator();
-                MBeanServer mBeanServer = null;
+                MBeanServer mBeanServer = (MBeanServer) servers.get(0);
                 ConnectionPoolMBean poolMBean = new ConnectionPoolMBean(alias, poolPropeties);
-                while (serverIterator.hasNext()) {
-                    mBeanServer = (MBeanServer) serverIterator.next();
-                    try {
-                        mBeanServer.registerMBean(poolMBean, getObjectName(connectionPoolDefinition.getAlias()));
-                        LOG.info("Registered JMX MBean for pool " + connectionPoolDefinition.getAlias() + " in agent " + agentIds[i]);
-                    } catch (Exception e) {
-                        LOG.error("Registration of JMX MBean for pool " + connectionPoolDefinition.getAlias()
-                            + "in agent " +  agentIds[i] + " failed.", e);
-                    }
+
+                try {
+                    mBeanServer.registerMBean(poolMBean, getObjectName(connectionPoolDefinition.getAlias()));
+                    LOG.info("Registered JMX MBean for pool " + connectionPoolDefinition.getAlias() + " in agent " + agentIds[i]);
+                } catch (Exception e) {
+                    LOG.error("Registration of JMX MBean for pool " + connectionPoolDefinition.getAlias()
+                            + "in agent " + agentIds[i] + " failed.", e);
                 }
             }
         }
@@ -81,25 +77,27 @@ public class ProxoolJMXHelper {
             servers = MBeanServerFactory.findMBeanServer(agentIds[i]);
             if (servers == null || servers.size() < 1) {
                 LOG.error("Could not unregister MBean for pool " + alias
-                    + " because lookup of MBeanServer using agent id " + agentIds[i] + " failed.");
+                        + " because lookup of MBeanServer using agent id " + agentIds[i] + " failed.");
             } else {
-                final Iterator serverIterator = servers.iterator();
-                MBeanServer mBeanServer = null;
-                while (serverIterator.hasNext()) {
-                    mBeanServer = (MBeanServer) serverIterator.next();
-                    try {
-                        mBeanServer.unregisterMBean(getObjectName(alias));
-                        LOG.info("Unregistered JMX MBean for pool " + alias + " in agent " + agentIds[i]);
-                    } catch (Exception e) {
-                        LOG.error("Unregistration of JMX MBean for pool " + alias + "in agent "
+                MBeanServer mBeanServer = (MBeanServer) servers.get(0);
+                try {
+                    mBeanServer.unregisterMBean(getObjectName(alias));
+                    LOG.info("Unregistered JMX MBean for pool " + alias + " in agent " + agentIds[i]);
+                } catch (Exception e) {
+                    LOG.error("Unregistration of JMX MBean for pool " + alias + "in agent "
                             + agentIds[i] + " failed.", e);
-                    }
                 }
             }
         }
     }
 
-    private static ObjectName getObjectName (String alias) throws MalformedObjectNameException {
+    /**
+     * Get the prefered JMX object name for a Proxool pool.
+     * @param alias the alias of the pool.
+     * @return the generated object name.
+     * @throws MalformedObjectNameException if the creation of the object name fails.
+     */
+    public static ObjectName getObjectName(String alias) throws MalformedObjectNameException {
         return new ObjectName("Proxool:type=Pool, name=" + alias);
     }
 
@@ -117,11 +115,38 @@ public class ProxoolJMXHelper {
             return (String[]) tokens.toArray(new String[tokens.size()]);
         }
     }
+
+    /**
+     * Generate a valid JMX identifier attribute name from a Proxool property name.
+     * This basically involves changing all occurences of <code>-&lt;char&gt;</code> to
+     * <code>&lt;uppercase char&gt;</code>.<br>
+     * <code>driver-properties</code> will for instance become
+     * <code>driverProperties</code>.
+     * @param propertyName the name to be converted.
+     * @return the converted attribute name.
+     */
+    public static String getValidIdentifier(String propertyName) {
+        if (propertyName.indexOf("-") == -1) {
+            return propertyName;
+        } else {
+            StringBuffer buffer = new StringBuffer (propertyName);
+            int index = -1;
+            while ((index = buffer.indexOf("-")) > -1) {
+                buffer.deleteCharAt(index);
+                buffer.setCharAt(index, Character.toUpperCase(buffer.charAt(index)));
+            }
+            return buffer.toString();
+        }
+    }
 }
 
 /*
  Revision history:
  $Log: ProxoolJMXHelper.java,v $
+ Revision 1.2  2003/02/26 19:05:03  chr32
+ Added utility methods.
+ Fixed mutiple servers bug.
+
  Revision 1.1  2003/02/24 18:01:29  chr32
  Rewrite and renamed: ProxoolJMXHelper.
 
