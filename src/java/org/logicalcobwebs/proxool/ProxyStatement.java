@@ -28,7 +28,7 @@ import java.util.TreeMap;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.7 $, $Date: 2002/11/09 15:57:33 $
+ * @version $Revision: 1.8 $, $Date: 2002/11/13 12:32:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -92,7 +92,7 @@ class ProxyStatement implements InvocationHandler {
             }
 
             // We only dump sql calls if we are in verbose mode and debug is enabled
-            if (LOG.isDebugEnabled() && connectionPool.getDefinition().isVerbose()) {
+            if (LOG.isDebugEnabled() && connectionPool.getDefinition().isTrace()) {
                 try {
 
                     // Lazily instantiate parameters if necessary
@@ -202,6 +202,9 @@ class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.8  2002/11/13 12:32:38  billhorsman
+ now correctly logs trace messages even with verbose off
+
  Revision 1.7  2002/11/09 15:57:33  billhorsman
  finished off execute logging and listening
 
