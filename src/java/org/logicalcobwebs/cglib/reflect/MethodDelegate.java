@@ -54,7 +54,6 @@
 package org.logicalcobwebs.cglib.reflect;
 
 import java.lang.reflect.*;
-import org.logicalcobwebs.cglib.*;
 import org.logicalcobwebs.cglib.core.*;
 import org.logicalcobwebs.asm.ClassVisitor;
 import org.logicalcobwebs.asm.Type;
@@ -140,7 +139,7 @@ import org.logicalcobwebs.asm.Type;
  *     <li>They refer to the same method as resolved by <code>Method.equals</code>.</li>
  *   </ul>
  *
- * @version $Id: MethodDelegate.java,v 1.1 2003/12/12 19:28:13 billhorsman Exp $
+ * @version $Id: MethodDelegate.java,v 1.2 2004/03/15 02:39:50 chr32 Exp $
  */
 abstract public class MethodDelegate {
     private static final MethodDelegateKey KEY_FACTORY =
