@@ -6,6 +6,7 @@
 package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.util.ReadWriteLock;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -16,7 +17,7 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/20 00:33:14 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/06 13:06:14 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -24,6 +25,8 @@ import java.util.Calendar;
 public class StatsRoller {
 
     private static final Log LOG = LogFactory.getLog(StatsRoller.class);
+
+    private ReadWriteLock readWriteLock = new ReadWriteLock();
 
     private Statistics completeStatistics;
 
@@ -108,13 +111,20 @@ public class StatsRoller {
         running = false;
     }
 
-    private synchronized void roll() {
-        if (!isCurrent()) {
-            currentStatistics.setStopDate(nextRollDate.getTime());
-            completeStatistics = currentStatistics;
-            currentStatistics = new Statistics(nextRollDate.getTime());
-            nextRollDate.add(units, period);
-            compositeStatisticsListener.statistics(alias, completeStatistics);
+    private void roll() {
+        try {
+            readWriteLock.aquireWrite();
+            if (!isCurrent()) {
+                currentStatistics.setStopDate(nextRollDate.getTime());
+                completeStatistics = currentStatistics;
+                currentStatistics = new Statistics(nextRollDate.getTime());
+                nextRollDate.add(units, period);
+                compositeStatisticsListener.statistics(alias, completeStatistics);
+            }
+        } catch (InterruptedException e) {
+            LOG.error("Unable to roll statistics log", e);
+        } finally {
+            readWriteLock.release();
         }
     }
 
@@ -123,34 +133,65 @@ public class StatsRoller {
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.Monitor#connectionReturned
+     * @see org.logicalcobwebs.proxool.admin.Admin#connectionReturned
      */
     public void connectionReturned(long activeTime) {
         if (!isCurrent()) {
             roll();
         }
-        currentStatistics.connectionReturned(activeTime);
+        try {
+            readWriteLock.aquireRead();
+            currentStatistics.connectionReturned(activeTime);
+            LOG.debug("Logging connectionReturned to stats starting at " + currentStatistics.getStartDate());
+        } catch (InterruptedException e) {
+            LOG.error("Unable to log connectionReturned", e);
+        } finally {
+            readWriteLock.release();
+        }
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.Monitor#connectionRefused
+     * @see org.logicalcobwebs.proxool.admin.Admin#connectionRefused
      */
     public void connectionRefused() {
         if (!isCurrent()) {
             roll();
         }
-        currentStatistics.connectionRefused();
+        try {
+            readWriteLock.aquireRead();
+            currentStatistics.connectionRefused();
+        } catch (InterruptedException e) {
+            LOG.error("Unable to log connectionRefused", e);
+        } finally {
+            readWriteLock.release();
+        }
     }
 
+    /**
+     *
+     * @return
+     */
     public Statistics getCompleteStatistics() {
-        return completeStatistics;
+        try {
+            readWriteLock.aquireRead();
+            return completeStatistics;
+        } catch (InterruptedException e) {
+            LOG.error("Couldn't read statistics", e);
+            return null;
+        } finally {
+            readWriteLock.release();
+        }
     }
+    
 }
 
 
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.2  2003/03/06 13:06:14  billhorsman
+ replicated readWriteLock fix just made to src/java
+
  Revision 1.1  2003/02/20 00:33:14  billhorsman
  renamed monitor package -> admin
 
