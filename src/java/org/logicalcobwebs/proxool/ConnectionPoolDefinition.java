@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.27 $, $Date: 2003/10/20 11:40:53 $
+ * @version $Revision: 1.28 $, $Date: 2003/10/24 15:22:21 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -253,6 +253,12 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private boolean setAnyProperty(String key, String value, boolean pretend) throws ProxoolException {
         boolean proxoolProperty = true;
         boolean changed = false;
+
+        // These groups of properties have been split off to make this method smaller
+        changed = changed || setHouseKeeperProperty(key, value, pretend);
+        changed = changed || setLoggingProperty(key, value, pretend);
+        changed = changed || setJndiProperty(key, value, pretend);
+
         if (key.equals(ProxoolConstants.USER_PROPERTY)) {
             proxoolProperty = false;
             if (isChanged(getUser(), value)) {
@@ -283,8 +289,6 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                     setUrl(value);
                 }
             }
-        } else if (setHouseKeeperProperty(key, value, pretend)) {
-            changed = true;
         } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY)) {
             if (getMaximumConnectionCount() != getInt(key, value)) {
                 changed = true;
@@ -347,8 +351,6 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                     setMaximumActiveTime(getInt(key, value));
                 }
             }
-        } else if (setLoggingProperty(key, value, pretend)) {
-            changed = true;
         } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
             if (isChanged(fatalSqlExceptionsAsString, value)) {
                 changed = true;
@@ -377,9 +379,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                     setStatisticsLogLevel(value.length() > 0 ? value : null);
                 }
             }
-        } else if (setJndiProperty(key, value, pretend)) {
-            changed = true;
-        } else {
+        }
+
+        if (key.startsWith(ProxoolConstants.PROPERTY_PREFIX)) {
             if (isChanged(getDelegateProperty(key), value)) {
                 changed = true;
                 if (!pretend) {
@@ -388,6 +390,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             }
             proxoolProperty = false;
         }
+
         if (changed && !pretend) {
             logChange(proxoolProperty, key, value);
             changedInfo.setProperty(key, value);
@@ -1128,6 +1131,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.28  2003/10/24 15:22:21  billhorsman
+ Fixed bug where connection pool was being recognised as changed even when it wasn't. (This bug introduced after 0.7.2).
+
  Revision 1.27  2003/10/20 11:40:53  billhorsman
  Smarter handling of null and empty strings. No NPE during unit tests now.
 
