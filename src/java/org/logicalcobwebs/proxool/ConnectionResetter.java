@@ -21,7 +21,7 @@ import java.util.HashSet;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/07 12:38:04 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/07 18:55:40 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -159,7 +159,7 @@ public class ConnectionResetter {
                                 log.debug("Remembering default value: " + accessor.getName() + "() = " + value);
                             }
                         } catch (Throwable t) {
-                            log.info("Problem getting default value from " + accessor.getName() + ". This method will not be reset.", t);
+                            log.debug("Problem getting default value from " + accessor.getName() + ". This method will not be reset.", t);
                             // We will remove this later (to avoid ConcurrentModifcation)
                             accessorsToRemove.add(accessor);
                         }
@@ -206,6 +206,9 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.3  2002/11/07 18:55:40  billhorsman
+ demoted log message from info to debug
+
  Revision 1.2  2002/11/07 12:38:04  billhorsman
  performance improvement - only reset when it might be necessary
 
