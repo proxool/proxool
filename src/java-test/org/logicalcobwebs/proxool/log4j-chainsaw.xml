@@ -13,6 +13,10 @@
         <priority value="DEBUG"/>
     </category>
 
+    <category name="org.logicalcobwebs.proxool.performance">
+        <priority value="INFO"/>
+    </category>
+
     <root>
         <priority value="ERROR"/>
         <appender-ref ref="chainsaw"/>
