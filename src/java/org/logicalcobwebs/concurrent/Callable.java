@@ -1,4 +1,3 @@
-
 /*
   File: Callable.java
 
@@ -19,7 +18,7 @@ package org.logicalcobwebs.concurrent;
 /**
  * Interface for runnable actions that bear results and/or throw Exceptions.
  * This interface is designed to provide a common protocol for
- * result-bearing actions that can be run independently in threads, 
+ * result-bearing actions that can be run independently in threads,
  * in which case
  * they are ordinarily used as the bases of Runnables that set
  * FutureResults
@@ -29,7 +28,7 @@ package org.logicalcobwebs.concurrent;
  **/
 
 public interface Callable {
-  /** Perform some action that returns a result or throws an exception **/
-  Object call() throws Exception;
+    /** Perform some action that returns a result or throws an exception **/
+    Object call() throws Exception;
 }
 

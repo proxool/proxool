@@ -9,7 +9,7 @@
   History:
   Date       Who                What
   19Jun1998  dl               Create public version
-  29aug1998  dl               rely on ThreadFactoryUser, 
+  29aug1998  dl               rely on ThreadFactoryUser,
                               remove ThreadGroup-based methods
                               adjusted locking policies
    3mar1999  dl               Worker threads sense decreases in pool size
@@ -20,8 +20,8 @@
    7sep2000  dl               BlockedExecutionHandler now an interface,
                               new DiscardOldestWhenBlocked policy
   12oct2000  dl               add shutdownAfterProcessingCurrentlyQueuedTasks
-  13nov2000  dl               null out task ref after run 
-  08apr2001  dl               declare inner class ctor protected 
+  13nov2000  dl               null out task ref after run
+  08apr2001  dl               declare inner class ctor protected
   12nov2001  dl               Better shutdown support
                               Blocked exec handlers can throw IE
                               Simplify locking scheme
@@ -30,7 +30,12 @@
 */
 
 package org.logicalcobwebs.concurrent;
-import java.util.*;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * A tunable, extensible thread pool class. The main supported public
@@ -55,7 +60,7 @@ import java.util.*;
  *    Thread objects rather than creating new ones.  (Note however
  *    that pools are hardly ever cure-alls for performance problems
  *    associated with thread construction, especially on JVMs that
- *    themselves internally pool or recycle threads.)  
+ *    themselves internally pool or recycle threads.)
  *
  * </ul>
  *
@@ -70,7 +75,7 @@ import java.util.*;
  * the usage examples below.
  *
  * <dl>
- *   <dt> Queueing 
+ *   <dt> Queueing
  *
  *   <dd> By default, this pool uses queueless synchronous channels to
  *   to hand off work to threads. This is a safe, conservative policy
@@ -166,8 +171,8 @@ import java.util.*;
  *   construction and cleanup overhead is on the order of
  *   milliseconds. The default keep-alive value is one minute, which
  *   means that the time needed to construct and then GC a thread is
- *   expended at most once per minute.  
- *   <p> 
+ *   expended at most once per minute.
+ *   <p>
  *
  *   To establish worker threads permanently, use a <em>negative</em>
  *   argument to setKeepAliveTime.  <p>
@@ -183,12 +188,12 @@ import java.util.*;
  *   <dl>
  *     <dt> Run (the default)
  *     <dd> The thread making the <code>execute</code> request
- *          runs the task itself. This policy helps guard against lockup. 
+ *          runs the task itself. This policy helps guard against lockup.
  *     <dt> Wait
  *     <dd> Wait until a thread becomes available.
  *     <dt> Abort
  *     <dd> Throw a RuntimeException
- *     <dt> Discard 
+ *     <dt> Discard
  *     <dd> Throw away the current request and return.
  *     <dt> DiscardOldest
  *     <dd> Throw away the oldest request and return.
@@ -329,554 +334,554 @@ import java.util.*;
 
 public class PooledExecutor extends ThreadFactoryUser implements Executor {
 
-  /** 
-   * The maximum pool size; used if not otherwise specified.  Default
-   * value is essentially infinite (Integer.MAX_VALUE)
-   **/
-  public static final int  DEFAULT_MAXIMUMPOOLSIZE = Integer.MAX_VALUE;
-
-  /** 
-   * The minimum pool size; used if not otherwise specified.  Default
-   * value is 1.
-   **/
-  public static final int  DEFAULT_MINIMUMPOOLSIZE = 1;
-
-  /**
-   * The maximum time to keep worker threads alive waiting for new
-   * tasks; used if not otherwise specified. Default value is one
-   * minute (60000 milliseconds).
-   **/
-  public static final long DEFAULT_KEEPALIVETIME = 60 * 1000;
-
-  /** The maximum number of threads allowed in pool. **/
-  protected int maximumPoolSize_ = DEFAULT_MAXIMUMPOOLSIZE;
-
-  /** The minumum number of threads to maintain in pool. **/
-  protected int minimumPoolSize_ = DEFAULT_MINIMUMPOOLSIZE;
-
-  /**  Current pool size.  **/
-  protected int poolSize_ = 0;
-
-  /** The maximum time for an idle thread to wait for new task. **/
-  protected long keepAliveTime_ = DEFAULT_KEEPALIVETIME;
-
-  /** 
-   * Shutdown flag - latches true when a shutdown method is called 
-   * in order to disable queuing/handoffs of new tasks.
-   **/
-  protected boolean shutdown_ = false;
-
-  /**
-   * The channel used to hand off the command to a thread in the pool.
-   **/
-  protected final Channel handOff_;
-
-  /**
-   * The set of active threads, declared as a map from workers to
-   * their threads.  This is needed by the interruptAll method.  It
-   * may also be useful in subclasses that need to perform other
-   * thread management chores.
-   **/
-  protected final Map threads_;
-
-  /** The current handler for unserviceable requests. **/
-  protected BlockedExecutionHandler blockedExecutionHandler_;
-
-  /** 
-   * Create a new pool with all default settings
-   **/
-
-  public PooledExecutor() {
-    this (new SynchronousChannel(), DEFAULT_MAXIMUMPOOLSIZE);
-  }
-
-  /** 
-   * Create a new pool with all default settings except
-   * for maximum pool size.
-   **/
-
-  public PooledExecutor(int maxPoolSize) {
-    this(new SynchronousChannel(), maxPoolSize);
-  }
-
-  /** 
-   * Create a new pool that uses the supplied Channel for queuing, and
-   * with all default parameter settings.
-   **/
-
-  public PooledExecutor(Channel channel) {
-    this(channel, DEFAULT_MAXIMUMPOOLSIZE);
-  }
-
-  /** 
-   * Create a new pool that uses the supplied Channel for queuing, and
-   * with all default parameter settings except for maximum pool size.
-   **/
-
-  public PooledExecutor(Channel channel, int maxPoolSize) {
-    maximumPoolSize_ = maxPoolSize;
-    handOff_ = channel;
-    runWhenBlocked();
-    threads_ = new HashMap();
-  }
-  
-  /** 
-   * Return the maximum number of threads to simultaneously execute
-   * New unqueued requests will be handled according to the current
-   * blocking policy once this limit is exceeded.
-   **/
-  public synchronized int getMaximumPoolSize() { 
-    return maximumPoolSize_; 
-  }
-
-  /** 
-   * Set the maximum number of threads to use. Decreasing the pool
-   * size will not immediately kill existing threads, but they may
-   * later die when idle.
-   * @exception IllegalArgumentException if less or equal to zero.
-   * (It is
-   * not considered an error to set the maximum to be less than than
-   * the minimum. However, in this case there are no guarantees
-   * about behavior.)
-   **/
-  public synchronized void setMaximumPoolSize(int newMaximum) { 
-    if (newMaximum <= 0) throw new IllegalArgumentException();
-    maximumPoolSize_ = newMaximum; 
-  }
-
-  /** 
-   * Return the minimum number of threads to simultaneously execute.
-   * (Default value is 1).  If fewer than the mininum number are
-   * running upon reception of a new request, a new thread is started
-   * to handle this request.
-   **/
-  public synchronized int getMinimumPoolSize() { 
-    return minimumPoolSize_; 
-  }
-
-  /** 
-   * Set the minimum number of threads to use. 
-   * @exception IllegalArgumentException if less than zero. (It is not
-   * considered an error to set the minimum to be greater than the
-   * maximum. However, in this case there are no guarantees about
-   * behavior.)
-   **/
-  public synchronized void setMinimumPoolSize(int newMinimum) { 
-    if (newMinimum < 0) throw new IllegalArgumentException();
-    minimumPoolSize_ = newMinimum; 
-  }
-  
-  /** 
-   * Return the current number of active threads in the pool.  This
-   * number is just a snaphot, and may change immediately upon
-   * returning
-   **/
-  public synchronized int getPoolSize() { 
-    return poolSize_; 
-  }
-
-  /** 
-   * Return the number of milliseconds to keep threads alive waiting
-   * for new commands. A negative value means to wait forever. A zero
-   * value means not to wait at all.
-   **/
-  public synchronized long getKeepAliveTime() { 
-    return keepAliveTime_; 
-  }
-
-  /** 
-   * Set the number of milliseconds to keep threads alive waiting for
-   * new commands. A negative value means to wait forever. A zero
-   * value means not to wait at all.
-   **/
-  public synchronized void setKeepAliveTime(long msecs) { 
-    keepAliveTime_ = msecs; 
-  }
-
-  /** Get the handler for blocked execution **/
-  public synchronized BlockedExecutionHandler getBlockedExecutionHandler() {
-    return blockedExecutionHandler_;
-  }
-
-  /** Set the handler for blocked execution **/
-  public synchronized void setBlockedExecutionHandler(BlockedExecutionHandler h) {
-    blockedExecutionHandler_ = h;
-  }
-
-  /**
-   * Create and start a thread to handle a new command.  Call only
-   * when holding lock.
-   **/
-  protected void addThread(Runnable command) {
-    Worker worker = new Worker(command);
-    Thread thread = getThreadFactory().newThread(worker);
-    threads_.put(worker, thread);
-    ++poolSize_;
-    thread.start();
-  }
-
-  /**
-   * Create and start up to numberOfThreads threads in the pool.
-   * Return the number created. This may be less than the number
-   * requested if creating more would exceed maximum pool size bound.
-   **/
-  public int createThreads(int numberOfThreads) {
-    int ncreated = 0;
-    for (int i = 0; i < numberOfThreads; ++i) {
-      synchronized(this) { 
-        if (poolSize_ < maximumPoolSize_) {
-          addThread(null);
-          ++ncreated;
-        }
-        else 
-          break;
-      }
-    }
-    return ncreated;
-  }
-
-  /**
-   * Interrupt all threads in the pool, causing them all to
-   * terminate. Assuming that executed tasks do not disable (clear)
-   * interruptions, each thread will terminate after processing its
-   * current task. Threads will terminate sooner if the executed tasks
-   * themselves respond to interrupts.
-   **/
-  public synchronized void interruptAll() {
-    for (Iterator it = threads_.values().iterator(); it.hasNext(); ) {
-      Thread t = (Thread)(it.next());
-      t.interrupt();
-    }
-  }
-
-  /**
-   * Interrupt all threads and disable construction of new
-   * threads. Any tasks entered after this point will be discarded. A
-   * shut down pool cannot be restarted.
-   */
-  public void shutdownNow() {
-    shutdownNow(new DiscardWhenBlocked());
-  }
-
-  /**
-   * Interrupt all threads and disable construction of new
-   * threads. Any tasks entered after this point will be handled by
-   * the given BlockedExecutionHandler.  A shut down pool cannot be
-   * restarted.
-   */
-  public synchronized void shutdownNow(BlockedExecutionHandler handler) {
-    setBlockedExecutionHandler(handler);
-    shutdown_ = true; // don't allow new tasks
-    minimumPoolSize_ = maximumPoolSize_ = 0; // don't make new threads
-    interruptAll(); // interrupt all existing threads
-  }
-
-  /**
-   * Terminate threads after processing all elements currently in
-   * queue. Any tasks entered after this point will be discarded. A
-   * shut down pool cannot be restarted.
-   **/
-  public void shutdownAfterProcessingCurrentlyQueuedTasks() {
-    shutdownAfterProcessingCurrentlyQueuedTasks(new DiscardWhenBlocked());
-  }
-
-  /**
-   * Terminate threads after processing all elements currently in
-   * queue. Any tasks entered after this point will be handled by the
-   * given BlockedExecutionHandler.  A shut down pool cannot be
-   * restarted.
-   **/
-  public synchronized void shutdownAfterProcessingCurrentlyQueuedTasks(BlockedExecutionHandler handler) {
-    setBlockedExecutionHandler(handler);
-    shutdown_ = true;
-    if (poolSize_ == 0) // disable new thread construction when idle
-      minimumPoolSize_ = maximumPoolSize_ = 0;
-  }
-
-  /** 
-   * Return true if a shutDown method has succeeded in terminating all
-   * threads.
-   */
-  public synchronized boolean isTerminatedAfterShutdown() {
-    return shutdown_ && poolSize_ == 0;
-  }
-
-  /**
-   * Wait for a shutdown pool to fully terminate, or until the timeout
-   * has expired. This method may only be called <em>after</em>
-   * invoking shutdownNow or
-   * shutdownAfterProcessingCurrentlyQueuedTasks.
-   *
-   * @param maxWaitTime  the maximum time in milliseconds to wait
-   * @return true if the pool has terminated within the max wait period
-   * @exception IllegalStateException if shutdown has not been requested
-   * @exception InterruptedException if the current thread has been interrupted in the course of waiting
-   */
-  public synchronized boolean awaitTerminationAfterShutdown(long maxWaitTime) throws InterruptedException {
-    if (!shutdown_)
-      throw new IllegalStateException();
-    if (poolSize_ == 0)
-      return true;
-    long waitTime = maxWaitTime;
-    if (waitTime <= 0)
-      return false;
-    long start = System.currentTimeMillis();
-    for (;;) {
-      wait(waitTime);
-      if (poolSize_ == 0)
-        return true;
-      waitTime = maxWaitTime - (System.currentTimeMillis() - start);
-      if (waitTime <= 0) 
-        return false;
-    }
-  }
-
-  /**
-   * Wait for a shutdown pool to fully terminate.  This method may
-   * only be called <em>after</em> invoking shutdownNow or
-   * shutdownAfterProcessingCurrentlyQueuedTasks.
-   *
-   * @exception IllegalStateException if shutdown has not been requested
-   * @exception InterruptedException if the current thread has been interrupted in the course of waiting
-   */
-  public synchronized void awaitTerminationAfterShutdown() throws InterruptedException {
-    if (!shutdown_)
-      throw new IllegalStateException();
-    while (poolSize_ > 0)
-      wait();
-  }
-
-  /**
-   * Remove all unprocessed tasks from pool queue, and return them in
-   * a java.util.List. Thsi method should be used only when there are
-   * not any active clients of the pool. Otherwise you face the
-   * possibility that the method will loop pulling out tasks as
-   * clients are putting them in.  This method can be useful after
-   * shutting down a pool (via shutdownNow) to determine whether there
-   * are any pending tasks that were not processed.  You can then, for
-   * example execute all unprocessed commands via code along the lines
-   * of:
-   *
-   * <pre>
-   *   List tasks = pool.drain();
-   *   for (Iterator it = tasks.iterator(); it.hasNext();) 
-   *     ( (Runnable)(it.next()) ).run();
-   * </pre>
-   **/
-  public List drain() {
-    boolean wasInterrupted = false;
-    Vector tasks = new Vector();
-    for (;;) {
-      try {
-        Object x = handOff_.poll(0);
-        if (x == null) 
-          break;
-        else
-          tasks.addElement(x);
-      }
-      catch (InterruptedException ex) {
-        wasInterrupted = true; // postpone re-interrupt until drained
-      }
-    }
-    if (wasInterrupted) Thread.currentThread().interrupt();
-    return tasks;
-  }
-  
-  /** 
-   * Cleanup method called upon termination of worker thread.
-   **/
-  protected synchronized void workerDone(Worker w) {
-    threads_.remove(w);
-    if (--poolSize_ == 0 && shutdown_) { 
-      maximumPoolSize_ = minimumPoolSize_ = 0; // disable new threads
-      notifyAll(); // notify awaitTerminationAfterShutdown
-    }
-  }
-
-  /** 
-   * Get a task from the handoff queue, or null if shutting down.
-   **/
-  protected Runnable getTask() throws InterruptedException {
-    long waitTime;
-    synchronized(this) {
-      if (poolSize_ > maximumPoolSize_) // Cause to die if too many threads
-        return null;
-      waitTime = (shutdown_)? 0 : keepAliveTime_;
-    }
-    if (waitTime >= 0) 
-      return (Runnable)(handOff_.poll(waitTime));
-    else 
-      return (Runnable)(handOff_.take());
-  }
-  
-
-  /**
-   * Class defining the basic run loop for pooled threads.
-   **/
-  protected class Worker implements Runnable {
-    protected Runnable firstTask_;
-
-    protected Worker(Runnable firstTask) { firstTask_ = firstTask; }
-
-    public void run() {
-      try {
-        Runnable task = firstTask_;
-        firstTask_ = null; // enable GC
-
-        if (task != null) {
-          task.run();
-          task = null;
-        }
-        
-        while ( (task = getTask()) != null) {
-          task.run();
-          task = null;
-        }
-      }
-      catch (InterruptedException ex) { } // fall through
-      finally {
-        workerDone(this);
-      }
-    }
-  }
-
-  /**
-   * Class for actions to take when execute() blocks. Uses Strategy
-   * pattern to represent different actions. You can add more in
-   * subclasses, and/or create subclasses of these. If so, you will
-   * also want to add or modify the corresponding methods that set the
-   * current blockedExectionHandler_.
-   **/
-  public interface BlockedExecutionHandler {
-    /** 
-     * Return true if successfully handled so, execute should
-     * terminate; else return false if execute loop should be retried.
+    /**
+     * The maximum pool size; used if not otherwise specified.  Default
+     * value is essentially infinite (Integer.MAX_VALUE)
      **/
-    boolean blockedAction(Runnable command) throws InterruptedException;
-  }
+    public static final int DEFAULT_MAXIMUMPOOLSIZE = Integer.MAX_VALUE;
 
-  /** Class defining Run action. **/
-  protected class RunWhenBlocked implements BlockedExecutionHandler {
-    public boolean blockedAction(Runnable command) {
-      command.run();
-      return true;
+    /**
+     * The minimum pool size; used if not otherwise specified.  Default
+     * value is 1.
+     **/
+    public static final int DEFAULT_MINIMUMPOOLSIZE = 1;
+
+    /**
+     * The maximum time to keep worker threads alive waiting for new
+     * tasks; used if not otherwise specified. Default value is one
+     * minute (60000 milliseconds).
+     **/
+    public static final long DEFAULT_KEEPALIVETIME = 60 * 1000;
+
+    /** The maximum number of threads allowed in pool. **/
+    protected int maximumPoolSize_ = DEFAULT_MAXIMUMPOOLSIZE;
+
+    /** The minumum number of threads to maintain in pool. **/
+    protected int minimumPoolSize_ = DEFAULT_MINIMUMPOOLSIZE;
+
+    /**  Current pool size.  **/
+    protected int poolSize_ = 0;
+
+    /** The maximum time for an idle thread to wait for new task. **/
+    protected long keepAliveTime_ = DEFAULT_KEEPALIVETIME;
+
+    /**
+     * Shutdown flag - latches true when a shutdown method is called
+     * in order to disable queuing/handoffs of new tasks.
+     **/
+    protected boolean shutdown_ = false;
+
+    /**
+     * The channel used to hand off the command to a thread in the pool.
+     **/
+    protected final Channel handOff_;
+
+    /**
+     * The set of active threads, declared as a map from workers to
+     * their threads.  This is needed by the interruptAll method.  It
+     * may also be useful in subclasses that need to perform other
+     * thread management chores.
+     **/
+    protected final Map threads_;
+
+    /** The current handler for unserviceable requests. **/
+    protected BlockedExecutionHandler blockedExecutionHandler_;
+
+    /**
+     * Create a new pool with all default settings
+     **/
+
+    public PooledExecutor() {
+        this(new SynchronousChannel(), DEFAULT_MAXIMUMPOOLSIZE);
     }
-  }
 
-  /** 
-   * Set the policy for blocked execution to be that the current
-   * thread executes the command if there are no available threads in
-   * the pool.
-   **/
-  public void runWhenBlocked() {
-    setBlockedExecutionHandler(new RunWhenBlocked());
-  }
+    /**
+     * Create a new pool with all default settings except
+     * for maximum pool size.
+     **/
 
-  /** Class defining Wait action. **/
-  protected class WaitWhenBlocked implements BlockedExecutionHandler {
-    public boolean blockedAction(Runnable command) throws InterruptedException{
-      handOff_.put(command);
-      return true;
+    public PooledExecutor(int maxPoolSize) {
+        this(new SynchronousChannel(), maxPoolSize);
     }
-  }
 
-  /** 
-   * Set the policy for blocked execution to be to wait until a thread
-   * is available.
-   **/
-  public void waitWhenBlocked() {
-    setBlockedExecutionHandler(new WaitWhenBlocked());
-  }
+    /**
+     * Create a new pool that uses the supplied Channel for queuing, and
+     * with all default parameter settings.
+     **/
 
-  /** Class defining Discard action. **/
-  protected class DiscardWhenBlocked implements BlockedExecutionHandler {
-    public boolean blockedAction(Runnable command) {
-      return true;
+    public PooledExecutor(Channel channel) {
+        this(channel, DEFAULT_MAXIMUMPOOLSIZE);
     }
-  }
 
-  /** 
-   * Set the policy for blocked execution to be to return without
-   * executing the request.
-   **/
-  public void discardWhenBlocked() {
-    setBlockedExecutionHandler(new DiscardWhenBlocked());
-  }
+    /**
+     * Create a new pool that uses the supplied Channel for queuing, and
+     * with all default parameter settings except for maximum pool size.
+     **/
 
-
-  /** Class defining Abort action. **/
-  protected class AbortWhenBlocked implements BlockedExecutionHandler {
-    public boolean blockedAction(Runnable command) {
-      throw new RuntimeException("Pool is blocked");
+    public PooledExecutor(Channel channel, int maxPoolSize) {
+        maximumPoolSize_ = maxPoolSize;
+        handOff_ = channel;
+        runWhenBlocked();
+        threads_ = new HashMap();
     }
-  }
 
-  /** 
-   * Set the policy for blocked execution to be to
-   * throw a RuntimeException.
-   **/
-  public void abortWhenBlocked() {
-    setBlockedExecutionHandler(new AbortWhenBlocked());
-  }
-
-
-  /**
-   * Class defining DiscardOldest action.  Under this policy, at most
-   * one old unhandled task is discarded.  If the new task can then be
-   * handed off, it is.  Otherwise, the new task is run in the current
-   * thread (i.e., RunWhenBlocked is used as a backup policy.)
-   **/
-  protected class DiscardOldestWhenBlocked implements BlockedExecutionHandler {
-    public boolean blockedAction(Runnable command) throws InterruptedException{
-      handOff_.poll(0);
-      if (!handOff_.offer(command, 0))
-        command.run();
-      return true;
+    /**
+     * Return the maximum number of threads to simultaneously execute
+     * New unqueued requests will be handled according to the current
+     * blocking policy once this limit is exceeded.
+     **/
+    public synchronized int getMaximumPoolSize() {
+        return maximumPoolSize_;
     }
-  }
 
-  /** 
-   * Set the policy for blocked execution to be to discard the oldest
-   * unhandled request
-   **/
-  public void discardOldestWhenBlocked() {
-    setBlockedExecutionHandler(new DiscardOldestWhenBlocked());
-  }
+    /**
+     * Set the maximum number of threads to use. Decreasing the pool
+     * size will not immediately kill existing threads, but they may
+     * later die when idle.
+     * @exception IllegalArgumentException if less or equal to zero.
+     * (It is
+     * not considered an error to set the maximum to be less than than
+     * the minimum. However, in this case there are no guarantees
+     * about behavior.)
+     **/
+    public synchronized void setMaximumPoolSize(int newMaximum) {
+        if (newMaximum <= 0) throw new IllegalArgumentException();
+        maximumPoolSize_ = newMaximum;
+    }
 
-  /**
-   * Arrange for the given command to be executed by a thread in this
-   * pool.  The method normally returns when the command has been
-   * handed off for (possibly later) execution.
-   **/
-  public void execute(Runnable command) throws InterruptedException {
-    for (;;) {
-      synchronized(this) { 
-        if (!shutdown_) {
-          int size = poolSize_;
+    /**
+     * Return the minimum number of threads to simultaneously execute.
+     * (Default value is 1).  If fewer than the mininum number are
+     * running upon reception of a new request, a new thread is started
+     * to handle this request.
+     **/
+    public synchronized int getMinimumPoolSize() {
+        return minimumPoolSize_;
+    }
 
-          // Ensure minimum number of threads
-          if (size < minimumPoolSize_) {
-            addThread(command);
-            return;
-          }
-          
-          // Try to give to existing thread
-          if (handOff_.offer(command, 0)) { 
-            return;
-          }
-          
-          // If cannot handoff and still under maximum, create new thread
-          if (size < maximumPoolSize_) {
-            addThread(command);
-            return;
-          }
+    /**
+     * Set the minimum number of threads to use.
+     * @exception IllegalArgumentException if less than zero. (It is not
+     * considered an error to set the minimum to be greater than the
+     * maximum. However, in this case there are no guarantees about
+     * behavior.)
+     **/
+    public synchronized void setMinimumPoolSize(int newMinimum) {
+        if (newMinimum < 0) throw new IllegalArgumentException();
+        minimumPoolSize_ = newMinimum;
+    }
+
+    /**
+     * Return the current number of active threads in the pool.  This
+     * number is just a snaphot, and may change immediately upon
+     * returning
+     **/
+    public synchronized int getPoolSize() {
+        return poolSize_;
+    }
+
+    /**
+     * Return the number of milliseconds to keep threads alive waiting
+     * for new commands. A negative value means to wait forever. A zero
+     * value means not to wait at all.
+     **/
+    public synchronized long getKeepAliveTime() {
+        return keepAliveTime_;
+    }
+
+    /**
+     * Set the number of milliseconds to keep threads alive waiting for
+     * new commands. A negative value means to wait forever. A zero
+     * value means not to wait at all.
+     **/
+    public synchronized void setKeepAliveTime(long msecs) {
+        keepAliveTime_ = msecs;
+    }
+
+    /** Get the handler for blocked execution **/
+    public synchronized BlockedExecutionHandler getBlockedExecutionHandler() {
+        return blockedExecutionHandler_;
+    }
+
+    /** Set the handler for blocked execution **/
+    public synchronized void setBlockedExecutionHandler(BlockedExecutionHandler h) {
+        blockedExecutionHandler_ = h;
+    }
+
+    /**
+     * Create and start a thread to handle a new command.  Call only
+     * when holding lock.
+     **/
+    protected void addThread(Runnable command) {
+        Worker worker = new Worker(command);
+        Thread thread = getThreadFactory().newThread(worker);
+        threads_.put(worker, thread);
+        ++poolSize_;
+        thread.start();
+    }
+
+    /**
+     * Create and start up to numberOfThreads threads in the pool.
+     * Return the number created. This may be less than the number
+     * requested if creating more would exceed maximum pool size bound.
+     **/
+    public int createThreads(int numberOfThreads) {
+        int ncreated = 0;
+        for (int i = 0; i < numberOfThreads; ++i) {
+            synchronized (this) {
+                if (poolSize_ < maximumPoolSize_) {
+                    addThread(null);
+                    ++ncreated;
+                } else
+                    break;
+            }
         }
-      }
-
-      // Cannot hand off and cannot create -- ask for help
-      if (getBlockedExecutionHandler().blockedAction(command)) {
-        return;
-      }
+        return ncreated;
     }
-  }
+
+    /**
+     * Interrupt all threads in the pool, causing them all to
+     * terminate. Assuming that executed tasks do not disable (clear)
+     * interruptions, each thread will terminate after processing its
+     * current task. Threads will terminate sooner if the executed tasks
+     * themselves respond to interrupts.
+     **/
+    public synchronized void interruptAll() {
+        for (Iterator it = threads_.values().iterator(); it.hasNext();) {
+            Thread t = (Thread) (it.next());
+            t.interrupt();
+        }
+    }
+
+    /**
+     * Interrupt all threads and disable construction of new
+     * threads. Any tasks entered after this point will be discarded. A
+     * shut down pool cannot be restarted.
+     */
+    public void shutdownNow() {
+        shutdownNow(new DiscardWhenBlocked());
+    }
+
+    /**
+     * Interrupt all threads and disable construction of new
+     * threads. Any tasks entered after this point will be handled by
+     * the given BlockedExecutionHandler.  A shut down pool cannot be
+     * restarted.
+     */
+    public synchronized void shutdownNow(BlockedExecutionHandler handler) {
+        setBlockedExecutionHandler(handler);
+        shutdown_ = true; // don't allow new tasks
+        minimumPoolSize_ = maximumPoolSize_ = 0; // don't make new threads
+        interruptAll(); // interrupt all existing threads
+    }
+
+    /**
+     * Terminate threads after processing all elements currently in
+     * queue. Any tasks entered after this point will be discarded. A
+     * shut down pool cannot be restarted.
+     **/
+    public void shutdownAfterProcessingCurrentlyQueuedTasks() {
+        shutdownAfterProcessingCurrentlyQueuedTasks(new DiscardWhenBlocked());
+    }
+
+    /**
+     * Terminate threads after processing all elements currently in
+     * queue. Any tasks entered after this point will be handled by the
+     * given BlockedExecutionHandler.  A shut down pool cannot be
+     * restarted.
+     **/
+    public synchronized void shutdownAfterProcessingCurrentlyQueuedTasks(BlockedExecutionHandler handler) {
+        setBlockedExecutionHandler(handler);
+        shutdown_ = true;
+        if (poolSize_ == 0) // disable new thread construction when idle
+            minimumPoolSize_ = maximumPoolSize_ = 0;
+    }
+
+    /**
+     * Return true if a shutDown method has succeeded in terminating all
+     * threads.
+     */
+    public synchronized boolean isTerminatedAfterShutdown() {
+        return shutdown_ && poolSize_ == 0;
+    }
+
+    /**
+     * Wait for a shutdown pool to fully terminate, or until the timeout
+     * has expired. This method may only be called <em>after</em>
+     * invoking shutdownNow or
+     * shutdownAfterProcessingCurrentlyQueuedTasks.
+     *
+     * @param maxWaitTime  the maximum time in milliseconds to wait
+     * @return true if the pool has terminated within the max wait period
+     * @exception IllegalStateException if shutdown has not been requested
+     * @exception InterruptedException if the current thread has been interrupted in the course of waiting
+     */
+    public synchronized boolean awaitTerminationAfterShutdown(long maxWaitTime) throws InterruptedException {
+        if (!shutdown_)
+            throw new IllegalStateException();
+        if (poolSize_ == 0)
+            return true;
+        long waitTime = maxWaitTime;
+        if (waitTime <= 0)
+            return false;
+        long start = System.currentTimeMillis();
+        for (; ;) {
+            wait(waitTime);
+            if (poolSize_ == 0)
+                return true;
+            waitTime = maxWaitTime - (System.currentTimeMillis() - start);
+            if (waitTime <= 0)
+                return false;
+        }
+    }
+
+    /**
+     * Wait for a shutdown pool to fully terminate.  This method may
+     * only be called <em>after</em> invoking shutdownNow or
+     * shutdownAfterProcessingCurrentlyQueuedTasks.
+     *
+     * @exception IllegalStateException if shutdown has not been requested
+     * @exception InterruptedException if the current thread has been interrupted in the course of waiting
+     */
+    public synchronized void awaitTerminationAfterShutdown() throws InterruptedException {
+        if (!shutdown_)
+            throw new IllegalStateException();
+        while (poolSize_ > 0)
+            wait();
+    }
+
+    /**
+     * Remove all unprocessed tasks from pool queue, and return them in
+     * a java.util.List. Thsi method should be used only when there are
+     * not any active clients of the pool. Otherwise you face the
+     * possibility that the method will loop pulling out tasks as
+     * clients are putting them in.  This method can be useful after
+     * shutting down a pool (via shutdownNow) to determine whether there
+     * are any pending tasks that were not processed.  You can then, for
+     * example execute all unprocessed commands via code along the lines
+     * of:
+     *
+     * <pre>
+     *   List tasks = pool.drain();
+     *   for (Iterator it = tasks.iterator(); it.hasNext();)
+     *     ( (Runnable)(it.next()) ).run();
+     * </pre>
+     **/
+    public List drain() {
+        boolean wasInterrupted = false;
+        Vector tasks = new Vector();
+        for (; ;) {
+            try {
+                Object x = handOff_.poll(0);
+                if (x == null)
+                    break;
+                else
+                    tasks.addElement(x);
+            } catch (InterruptedException ex) {
+                wasInterrupted = true; // postpone re-interrupt until drained
+            }
+        }
+        if (wasInterrupted) Thread.currentThread().interrupt();
+        return tasks;
+    }
+
+    /**
+     * Cleanup method called upon termination of worker thread.
+     **/
+    protected synchronized void workerDone(Worker w) {
+        threads_.remove(w);
+        if (--poolSize_ == 0 && shutdown_) {
+            maximumPoolSize_ = minimumPoolSize_ = 0; // disable new threads
+            notifyAll(); // notify awaitTerminationAfterShutdown
+        }
+    }
+
+    /**
+     * Get a task from the handoff queue, or null if shutting down.
+     **/
+    protected Runnable getTask() throws InterruptedException {
+        long waitTime;
+        synchronized (this) {
+            if (poolSize_ > maximumPoolSize_) // Cause to die if too many threads
+                return null;
+            waitTime = (shutdown_) ? 0 : keepAliveTime_;
+        }
+        if (waitTime >= 0)
+            return (Runnable) (handOff_.poll(waitTime));
+        else
+            return (Runnable) (handOff_.take());
+    }
+
+
+    /**
+     * Class defining the basic run loop for pooled threads.
+     **/
+    protected class Worker implements Runnable {
+        protected Runnable firstTask_;
+
+        protected Worker(Runnable firstTask) {
+            firstTask_ = firstTask;
+        }
+
+        public void run() {
+            try {
+                Runnable task = firstTask_;
+                firstTask_ = null; // enable GC
+
+                if (task != null) {
+                    task.run();
+                    task = null;
+                }
+
+                while ((task = getTask()) != null) {
+                    task.run();
+                    task = null;
+                }
+            } catch (InterruptedException ex) {
+            } // fall through
+            finally {
+                workerDone(this);
+            }
+        }
+    }
+
+    /**
+     * Class for actions to take when execute() blocks. Uses Strategy
+     * pattern to represent different actions. You can add more in
+     * subclasses, and/or create subclasses of these. If so, you will
+     * also want to add or modify the corresponding methods that set the
+     * current blockedExectionHandler_.
+     **/
+    public interface BlockedExecutionHandler {
+        /**
+         * Return true if successfully handled so, execute should
+         * terminate; else return false if execute loop should be retried.
+         **/
+        boolean blockedAction(Runnable command) throws InterruptedException;
+    }
+
+    /** Class defining Run action. **/
+    protected class RunWhenBlocked implements BlockedExecutionHandler {
+        public boolean blockedAction(Runnable command) {
+            command.run();
+            return true;
+        }
+    }
+
+    /**
+     * Set the policy for blocked execution to be that the current
+     * thread executes the command if there are no available threads in
+     * the pool.
+     **/
+    public void runWhenBlocked() {
+        setBlockedExecutionHandler(new RunWhenBlocked());
+    }
+
+    /** Class defining Wait action. **/
+    protected class WaitWhenBlocked implements BlockedExecutionHandler {
+        public boolean blockedAction(Runnable command) throws InterruptedException {
+            handOff_.put(command);
+            return true;
+        }
+    }
+
+    /**
+     * Set the policy for blocked execution to be to wait until a thread
+     * is available.
+     **/
+    public void waitWhenBlocked() {
+        setBlockedExecutionHandler(new WaitWhenBlocked());
+    }
+
+    /** Class defining Discard action. **/
+    protected class DiscardWhenBlocked implements BlockedExecutionHandler {
+        public boolean blockedAction(Runnable command) {
+            return true;
+        }
+    }
+
+    /**
+     * Set the policy for blocked execution to be to return without
+     * executing the request.
+     **/
+    public void discardWhenBlocked() {
+        setBlockedExecutionHandler(new DiscardWhenBlocked());
+    }
+
+
+    /** Class defining Abort action. **/
+    protected class AbortWhenBlocked implements BlockedExecutionHandler {
+        public boolean blockedAction(Runnable command) {
+            throw new RuntimeException("Pool is blocked");
+        }
+    }
+
+    /**
+     * Set the policy for blocked execution to be to
+     * throw a RuntimeException.
+     **/
+    public void abortWhenBlocked() {
+        setBlockedExecutionHandler(new AbortWhenBlocked());
+    }
+
+
+    /**
+     * Class defining DiscardOldest action.  Under this policy, at most
+     * one old unhandled task is discarded.  If the new task can then be
+     * handed off, it is.  Otherwise, the new task is run in the current
+     * thread (i.e., RunWhenBlocked is used as a backup policy.)
+     **/
+    protected class DiscardOldestWhenBlocked implements BlockedExecutionHandler {
+        public boolean blockedAction(Runnable command) throws InterruptedException {
+            handOff_.poll(0);
+            if (!handOff_.offer(command, 0))
+                command.run();
+            return true;
+        }
+    }
+
+    /**
+     * Set the policy for blocked execution to be to discard the oldest
+     * unhandled request
+     **/
+    public void discardOldestWhenBlocked() {
+        setBlockedExecutionHandler(new DiscardOldestWhenBlocked());
+    }
+
+    /**
+     * Arrange for the given command to be executed by a thread in this
+     * pool.  The method normally returns when the command has been
+     * handed off for (possibly later) execution.
+     **/
+    public void execute(Runnable command) throws InterruptedException {
+        for (; ;) {
+            synchronized (this) {
+                if (!shutdown_) {
+                    int size = poolSize_;
+
+                    // Ensure minimum number of threads
+                    if (size < minimumPoolSize_) {
+                        addThread(command);
+                        return;
+                    }
+
+                    // Try to give to existing thread
+                    if (handOff_.offer(command, 0)) {
+                        return;
+                    }
+
+                    // If cannot handoff and still under maximum, create new thread
+                    if (size < maximumPoolSize_) {
+                        addThread(command);
+                        return;
+                    }
+                }
+            }
+
+            // Cannot hand off and cannot create -- ask for help
+            if (getBlockedExecutionHandler().blockedAction(command)) {
+                return;
+            }
+        }
+    }
 }

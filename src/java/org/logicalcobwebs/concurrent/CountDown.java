@@ -14,13 +14,13 @@
 package org.logicalcobwebs.concurrent;
 
 /**
- * A CountDown can serve as a simple one-shot barrier. 
+ * A CountDown can serve as a simple one-shot barrier.
  * A Countdown is initialized
  * with a given count value. Each release decrements the count.
  * All acquires block until the count reaches zero. Upon reaching
- * zero all current acquires are unblocked and all 
+ * zero all current acquires are unblocked and all
  * subsequent acquires pass without blocking. This is a one-shot
- * phenomenon -- the count cannot be reset. 
+ * phenomenon -- the count cannot be reset.
  * If you need a version that resets the count, consider
  * using a Barrier.
  * <p>
@@ -28,7 +28,7 @@ package org.logicalcobwebs.concurrent;
  * a group of worker threads use a countdown to
  * notify a driver when all threads are complete.
  * <pre>
- * class Worker implements Runnable { 
+ * class Worker implements Runnable {
  *   private final CountDown done;
  *   Worker(CountDown d) { done = d; }
  *   public void run() {
@@ -36,87 +36,93 @@ package org.logicalcobwebs.concurrent;
  *    done.release();
  *   }
  * }
- * 
+ *
  * class Driver { // ...
  *   void main() {
  *     CountDown done = new CountDown(N);
- *     for (int i = 0; i < N; ++i) 
+ *     for (int i = 0; i < N; ++i)
  *       new Thread(new Worker(done)).start();
- *     doSomethingElse(); 
+ *     doSomethingElse();
  *     done.acquire(); // wait for all to finish
- *   } 
+ *   }
  * }
  * </pre>
  *
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
  *
-**/
+ **/
 
 public class CountDown implements Sync {
-  protected final int initialCount_;
-  protected int count_;
+    protected final int initialCount_;
+    protected int count_;
 
-  /** Create a new CountDown with given count value **/
-  public CountDown(int count) { count_ = initialCount_ = count; }
-
-  
-  /*
-    This could use double-check, but doesn't out of concern
-    for surprising effects on user programs stemming
-    from lack of memory barriers with lack of synch.
-  */
-  public void acquire() throws InterruptedException {
-    if (Thread.interrupted()) throw new InterruptedException();
-    synchronized(this) {
-      while (count_ > 0) 
-        wait();
+    /** Create a new CountDown with given count value **/
+    public CountDown(int count) {
+        count_ = initialCount_ = count;
     }
-  }
 
 
-  public boolean attempt(long msecs) throws InterruptedException {
-    if (Thread.interrupted()) throw new InterruptedException();
-    synchronized(this) {
-      if (count_ <= 0) 
-        return true;
-      else if (msecs <= 0) 
-        return false;
-      else {
-        long waitTime = msecs;
-        long start = System.currentTimeMillis();
-        for (;;) {
-          wait(waitTime);
-          if (count_ <= 0) 
-            return true;
-          else {
-            waitTime = msecs - (System.currentTimeMillis() - start);
-            if (waitTime <= 0) 
-              return false;
-          }
+    /*
+      This could use double-check, but doesn't out of concern
+      for surprising effects on user programs stemming
+      from lack of memory barriers with lack of synch.
+    */
+    public void acquire() throws InterruptedException {
+        if (Thread.interrupted()) throw new InterruptedException();
+        synchronized (this) {
+            while (count_ > 0)
+                wait();
         }
-      }
     }
-  }
-
-  /**
-   * Decrement the count.
-   * After the initialCount'th release, all current and future
-   * acquires will pass
-   **/
-  public synchronized void release() {
-    if (--count_ == 0) 
-      notifyAll();
-  }
-
-  /** Return the initial count value **/
-  public int initialCount() { return initialCount_; }
 
 
-  /** 
-   * Return the current count value.
-   * This is just a snapshot value, that may change immediately
-   * after returning.
-   **/
-  public synchronized int currentCount() { return count_; }
+    public boolean attempt(long msecs) throws InterruptedException {
+        if (Thread.interrupted()) throw new InterruptedException();
+        synchronized (this) {
+            if (count_ <= 0)
+                return true;
+            else if (msecs <= 0)
+                return false;
+            else {
+                long waitTime = msecs;
+                long start = System.currentTimeMillis();
+                for (; ;) {
+                    wait(waitTime);
+                    if (count_ <= 0)
+                        return true;
+                    else {
+                        waitTime = msecs - (System.currentTimeMillis() - start);
+                        if (waitTime <= 0)
+                            return false;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Decrement the count.
+     * After the initialCount'th release, all current and future
+     * acquires will pass
+     **/
+    public synchronized void release() {
+        if (--count_ == 0)
+            notifyAll();
+    }
+
+    /** Return the initial count value **/
+    public int initialCount() {
+        return initialCount_;
+    }
+
+
+    /**
+     * Return the current count value.
+     * This is just a snapshot value, that may change immediately
+     * after returning.
+     **/
+    public synchronized int currentCount() {
+        return count_;
+    }
 }
 

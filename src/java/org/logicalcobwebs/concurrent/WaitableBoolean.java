@@ -21,107 +21,109 @@ package org.logicalcobwebs.concurrent;
 
 public class WaitableBoolean extends SynchronizedBoolean {
 
-  /** Make a new WaitableBoolean with the given initial value **/
-  public WaitableBoolean(boolean initialValue) { super(initialValue); }
-
-
-  /** 
-   * Make a new WaitableBoolean with the given initial value,
-   * and using the supplied lock.
-   **/
-  public WaitableBoolean(boolean initialValue, Object lock) { 
-    super(initialValue, lock); 
-  }
-
-
-  public boolean set(boolean newValue) { 
-    synchronized (lock_) {
-      lock_.notifyAll();
-      return super.set(newValue);
+    /** Make a new WaitableBoolean with the given initial value **/
+    public WaitableBoolean(boolean initialValue) {
+        super(initialValue);
     }
-  }
 
-  public boolean commit(boolean assumedValue, boolean newValue) {
-    synchronized (lock_) {
-      boolean success = super.commit(assumedValue, newValue);
-      if (success) lock_.notifyAll();
-      return success;
+
+    /**
+     * Make a new WaitableBoolean with the given initial value,
+     * and using the supplied lock.
+     **/
+    public WaitableBoolean(boolean initialValue, Object lock) {
+        super(initialValue, lock);
     }
-  }
 
-  public  boolean complement() { 
-    synchronized (lock_) {
-      lock_.notifyAll();
-      return super.complement();
+
+    public boolean set(boolean newValue) {
+        synchronized (lock_) {
+            lock_.notifyAll();
+            return super.set(newValue);
+        }
     }
-  }
 
-  public  boolean and(boolean b) { 
-    synchronized (lock_) {
-      lock_.notifyAll();
-      return super.and(b);
+    public boolean commit(boolean assumedValue, boolean newValue) {
+        synchronized (lock_) {
+            boolean success = super.commit(assumedValue, newValue);
+            if (success) lock_.notifyAll();
+            return success;
+        }
     }
-  }
 
-  public  boolean or(boolean b) { 
-    synchronized (lock_) {
-      lock_.notifyAll();
-      return super.or(b);
+    public boolean complement() {
+        synchronized (lock_) {
+            lock_.notifyAll();
+            return super.complement();
+        }
     }
-  }
 
-  public  boolean xor(boolean b) { 
-    synchronized (lock_) {
-      lock_.notifyAll();
-      return super.xor(b);
+    public boolean and(boolean b) {
+        synchronized (lock_) {
+            lock_.notifyAll();
+            return super.and(b);
+        }
     }
-  }
 
-  /**
-   * Wait until value is false, then run action if nonnull.
-   * The action is run with the synchronization lock held.
-   **/
-
-  public  void whenFalse(Runnable action) throws InterruptedException {
-    synchronized (lock_) {
-      while (value_) lock_.wait();
-      if (action != null) action.run();
+    public boolean or(boolean b) {
+        synchronized (lock_) {
+            lock_.notifyAll();
+            return super.or(b);
+        }
     }
-  }
 
-  /**
-   * wait until value is true, then run action if nonnull.
-   * The action is run with the synchronization lock held.
-   **/
-  public  void whenTrue(Runnable action) throws InterruptedException {
-    synchronized (lock_) {
-      while (!value_) lock_.wait();
-      if (action != null) action.run();
+    public boolean xor(boolean b) {
+        synchronized (lock_) {
+            lock_.notifyAll();
+            return super.xor(b);
+        }
     }
-  }
 
-  /**
-   * Wait until value equals c, then run action if nonnull.
-   * The action is run with the synchronization lock held.
-   **/
+    /**
+     * Wait until value is false, then run action if nonnull.
+     * The action is run with the synchronization lock held.
+     **/
 
-  public  void whenEqual(boolean c, Runnable action) throws InterruptedException {
-    synchronized (lock_) {
-      while (!(value_ == c)) lock_.wait();
-      if (action != null) action.run();
+    public void whenFalse(Runnable action) throws InterruptedException {
+        synchronized (lock_) {
+            while (value_) lock_.wait();
+            if (action != null) action.run();
+        }
     }
-  }
 
-  /**
-   * wait until value not equal to c, then run action if nonnull.
-   * The action is run with the synchronization lock held.
-   **/
-  public  void whenNotEqual(boolean c, Runnable action) throws InterruptedException {
-    synchronized (lock_) {
-      while (!(value_ != c)) lock_.wait();
-      if (action != null) action.run();
+    /**
+     * wait until value is true, then run action if nonnull.
+     * The action is run with the synchronization lock held.
+     **/
+    public void whenTrue(Runnable action) throws InterruptedException {
+        synchronized (lock_) {
+            while (!value_) lock_.wait();
+            if (action != null) action.run();
+        }
     }
-  }
+
+    /**
+     * Wait until value equals c, then run action if nonnull.
+     * The action is run with the synchronization lock held.
+     **/
+
+    public void whenEqual(boolean c, Runnable action) throws InterruptedException {
+        synchronized (lock_) {
+            while (!(value_ == c)) lock_.wait();
+            if (action != null) action.run();
+        }
+    }
+
+    /**
+     * wait until value not equal to c, then run action if nonnull.
+     * The action is run with the synchronization lock held.
+     **/
+    public void whenNotEqual(boolean c, Runnable action) throws InterruptedException {
+        synchronized (lock_) {
+            while (!(value_ != c)) lock_.wait();
+            if (action != null) action.run();
+        }
+    }
 
 }
 

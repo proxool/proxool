@@ -24,8 +24,8 @@ package org.logicalcobwebs.concurrent;
  **/
 
 public interface ThreadFactory {
-  /** 
-   * Create a new thread that will run the given command when started
-   **/
-  public Thread newThread(Runnable command);
+    /**
+     * Create a new thread that will run the given command when started
+     **/
+    public Thread newThread(Runnable command);
 }

@@ -21,151 +21,157 @@ package org.logicalcobwebs.concurrent;
 
 public class SynchronizedDouble extends SynchronizedVariable implements Comparable, Cloneable {
 
-  protected double value_;
+    protected double value_;
 
-  /** 
-   * Make a new SynchronizedDouble with the given initial value,
-   * and using its own internal lock.
-   **/
-  public SynchronizedDouble(double initialValue) { 
-    super(); 
-    value_ = initialValue; 
-  }
-
-  /** 
-   * Make a new SynchronizedDouble with the given initial value,
-   * and using the supplied lock.
-   **/
-  public SynchronizedDouble(double initialValue, Object lock) { 
-    super(lock); 
-    value_ = initialValue; 
-  }
-
-  /** 
-   * Return the current value 
-   **/
-  public final double get() { synchronized(lock_) { return value_; } }
-
-  /** 
-   * Set to newValue.
-   * @return the old value 
-   **/
-
-  public double set(double newValue) { 
-    synchronized (lock_) {
-      double old = value_;
-      value_ = newValue; 
-      return old;
+    /**
+     * Make a new SynchronizedDouble with the given initial value,
+     * and using its own internal lock.
+     **/
+    public SynchronizedDouble(double initialValue) {
+        super();
+        value_ = initialValue;
     }
-  }
 
-  /**
-   * Set value to newValue only if it is currently assumedValue.
-   * @return true if successful
-   **/
-  public boolean commit(double assumedValue, double newValue) {
-    synchronized(lock_) {
-      boolean success = (assumedValue == value_);
-      if (success) value_ = newValue;
-      return success;
+    /**
+     * Make a new SynchronizedDouble with the given initial value,
+     * and using the supplied lock.
+     **/
+    public SynchronizedDouble(double initialValue, Object lock) {
+        super(lock);
+        value_ = initialValue;
     }
-  }
 
-
-  /** 
-   * Atomically swap values with another SynchronizedDouble.
-   * Uses identityHashCode to avoid deadlock when
-   * two SynchronizedDoubles attempt to simultaneously swap with each other.
-   * (Note: Ordering via identyHashCode is not strictly guaranteed
-   * by the language specification to return unique, orderable
-   * values, but in practice JVMs rely on them being unique.)
-   * @return the new value 
-   **/
-
-  public double swap(SynchronizedDouble other) {
-    if (other == this) return get();
-    SynchronizedDouble fst = this;
-    SynchronizedDouble snd = other;
-    if (System.identityHashCode(fst) > System.identityHashCode(snd)) {
-      fst = other;
-      snd = this;
+    /**
+     * Return the current value
+     **/
+    public final double get() {
+        synchronized (lock_) {
+            return value_;
+        }
     }
-    synchronized(fst.lock_) {
-      synchronized(snd.lock_) {
-        fst.set(snd.set(fst.get()));
-        return get();
-      }
+
+    /**
+     * Set to newValue.
+     * @return the old value
+     **/
+
+    public double set(double newValue) {
+        synchronized (lock_) {
+            double old = value_;
+            value_ = newValue;
+            return old;
+        }
     }
-  }
 
-
-  /** 
-   * Add amount to value (i.e., set value += amount)
-   * @return the new value 
-   **/
-  public double add(double amount) { 
-    synchronized (lock_) {
-      return value_ += amount; 
+    /**
+     * Set value to newValue only if it is currently assumedValue.
+     * @return true if successful
+     **/
+    public boolean commit(double assumedValue, double newValue) {
+        synchronized (lock_) {
+            boolean success = (assumedValue == value_);
+            if (success) value_ = newValue;
+            return success;
+        }
     }
-  }
 
-  /** 
-   * Subtract amount from value (i.e., set value -= amount)
-   * @return the new value 
-   **/
-  public double subtract(double amount) { 
-    synchronized (lock_) {
-      return value_ -= amount; 
+
+    /**
+     * Atomically swap values with another SynchronizedDouble.
+     * Uses identityHashCode to avoid deadlock when
+     * two SynchronizedDoubles attempt to simultaneously swap with each other.
+     * (Note: Ordering via identyHashCode is not strictly guaranteed
+     * by the language specification to return unique, orderable
+     * values, but in practice JVMs rely on them being unique.)
+     * @return the new value
+     **/
+
+    public double swap(SynchronizedDouble other) {
+        if (other == this) return get();
+        SynchronizedDouble fst = this;
+        SynchronizedDouble snd = other;
+        if (System.identityHashCode(fst) > System.identityHashCode(snd)) {
+            fst = other;
+            snd = this;
+        }
+        synchronized (fst.lock_) {
+            synchronized (snd.lock_) {
+                fst.set(snd.set(fst.get()));
+                return get();
+            }
+        }
     }
-  }
 
-  /** 
-   * Multiply value by factor (i.e., set value *= factor)
-   * @return the new value 
-   **/
-  public synchronized double multiply(double factor) { 
-    synchronized (lock_) {
-      return value_ *= factor; 
+
+    /**
+     * Add amount to value (i.e., set value += amount)
+     * @return the new value
+     **/
+    public double add(double amount) {
+        synchronized (lock_) {
+            return value_ += amount;
+        }
     }
-  }
 
-  /** 
-   * Divide value by factor (i.e., set value /= factor)
-   * @return the new value 
-   **/
-  public double divide(double factor) { 
-    synchronized (lock_) {
-      return value_ /= factor; 
+    /**
+     * Subtract amount from value (i.e., set value -= amount)
+     * @return the new value
+     **/
+    public double subtract(double amount) {
+        synchronized (lock_) {
+            return value_ -= amount;
+        }
     }
-  }
 
-  public int compareTo(double other) {
-    double val = get();
-    return (val < other)? -1 : (val == other)? 0 : 1;
-  }
+    /**
+     * Multiply value by factor (i.e., set value *= factor)
+     * @return the new value
+     **/
+    public synchronized double multiply(double factor) {
+        synchronized (lock_) {
+            return value_ *= factor;
+        }
+    }
 
-  public int compareTo(SynchronizedDouble other) {
-    return compareTo(other.get());
-  }
+    /**
+     * Divide value by factor (i.e., set value /= factor)
+     * @return the new value
+     **/
+    public double divide(double factor) {
+        synchronized (lock_) {
+            return value_ /= factor;
+        }
+    }
 
-  public int compareTo(Object other) {
-    return compareTo((SynchronizedDouble)other);
-  }
+    public int compareTo(double other) {
+        double val = get();
+        return (val < other) ? -1 : (val == other) ? 0 : 1;
+    }
 
-  public boolean equals(Object other) {
-    if (other != null &&
-        other instanceof SynchronizedDouble)
-      return get() == ((SynchronizedDouble)other).get();
-    else
-      return false;
-  }
+    public int compareTo(SynchronizedDouble other) {
+        return compareTo(other.get());
+    }
 
-  public int hashCode() { // same hash as Double
-    long bits = Double.doubleToLongBits(get());
-    return (int)(bits ^ (bits >> 32));
-  }
+    public int compareTo(Object other) {
+        return compareTo((SynchronizedDouble) other);
+    }
 
-  public String toString() { return String.valueOf(get()); }
+    public boolean equals(Object other) {
+        if (other != null &&
+                other instanceof SynchronizedDouble)
+            return get() == ((SynchronizedDouble) other).get();
+        else
+            return false;
+    }
+
+    public int hashCode() { // same hash as Double
+        long bits = Double.doubleToLongBits(get());
+        return (int) (bits ^ (bits >> 32));
+    }
+
+    public String toString() {
+        return String.valueOf(get());
+    }
 
 }
 

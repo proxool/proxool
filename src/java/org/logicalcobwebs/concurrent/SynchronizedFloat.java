@@ -21,150 +21,156 @@ package org.logicalcobwebs.concurrent;
 
 public class SynchronizedFloat extends SynchronizedVariable implements Comparable, Cloneable {
 
-  protected float value_;
+    protected float value_;
 
-  /** 
-   * Make a new SynchronizedFloat with the given initial value,
-   * and using its own internal lock.
-   **/
-  public SynchronizedFloat(float initialValue) { 
-    super(); 
-    value_ = initialValue; 
-  }
-
-  /** 
-   * Make a new SynchronizedFloat with the given initial value,
-   * and using the supplied lock.
-   **/
-  public SynchronizedFloat(float initialValue, Object lock) { 
-    super(lock); 
-    value_ = initialValue; 
-  }
-
-  /** 
-   * Return the current value 
-   **/
-  public final float get() { synchronized(lock_) { return value_; } }
-
-  /** 
-   * Set to newValue.
-   * @return the old value 
-   **/
-
-  public float set(float newValue) { 
-    synchronized (lock_) {
-      float old = value_;
-      value_ = newValue; 
-      return old;
+    /**
+     * Make a new SynchronizedFloat with the given initial value,
+     * and using its own internal lock.
+     **/
+    public SynchronizedFloat(float initialValue) {
+        super();
+        value_ = initialValue;
     }
-  }
 
-  /**
-   * Set value to newValue only if it is currently assumedValue.
-   * @return true if successful
-   **/
-  public boolean commit(float assumedValue, float newValue) {
-    synchronized(lock_) {
-      boolean success = (assumedValue == value_);
-      if (success) value_ = newValue;
-      return success;
+    /**
+     * Make a new SynchronizedFloat with the given initial value,
+     * and using the supplied lock.
+     **/
+    public SynchronizedFloat(float initialValue, Object lock) {
+        super(lock);
+        value_ = initialValue;
     }
-  }
 
-
-  /** 
-   * Atomically swap values with another SynchronizedFloat.
-   * Uses identityHashCode to avoid deadlock when
-   * two SynchronizedFloats attempt to simultaneously swap with each other.
-   * (Note: Ordering via identyHashCode is not strictly guaranteed
-   * by the language specification to return unique, orderable
-   * values, but in practice JVMs rely on them being unique.)
-   * @return the new value 
-   **/
-
-  public float swap(SynchronizedFloat other) {
-    if (other == this) return get();
-    SynchronizedFloat fst = this;
-    SynchronizedFloat snd = other;
-    if (System.identityHashCode(fst) > System.identityHashCode(snd)) {
-      fst = other;
-      snd = this;
+    /**
+     * Return the current value
+     **/
+    public final float get() {
+        synchronized (lock_) {
+            return value_;
+        }
     }
-    synchronized(fst.lock_) {
-      synchronized(snd.lock_) {
-        fst.set(snd.set(fst.get()));
-        return get();
-      }
+
+    /**
+     * Set to newValue.
+     * @return the old value
+     **/
+
+    public float set(float newValue) {
+        synchronized (lock_) {
+            float old = value_;
+            value_ = newValue;
+            return old;
+        }
     }
-  }
 
-
-  /** 
-   * Add amount to value (i.e., set value += amount)
-   * @return the new value 
-   **/
-  public float add(float amount) { 
-    synchronized (lock_) {
-      return value_ += amount; 
+    /**
+     * Set value to newValue only if it is currently assumedValue.
+     * @return true if successful
+     **/
+    public boolean commit(float assumedValue, float newValue) {
+        synchronized (lock_) {
+            boolean success = (assumedValue == value_);
+            if (success) value_ = newValue;
+            return success;
+        }
     }
-  }
 
-  /** 
-   * Subtract amount from value (i.e., set value -= amount)
-   * @return the new value 
-   **/
-  public float subtract(float amount) { 
-    synchronized (lock_) {
-      return value_ -= amount; 
+
+    /**
+     * Atomically swap values with another SynchronizedFloat.
+     * Uses identityHashCode to avoid deadlock when
+     * two SynchronizedFloats attempt to simultaneously swap with each other.
+     * (Note: Ordering via identyHashCode is not strictly guaranteed
+     * by the language specification to return unique, orderable
+     * values, but in practice JVMs rely on them being unique.)
+     * @return the new value
+     **/
+
+    public float swap(SynchronizedFloat other) {
+        if (other == this) return get();
+        SynchronizedFloat fst = this;
+        SynchronizedFloat snd = other;
+        if (System.identityHashCode(fst) > System.identityHashCode(snd)) {
+            fst = other;
+            snd = this;
+        }
+        synchronized (fst.lock_) {
+            synchronized (snd.lock_) {
+                fst.set(snd.set(fst.get()));
+                return get();
+            }
+        }
     }
-  }
 
-  /** 
-   * Multiply value by factor (i.e., set value *= factor)
-   * @return the new value 
-   **/
-  public synchronized float multiply(float factor) { 
-    synchronized (lock_) {
-      return value_ *= factor; 
+
+    /**
+     * Add amount to value (i.e., set value += amount)
+     * @return the new value
+     **/
+    public float add(float amount) {
+        synchronized (lock_) {
+            return value_ += amount;
+        }
     }
-  }
 
-  /** 
-   * Divide value by factor (i.e., set value /= factor)
-   * @return the new value 
-   **/
-  public float divide(float factor) { 
-    synchronized (lock_) {
-      return value_ /= factor; 
+    /**
+     * Subtract amount from value (i.e., set value -= amount)
+     * @return the new value
+     **/
+    public float subtract(float amount) {
+        synchronized (lock_) {
+            return value_ -= amount;
+        }
     }
-  }
 
-  public int compareTo(float other) {
-    float val = get();
-    return (val < other)? -1 : (val == other)? 0 : 1;
-  }
+    /**
+     * Multiply value by factor (i.e., set value *= factor)
+     * @return the new value
+     **/
+    public synchronized float multiply(float factor) {
+        synchronized (lock_) {
+            return value_ *= factor;
+        }
+    }
 
-  public int compareTo(SynchronizedFloat other) {
-    return compareTo(other.get());
-  }
+    /**
+     * Divide value by factor (i.e., set value /= factor)
+     * @return the new value
+     **/
+    public float divide(float factor) {
+        synchronized (lock_) {
+            return value_ /= factor;
+        }
+    }
 
-  public int compareTo(Object other) {
-    return compareTo((SynchronizedFloat)other);
-  }
+    public int compareTo(float other) {
+        float val = get();
+        return (val < other) ? -1 : (val == other) ? 0 : 1;
+    }
 
-  public boolean equals(Object other) {
-    if (other != null &&
-        other instanceof SynchronizedFloat)
-      return get() == ((SynchronizedFloat)other).get();
-    else
-      return false;
-  }
+    public int compareTo(SynchronizedFloat other) {
+        return compareTo(other.get());
+    }
 
-  public int hashCode() {
-    return Float.floatToIntBits(get());
-  }
+    public int compareTo(Object other) {
+        return compareTo((SynchronizedFloat) other);
+    }
 
-  public String toString() { return String.valueOf(get()); }
+    public boolean equals(Object other) {
+        if (other != null &&
+                other instanceof SynchronizedFloat)
+            return get() == ((SynchronizedFloat) other).get();
+        else
+            return false;
+    }
+
+    public int hashCode() {
+        return Float.floatToIntBits(get());
+    }
+
+    public String toString() {
+        return String.valueOf(get());
+    }
 
 }
 

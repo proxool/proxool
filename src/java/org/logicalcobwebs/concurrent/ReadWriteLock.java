@@ -23,7 +23,7 @@ package org.logicalcobwebs.concurrent;
  * plain Sync locks or synchronized methods in cases where:
  * <ul>
  *   <li> The methods in a class can be cleanly separated into
- *        those that only access (read) data vs those that 
+ *        those that only access (read) data vs those that
  *        modify (write).
  *   <li> Target applications generally have more readers than writers.
  *   <li> The methods are relatively time-consuming (as a rough
@@ -31,11 +31,11 @@ package org.logicalcobwebs.concurrent;
  *        pays to introduce a bit more overhead associated with
  *        ReadWrite locks compared to simple synchronized methods etc
  *        in order to allow concurrency among reader threads.
- *        
+ *
  * </ul>
  * Different implementation classes differ in policies surrounding
  * which threads to prefer when there is
- * contention. By far, the most commonly useful policy is 
+ * contention. By far, the most commonly useful policy is
  * WriterPreferenceReadWriteLock. The other implementations
  * are targeted for less common, niche applications.
  *<p>
@@ -45,7 +45,7 @@ package org.logicalcobwebs.concurrent;
  *   ReadWriteLock rw;
  *   // ...
  *
- *   public void read() throws InterruptedException { 
+ *   public void read() throws InterruptedException {
  *     rw.readLock().acquire();
  *     try {
  *       // ... do the read
@@ -56,7 +56,7 @@ package org.logicalcobwebs.concurrent;
  *   }
  *
  *
- *   public void write() throws InterruptedException { 
+ *   public void write() throws InterruptedException {
  *     rw.writeLock().acquire();
  *     try {
  *       // ... do the write
@@ -70,13 +70,13 @@ package org.logicalcobwebs.concurrent;
  * @see Sync
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
 
-**/
+ **/
 
 public interface ReadWriteLock {
-  /** get the readLock **/
-  Sync readLock();
+    /** get the readLock **/
+    Sync readLock();
 
-  /** get the writeLock **/
-  Sync writeLock();
+    /** get the writeLock **/
+    Sync writeLock();
 }
 

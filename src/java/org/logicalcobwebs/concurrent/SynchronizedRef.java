@@ -12,7 +12,7 @@
 */
 
 package org.logicalcobwebs.concurrent;
-import java.io.*;
+
 
 /**
  * A simple class maintaining a single reference variable that
@@ -22,83 +22,87 @@ import java.io.*;
  **/
 
 public class SynchronizedRef extends SynchronizedVariable {
-  /** The maintained reference **/
-  protected Object value_;
+    /** The maintained reference **/
+    protected Object value_;
 
-  /** 
-   * Create a SynchronizedRef initially holding the given reference 
-   * and using its own internal lock.
-   **/
-  public SynchronizedRef(Object initialValue) { 
-    super();
-    value_ = initialValue; 
-  }
-
-  /** 
-   * Make a new SynchronizedRef with the given initial value,
-   * and using the supplied lock.
-   **/
-  public SynchronizedRef(Object initialValue, Object lock) { 
-    super(lock); 
-    value_ = initialValue; 
-  }
-
-  /** 
-   * Return the current value 
-   **/
-  public final Object get() { synchronized(lock_) { return value_; } }
-
-  /** 
-   * Set to newValue.
-   * @return the old value 
-   **/
-
-  public Object set(Object newValue) { 
-    synchronized (lock_) {
-      Object old = value_;
-      value_ = newValue; 
-      return old;
+    /**
+     * Create a SynchronizedRef initially holding the given reference
+     * and using its own internal lock.
+     **/
+    public SynchronizedRef(Object initialValue) {
+        super();
+        value_ = initialValue;
     }
-  }
 
-  /**
-   * Set value to newValue only if it is currently assumedValue.
-   * @return true if successful
-   **/
-  public boolean commit(Object assumedValue, Object newValue) {
-    synchronized(lock_) {
-      boolean success = (assumedValue == value_);
-      if (success) value_ = newValue;
-      return success;
+    /**
+     * Make a new SynchronizedRef with the given initial value,
+     * and using the supplied lock.
+     **/
+    public SynchronizedRef(Object initialValue, Object lock) {
+        super(lock);
+        value_ = initialValue;
     }
-  }
 
-
-  /** 
-   * Atomically swap values with another SynchronizedRef.
-   * Uses identityHashCode to avoid deadlock when
-   * two SynchronizedRefs attempt to simultaneously swap with each other.
-   * (Note: Ordering via identyHashCode is not strictly guaranteed
-   * by the language specification to return unique, orderable
-   * values, but in practice JVMs rely on them being unique.)
-   * @return the new value 
-   **/
-
-  public Object swap(SynchronizedRef other) {
-    if (other == this) return get();
-    SynchronizedRef fst = this;
-    SynchronizedRef snd = other;
-    if (System.identityHashCode(fst) > System.identityHashCode(snd)) {
-      fst = other;
-      snd = this;
+    /**
+     * Return the current value
+     **/
+    public final Object get() {
+        synchronized (lock_) {
+            return value_;
+        }
     }
-    synchronized(fst.lock_) {
-      synchronized(snd.lock_) {
-        fst.set(snd.set(fst.get()));
-        return get();
-      }
+
+    /**
+     * Set to newValue.
+     * @return the old value
+     **/
+
+    public Object set(Object newValue) {
+        synchronized (lock_) {
+            Object old = value_;
+            value_ = newValue;
+            return old;
+        }
     }
-  }
+
+    /**
+     * Set value to newValue only if it is currently assumedValue.
+     * @return true if successful
+     **/
+    public boolean commit(Object assumedValue, Object newValue) {
+        synchronized (lock_) {
+            boolean success = (assumedValue == value_);
+            if (success) value_ = newValue;
+            return success;
+        }
+    }
+
+
+    /**
+     * Atomically swap values with another SynchronizedRef.
+     * Uses identityHashCode to avoid deadlock when
+     * two SynchronizedRefs attempt to simultaneously swap with each other.
+     * (Note: Ordering via identyHashCode is not strictly guaranteed
+     * by the language specification to return unique, orderable
+     * values, but in practice JVMs rely on them being unique.)
+     * @return the new value
+     **/
+
+    public Object swap(SynchronizedRef other) {
+        if (other == this) return get();
+        SynchronizedRef fst = this;
+        SynchronizedRef snd = other;
+        if (System.identityHashCode(fst) > System.identityHashCode(snd)) {
+            fst = other;
+            snd = this;
+        }
+        synchronized (fst.lock_) {
+            synchronized (snd.lock_) {
+                fst.set(snd.set(fst.get()));
+                return get();
+            }
+        }
+    }
 
 
 }

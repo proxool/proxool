@@ -14,11 +14,11 @@
 
 package org.logicalcobwebs.concurrent;
 
-/** 
+/**
  * Main interface for buffers, queues, pipes, conduits, etc.
  * <p>
  * A Channel represents anything that you can put items
- * into and take them out of. As with the Sync 
+ * into and take them out of. As with the Sync
  * interface, both
  * blocking (put(x), take),
  * and timeouts (offer(x, msecs), poll(msecs)) policies
@@ -70,22 +70,22 @@ package org.logicalcobwebs.concurrent;
  * A given channel implementation might or might not have bounded
  * capacity or other insertion constraints, so in general, you cannot tell if
  * a given put will block. However,
- * Channels that are designed to 
+ * Channels that are designed to
  * have an element capacity (and so always block when full)
- * should implement the 
- * BoundedChannel 
+ * should implement the
+ * BoundedChannel
  * subinterface.
  * <p>
  * Channels may hold any kind of item. However,
  * insertion of null is not in general supported. Implementations
  * may (all currently do) throw IllegalArgumentExceptions upon attempts to
- * insert null. 
+ * insert null.
  * <p>
  * By design, the Channel interface does not support any methods to determine
  * the current number of elements being held in the channel.
  * This decision reflects the fact that in
  * concurrent programming, such methods are so rarely useful
- * that including them invites misuse; at best they could 
+ * that including them invites misuse; at best they could
  * provide a snapshot of current
  * state, that could change immediately after being reported.
  * It is better practice to instead use poll and offer to try
@@ -126,11 +126,11 @@ package org.logicalcobwebs.concurrent;
  * All channels allow multiple producers and/or consumers.
  * They do not support any kind of <em>close</em> method
  * to shut down operation or indicate completion of particular
- * producer or consumer threads. 
+ * producer or consumer threads.
  * If you need to signal completion, one way to do it is to
  * create a class such as
  * <pre>
- * class EndOfStream { 
+ * class EndOfStream {
  *    // Application-dependent field/methods
  * }
  * </pre>
@@ -139,13 +139,13 @@ package org.logicalcobwebs.concurrent;
  * check this via
  * <pre>
  *   Object x = aChannel.take();
- *   if (x instanceof EndOfStream) 
+ *   if (x instanceof EndOfStream)
  *     // special actions; perhaps terminate
  *   else
  *     // process normally
  * </pre>
  * <p>
- * In time-out based methods (poll(msecs) and offer(x, msecs), 
+ * In time-out based methods (poll(msecs) and offer(x, msecs),
  * time bounds are interpreted in
  * a coarse-grained, best-effort fashion. Since there is no
  * way in Java to escape out of a wait for a synchronized
@@ -159,16 +159,16 @@ package org.logicalcobwebs.concurrent;
  * in all methods. Normally, InterruptionExceptions are thrown
  * in put/take and offer(msec)/poll(msec) if interruption
  * is detected upon entry to the method, as well as in any
- * later context surrounding waits. 
+ * later context surrounding waits.
  * <p>
  * If a put returns normally, an offer
  * returns true, or a put or poll returns non-null, the operation
- * completed successfully. 
+ * completed successfully.
  * In all other cases, the operation fails cleanly -- the
  * element is not put or taken.
  * <p>
  * As with Sync classes, spinloops are not directly supported,
- * are not particularly recommended for routine use, but are not hard 
+ * are not particularly recommended for routine use, but are not hard
  * to construct. For example, here is an exponential backoff version:
  * <pre>
  * Object backOffTake(Channel q) throws InterruptedException {
@@ -190,11 +190,11 @@ package org.logicalcobwebs.concurrent;
  * <pre>
  * class Service {
  *   private final Channel channel = ... some Channel implementation;
- *  
+ *
  *   private void backgroundTask(int taskParam) { ... }
  *
  *   public void action(final int arg) {
- *     Runnable command = 
+ *     Runnable command =
  *       new Runnable() {
  *         public void run() { backgroundTask(arg); }
  *       };
@@ -203,9 +203,9 @@ package org.logicalcobwebs.concurrent;
  *       Thread.currentThread().interrupt(); // ignore but propagate
  *     }
  *   }
- * 
+ *
  *   public Service() {
- *     Runnable backgroundLoop = 
+ *     Runnable backgroundLoop =
  *       new Runnable() {
  *         public void run() {
  *           for (;;) {
@@ -220,85 +220,85 @@ package org.logicalcobwebs.concurrent;
  *     new Thread(backgroundLoop).start();
  *   }
  * }
- *    
+ *
  * </pre>
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
- * @see Sync 
- * @see BoundedChannel 
-**/
+ * @see Sync
+ * @see BoundedChannel
+ **/
 
 public interface Channel extends Puttable, Takable {
 
-  /** 
-   * Place item in the channel, possibly waiting indefinitely until
-   * it can be accepted. Channels implementing the BoundedChannel
-   * subinterface are generally guaranteed to block on puts upon
-   * reaching capacity, but other implementations may or may not block.
-   * @param item the element to be inserted. Should be non-null.
-   * @exception InterruptedException if the current thread has
-   * been interrupted at a point at which interruption
-   * is detected, in which case the element is guaranteed not
-   * to be inserted. Otherwise, on normal return, the element is guaranteed
-   * to have been inserted.
-  **/
-  public void put(Object item) throws InterruptedException;
+    /**
+     * Place item in the channel, possibly waiting indefinitely until
+     * it can be accepted. Channels implementing the BoundedChannel
+     * subinterface are generally guaranteed to block on puts upon
+     * reaching capacity, but other implementations may or may not block.
+     * @param item the element to be inserted. Should be non-null.
+     * @exception InterruptedException if the current thread has
+     * been interrupted at a point at which interruption
+     * is detected, in which case the element is guaranteed not
+     * to be inserted. Otherwise, on normal return, the element is guaranteed
+     * to have been inserted.
+     **/
+    public void put(Object item) throws InterruptedException;
 
-  /** 
-   * Place item in channel only if it can be accepted within
-   * msecs milliseconds. The time bound is interpreted in
-   * a coarse-grained, best-effort fashion. 
-   * @param item the element to be inserted. Should be non-null.
-   * @param msecs the number of milliseconds to wait. If less than
-   * or equal to zero, the method does not perform any timed waits,
-   * but might still require
-   * access to a synchronization lock, which can impose unbounded
-   * delay if there is a lot of contention for the channel.
-   * @return true if accepted, else false
-   * @exception InterruptedException if the current thread has
-   * been interrupted at a point at which interruption
-   * is detected, in which case the element is guaranteed not
-   * to be inserted (i.e., is equivalent to a false return).
-  **/
-  public boolean offer(Object item, long msecs) throws InterruptedException;
+    /**
+     * Place item in channel only if it can be accepted within
+     * msecs milliseconds. The time bound is interpreted in
+     * a coarse-grained, best-effort fashion.
+     * @param item the element to be inserted. Should be non-null.
+     * @param msecs the number of milliseconds to wait. If less than
+     * or equal to zero, the method does not perform any timed waits,
+     * but might still require
+     * access to a synchronization lock, which can impose unbounded
+     * delay if there is a lot of contention for the channel.
+     * @return true if accepted, else false
+     * @exception InterruptedException if the current thread has
+     * been interrupted at a point at which interruption
+     * is detected, in which case the element is guaranteed not
+     * to be inserted (i.e., is equivalent to a false return).
+     **/
+    public boolean offer(Object item, long msecs) throws InterruptedException;
 
-  /** 
-   * Return and remove an item from channel, 
-   * possibly waiting indefinitely until
-   * such an item exists.
-   * @return  some item from the channel. Different implementations
-   *  may guarantee various properties (such as FIFO) about that item
-   * @exception InterruptedException if the current thread has
-   * been interrupted at a point at which interruption
-   * is detected, in which case state of the channel is unchanged.
-   *
-  **/
-  public Object take() throws InterruptedException;
+    /**
+     * Return and remove an item from channel,
+     * possibly waiting indefinitely until
+     * such an item exists.
+     * @return  some item from the channel. Different implementations
+     *  may guarantee various properties (such as FIFO) about that item
+     * @exception InterruptedException if the current thread has
+     * been interrupted at a point at which interruption
+     * is detected, in which case state of the channel is unchanged.
+     *
+     **/
+    public Object take() throws InterruptedException;
 
 
-  /** 
-   * Return and remove an item from channel only if one is available within
-   * msecs milliseconds. The time bound is interpreted in a coarse
-   * grained, best-effort fashion.
-   * @param msecs the number of milliseconds to wait. If less than
-   *  or equal to zero, the operation does not perform any timed waits,
-   * but might still require
-   * access to a synchronization lock, which can impose unbounded
-   * delay if there is a lot of contention for the channel.
-   * @return some item, or null if the channel is empty.
-   * @exception InterruptedException if the current thread has
-   * been interrupted at a point at which interruption
-   * is detected, in which case state of the channel is unchanged
-   * (i.e., equivalent to a null return).
-  **/
+    /**
+     * Return and remove an item from channel only if one is available within
+     * msecs milliseconds. The time bound is interpreted in a coarse
+     * grained, best-effort fashion.
+     * @param msecs the number of milliseconds to wait. If less than
+     *  or equal to zero, the operation does not perform any timed waits,
+     * but might still require
+     * access to a synchronization lock, which can impose unbounded
+     * delay if there is a lot of contention for the channel.
+     * @return some item, or null if the channel is empty.
+     * @exception InterruptedException if the current thread has
+     * been interrupted at a point at which interruption
+     * is detected, in which case state of the channel is unchanged
+     * (i.e., equivalent to a null return).
+     **/
 
-  public Object poll(long msecs) throws InterruptedException;
+    public Object poll(long msecs) throws InterruptedException;
 
-  /**
-   * Return, but do not remove object at head of Channel,
-   * or null if it is empty.
-   **/
+    /**
+     * Return, but do not remove object at head of Channel,
+     * or null if it is empty.
+     **/
 
-  public Object peek();
+    public Object peek();
 
 }
 

@@ -12,7 +12,9 @@
 */
 
 package org.logicalcobwebs.concurrent;
-import java.util.*;
+
+import java.util.Comparator;
+import java.util.SortedSet;
 
 /**
  * SyncSortedSets wrap Sync-based control around java.util.SortedSets.
@@ -20,105 +22,99 @@ import java.util.*;
  * SyncCollection: comparator, subSet, headSet, tailSet, first, last.
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
  * @see SyncCollection
-**/
+ **/
 
 
 public class SyncSortedSet extends SyncSet implements SortedSet {
 
-  /**
-   * Create a new SyncSortedSet protecting the given collection,
-   * and using the given sync to control both reader and writer methods.
-   * Common, reasonable choices for the sync argument include
-   * Mutex, ReentrantLock, and Semaphores initialized to 1.
-   **/
-  public SyncSortedSet(SortedSet set, Sync sync) {
-    super (set, sync);
-  }
-
-  /**
-   * Create a new SyncSortedSet protecting the given set,
-   * and using the given ReadWriteLock to control reader and writer methods.
-   **/
-  public SyncSortedSet(SortedSet set, ReadWriteLock rwl) {
-    super (set, rwl.readLock(), rwl.writeLock());
-  }
-
-  /**
-   * Create a new SyncSortedSet protecting the given set,
-   * and using the given pair of locks to control reader and writer methods.
-   **/
-  public SyncSortedSet(SortedSet set, Sync readLock, Sync writeLock) {
-    super(set, readLock, writeLock);
-  }
-
-
-  protected SortedSet baseSortedSet() {
-    return (SortedSet)c_;
-  }
-
-  public Comparator comparator() {
-    boolean wasInterrupted = beforeRead();
-    try {
-      return baseSortedSet().comparator();
+    /**
+     * Create a new SyncSortedSet protecting the given collection,
+     * and using the given sync to control both reader and writer methods.
+     * Common, reasonable choices for the sync argument include
+     * Mutex, ReentrantLock, and Semaphores initialized to 1.
+     **/
+    public SyncSortedSet(SortedSet set, Sync sync) {
+        super(set, sync);
     }
-    finally {
-      afterRead(wasInterrupted);
-    }
-  }
 
-  public Object first() {
-    boolean wasInterrupted = beforeRead();
-    try {
-      return baseSortedSet().first();
+    /**
+     * Create a new SyncSortedSet protecting the given set,
+     * and using the given ReadWriteLock to control reader and writer methods.
+     **/
+    public SyncSortedSet(SortedSet set, ReadWriteLock rwl) {
+        super(set, rwl.readLock(), rwl.writeLock());
     }
-    finally {
-      afterRead(wasInterrupted);
-    }
-  }
 
-  public Object last() {
-    boolean wasInterrupted = beforeRead();
-    try {
-      return baseSortedSet().last();
+    /**
+     * Create a new SyncSortedSet protecting the given set,
+     * and using the given pair of locks to control reader and writer methods.
+     **/
+    public SyncSortedSet(SortedSet set, Sync readLock, Sync writeLock) {
+        super(set, readLock, writeLock);
     }
-    finally {
-      afterRead(wasInterrupted);
-    }
-  }
 
 
-  public SortedSet subSet(Object fromElement, Object toElement) {
-    boolean wasInterrupted = beforeRead();
-    try {
-      return new SyncSortedSet(baseSortedSet().subSet(fromElement, toElement),
-                               rd_, wr_);
+    protected SortedSet baseSortedSet() {
+        return (SortedSet) c_;
     }
-    finally {
-      afterRead(wasInterrupted);
-    }
-  }
 
-  public SortedSet headSet(Object toElement) {
-    boolean wasInterrupted = beforeRead();
-    try {
-      return new SyncSortedSet(baseSortedSet().headSet(toElement),
-                               rd_, wr_);
+    public Comparator comparator() {
+        boolean wasInterrupted = beforeRead();
+        try {
+            return baseSortedSet().comparator();
+        } finally {
+            afterRead(wasInterrupted);
+        }
     }
-    finally {
-      afterRead(wasInterrupted);
-    }
-  }
 
-  public SortedSet tailSet(Object fromElement) {
-    boolean wasInterrupted = beforeRead();
-    try {
-      return new SyncSortedSet(baseSortedSet().tailSet(fromElement),
-                               rd_, wr_);
+    public Object first() {
+        boolean wasInterrupted = beforeRead();
+        try {
+            return baseSortedSet().first();
+        } finally {
+            afterRead(wasInterrupted);
+        }
     }
-    finally {
-      afterRead(wasInterrupted);
+
+    public Object last() {
+        boolean wasInterrupted = beforeRead();
+        try {
+            return baseSortedSet().last();
+        } finally {
+            afterRead(wasInterrupted);
+        }
     }
-  }
+
+
+    public SortedSet subSet(Object fromElement, Object toElement) {
+        boolean wasInterrupted = beforeRead();
+        try {
+            return new SyncSortedSet(baseSortedSet().subSet(fromElement, toElement),
+                    rd_, wr_);
+        } finally {
+            afterRead(wasInterrupted);
+        }
+    }
+
+    public SortedSet headSet(Object toElement) {
+        boolean wasInterrupted = beforeRead();
+        try {
+            return new SyncSortedSet(baseSortedSet().headSet(toElement),
+                    rd_, wr_);
+        } finally {
+            afterRead(wasInterrupted);
+        }
+    }
+
+    public SortedSet tailSet(Object fromElement) {
+        boolean wasInterrupted = beforeRead();
+        try {
+            return new SyncSortedSet(baseSortedSet().tailSet(fromElement),
+                    rd_, wr_);
+        } finally {
+            afterRead(wasInterrupted);
+        }
+    }
 
 }
 

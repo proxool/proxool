@@ -15,22 +15,22 @@
 package org.logicalcobwebs.concurrent;
 
 /**
- * 
+ *
  * An implementation of Executor that creates a new
  * Thread that invokes the run method of the supplied command.
- * 
+ *
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
  **/
 public class ThreadedExecutor extends ThreadFactoryUser implements Executor {
 
-  /** 
-   * Execute the given command in a new thread.
-   **/
-  public synchronized void execute(Runnable command) throws InterruptedException {
-    if (Thread.interrupted()) 
-      throw new InterruptedException();
+    /**
+     * Execute the given command in a new thread.
+     **/
+    public synchronized void execute(Runnable command) throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
 
-    Thread thread = getThreadFactory().newThread(command);
-    thread.start();
-  }
+        Thread thread = getThreadFactory().newThread(command);
+        thread.start();
+    }
 }

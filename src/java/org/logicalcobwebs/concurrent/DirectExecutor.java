@@ -14,19 +14,19 @@
 package org.logicalcobwebs.concurrent;
 
 /**
- * 
- * An implementation of Executor that 
+ *
+ * An implementation of Executor that
  * invokes the run method of the supplied command and then returns.
- * 
+ *
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
  **/
 public class DirectExecutor implements Executor {
-  /** 
-   * Execute the given command directly in the current thread.
-   **/
-  public void execute(Runnable command) throws InterruptedException {
-    if (Thread.interrupted()) throw new InterruptedException();
+    /**
+     * Execute the given command directly in the current thread.
+     **/
+    public void execute(Runnable command) throws InterruptedException {
+        if (Thread.interrupted()) throw new InterruptedException();
 
-    command.run();
-  }
+        command.run();
+    }
 }

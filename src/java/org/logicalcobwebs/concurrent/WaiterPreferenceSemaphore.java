@@ -26,7 +26,7 @@ package org.logicalcobwebs.concurrent;
  *  The acquire method waits even if there are permits
  *  available but have not yet been claimed by threads that have
  *  been notified but not yet resumed. This makes the semaphore
- *  almost as fair as the underlying Java primitives allow. 
+ *  almost as fair as the underlying Java primitives allow.
  *  So, if synch lock entry and notify are both fair
  *  so is the semaphore -- almost:  Rewaits stemming
  *  from timeouts in attempt, along with potentials for
@@ -39,109 +39,106 @@ package org.logicalcobwebs.concurrent;
  *  and continue before other resumable threads are actually resumed.
  *  However, all of these potential fairness breaches are
  *  very rare in practice unless the underlying JVM
- *  performs strictly LIFO notifications (which has, sadly enough, 
+ *  performs strictly LIFO notifications (which has, sadly enough,
  *  been known to occur) in which case you need to use
  *  a FIFOSemaphore to maintain a reasonable approximation
  *  of fairness.
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
-**/
+ **/
 
 
-public final class WaiterPreferenceSemaphore extends Semaphore  {
+public final class WaiterPreferenceSemaphore extends Semaphore {
 
-  /** 
-   * Create a Semaphore with the given initial number of permits.
-  **/
+    /**
+     * Create a Semaphore with the given initial number of permits.
+     **/
 
-  public WaiterPreferenceSemaphore(long initial) {  super(initial); }
-
-  /** Number of waiting threads **/
-  protected long waits_ = 0;   
-
-  public void acquire() throws InterruptedException {
-    if (Thread.interrupted()) throw new InterruptedException();
-    synchronized(this) {
-      /*
-        Only take if there are more permits than threads waiting
-        for permits. This prevents infinite overtaking.
-      */ 
-      if (permits_ > waits_) { 
-        --permits_;
-        return;
-      }
-      else { 
-        ++waits_;
-        try { 
-          for (;;) {
-            wait(); 
-            if (permits_ > 0) {
-              --waits_;
-              --permits_;
-              return;
-            }
-          }
-        }
-        catch(InterruptedException ex) { 
-          --waits_;
-          notify();
-          throw ex;
-        }
-      }
+    public WaiterPreferenceSemaphore(long initial) {
+        super(initial);
     }
-  }
 
-  public boolean attempt(long msecs) throws InterruptedException {
-    if (Thread.interrupted()) throw new InterruptedException();
+    /** Number of waiting threads **/
+    protected long waits_ = 0;
 
-    synchronized(this) {
-      if (permits_ > waits_) { 
-        --permits_;
-        return true;
-      }
-      else if (msecs <= 0)   
-        return false;
-      else {
-        ++waits_;
-        
-        long startTime = System.currentTimeMillis();
-        long waitTime = msecs;
-        
-        try {
-          for (;;) {
-            wait(waitTime);
-            if (permits_ > 0) {
-              --waits_;
-              --permits_;
-              return true;
+    public void acquire() throws InterruptedException {
+        if (Thread.interrupted()) throw new InterruptedException();
+        synchronized (this) {
+            /*
+              Only take if there are more permits than threads waiting
+              for permits. This prevents infinite overtaking.
+            */
+            if (permits_ > waits_) {
+                --permits_;
+                return;
+            } else {
+                ++waits_;
+                try {
+                    for (; ;) {
+                        wait();
+                        if (permits_ > 0) {
+                            --waits_;
+                            --permits_;
+                            return;
+                        }
+                    }
+                } catch (InterruptedException ex) {
+                    --waits_;
+                    notify();
+                    throw ex;
+                }
             }
-            else { // got a time-out or false-alarm notify
-              waitTime = msecs - (System.currentTimeMillis() - startTime);
-              if (waitTime <= 0) {
-                --waits_;
+        }
+    }
+
+    public boolean attempt(long msecs) throws InterruptedException {
+        if (Thread.interrupted()) throw new InterruptedException();
+
+        synchronized (this) {
+            if (permits_ > waits_) {
+                --permits_;
+                return true;
+            } else if (msecs <= 0)
                 return false;
-              }
+            else {
+                ++waits_;
+
+                long startTime = System.currentTimeMillis();
+                long waitTime = msecs;
+
+                try {
+                    for (; ;) {
+                        wait(waitTime);
+                        if (permits_ > 0) {
+                            --waits_;
+                            --permits_;
+                            return true;
+                        } else { // got a time-out or false-alarm notify
+                            waitTime = msecs - (System.currentTimeMillis() - startTime);
+                            if (waitTime <= 0) {
+                                --waits_;
+                                return false;
+                            }
+                        }
+                    }
+                } catch (InterruptedException ex) {
+                    --waits_;
+                    notify();
+                    throw ex;
+                }
             }
-          }
         }
-        catch(InterruptedException ex) { 
-          --waits_;
-          notify();
-          throw ex;
-        }
-      }
     }
-  }
 
-  public synchronized void release() {
-    ++permits_;
-    notify();
-  }
+    public synchronized void release() {
+        ++permits_;
+        notify();
+    }
 
-  /** Release N permits **/
-  public synchronized void release(long n) {
-    permits_ += n;
-    for (long i = 0; i < n; ++i) notify();
-  }
+    /** Release N permits **/
+    public synchronized void release(long n) {
+        permits_ += n;
+        for (long i = 0; i < n; ++i) notify();
+    }
 
 }
 

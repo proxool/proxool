@@ -13,7 +13,8 @@
 */
 
 package org.logicalcobwebs.concurrent;
-import java.lang.reflect.*;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * A one-slot buffer, using semaphores to control access.
@@ -26,57 +27,57 @@ import java.lang.reflect.*;
  * and returned by various threads.
  *
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
-**/
+ **/
 
 public class Slot extends SemaphoreControlledChannel {
 
-  /**
-   * Create a buffer with the given capacity, using
-   * the supplied Semaphore class for semaphores.
-   * @exception NoSuchMethodException If class does not have constructor 
-   * that intializes permits
-   * @exception SecurityException if constructor information 
-   * not accessible
-   * @exception InstantiationException if semaphore class is abstract
-   * @exception IllegalAccessException if constructor cannot be called
-   * @exception InvocationTargetException if semaphore constructor throws an
-   * exception
-   **/
+    /**
+     * Create a buffer with the given capacity, using
+     * the supplied Semaphore class for semaphores.
+     * @exception NoSuchMethodException If class does not have constructor
+     * that intializes permits
+     * @exception SecurityException if constructor information
+     * not accessible
+     * @exception InstantiationException if semaphore class is abstract
+     * @exception IllegalAccessException if constructor cannot be called
+     * @exception InvocationTargetException if semaphore constructor throws an
+     * exception
+     **/
 
-  public Slot(Class semaphoreClass) 
-   throws NoSuchMethodException, 
-          SecurityException, 
-          InstantiationException, 
-          IllegalAccessException, 
-          InvocationTargetException {
-    super(1, semaphoreClass);
-  }
+    public Slot(Class semaphoreClass)
+            throws NoSuchMethodException,
+            SecurityException,
+            InstantiationException,
+            IllegalAccessException,
+            InvocationTargetException {
+        super(1, semaphoreClass);
+    }
 
-  /** 
-   * Create a new Slot using default Semaphore implementations 
-   **/
-  public Slot() {
-    super(1);
-  }
+    /**
+     * Create a new Slot using default Semaphore implementations
+     **/
+    public Slot() {
+        super(1);
+    }
 
-  /** The slot **/
-  protected Object item_ = null;
+    /** The slot **/
+    protected Object item_ = null;
 
 
-  /** Set the item in preparation for a take **/
-  protected synchronized void insert(Object x) { 
-    item_ = x; 
-  }
+    /** Set the item in preparation for a take **/
+    protected synchronized void insert(Object x) {
+        item_ = x;
+    }
 
-  /** Take item known to exist **/
-  protected synchronized Object extract() { 
-    Object x = item_;
-    item_ = null;
-    return x;
-  }
+    /** Take item known to exist **/
+    protected synchronized Object extract() {
+        Object x = item_;
+        item_ = null;
+        return x;
+    }
 
-  public synchronized Object peek() {
-    return item_;
-  }
+    public synchronized Object peek() {
+        return item_;
+    }
 
 }

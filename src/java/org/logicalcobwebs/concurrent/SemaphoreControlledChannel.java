@@ -14,7 +14,9 @@
 */
 
 package org.logicalcobwebs.concurrent;
-import java.lang.reflect.*;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Abstract class for channels that use Semaphores to
@@ -23,138 +25,137 @@ import java.lang.reflect.*;
  **/
 
 public abstract class SemaphoreControlledChannel implements BoundedChannel {
-  protected final Semaphore putGuard_;
-  protected final Semaphore takeGuard_;
-  protected int capacity_;
+    protected final Semaphore putGuard_;
+    protected final Semaphore takeGuard_;
+    protected int capacity_;
 
-  /**
-   * Create a channel with the given capacity and default
-   * semaphore implementation
-   * @exception IllegalArgumentException if capacity less or equal to zero
-   **/
+    /**
+     * Create a channel with the given capacity and default
+     * semaphore implementation
+     * @exception IllegalArgumentException if capacity less or equal to zero
+     **/
 
-  public SemaphoreControlledChannel(int capacity) 
-   throws IllegalArgumentException {
-    if (capacity <= 0) throw new IllegalArgumentException();
-    capacity_ = capacity;
-    putGuard_ = new Semaphore(capacity);
-    takeGuard_ = new Semaphore(0);
-  }
-
-
-  /**
-   * Create a channel with the given capacity and 
-   * semaphore implementations instantiated from the supplied class
-   * @exception IllegalArgumentException if capacity less or equal to zero.
-   * @exception NoSuchMethodException If class does not have constructor 
-   * that intializes permits
-   * @exception SecurityException if constructor information 
-   * not accessible
-   * @exception InstantiationException if semaphore class is abstract
-   * @exception IllegalAccessException if constructor cannot be called
-   * @exception InvocationTargetException if semaphore constructor throws an
-   * exception
-   **/
-  public SemaphoreControlledChannel(int capacity, Class semaphoreClass) 
-   throws IllegalArgumentException, 
-          NoSuchMethodException, 
-          SecurityException, 
-          InstantiationException, 
-          IllegalAccessException, 
-          InvocationTargetException {
-    if (capacity <= 0) throw new IllegalArgumentException();
-    capacity_ = capacity;
-    Class[] longarg = { Long.TYPE };
-    Constructor ctor = semaphoreClass.getDeclaredConstructor(longarg);
-    Long[] cap = { new Long(capacity) };
-    putGuard_ = (Semaphore)(ctor.newInstance(cap));
-    Long[] zero = { new Long(0) };
-    takeGuard_ = (Semaphore)(ctor.newInstance(zero));
-  }
-
-
-
-  public int  capacity() { return capacity_; }
-
-  /** 
-   * Return the number of elements in the buffer.
-   * This is only a snapshot value, that may change
-   * immediately after returning.
-   **/
-
-  public int size() { return (int)(takeGuard_.permits());  }
-
-  /**
-   * Internal mechanics of put.
-   **/
-  protected abstract void insert(Object x);
-
-  /**
-   * Internal mechanics of take.
-   **/
-  protected abstract Object extract();
-
-  public void put(Object x) throws InterruptedException {
-    if (x == null) throw new IllegalArgumentException();
-    if (Thread.interrupted()) throw new InterruptedException();
-    putGuard_.acquire();
-    try {
-      insert(x);
-      takeGuard_.release();
+    public SemaphoreControlledChannel(int capacity)
+            throws IllegalArgumentException {
+        if (capacity <= 0) throw new IllegalArgumentException();
+        capacity_ = capacity;
+        putGuard_ = new Semaphore(capacity);
+        takeGuard_ = new Semaphore(0);
     }
-    catch (ClassCastException ex) {
-      putGuard_.release();
-      throw ex;
-    }
-  }
 
-  public boolean offer(Object x, long msecs) throws InterruptedException {
-    if (x == null) throw new IllegalArgumentException();
-    if (Thread.interrupted()) throw new InterruptedException();
-    if (!putGuard_.attempt(msecs)) 
-      return false;
-    else {
-      try {
-        insert(x);
-        takeGuard_.release();
-        return true;
-      }
-      catch (ClassCastException ex) {
-        putGuard_.release();
-        throw ex;
-      }
-    }
-  }
 
-  public Object take() throws InterruptedException {
-    if (Thread.interrupted()) throw new InterruptedException();
-    takeGuard_.acquire();
-    try {
-      Object x = extract();
-      putGuard_.release();
-      return x;
+    /**
+     * Create a channel with the given capacity and
+     * semaphore implementations instantiated from the supplied class
+     * @exception IllegalArgumentException if capacity less or equal to zero.
+     * @exception NoSuchMethodException If class does not have constructor
+     * that intializes permits
+     * @exception SecurityException if constructor information
+     * not accessible
+     * @exception InstantiationException if semaphore class is abstract
+     * @exception IllegalAccessException if constructor cannot be called
+     * @exception InvocationTargetException if semaphore constructor throws an
+     * exception
+     **/
+    public SemaphoreControlledChannel(int capacity, Class semaphoreClass)
+            throws IllegalArgumentException,
+            NoSuchMethodException,
+            SecurityException,
+            InstantiationException,
+            IllegalAccessException,
+            InvocationTargetException {
+        if (capacity <= 0) throw new IllegalArgumentException();
+        capacity_ = capacity;
+        Class[] longarg = {Long.TYPE};
+        Constructor ctor = semaphoreClass.getDeclaredConstructor(longarg);
+        Long[] cap = {new Long(capacity)};
+        putGuard_ = (Semaphore) (ctor.newInstance(cap));
+        Long[] zero = {new Long(0)};
+        takeGuard_ = (Semaphore) (ctor.newInstance(zero));
     }
-    catch (ClassCastException ex) {
-      takeGuard_.release();
-      throw ex;
-    }
-  }
 
-  public Object poll(long msecs) throws InterruptedException {
-    if (Thread.interrupted()) throw new InterruptedException();
-    if (!takeGuard_.attempt(msecs))
-      return null;
-    else {
-      try {
-        Object x = extract();
-        putGuard_.release();
-        return x;
-      }
-      catch (ClassCastException ex) {
-        takeGuard_.release();
-        throw ex;
-      }
+
+    public int capacity() {
+        return capacity_;
     }
-  }
+
+    /**
+     * Return the number of elements in the buffer.
+     * This is only a snapshot value, that may change
+     * immediately after returning.
+     **/
+
+    public int size() {
+        return (int) (takeGuard_.permits());
+    }
+
+    /**
+     * Internal mechanics of put.
+     **/
+    protected abstract void insert(Object x);
+
+    /**
+     * Internal mechanics of take.
+     **/
+    protected abstract Object extract();
+
+    public void put(Object x) throws InterruptedException {
+        if (x == null) throw new IllegalArgumentException();
+        if (Thread.interrupted()) throw new InterruptedException();
+        putGuard_.acquire();
+        try {
+            insert(x);
+            takeGuard_.release();
+        } catch (ClassCastException ex) {
+            putGuard_.release();
+            throw ex;
+        }
+    }
+
+    public boolean offer(Object x, long msecs) throws InterruptedException {
+        if (x == null) throw new IllegalArgumentException();
+        if (Thread.interrupted()) throw new InterruptedException();
+        if (!putGuard_.attempt(msecs))
+            return false;
+        else {
+            try {
+                insert(x);
+                takeGuard_.release();
+                return true;
+            } catch (ClassCastException ex) {
+                putGuard_.release();
+                throw ex;
+            }
+        }
+    }
+
+    public Object take() throws InterruptedException {
+        if (Thread.interrupted()) throw new InterruptedException();
+        takeGuard_.acquire();
+        try {
+            Object x = extract();
+            putGuard_.release();
+            return x;
+        } catch (ClassCastException ex) {
+            takeGuard_.release();
+            throw ex;
+        }
+    }
+
+    public Object poll(long msecs) throws InterruptedException {
+        if (Thread.interrupted()) throw new InterruptedException();
+        if (!takeGuard_.attempt(msecs))
+            return null;
+        else {
+            try {
+                Object x = extract();
+                putGuard_.release();
+                return x;
+            } catch (ClassCastException ex) {
+                takeGuard_.release();
+                throw ex;
+            }
+        }
+    }
 
 }

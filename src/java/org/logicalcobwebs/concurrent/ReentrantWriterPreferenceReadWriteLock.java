@@ -10,15 +10,16 @@
   Date       Who                What
   26aug1998  dl                 Create public version
    7sep2000  dl                 Readers are now also reentrant
-  19jan2001  dl                 Allow read->write upgrades if the only reader 
+  19jan2001  dl                 Allow read->write upgrades if the only reader
   10dec2002  dl                 Throw IllegalStateException on extra release
 */
 
 package org.logicalcobwebs.concurrent;
-import java.util.*;
 
-/** 
- * A writer-preference ReadWriteLock that allows both readers and 
+import java.util.HashMap;
+
+/**
+ * A writer-preference ReadWriteLock that allows both readers and
  * writers to reacquire
  * read or write locks in the style of a ReentrantLock.
  * Readers are not allowed until all write locks held by
@@ -57,104 +58,98 @@ import java.util.*;
  * }
  * </pre>
  *
- * 
+ *
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
  * @see ReentrantLock
  **/
 
 public class ReentrantWriterPreferenceReadWriteLock extends WriterPreferenceReadWriteLock {
 
-  /** Number of acquires on write lock by activeWriter_ thread **/
-  protected long writeHolds_ = 0;  
+    /** Number of acquires on write lock by activeWriter_ thread **/
+    protected long writeHolds_ = 0;
 
-  /** Number of acquires on read lock by any reader thread **/
-  protected HashMap readers_ = new HashMap();
+    /** Number of acquires on read lock by any reader thread **/
+    protected HashMap readers_ = new HashMap();
 
-  /** cache/reuse the special Integer value one to speed up readlocks **/
-  protected static final Integer IONE = new Integer(1);
+    /** cache/reuse the special Integer value one to speed up readlocks **/
+    protected static final Integer IONE = new Integer(1);
 
 
-  protected boolean allowReader() {
-    return (activeWriter_ == null && waitingWriters_ == 0) ||
-      activeWriter_ == Thread.currentThread();
-  }
-
-  protected synchronized boolean startRead() {
-    Thread t = Thread.currentThread();
-    Object c = readers_.get(t);
-    if (c != null) { // already held -- just increment hold count
-      readers_.put(t, new Integer(((Integer)(c)).intValue()+1));
-      ++activeReaders_;
-      return true;
+    protected boolean allowReader() {
+        return (activeWriter_ == null && waitingWriters_ == 0) ||
+                activeWriter_ == Thread.currentThread();
     }
-    else if (allowReader()) {
-      readers_.put(t, IONE);
-      ++activeReaders_;
-      return true;
-    }
-    else
-      return false;
-  }
 
-  protected synchronized boolean startWrite() {
-    if (activeWriter_ == Thread.currentThread()) { // already held; re-acquire
-      ++writeHolds_;
-      return true;
+    protected synchronized boolean startRead() {
+        Thread t = Thread.currentThread();
+        Object c = readers_.get(t);
+        if (c != null) { // already held -- just increment hold count
+            readers_.put(t, new Integer(((Integer) (c)).intValue() + 1));
+            ++activeReaders_;
+            return true;
+        } else if (allowReader()) {
+            readers_.put(t, IONE);
+            ++activeReaders_;
+            return true;
+        } else
+            return false;
     }
-    else if (writeHolds_ == 0) {
-      if (activeReaders_ == 0 || 
-          (readers_.size() == 1 && 
-           readers_.get(Thread.currentThread()) != null)) {
-        activeWriter_ = Thread.currentThread();
-        writeHolds_ = 1;
-        return true;
-      }
-      else
-        return false;
+
+    protected synchronized boolean startWrite() {
+        if (activeWriter_ == Thread.currentThread()) { // already held; re-acquire
+            ++writeHolds_;
+            return true;
+        } else if (writeHolds_ == 0) {
+            if (activeReaders_ == 0 ||
+                    (readers_.size() == 1 &&
+                    readers_.get(Thread.currentThread()) != null)) {
+                activeWriter_ = Thread.currentThread();
+                writeHolds_ = 1;
+                return true;
+            } else
+                return false;
+        } else
+            return false;
     }
-    else
-      return false;
-  }
 
 
-  protected synchronized Signaller endRead() {
-    Thread t = Thread.currentThread();
-    Object c = readers_.get(t);
-    if (c == null)
-      throw new IllegalStateException();
-    --activeReaders_;
-    if (c != IONE) { // more than one hold; decrement count
-      int h = ((Integer)(c)).intValue()-1;
-      Integer ih = (h == 1)? IONE : new Integer(h);
-      readers_.put(t, ih);
-      return null;
-    }
-    else {
-      readers_.remove(t);
-    
-      if (writeHolds_ > 0) // a write lock is still held by current thread
-        return null;
-      else if (activeReaders_ == 0 && waitingWriters_ > 0)
-        return writerLock_;
-      else
-        return null;
-    }
-  }
+    protected synchronized Signaller endRead() {
+        Thread t = Thread.currentThread();
+        Object c = readers_.get(t);
+        if (c == null)
+            throw new IllegalStateException();
+        --activeReaders_;
+        if (c != IONE) { // more than one hold; decrement count
+            int h = ((Integer) (c)).intValue() - 1;
+            Integer ih = (h == 1) ? IONE : new Integer(h);
+            readers_.put(t, ih);
+            return null;
+        } else {
+            readers_.remove(t);
 
-  protected synchronized Signaller endWrite() {
-    --writeHolds_;
-    if (writeHolds_ > 0)   // still being held
-      return null;
-    else {
-      activeWriter_ = null;
-      if (waitingReaders_ > 0 && allowReader())
-        return readerLock_;
-      else if (waitingWriters_ > 0)
-        return writerLock_;
-      else
-        return null;
+            if (writeHolds_ > 0) // a write lock is still held by current thread
+                return null;
+            else if (activeReaders_ == 0 && waitingWriters_ > 0)
+                return writerLock_;
+            else
+                return null;
+        }
     }
-  }
+
+    protected synchronized Signaller endWrite() {
+        --writeHolds_;
+        if (writeHolds_ > 0)   // still being held
+            return null;
+        else {
+            activeWriter_ = null;
+            if (waitingReaders_ > 0 && allowReader())
+                return readerLock_;
+            else if (waitingWriters_ > 0)
+                return writerLock_;
+            else
+                return null;
+        }
+    }
 
 }
 

@@ -25,21 +25,22 @@ package org.logicalcobwebs.concurrent;
  * it is found that locking is not strictly necesssary.
  *
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
-**/
+ **/
 
 
 public class NullSync implements Sync {
 
-  public synchronized void acquire() throws InterruptedException {
-    if (Thread.interrupted()) throw new InterruptedException();
-  }
+    public synchronized void acquire() throws InterruptedException {
+        if (Thread.interrupted()) throw new InterruptedException();
+    }
 
-  public synchronized boolean attempt(long msecs) throws InterruptedException {
-    if (Thread.interrupted()) throw new InterruptedException();
-    return true;
-  }
+    public synchronized boolean attempt(long msecs) throws InterruptedException {
+        if (Thread.interrupted()) throw new InterruptedException();
+        return true;
+    }
 
-  public synchronized void release() {}
+    public synchronized void release() {
+    }
 
 
 }

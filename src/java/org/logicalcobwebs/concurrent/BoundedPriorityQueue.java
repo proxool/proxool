@@ -14,12 +14,13 @@
 */
 
 package org.logicalcobwebs.concurrent;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
-import java.lang.reflect.*;
 
 /**
  * A heap-based priority queue, using semaphores for
- * concurrency control. 
+ * concurrency control.
  * The take operation returns the <em>least</em> element
  * with respect to the given ordering. (If more than
  * one element is tied for least value, one of them is
@@ -32,86 +33,94 @@ import java.lang.reflect.*;
  * The implementation uses a standard array-based heap algorithm,
  * as described in just about any data structures textbook.
  * <p>
- * Put and take operations may throw ClassCastException 
+ * Put and take operations may throw ClassCastException
  * if elements are not Comparable, or
- * not comparable using the supplied comparator. 
+ * not comparable using the supplied comparator.
  * Since not all elements are compared on each operation
- * it is possible that an exception will not be thrown 
- * during insertion of non-comparable element, but will later be 
+ * it is possible that an exception will not be thrown
+ * during insertion of non-comparable element, but will later be
  * encountered during another insertion or extraction.
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
  **/
 
 public class BoundedPriorityQueue extends SemaphoreControlledChannel {
-  protected final Heap heap_;
+    protected final Heap heap_;
 
-  /**
-   * Create a priority queue with the given capacity and comparator
-   * @exception IllegalArgumentException if capacity less or equal to zero
-   **/
+    /**
+     * Create a priority queue with the given capacity and comparator
+     * @exception IllegalArgumentException if capacity less or equal to zero
+     **/
 
-  public BoundedPriorityQueue(int capacity, Comparator cmp) 
-   throws IllegalArgumentException {
-    super(capacity);
-    heap_ = new Heap(capacity, cmp);
-  }
+    public BoundedPriorityQueue(int capacity, Comparator cmp)
+            throws IllegalArgumentException {
+        super(capacity);
+        heap_ = new Heap(capacity, cmp);
+    }
 
-  /**
-   * Create a priority queue with the current default capacity
-   * and the given comparator
-   **/
+    /**
+     * Create a priority queue with the current default capacity
+     * and the given comparator
+     **/
 
-  public BoundedPriorityQueue(Comparator comparator) { 
-    this(DefaultChannelCapacity.get(), comparator); 
-  }
+    public BoundedPriorityQueue(Comparator comparator) {
+        this(DefaultChannelCapacity.get(), comparator);
+    }
 
-  /**
-   * Create a priority queue with the given capacity,
-   * and relying on natural ordering.
-   **/
+    /**
+     * Create a priority queue with the given capacity,
+     * and relying on natural ordering.
+     **/
 
-  public BoundedPriorityQueue(int capacity) { 
-    this(capacity, null); 
-  }
+    public BoundedPriorityQueue(int capacity) {
+        this(capacity, null);
+    }
 
-  /**
-   * Create a priority queue with the current default capacity
-   * and relying on natural ordering.
-   **/
+    /**
+     * Create a priority queue with the current default capacity
+     * and relying on natural ordering.
+     **/
 
-  public BoundedPriorityQueue() { 
-    this(DefaultChannelCapacity.get(), null); 
-  }
+    public BoundedPriorityQueue() {
+        this(DefaultChannelCapacity.get(), null);
+    }
 
 
-  /**
-   * Create a priority queue with the given capacity and comparator, using
-   * the supplied Semaphore class for semaphores.
-   * @exception IllegalArgumentException if capacity less or equal to zero
-   * @exception NoSuchMethodException If class does not have constructor 
-   * that intializes permits
-   * @exception SecurityException if constructor information 
-   * not accessible
-   * @exception InstantiationException if semaphore class is abstract
-   * @exception IllegalAccessException if constructor cannot be called
-   * @exception InvocationTargetException if semaphore constructor throws an
-   * exception
-   **/
+    /**
+     * Create a priority queue with the given capacity and comparator, using
+     * the supplied Semaphore class for semaphores.
+     * @exception IllegalArgumentException if capacity less or equal to zero
+     * @exception NoSuchMethodException If class does not have constructor
+     * that intializes permits
+     * @exception SecurityException if constructor information
+     * not accessible
+     * @exception InstantiationException if semaphore class is abstract
+     * @exception IllegalAccessException if constructor cannot be called
+     * @exception InvocationTargetException if semaphore constructor throws an
+     * exception
+     **/
 
-  public BoundedPriorityQueue(int capacity, Comparator cmp, 
-                              Class semaphoreClass) 
-   throws IllegalArgumentException, 
-          NoSuchMethodException, 
-          SecurityException, 
-          InstantiationException, 
-          IllegalAccessException, 
-          InvocationTargetException {
-    super(capacity, semaphoreClass);
-    heap_ = new Heap(capacity, cmp);
-  }
+    public BoundedPriorityQueue(int capacity, Comparator cmp,
+                                Class semaphoreClass)
+            throws IllegalArgumentException,
+            NoSuchMethodException,
+            SecurityException,
+            InstantiationException,
+            IllegalAccessException,
+            InvocationTargetException {
+        super(capacity, semaphoreClass);
+        heap_ = new Heap(capacity, cmp);
+    }
 
-  protected void insert(Object x) {  heap_.insert(x);  }
-  protected Object extract()      { return heap_.extract(); }
-  public Object peek()            { return heap_.peek(); }
+    protected void insert(Object x) {
+        heap_.insert(x);
+    }
+
+    protected Object extract() {
+        return heap_.extract();
+    }
+
+    public Object peek() {
+        return heap_.peek();
+    }
 
 }

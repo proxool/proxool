@@ -26,64 +26,61 @@ package org.logicalcobwebs.concurrent;
  * LayeredSync.
  *
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
-**/
+ **/
 
 
 public class LayeredSync implements Sync {
 
-  protected final Sync outer_;
-  protected final Sync inner_;
+    protected final Sync outer_;
+    protected final Sync inner_;
 
-  /** 
-   * Create a LayeredSync managing the given outer and inner Sync
-   * objects
-   **/
+    /**
+     * Create a LayeredSync managing the given outer and inner Sync
+     * objects
+     **/
 
-  public LayeredSync(Sync outer, Sync inner) {
-    outer_ = outer;
-    inner_ = inner;
-  }
-
-  public void acquire() throws InterruptedException {
-    outer_.acquire();
-    try {
-      inner_.acquire();
+    public LayeredSync(Sync outer, Sync inner) {
+        outer_ = outer;
+        inner_ = inner;
     }
-    catch (InterruptedException ex) {
-      outer_.release();
-      throw ex;
-    }
-  }
 
-  public boolean attempt(long msecs) throws InterruptedException {
-
-    long start = (msecs <= 0)? 0 : System.currentTimeMillis();
-    long waitTime = msecs;
-
-    if (outer_.attempt(waitTime)) {
-      try {
-        if (msecs > 0)
-          waitTime = msecs - (System.currentTimeMillis() - start);
-        if (inner_.attempt(waitTime))
-          return true;
-        else {
-          outer_.release();
-          return false;
+    public void acquire() throws InterruptedException {
+        outer_.acquire();
+        try {
+            inner_.acquire();
+        } catch (InterruptedException ex) {
+            outer_.release();
+            throw ex;
         }
-      }
-      catch (InterruptedException ex) {
-        outer_.release();
-        throw ex;
-      }
     }
-    else
-      return false;
-  }
 
-  public void release() {
-    inner_.release();
-    outer_.release();
-  }
+    public boolean attempt(long msecs) throws InterruptedException {
+
+        long start = (msecs <= 0) ? 0 : System.currentTimeMillis();
+        long waitTime = msecs;
+
+        if (outer_.attempt(waitTime)) {
+            try {
+                if (msecs > 0)
+                    waitTime = msecs - (System.currentTimeMillis() - start);
+                if (inner_.attempt(waitTime))
+                    return true;
+                else {
+                    outer_.release();
+                    return false;
+                }
+            } catch (InterruptedException ex) {
+                outer_.release();
+                throw ex;
+            }
+        } else
+            return false;
+    }
+
+    public void release() {
+        inner_.release();
+        outer_.release();
+    }
 
 }
 

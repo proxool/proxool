@@ -27,43 +27,43 @@ package org.logicalcobwebs.concurrent;
  * try {
  *   set. add("hi");
  * }
- * // SyncSets translate timeouts and other lock failures 
- * //   to unsupported operation exceptions, 
+ * // SyncSets translate timeouts and other lock failures
+ * //   to unsupported operation exceptions,
  * catch (UnsupportedOperationException ex) {
  *    System.out.println("Lock failure");
  * }
- * </pre>  
+ * </pre>
  *
  * <p>[<a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"> Introduction to this package. </a>]
  * @see Sync
-**/
+ **/
 
 
 public class TimeoutSync implements Sync {
 
-  protected final Sync sync_;     // the adapted sync
-  protected final long timeout_;  // timeout value
+    protected final Sync sync_;     // the adapted sync
+    protected final long timeout_;  // timeout value
 
-  /** 
-   * Create a TimeoutSync using the given Sync object, and
-   * using the given timeout value for all calls to acquire.
-   **/
+    /**
+     * Create a TimeoutSync using the given Sync object, and
+     * using the given timeout value for all calls to acquire.
+     **/
 
-  public TimeoutSync(Sync sync, long timeout) {
-    sync_ = sync;
-    timeout_ = timeout;
-  }
+    public TimeoutSync(Sync sync, long timeout) {
+        sync_ = sync;
+        timeout_ = timeout;
+    }
 
-  public void acquire() throws InterruptedException {
-    if (!sync_.attempt(timeout_)) throw new TimeoutException(timeout_);
-  }
+    public void acquire() throws InterruptedException {
+        if (!sync_.attempt(timeout_)) throw new TimeoutException(timeout_);
+    }
 
-  public boolean attempt(long msecs) throws InterruptedException {
-    return sync_.attempt(msecs);
-  }
+    public boolean attempt(long msecs) throws InterruptedException {
+        return sync_.attempt(msecs);
+    }
 
-  public void release() {
-    sync_.release();
-  }
+    public void release() {
+        sync_.release();
+    }
 
 }

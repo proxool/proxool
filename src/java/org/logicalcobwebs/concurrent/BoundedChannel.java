@@ -25,9 +25,9 @@ package org.logicalcobwebs.concurrent;
  **/
 
 public interface BoundedChannel extends Channel {
-  /** 
-   * Return the maximum number of elements that can be held.
-   * @return the capacity of this channel.
-   **/
-  public int capacity();
+    /**
+     * Return the maximum number of elements that can be held.
+     * @return the capacity of this channel.
+     **/
+    public int capacity();
 }
