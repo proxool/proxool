@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  * A full definition of everything to do with a connection.
- * @version $Revision: 1.2 $, $Date: 2002/10/17 19:46:02 $
+ * @version $Revision: 1.3 $, $Date: 2002/10/24 17:29:06 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -22,8 +22,8 @@ public interface ConnectionPoolDefinitionIF {
     /** 300000 (5 minutes) */
     public static final int DEFAULT_MAXIMUM_ACTIVE_TIME = 300000; // 5 minutes
 
-    /** 5 */
-    public static final int DEFAULT_PROTOTYPE_COUNT = 5;
+    /** 0 */
+    public static final int DEFAULT_PROTOTYPE_COUNT = 0;
 
     /** 5 */
     public static final int DEFAULT_MINIMUM_CONNECTION_COUNT = 5;
@@ -134,6 +134,9 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.3  2002/10/24 17:29:06  billhorsman
+ prototype count now defaults to zero
+
  Revision 1.2  2002/10/17 19:46:02  billhorsman
  removed redundant reference to logFilename (we now use Jakarta's Commons Logging component
 
