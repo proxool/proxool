@@ -10,9 +10,9 @@
  */
 
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/proxool/Attic/FastArrayList.java,v 1.3 2003/02/07 01:33:31 chr32 Exp $
- * $Revision: 1.3 $
- * $Date: 2003/02/07 01:33:31 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/proxool/Attic/FastArrayList.java,v 1.4 2003/02/07 01:34:17 chr32 Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/02/07 01:34:17 $
  *
  * ====================================================================
  *
@@ -119,10 +119,10 @@ import java.util.ListIterator;
  * @since Proxool 0.6
  * @author Craig R. McClanahan
  * @author $Author: chr32 $ (current maintainer)
- * @version $Revision: 1.3 $ $Date: 2003/02/07 01:33:31 $
+ * @version $Revision: 1.4 $ $Date: 2003/02/07 01:34:17 $
  */
 
-class FastArrayList extends ArrayList {
+public class FastArrayList extends ArrayList {
 
 
     // ----------------------------------------------------------- Constructors
@@ -1381,6 +1381,9 @@ class FastArrayList extends ArrayList {
 /*
  Revision history:
  $Log: FastArrayList.java,v $
+ Revision 1.4  2003/02/07 01:34:17  chr32
+ Made class public.
+
  Revision 1.3  2003/02/07 01:33:31  chr32
  Moved in from main proxool package.
 
