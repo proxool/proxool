@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.15 $, $Date: 2002/11/02 13:57:33 $
+ * @version $Revision: 1.16 $, $Date: 2002/11/05 21:24:18 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -76,7 +76,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private DecimalFormat idFormat = new DecimalFormat("0000");
 
-    private DecimalFormat bigCountFormat = new DecimalFormat("###,000,000");
+    private DecimalFormat bigCountFormat = new DecimalFormat("###000000");
 
     private ConnectionListenerIF connectionListener;
 
@@ -1042,6 +1042,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.16  2002/11/05 21:24:18  billhorsman
+ cosmetic: changed format of statistics dumped to log to make it less confusing for locales that use a space separator for thousands
+
  Revision 1.15  2002/11/02 13:57:33  billhorsman
  checkstyle
 
