@@ -83,7 +83,7 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.6 $, $Date: 2003/03/03 11:11:59 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/05 23:28:56 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -211,6 +211,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_NEW_CONNECTIONS)) {
                     resultList.add (new Attribute (attributeNames[i],
                         new Integer (this.poolDefinition.getMaximumNewConnections ())));
+                } else if (equalsProperty(attributeNames[i], ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE)) {
+                    resultList.add (new Attribute (attributeNames[i],
+                        new Integer (this.poolDefinition.getSimultaneousBuildThrottle ())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MINIMUM_CONNECTION_COUNT)) {
                     resultList.add (new Attribute (attributeNames[i],
                         new Integer (this.poolDefinition.getMinimumConnectionCount ())));
@@ -304,6 +307,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                 } else if (equalsProperty(name, ProxoolConstants.MAXIMUM_NEW_CONNECTIONS)) {
                     setIntegerAttribute(name, ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY, value,
                             ConnectionPoolDefinitionIF.DEFAULT_MAXIMUM_NEW_CONNECTIONS, newProperties, resultList);
+                } else if (equalsProperty(name, ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE)) {
+                    setIntegerAttribute(name, ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY, value,
+                            ConnectionPoolDefinitionIF.DEFAULT_SIMULTANEOUS_BUILD_THROTTLE, newProperties, resultList);
                 } else if (equalsProperty(name, ProxoolConstants.MINIMUM_CONNECTION_COUNT)) {
                     checkAssignable (name, Integer.class, value.getClass ());
                     newProperties.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, value.toString());
@@ -385,7 +391,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
             createProxoolAttribute (ProxoolConstants.MAXIMUM_ACTIVE_TIME, Integer.class),
             createProxoolAttribute (ProxoolConstants.MAXIMUM_CONNECTION_COUNT, Integer.class),
             createProxoolAttribute (ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME, Integer.class),
-            createProxoolAttribute (ProxoolConstants.MAXIMUM_NEW_CONNECTIONS, Integer.class),
+            createProxoolAttribute (ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE, Integer.class),
             createProxoolAttribute (ProxoolConstants.MINIMUM_CONNECTION_COUNT, Integer.class),
             createProxoolAttribute (ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME, Integer.class),
             createProxoolAttribute (ProxoolConstants.PROTOTYPE_COUNT, Integer.class),
@@ -632,6 +638,10 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.7  2003/03/05 23:28:56  billhorsman
+ deprecated maximum-new-connections property in favour of
+ more descriptive simultaneous-build-throttle
+
  Revision 1.6  2003/03/03 11:11:59  billhorsman
  fixed licence
 

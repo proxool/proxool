@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.14 $, $Date: 2003/03/03 11:11:58 $
+ * @version $Revision: 1.15 $, $Date: 2003/03/05 23:28:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -73,11 +73,21 @@ public interface ProxoolConstants {
     /** @see ProxoolDriver#getPropertyInfo */
     public final String MAXIMUM_CONNECTION_LIFETIME_PROPERTY = PROPERTY_PREFIX + MAXIMUM_CONNECTION_LIFETIME;
 
-    /** @see #MAXIMUM_NEW_CONNECTIONS_PROPERTY */
+    /**
+     * @deprecated use {@link #SIMULTANEOUS_BUILD_THROTTLE} instead
+     */
     public final String MAXIMUM_NEW_CONNECTIONS = "maximum-new-connections";
 
-    /** @see ProxoolDriver#getPropertyInfo */
+    /**
+     * @deprecated use {@link #SIMULTANEOUS_BUILD_THROTTLE_PROPERTY} instead
+     */
     public final String MAXIMUM_NEW_CONNECTIONS_PROPERTY = PROPERTY_PREFIX + MAXIMUM_NEW_CONNECTIONS;
+
+    /** @see #SIMULTANEOUS_BUILD_THROTTLE_PROPERTY*/
+    public final String SIMULTANEOUS_BUILD_THROTTLE = "simultaneous-build-throttle";
+
+    /** @see ProxoolDriver#getPropertyInfo */
+    public final String SIMULTANEOUS_BUILD_THROTTLE_PROPERTY = PROPERTY_PREFIX + SIMULTANEOUS_BUILD_THROTTLE;
 
     /** @see #MINIMUM_CONNECTION_COUNT_PROPERTY */
     public final String MINIMUM_CONNECTION_COUNT = "minimum-connection-count";
@@ -110,8 +120,7 @@ public interface ProxoolConstants {
     public final String MAXIMUM_ACTIVE_TIME_PROPERTY = PROPERTY_PREFIX + MAXIMUM_ACTIVE_TIME;
 
     /**
-     * Deprecated - use {@link #VERBOSE_PROPERTY verbose} instead.
-     * @see ProxoolDriver#getPropertyInfo
+     * @deprecated use {@link #VERBOSE_PROPERTY verbose} instead.
      */
     public final String DEBUG_LEVEL_PROPERTY = PROPERTY_PREFIX + "debug-level";
 
@@ -203,6 +212,10 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.15  2003/03/05 23:28:56  billhorsman
+ deprecated maximum-new-connections property in favour of
+ more descriptive simultaneous-build-throttle
+
  Revision 1.14  2003/03/03 11:11:58  billhorsman
  fixed licence
 

@@ -6,14 +6,14 @@
 
     DTD for configuring Proxool using XMLConfigurator
 
-    version $Revision: 1.3 $, $Date: 2003/03/03 11:12:01 $
+    version $Revision: 1.4 $, $Date: 2003/03/05 23:28:56 $
     author billhorsman
     author $Author: billhorsman $ (current maintainer)
     since Proxool 0.6
 
   -->
 <!ELEMENT proxool-config (proxool+)>
-<!ELEMENT proxool (alias, driver-url, driver-class, driver-properties?, house-keeping-sleep-time?, house-keeping-test-sql?, maximum-connection-count?, minimum-connection-count?, maximum-connection-lifetime?, maximum-new-connections?, recently-started-threshold?, overload-without-refusal-lifetime?, maximum-active-time?, verbose?, trace?, fatal-sql-exception*, prototype-count?)>
+<!ELEMENT proxool (alias, driver-url, driver-class, driver-properties?, house-keeping-sleep-time?, house-keeping-test-sql?, maximum-connection-count?, minimum-connection-count?, maximum-connection-lifetime?, maximum-new-connections?, simultaneous-build-throttle?, recently-started-threshold?, overload-without-refusal-lifetime?, maximum-active-time?, verbose?, trace?, fatal-sql-exception*, prototype-count?)>
 <!-- This is the alias for the pool -->
 <!ELEMENT alias (#PCDATA)>
 <!-- The delegate driver we are delegating to
@@ -34,6 +34,10 @@
     the number of new connections that have been requested but aren't yet available for use.
     Defaults to 10. -->
 <!ELEMENT maximum-new-connections (#PCDATA)>
+<!-- This is the maximum number of connections we can be building at any one time. That is,
+    the number of new connections that have been requested but aren't yet available for use.
+    Defaults to 10. -->
+<!ELEMENT simultaneous-build-throttle (#PCDATA)>
 <!-- How long the house keeping thread sleeps for (milliseconds). Defaults to
     30000 (30 seconds) -->
 <!ELEMENT house-keeping-sleep-time (#PCDATA)>
@@ -75,6 +79,10 @@
 <!--
  Revision history:
  $Log: proxool.dtd,v $
+ Revision 1.4  2003/03/05 23:28:56  billhorsman
+ deprecated maximum-new-connections property in favour of
+ more descriptive simultaneous-build-throttle
+
  Revision 1.3  2003/03/03 11:12:01  billhorsman
  fixed licence
 

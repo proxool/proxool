@@ -17,7 +17,7 @@ TestHelper.buildCompleteAlternativeProperties()
         <proxool:maximum-connection-count>10</proxool:maximum-connection-count>
         <proxool:minimum-connection-count>3</proxool:minimum-connection-count>
         <proxool:maximum-connection-lifetime>18000000</proxool:maximum-connection-lifetime> <!-- 5 hours -->
-        <proxool:maximum-new-connections>5</proxool:maximum-new-connections>
+        <proxool:simultaneous-build-throttle>5</proxool:simultaneous-build-throttle>
         <proxool:recently-started-threshold>40000</proxool:recently-started-threshold>
         <proxool:overload-without-refusal-lifetime>50000</proxool:overload-without-refusal-lifetime>
         <proxool:maximum-active-time>60000</proxool:maximum-active-time>
@@ -40,7 +40,7 @@ TestHelper.buildCompleteAlternativeProperties()
             <proxool:maximum-connection-count>10</proxool:maximum-connection-count>
             <proxool:minimum-connection-count>3</proxool:minimum-connection-count>
             <proxool:maximum-connection-lifetime>18000000</proxool:maximum-connection-lifetime> <!-- 5 hours -->
-            <proxool:maximum-new-connections>5</proxool:maximum-new-connections>
+            <proxool:simultaneous-build-throttle>5</proxool:simultaneous-build-throttle>
             <proxool:recently-started-threshold>40000</proxool:recently-started-threshold>
             <proxool:overload-without-refusal-lifetime>50000</proxool:overload-without-refusal-lifetime>
             <proxool:maximum-active-time>60000</proxool:maximum-active-time>

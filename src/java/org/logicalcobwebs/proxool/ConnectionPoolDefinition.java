@@ -16,12 +16,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.StringTokenizer;
-import java.util.Enumeration;
 
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.11 $, $Date: 2003/03/05 18:42:32 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/05 23:28:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -67,7 +66,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     private int houseKeepingSleepTime;
 
-    private int maximumNewConnections;
+    private int simultaneousBuildThrottle;
 
     private int recentlyStartedThreshold;
 
@@ -149,7 +148,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
         if (connectionPropertiesChanged) {
             LOG.info("Mercifully killing all current connections because of definition changes");
-            ProxoolFacade.killAllConnections(alias, true);
+            ProxoolFacade.killAllConnections(alias, "definition has changed", true);
         }
     }
 
@@ -252,9 +251,15 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                 setMaximumConnectionLifetime(getInt(key, value));
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY)) {
-            if (getMaximumNewConnections() != getInt(key, value)) {
+            poolLog.warn("Use of " + ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY + " is deprecated. Use more descriptive " + ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY + " instead.");
+            if (getSimultaneousBuildThrottle() != getInt(key, value)) {
                 changed = true;
-                setMaximumNewConnections(getInt(key, value));
+                setSimultaneousBuildThrottle(getInt(key, value));
+            }
+        } else if (key.equals(ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY)) {
+            if (getSimultaneousBuildThrottle() != getInt(key, value)) {
+                changed = true;
+                setSimultaneousBuildThrottle(getInt(key, value));
             }
         } else if (key.equals(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY)) {
             if (getMinimumConnectionCount() != getInt(key, value)) {
@@ -376,7 +381,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         maximumConnectionCount = DEFAULT_MAXIMUM_CONNECTION_COUNT;
         houseKeepingSleepTime = DEFAULT_HOUSE_KEEPING_SLEEP_TIME;
         houseKeepingTestSql = null;
-        maximumNewConnections = DEFAULT_MAXIMUM_NEW_CONNECTIONS;
+        simultaneousBuildThrottle = DEFAULT_MAXIMUM_NEW_CONNECTIONS;
         recentlyStartedThreshold = DEFAULT_RECENTLY_STARTED_THRESHOLD;
         overloadWithoutRefusalLifetime = DEFAULT_OVERLOAD_WITHOUT_REFUSAL_THRESHOLD;
         maximumActiveTime = DEFAULT_MAXIMUM_ACTIVE_TIME;
@@ -540,16 +545,32 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumNewConnections
+     * @deprecated use more descriptive {@link  #getSimultaneousBuildThrottle} instead
      */
     public int getMaximumNewConnections() {
-        return maximumNewConnections;
+        return simultaneousBuildThrottle;
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumNewConnections
+     * @deprecated use more descriptive {@link  #setSimultaneousBuildThrottle} instead
      */
     public void setMaximumNewConnections(int maximumNewConnections) {
-        this.maximumNewConnections = maximumNewConnections;
+        this.simultaneousBuildThrottle = maximumNewConnections;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getSimultaneousBuildThrottle
+     */
+    public int getSimultaneousBuildThrottle() {
+        return simultaneousBuildThrottle;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#getSimultaneousBuildThrottle
+     */
+    public void setSimultaneousBuildThrottle(int simultaneousBuildThrottle) {
+        this.simultaneousBuildThrottle = simultaneousBuildThrottle;
     }
 
     /**
@@ -775,6 +796,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.12  2003/03/05 23:28:56  billhorsman
+ deprecated maximum-new-connections property in favour of
+ more descriptive simultaneous-build-throttle
+
  Revision 1.11  2003/03/05 18:42:32  billhorsman
  big refactor of prototyping and house keeping to
  drastically reduce the number of threads when using

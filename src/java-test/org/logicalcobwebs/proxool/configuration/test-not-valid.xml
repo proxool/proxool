@@ -19,7 +19,7 @@ TestHelper.buildCompleteAlternativeProperties()
 		<minimum-connection-count>3</minimum-connection-count>
 		<maximum-connection-lifetime>18000000</maximum-connection-lifetime>
 		<!-- 5 hours -->
-		<maximum-new-connections>5</maximum-new-connections>
+		<simultaneous-build-throttle>5</simultaneous-build-throttle>
 		<recently-started-threshold>40000</recently-started-threshold>
 		<overload-without-refusal-lifetime>50000</overload-without-refusal-lifetime>
 		<maximum-active-time>60000</maximum-active-time>
@@ -43,7 +43,7 @@ TestHelper.buildCompleteAlternativeProperties()
 		<minimum-connection-count>3</minimum-connection-count>
 		<maximum-connection-lifetime>18000000</maximum-connection-lifetime>
 		<!-- 5 hours -->
-		<maximum-new-connections>5</maximum-new-connections>
+		<simultaneous-build-throttle>5</simultaneous-build-throttle>
 		<recently-started-threshold>40000</recently-started-threshold>
 		<overload-without-refusal-lifetime>50000</overload-without-refusal-lifetime>
 		<maximum-active-time>60000</maximum-active-time>

@@ -11,7 +11,7 @@ import java.util.Properties;
 /**
  * Helper for all tests
  *
- * @version $Revision: 1.19 $, $Date: 2003/03/04 10:58:44 $
+ * @version $Revision: 1.20 $, $Date: 2003/03/05 23:28:55 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -33,7 +33,7 @@ public class TestHelper {
         properties.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "10");
         properties.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "3");
         properties.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY, "18000000");
-        properties.setProperty(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY, "5");
+        properties.setProperty(ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY, "5");
         properties.setProperty(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY, "40000");
         properties.setProperty(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY, "50000");
         properties.setProperty(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY, "60000");
@@ -64,8 +64,8 @@ public class TestHelper {
                 connectionPoolDefinition.getMinimumConnectionCount());
         checkProperty(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME, 18000000,
                 connectionPoolDefinition.getMaximumConnectionLifetime());
-        checkProperty(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS, 5,
-                connectionPoolDefinition.getMaximumNewConnections());
+        checkProperty(ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE, 5,
+                connectionPoolDefinition.getSimultaneousBuildThrottle());
         checkProperty(ProxoolConstants.RECENTLY_STARTED_THRESHOLD, 40000,
                 connectionPoolDefinition.getRecentlyStartedThreshold());
         checkProperty(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME, 50000,
@@ -140,6 +140,10 @@ public class TestHelper {
 /*
  Revision history:
  $Log: TestHelper.java,v $
+ Revision 1.20  2003/03/05 23:28:55  billhorsman
+ deprecated maximum-new-connections property in favour of
+ more descriptive simultaneous-build-throttle
+
  Revision 1.19  2003/03/04 10:58:44  billhorsman
  checkstyle
 

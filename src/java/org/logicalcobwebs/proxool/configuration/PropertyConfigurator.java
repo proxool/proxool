@@ -32,7 +32,7 @@ import java.util.Properties;
  * jdbc-0.proxool.maximum-connection-count=10
  * jdbc-0.proxool.minimum-connection-count=3
  * jdbc-0.proxool.maximum-connection-lifetime=18000000
- * jdbc-0.proxool.maximum-new-connections=5
+ * jdbc-0.proxool.simultaneous-build-throttle=5
  * jdbc-0.proxool.recently-started-threshold=40000
  * jdbc-0.proxool.overload-without-refusal-lifetime=50000
  * jdbc-0.proxool.maximum-active-time=60000
@@ -51,7 +51,7 @@ import java.util.Properties;
  * jdbc-1.proxool.maximum-connection-count=10
  * jdbc-1.proxool.minimum-connection-count=3
  * jdbc-1.proxool.maximum-connection-lifetime=18000000
- * jdbc-1.proxool.maximum-new-connections=5
+ * jdbc-1.proxool.simultaneous-build-throttle=5
  * jdbc-1.proxool.recently-started-threshold=40000
  * jdbc-1.proxool.overload-without-refusal-lifetime=50000
  * jdbc-1.proxool.maximum-active-time=60000
@@ -70,7 +70,7 @@ import java.util.Properties;
  * delegate JDBC driver.
  * </p>
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/03 11:12:00 $
+ * @version $Revision: 1.10 $, $Date: 2003/03/05 23:28:56 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -170,6 +170,10 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.10  2003/03/05 23:28:56  billhorsman
+ deprecated maximum-new-connections property in favour of
+ more descriptive simultaneous-build-throttle
+
  Revision 1.9  2003/03/03 11:12:00  billhorsman
  fixed licence
 

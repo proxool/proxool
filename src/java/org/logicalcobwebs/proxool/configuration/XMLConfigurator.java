@@ -46,7 +46,7 @@ import java.util.Properties;
  *     &lt;maximum-connection-count&gt;10&lt;/maximum-connection-count&gt;
  *     &lt;minimum-connection-count&gt;3&lt;/minimum-connection-count&gt;
  *     &lt;maximum-connection-lifetime&gt;18000000&lt;/maximum-connection-lifetime&gt; &lt;!-- 5 hours --&gt;
- *     &lt;maximum-new-connections&gt;5&lt;/maximum-new-connections&gt;
+ *     &lt;simultaneous-build-throttle&gt;5&lt;/simultaneous-build-throttle&gt;
  *     &lt;recently-started-threshold&gt;40000&lt;/recently-started-threshold&gt;
  *     &lt;overload-without-refusal-lifetime&gt;50000&lt;/overload-without-refusal-lifetime&gt;
  *     &lt;maximum-active-time&gt;60000&lt;/maximum-active-time&gt;
@@ -85,7 +85,7 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.16 $, $Date: 2003/03/03 11:12:00 $
+ * @version $Revision: 1.17 $, $Date: 2003/03/05 23:28:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */

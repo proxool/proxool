@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.15 $, $Date: 2003/03/03 11:11:57 $
+ * @version $Revision: 1.16 $, $Date: 2003/03/05 23:28:56 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -46,8 +46,13 @@ public interface ConnectionPoolDefinitionIF {
     /** 30000 (30 Seconds) */
     public static final int DEFAULT_HOUSE_KEEPING_SLEEP_TIME = 30000;
 
-    /** 10 */
+    /** 10
+     * @deprecated use {@link #DEFAULT_SIMULTANEOUS_BUILD_THROTTLE} instead
+     */
     public static final int DEFAULT_MAXIMUM_NEW_CONNECTIONS = 10;
+
+    /** 10 */
+    public static final int DEFAULT_SIMULTANEOUS_BUILD_THROTTLE = 10;
 
     /** 60000 */
     public static final int DEFAULT_OVERLOAD_WITHOUT_REFUSAL_THRESHOLD = 60000;
@@ -80,8 +85,15 @@ public interface ConnectionPoolDefinitionIF {
     /**
      * In order to prevent overloading, this is the maximum number of connections that you can have that are in the progress
      * of being made. That is, ones we have started to make but haven't finished yet.
+     * @deprecated use more descriptive {@link  #getSimultaneousBuildThrottle} instead
      */
     int getMaximumNewConnections();
+
+    /**
+     * In order to prevent overloading, this is the maximum number of connections that you can have that are in the progress
+     * of being made. That is, ones we have started to make but haven't finished yet.
+     */
+    int getSimultaneousBuildThrottle();
 
     /** The minimum number of connections we will keep open, regardless of whether anyone needs them or not. */
     int getMinimumConnectionCount();
@@ -220,6 +232,10 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.16  2003/03/05 23:28:56  billhorsman
+ deprecated maximum-new-connections property in favour of
+ more descriptive simultaneous-build-throttle
+
  Revision 1.15  2003/03/03 11:11:57  billhorsman
  fixed licence
 
