@@ -13,9 +13,9 @@ import org.logicalcobwebs.proxool.GlobalTest;
 /**
  * Run all tests
  *
- * @version $Revision: 1.1 $, $Date: 2003/10/26 16:23:20 $
+ * @version $Revision: 1.2 $, $Date: 2004/03/18 17:12:22 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
  */
 public class AllTests {
@@ -44,6 +44,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.2  2004/03/18 17:12:22  chr32
+ NOP
+
  Revision 1.1  2003/10/26 16:23:20  billhorsman
  Fixed up test suites
 
@@ -54,7 +57,7 @@ public class AllTests {
  temporary removal of PerformanceTest
 
  Revision 1.20  2003/04/27 15:46:11  billhorsman
- moved DataSourceTest to sandbox
+ moved ProxoolDataSourceTest to sandbox
 
  Revision 1.19  2003/04/19 13:01:01  billhorsman
  improve tests
