@@ -19,7 +19,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.10 $, $Date: 2002/10/27 13:02:45 $
+ * @version $Revision: 1.11 $, $Date: 2002/10/28 19:44:03 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -102,7 +102,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     /** Starts up house keeping and prototyper threads. */
     protected void start() {
-        log.info("Establishing ConnectionPool " + definition.getName());
         pokeHouseKeeper();
         pokePrototyper();
     }
@@ -481,12 +480,12 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     long sleepTime = Math.max(0, delay + startFinalize - System.currentTimeMillis());
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e1) {
-                    log.debug("Interrupted whilst sleeping. Snooze.", e1);
+                    log.debug("Interrupted whilst sleeping. Snooze.");
                     try {
                         long sleepTime = Math.max(0, delay + startFinalize - System.currentTimeMillis());
                         Thread.sleep(sleepTime);
                     } catch (InterruptedException e2) {
-                        log.debug("Interrupted whilst sleeping. Snooze.", e2);
+                        log.debug("Interrupted whilst sleeping. Snooze.");
                         try {
                             long sleepTime = Math.max(0, delay + startFinalize - System.currentTimeMillis());
                             Thread.sleep(sleepTime);
@@ -1041,6 +1040,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.11  2002/10/28 19:44:03  billhorsman
+ small change to cleanup log
+
  Revision 1.10  2002/10/27 13:02:45  billhorsman
  change to prototyper logic to make it clearer (but no functional change)
 
