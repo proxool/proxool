@@ -20,7 +20,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.35 $, $Date: 2003/02/07 10:14:06 $
+ * @version $Revision: 1.36 $, $Date: 2003/02/12 00:35:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -451,6 +451,52 @@ public class GeneralTests extends TestCase {
 
     }
 
+    /**
+     * Can we update a pool definition by calling updateConnectionPool?
+     */
+    public void testUpdateUsingAPI() throws SQLException, ClassNotFoundException {
+
+        String testName = "updateUsingAPI";
+
+        try {
+            String alias = testName;
+
+            String url = ProxoolConstants.PROXOOL
+                    + ProxoolConstants.ALIAS_DELIMITER
+                    + alias
+                    + ProxoolConstants.URL_DELIMITER
+                    + TestHelper.HYPERSONIC_DRIVER
+                    + ProxoolConstants.URL_DELIMITER
+                    + "jdbc:hsqldb:db/update";
+
+
+            LOG.debug("Register pool");
+            Properties info = new Properties();
+            String checkAlias = ProxoolFacade.registerConnectionPool(url, info);
+            assertEquals(alias, checkAlias);
+
+            LOG.debug("setConfigurationListener");
+            ProxoolFacade.setConfigurationListener(alias, new ConfigurationListenerIF() {
+                public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
+                }
+            });
+
+            LOG.debug("setStateListener");
+            ProxoolFacade.setStateListener(alias, new StateListenerIF() {
+                public void upStateChanged(int upState) {
+                }
+            });
+
+            LOG.debug("Update pool");
+            ProxoolFacade.updateConnectionPool(url, info);
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        }
+
+    }
+
     public void testMaximumActiveTime() {
 
         String testName = "maximumActiveTime";
@@ -781,6 +827,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.36  2003/02/12 00:35:08  billhorsman
+ new update test
+
  Revision 1.35  2003/02/07 10:14:06  billhorsman
  new removal test
 
