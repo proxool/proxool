@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.46 $, $Date: 2003/02/07 17:26:04 $
+ * @version $Revision: 1.47 $, $Date: 2003/02/12 12:27:16 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -328,6 +328,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     StringBuffer out = new StringBuffer(displayStatistics());
                     out.append(" - Connection #");
                     out.append(proxyConnection.getId());
+                    if (getDefinition().isVerbose()) {
+                        out.append(" (");
+                        out.append(Integer.toHexString(proxyConnection.hashCode()));
+                        out.append(")");
+                    }
                     out.append(" created ");
                     out.append(creator);
                     out.append(" = ");
@@ -1185,6 +1190,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.47  2003/02/12 12:27:16  billhorsman
+ log proxy hashcode too
+
  Revision 1.46  2003/02/07 17:26:04  billhorsman
  deprecated removeAllConnectionPools in favour of
  shutdown (and dropped unreliable finalize() method)
