@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.2 $
-    $Date: 2002/09/17 22:45:08 $
+    $Revision: 1.3 $
+    $Date: 2002/09/18 13:56:00 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -115,12 +115,19 @@
         name="checkstyle"
         description="Checks Java code for style"
         >
-        <checkstyle maxLineLen="150" javadocScope="protected" ignoreLineLengthPattern="^\s*\*\s*(See also the &lt;a href=|@deprecated)">
+        <checkstyle>
+
             <fileset dir="src/java" includes="**/*.java"/>
             <fileset dir="src/java-examples" includes="**/*.java"/>
             <fileset dir="src/java-ext" includes="**/*.java"/>
             <fileset dir="src/java-jdk1.2" includes="**/*.java"/>
             <fileset dir="src/java-test" includes="**/*.java"/>
+
+            <property key="checkstyle.require.version" value="true"/>
+            <property key="checkstyle.javadoc.scope" value="nothing"/>
+            <property key="checkstyle.maxlinelen" value="500"/>
+            <property key="checkstyle.tab.width" value="4"/>
+
         </checkstyle>
     </target>
 
