@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.31 $, $Date: 2003/01/30 17:48:28 $
+ * @version $Revision: 1.32 $, $Date: 2003/01/31 11:51:41 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -135,6 +135,15 @@ public class GeneralTests extends TestCase {
 
             ProxoolFacade.updateConnectionPool(urlPrefix + "1", null);
             ProxoolFacade.killAllConnections(alias);
+
+            // Get another connection
+            {
+                Connection c = TestHelper.getProxoolConnection(urlPrefix + "1");
+                c.close();
+            }
+
+            // If the above calls all used the same pool then it should have served exactly 3 connections.s
+            assertEquals("connectionsServedCount", 3L, ProxoolFacade.getConnectionPoolStatistics(alias).getConnectionsServedCount());
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -699,6 +708,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.32  2003/01/31 11:51:41  billhorsman
+ improved changeUrl
+
  Revision 1.31  2003/01/30 17:48:28  billhorsman
  new configuration listener test
 
