@@ -20,7 +20,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.34 $, $Date: 2003/02/06 17:41:02 $
+ * @version $Revision: 1.35 $, $Date: 2003/02/07 10:14:06 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -145,6 +145,47 @@ public class GeneralTests extends TestCase {
 
             // If the above calls all used the same pool then it should have served exactly 3 connections.s
             assertEquals("connectionsServedCount", 3L, ProxoolFacade.getConnectionPoolStatistics(alias).getConnectionsServedCount());
+
+        } catch (Exception e) {
+            LOG.error("Whilst performing " + testName, e);
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Test whether we can register, remove and then re-register
+     * a pool
+     */
+    public void testRemoval() {
+
+        String testName = "removal";
+
+        try {
+            String alias = testName;
+            String url = TestHelper.getFullUrl(alias);
+            Properties info = TestHelper.buildProperties();
+
+            // Register
+            ProxoolFacade.registerConnectionPool(url, info);
+            Connection c1 = TestHelper.getProxoolConnection(url);
+            assertNotNull("connection is null", c1);
+            assertNotNull("definition is null", ProxoolFacade.getConnectionPoolDefinition(alias));
+
+            // Remove
+            ProxoolFacade.removeConnectionPool(alias, 0);
+            ConnectionPoolDefinitionIF cpd = null;
+            try {
+                cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
+            } catch (ProxoolException e) {
+                LOG.debug("Expected exception", e);
+            }
+            assertNull("definition is not null", cpd);
+
+            // Re-register
+            ProxoolFacade.registerConnectionPool(url, info);
+            Connection c3 = TestHelper.getProxoolConnection(url);
+            assertNotNull("connection is null", c3);
+            assertNotNull("definition is null", ProxoolFacade.getConnectionPoolDefinition(alias));
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -328,7 +369,8 @@ public class GeneralTests extends TestCase {
             final String newUrl = "proxool.defintionUpdated:org.hsqldb.jdbcDriver:jdbc:hsqldb:db/different";
             adapter.update(newUrl);
             assertTrue("Mp properties should have been updated", adapter.getChangedInfo() == null);
-            assertTrue("URL has not been updated", (adapter.getConnectionPoolDefinition().getCompleteUrl().equals(newUrl)));
+            final ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
+            assertTrue("URL has not been updated", (cpd.getCompleteUrl().equals(newUrl)));
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -373,7 +415,7 @@ public class GeneralTests extends TestCase {
      */
     public void testUpdate() throws SQLException, ClassNotFoundException {
 
-        String testName = "template";
+        String testName = "update";
         ProxoolAdapter adapter = null;
         Connection c = null;
         try {
@@ -642,7 +684,7 @@ public class GeneralTests extends TestCase {
      */
     public void testMultiple() throws SQLException, ClassNotFoundException {
 
-        String testName = "template";
+        String testName = "multiple";
         ProxoolAdapter adapter1 = null;
         ProxoolAdapter adapter2 = null;
         try {
@@ -739,6 +781,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.35  2003/02/07 10:14:06  billhorsman
+ new removal test
+
  Revision 1.34  2003/02/06 17:41:02  billhorsman
  now uses imported logging
 
