@@ -9,14 +9,12 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.DriverManager;
-import java.util.Iterator;
 import java.util.Properties;
-import java.util.Collection;
 
 /**
  * Tests {@link ProxoolFacade#getConnectionInfos}
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/11 00:38:41 $
+ * @version $Revision: 1.7 $, $Date: 2003/04/28 20:02:43 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -47,25 +45,24 @@ public class ConnectionInfoTest extends AbstractProxoolTest {
         ProxoolFacade.registerConnectionPool(url, info);
 
         DriverManager.getConnection(url);
-        assertEquals("connectionInfo count", 1, ProxoolFacade.getConnectionInfos(alias).size());
+        assertEquals("connectionInfo count", 1, ProxoolFacade.getSnapshot(alias, true).getConnectionInfos().length);
 
         DriverManager.getConnection(url);
-        assertEquals("connectionInfo count", 2, ProxoolFacade.getConnectionInfos(alias).size());
+        assertEquals("connectionInfo count", 2, ProxoolFacade.getSnapshot(alias, true).getConnectionInfos().length);
 
         DriverManager.getConnection(url).close();
-        assertEquals("connectionInfo count", 3, ProxoolFacade.getConnectionInfos(alias).size());
+        assertEquals("connectionInfo count", 3, ProxoolFacade.getSnapshot(alias, true).getConnectionInfos().length);
 
-        Collection connectionInfos = ProxoolFacade.getConnectionInfos(alias);
+        ConnectionInfoIF[] connectionInfos = ProxoolFacade.getSnapshot(alias, true).getConnectionInfos();
         assertEquals("activeCount", 2, getCount(connectionInfos, ConnectionInfoIF.STATUS_ACTIVE));
         assertEquals("availableCount", 1, getCount(connectionInfos, ConnectionInfoIF.STATUS_AVAILABLE));
 
     }
 
-    private int getCount(Collection connectionInfos, int status) {
+    private int getCount(ConnectionInfoIF[] connectionInfos, int status) {
         int count = 0;
-        Iterator i = connectionInfos.iterator();
-        while (i.hasNext()) {
-            ConnectionInfo connectionInfo = (ConnectionInfo) i.next();
+        for (int i = 0; i < connectionInfos.length; i++) {
+            ConnectionInfoIF connectionInfo = connectionInfos[i];
             if (connectionInfo.getStatus() == status) {
                 count++;
             }
@@ -80,6 +77,9 @@ public class ConnectionInfoTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionInfoTest.java,v $
+ Revision 1.7  2003/04/28 20:02:43  billhorsman
+ changed from deprecated getConnectionInfos to Snapshot
+
  Revision 1.6  2003/03/11 00:38:41  billhorsman
  allowed for connections in different order
 
