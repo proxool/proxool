@@ -17,7 +17,7 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/18 16:58:12 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/19 13:47:51 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.7
@@ -44,9 +44,9 @@ public class ConnectionListenerTest extends TestCase {
     public void testAddConnectionListener() throws Exception {
         clear();
         Properties info = new Properties();
-        info.setProperty("proxool.maximum-connection1-count", "2");
+        info.setProperty("proxool.maximum-connection-count", "2");
         info.setProperty("maximum-new-connections", "1");
-        info.setProperty("minimum-connection1-count", "0");
+        info.setProperty("minimum-connection-count", "0");
         info.setProperty("user", "sa");
         info.setProperty("password", "");
         String alias = "connectionListenerTest";
@@ -84,9 +84,9 @@ public class ConnectionListenerTest extends TestCase {
     public void testRemoveConnectionListener() throws Exception {
         clear();
         Properties info = new Properties();
-        info.setProperty("proxool.maximum-connection1-count", "2");
+        info.setProperty("proxool.maximum-connection-count", "2");
         info.setProperty("maximum-new-connections", "1");
-        info.setProperty("minimum-connection1-count", "0");
+        info.setProperty("minimum-connection-count", "0");
         info.setProperty("user", "sa");
         info.setProperty("password", "");
         String alias = "removeConnectionListenerTest";
@@ -167,6 +167,9 @@ public class ConnectionListenerTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.3  2003/02/19 13:47:51  chr32
+ Fixed wrong proxool parameters.
+
  Revision 1.2  2003/02/18 16:58:12  chr32
  Checkstyle.
 
