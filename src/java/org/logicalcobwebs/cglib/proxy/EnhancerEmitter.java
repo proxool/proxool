@@ -402,7 +402,7 @@ class EnhancerEmitter extends ClassEmitter {
             if (!seenGen.contains(gen)) {
                 seenGen.add(gen);
                 final List fmethods = (List)groups.get(gen);
-                CallbackGenerator.Context context = new CallbackGenerator.Context() {
+                Context context = new Context() {
                     public Iterator getMethods() {
                         return fmethods.iterator();
                     }

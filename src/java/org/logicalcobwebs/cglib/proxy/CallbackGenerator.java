@@ -53,22 +53,13 @@
  */
 package org.logicalcobwebs.cglib.proxy;
 
-import java.lang.reflect.Method;
-import java.util.Iterator;
 import org.logicalcobwebs.cglib.core.ClassEmitter;
 import org.logicalcobwebs.cglib.core.CodeEmitter;
+import org.logicalcobwebs.cglib.core.Context;
 
 interface CallbackGenerator
 {
     void generate(ClassEmitter e, Context context) throws Exception;
     void generateStatic(CodeEmitter e, Context context) throws Exception;
 
-    interface Context
-    {
-        Iterator getMethods();
-        int getIndex(Method method);
-        void emitCallback(CodeEmitter e, int index);
-        int getModifiers(Method method);
-        String getUniqueName(Method method);
-    }
 }

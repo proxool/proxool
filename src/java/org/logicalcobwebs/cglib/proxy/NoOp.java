@@ -59,8 +59,4 @@ package org.logicalcobwebs.cglib.proxy;
  */
 public interface NoOp extends Callback
 {
-    /**
-     * A thread-safe singleton instance of the <code>NoOp</code> callback.
-     */
-    public static final NoOp INSTANCE = new NoOp() { };
 }

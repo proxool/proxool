@@ -59,6 +59,7 @@ import java.util.Iterator;
 import org.logicalcobwebs.cglib.core.ClassEmitter;
 import org.logicalcobwebs.cglib.core.CodeEmitter;
 import org.logicalcobwebs.cglib.core.ReflectUtils;
+import org.logicalcobwebs.cglib.core.Context;
 
 class NoOpGenerator
 implements CallbackGenerator

@@ -66,7 +66,7 @@ import org.logicalcobwebs.cglib.reflect.*;
  * registered {@link MethodInterceptor} objects when an intercepted method is invoked. It can
  * be used to either invoke the original method, or call the same method on a different
  * object of the same type.
- * @version $Id: MethodProxy.java,v 1.1 2003/12/12 19:28:11 billhorsman Exp $
+ * @version $Id: MethodProxy.java,v 1.2 2003/12/17 21:10:35 billhorsman Exp $
  */
 public class MethodProxy {
     private Signature sig;
@@ -75,45 +75,6 @@ public class MethodProxy {
     private FastClass f2;
     private int i1;
     private int i2;
-
-    /**
-     * For internal use by {@link Enhancer} only; see the {@link org.logicalcobwebs.cglib.reflect.FastMethod} class
-     * for similar functionality.
-     */
-    public static MethodProxy create(ClassLoader loader, Class c1, Class c2, String desc, String name1, String name2) {
-        final Signature sig1 = new Signature(name1, desc);
-        Signature sig2 = new Signature(name2, desc);
-        FastClass f1 = helper(loader, c1);
-        FastClass f2 = helper(loader, c2);
-        int i1 = f1.getIndex(sig1);
-        int i2 = f2.getIndex(sig2);
-
-        MethodProxy proxy;
-        if (i1 < 0) {
-            proxy = new MethodProxy() {
-                public Object invoke(Object obj, Object[] args) throws Throwable {
-                    throw new IllegalArgumentException("Protected method: " + sig1);
-                }
-            };
-        } else {
-            proxy = new MethodProxy();
-        }
-
-        proxy.f1 = f1;
-        proxy.f2 = f2;
-        proxy.i1 = i1;
-        proxy.i2 = i2;
-        proxy.sig = sig1;
-        proxy.superName = name2;
-        return proxy;
-    }
-
-    private static FastClass helper(ClassLoader loader, Class type) {
-        FastClass.Generator g = new FastClass.Generator();
-        g.setType(type);
-        g.setClassLoader(loader);
-        return g.create();
-    }
 
     private MethodProxy() {
     }
