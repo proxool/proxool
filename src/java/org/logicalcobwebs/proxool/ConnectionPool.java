@@ -24,7 +24,7 @@ import java.util.Iterator;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.53 $, $Date: 2003/02/26 16:05:52 $
+ * @version $Revision: 1.54 $, $Date: 2003/02/28 10:10:25 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -554,8 +554,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     long id = getProxyConnection(i).getId();
                     try {
                         connectionClosedManually = true;
-                        getProxyConnection(i).reallyClose();
-                        ;
+                        removeProxyConnection(getProxyConnection(i), "of shutdown", true);
                         if (log.isDebugEnabled()) {
                             log.debug("Connection #" + id + " closed");
                         }
@@ -1196,6 +1195,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.54  2003/02/28 10:10:25  billhorsman
+ on death now gets called for connections killed during shutdown
+
  Revision 1.53  2003/02/26 16:05:52  billhorsman
  widespread changes caused by refactoring the way we
  update and redefine pool definitions.
