@@ -5,6 +5,7 @@
  */
 package org.logicalcobwebs.proxool.util;
 
+import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
@@ -38,7 +39,7 @@ import java.util.List;
  </pre>
  </code>
  * </p>
- * @version $Revision: 1.6 $, $Date: 2003/03/10 15:26:55 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/11 00:12:11 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -46,7 +47,7 @@ import java.util.List;
 public abstract class AbstractListenerContainer implements ListenerContainerIF {
     static final Log LOG = LogFactory.getLog(AbstractListenerContainer.class);
     private List listeners;
-    private ReadWriteLock readWriteLock = new ReadWriteLock();
+    private WriterPreferenceReadWriteLock readWriteLock = new WriterPreferenceReadWriteLock();
 
     /**
      * @see ListenerContainerIF#addListener(Object)
@@ -56,7 +57,7 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF {
             return;
         }
         try {
-            readWriteLock.aquireWrite();
+            readWriteLock.writeLock().acquire();
             if (this.listeners == null) {
                 this.listeners = new ArrayList(3);
             }
@@ -64,7 +65,7 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF {
         } catch (InterruptedException e) {
             LOG.error("Tried to aquire write lock for storing " + listener.getClass().getName() + " but was interrupted.");
         } finally {
-            readWriteLock.release();
+            readWriteLock.writeLock().release();
         }
     }
 
@@ -77,12 +78,12 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF {
         } else {
             boolean listenerRemoved = false;
             try {
-                this.readWriteLock.aquireRead();
+                this.readWriteLock.readLock().acquire();
                 listenerRemoved = this.listeners.remove(listener);
             } catch (InterruptedException e) {
                 LOG.error("Tried to aquire write lock for removing " + listener.getClass().getName() + " but was interrupted.");
             } finally {
-                this.readWriteLock.release();
+                this.readWriteLock.readLock().release();
             }
             return listenerRemoved;
         }
@@ -96,7 +97,7 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF {
      * @throws InterruptedException if the read lock can't be obtained.
      */
     protected Iterator getListenerIterator() throws InterruptedException {
-        this.readWriteLock.aquireRead();
+        this.readWriteLock.readLock().acquire();
         if (!isEmpty()) {
             return this.listeners.iterator();
         } else {
@@ -108,7 +109,7 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF {
      * Release the read lock aquired by the {@link #getListenerIterator()} method.
      */
     protected void releaseReadLock() {
-        this.readWriteLock.release();
+        this.readWriteLock.readLock().release();
     }
 
     /**
@@ -122,6 +123,9 @@ public abstract class AbstractListenerContainer implements ListenerContainerIF {
 /*
  Revision history:
  $Log: AbstractListenerContainer.java,v $
+ Revision 1.7  2003/03/11 00:12:11  billhorsman
+ switch to concurrent package
+
  Revision 1.6  2003/03/10 15:26:55  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)
