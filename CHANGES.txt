@@ -1,11 +1,11 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.33 $
-$Date: 2004/03/23 21:33:23 $
+$Revision: 1.34 $
+$Date: 2004/03/25 12:29:40 $
 $Author: billhorsman $
 
-0.9.0
+0.9.0 
 
 - New DataSource implementation. TODO more
 
