@@ -33,9 +33,9 @@ import java.io.Reader;
  * xml should be validated or not. If you want your xml to be validated be sure to read the
  * <a href="XMLConfigurator.html#validation">Validation</a> chapter in the JavaDoc for {@link XMLConfigurator}.
  * </p>
- * @version $Revision: 1.10 $, $Date: 2003/03/10 23:43:15 $
+ * @version $Revision: 1.11 $, $Date: 2004/05/14 21:15:47 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: brenuart $ (current maintainer)
  * @since Proxool 0.6
  */
 public class JAXPConfigurator {
@@ -82,8 +82,8 @@ public class JAXPConfigurator {
             }
             final XMLConfigurator xmlConfigurator = new XMLConfigurator();
             xmlReader.setErrorHandler(xmlConfigurator);
-            setSAXFeauture(xmlReader, "http://xml.org/sax/features/namespaces", NAMESPACE_AWARE);
-            setSAXFeauture(xmlReader, "http://xml.org/sax/features/namespace-prefixes", !NAMESPACE_AWARE);
+            setSAXFeature(xmlReader, "http://xml.org/sax/features/namespaces", NAMESPACE_AWARE);
+            setSAXFeature(xmlReader, "http://xml.org/sax/features/namespace-prefixes", !NAMESPACE_AWARE);
             saxParser.parse(inputSource, xmlConfigurator);
         } catch (ParserConfigurationException pce) {
             throw new ProxoolException("Parser configuration failed", pce);
@@ -109,7 +109,7 @@ public class JAXPConfigurator {
 
     // only log warning on problems with recognition and support of features
     // we'll probably pull through anyway...
-    private static void setSAXFeauture(XMLReader xmlReader, String feature, boolean state) {
+    private static void setSAXFeature(XMLReader xmlReader, String feature, boolean state) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting sax feature: '" + feature + "'. State: " + state + ".");
         }
@@ -126,6 +126,9 @@ public class JAXPConfigurator {
 /*
  Revision history:
  $Log: JAXPConfigurator.java,v $
+ Revision 1.11  2004/05/14 21:15:47  brenuart
+ Fix type in method name
+
  Revision 1.10  2003/03/10 23:43:15  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...
