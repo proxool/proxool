@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.1 $
-    $Date: 2002/09/13 08:12:29 $
+    $Revision: 1.2 $
+    $Date: 2002/09/17 22:45:08 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -35,7 +35,7 @@
     <property name="version" value="0.4"/>
 
     <!-- Classpath -->
-    <path id="classpath">
+    <path id="classpath" path="${build-dir}/classes" >
         <fileset dir="lib">
             <include name="**/*.jar"/>
         </fileset>
@@ -51,7 +51,7 @@
     <target
         name="init"
         >
-        <mkdir dir="${build-dir}/src/java"/>
+        <mkdir dir="${build-dir}/src/java" description="make source directory" />
         <mkdir dir="${build-dir}/etc"/>
         <mkdir dir="${build-dir}/deploy"/>
         <mkdir dir="${build-dir}/classes"/>
@@ -141,6 +141,7 @@
         description="Compiles the code"
         depends="init,build-src"
         >
+        <echo message="debug=${debug}"/>
         <javac srcdir="${build-dir}/src/java" destdir="${build-dir}/classes" debug="${debug}">
             <classpath refid="classpath"/>
 		</javac>
@@ -156,7 +157,7 @@
             <attribute name="Date" value="${TODAY}"/>
         </manifest>
         <jar
-            jarfile="${build-dir}/deploy/proxool-${version}.jar"
+            jarfile="${build-dir}/proxool-${version}.jar"
             basedir="${build-dir}/classes"
             manifest="${build-dir}/etc/MANIFEST.MF"
             />
@@ -213,16 +214,39 @@
     </target>
 
     <target
-        name="test"
-        description="Runs the JUnit tests"
+        name="build-test"
+        description="Builds the source for running the tests"
         depends="init"
         >
         <property name="build-test" value="true"/>
-        <!--antcall target="build-src"/>
-        <antcall target="compile"/ -->
-        <java classpathref="classpath" classpath="$[build-dir}/classes" classname="junit.textui.TestRunner" >
+        <antcall target="build-src"/>
+        <antcall target="compile"/>
+    </target>
+
+    <target
+        name="run-test-with-chainsaw"
+        description="Runs the JUnit tests (with Chainsaw)"
+        depends="init"
+        >
+        <parallel>
+            <java fork="yes" classpathref="classpath" classname="org.apache.log4j.chainsaw.Main" />
+            <sequential>
+                <sleep seconds="10"/>
+                <java fork="yes" classpathref="classpath" classname="junit.textui.TestRunner" >
+                    <arg value="org.logicalcobwebs.proxool.GeneralTests" />
+                </java>
+            </sequential>
+        </parallel>
+    </target>
+
+    <target
+        name="run-test"
+        description="Runs the JUnit tests"
+        depends="init"
+        >
+        <java fork="yes" classpathref="classpath" classname="junit.textui.TestRunner" >
             <arg value="org.logicalcobwebs.proxool.GeneralTests" />
-		</java>
+        </java>
     </target>
 
     <target
