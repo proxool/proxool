@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.28 $, $Date: 2003/10/24 15:22:21 $
+ * @version $Revision: 1.29 $, $Date: 2003/10/30 00:13:59 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -381,7 +381,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             }
         }
 
-        if (key.startsWith(ProxoolConstants.PROPERTY_PREFIX)) {
+        if (!key.startsWith(ProxoolConstants.PROPERTY_PREFIX)) {
             if (isChanged(getDelegateProperty(key), value)) {
                 changed = true;
                 if (!pretend) {
@@ -1131,6 +1131,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.29  2003/10/30 00:13:59  billhorsman
+ Fixed bug where all proxool properties were getting passed onto the delegate driver, and all delegate properties weren't
+
  Revision 1.28  2003/10/24 15:22:21  billhorsman
  Fixed bug where connection pool was being recognised as changed even when it wasn't. (This bug introduced after 0.7.2).
 
