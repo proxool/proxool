@@ -10,24 +10,20 @@ import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.ConnectionInfoIF;
-import org.logicalcobwebs.proxool.monitor.Snapshot;
-import org.logicalcobwebs.proxool.monitor.SnapshotIF;
-import org.logicalcobwebs.proxool.monitor.StatisticsIF;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.List;
-import java.util.Vector;
+import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/31 11:35:57 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 16:38:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -128,6 +124,9 @@ public class Monitor {
 /*
  Revision history:
  $Log: Monitor.java,v $
+ Revision 1.2  2003/01/31 16:38:51  billhorsman
+ doc (and removing public modifier for classes where possible)
+
  Revision 1.1  2003/01/31 11:35:57  billhorsman
  improvements to servlet (including connection details)
 

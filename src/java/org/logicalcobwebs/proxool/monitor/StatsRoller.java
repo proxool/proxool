@@ -5,27 +5,28 @@
  */
 package org.logicalcobwebs.proxool.monitor;
 
-import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.monitor.Statistics;
-import org.logicalcobwebs.proxool.monitor.StatisticsIF;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.ProxoolException;
 
-import java.util.Calendar;
-import java.util.TimerTask;
-import java.util.Timer;
-import java.text.DecimalFormat;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
- * TODO
- * @version $Revision: 1.2 $, $Date: 2003/01/31 14:33:19 $
+ * Responsbile for a single set of statistics. It rolls over to a new set
+ * whenever it should. It provides access to the latest complete set
+ * when it is available.
+ *
+ * @version $Revision: 1.3 $, $Date: 2003/01/31 16:38:54 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class StatsRoller {
+class StatsRoller {
 
     private Log log;
 
@@ -168,6 +169,9 @@ public class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.3  2003/01/31 16:38:54  billhorsman
+ doc (and removing public modifier for classes where possible)
+
  Revision 1.2  2003/01/31 14:33:19  billhorsman
  fix for DatabaseMetaData
 

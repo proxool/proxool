@@ -1,7 +1,7 @@
-/**
- * Clever Little Trader
- *
- * Jubilee Group and Logical Cobwebs, 2002
+/*
+ * This software is released under the Apache Software Licence. See
+ * package.html for details. The latest version is available at
+ * http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool.monitor;
 
@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * Implementation of StatisticsIF
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/31 11:35:57 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 16:38:53 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -133,6 +133,9 @@ class Statistics implements StatisticsIF {
 /*
  Revision history:
  $Log: Statistics.java,v $
+ Revision 1.2  2003/01/31 16:38:53  billhorsman
+ doc (and removing public modifier for classes where possible)
+
  Revision 1.1  2003/01/31 11:35:57  billhorsman
  improvements to servlet (including connection details)
 

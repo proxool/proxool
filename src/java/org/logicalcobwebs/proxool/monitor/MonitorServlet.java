@@ -7,10 +7,10 @@ package org.logicalcobwebs.proxool.monitor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.ConnectionInfoIF;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
-import org.logicalcobwebs.proxool.ConnectionInfoIF;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -45,7 +45,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/31 11:35:57 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/31 16:38:52 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -507,6 +507,9 @@ public class MonitorServlet extends HttpServlet {
 /*
  Revision history:
  $Log: MonitorServlet.java,v $
+ Revision 1.3  2003/01/31 16:38:52  billhorsman
+ doc (and removing public modifier for classes where possible)
+
  Revision 1.2  2003/01/31 11:35:57  billhorsman
  improvements to servlet (including connection details)
 

@@ -5,24 +5,22 @@
  */
 package org.logicalcobwebs.proxool.monitor;
 
-import org.logicalcobwebs.proxool.ConnectionInfoIF;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.proxool.ConnectionInfoIF;
 
 import java.util.Date;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.Comparator;
 
 /**
  * Implementation of SnapshotIF
  *
- * @version $Revision: 1.1 $, $Date: 2003/01/31 11:35:57 $
+ * @version $Revision: 1.2 $, $Date: 2003/01/31 16:38:53 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class Snapshot implements SnapshotIF {
+class Snapshot implements SnapshotIF {
 
     private static final Log LOG = LogFactory.getLog(Snapshot.class);
 
@@ -183,6 +181,9 @@ public class Snapshot implements SnapshotIF {
 /*
  Revision history:
  $Log: Snapshot.java,v $
+ Revision 1.2  2003/01/31 16:38:53  billhorsman
+ doc (and removing public modifier for classes where possible)
+
  Revision 1.1  2003/01/31 11:35:57  billhorsman
  improvements to servlet (including connection details)
 
