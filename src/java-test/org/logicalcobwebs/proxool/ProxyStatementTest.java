@@ -10,14 +10,13 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.7 $, $Date: 2003/11/05 00:00:52 $
+ * @version $Revision: 1.8 $, $Date: 2003/12/09 18:52:19 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -87,6 +86,9 @@ public class ProxyStatementTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ProxyStatementTest.java,v $
+ Revision 1.8  2003/12/09 18:52:19  billhorsman
+ checkstyle
+
  Revision 1.7  2003/11/05 00:00:52  billhorsman
  Remove redundant test (already in FatalSqlExceptionTest)
 
