@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.6 $
-    $Date: 2002/10/25 10:42:07 $
+    $Revision: 1.7 $
+    $Date: 2002/10/25 16:01:04 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -55,6 +55,8 @@
         <mkdir dir="${build-dir}/etc"/>
         <mkdir dir="${build-dir}/deploy"/>
         <mkdir dir="${build-dir}/classes"/>
+        <mkdir dir="${build-dir}/api"/>
+        <mkdir dir="${build-dir}/api-full"/>
         <tstamp/>
     </target>
 
@@ -255,11 +257,20 @@
         depends="init,build-src,compile">
         <javadoc
             sourcepath="${build-dir}/src/java"
-            destdir="${build-dir}/api"
+            destdir="${build-dir}/api-full"
             packagenames="org.logicalcobwebs.*"
             doctitle="Proxool API Documentation"
             windowtitle="Proxool API Documentation"
-            header="&lt;a target=&quot;_parent&quot; href=&quot;../index.html&quot;&gt;Proxool&lt;/a&gt;"
+        />
+        <javadoc
+            sourcepath="${build-dir}/src/java"
+            destdir="${build-dir}/api"
+            packagenames="org.logicalcobwebs.*"
+            doctitle="Proxool Simple API Documentation"
+            windowtitle="Proxool Simple API Documentation"
+            package="false"
+            private="false"
+            protected="false"
         />
     </target>
 
