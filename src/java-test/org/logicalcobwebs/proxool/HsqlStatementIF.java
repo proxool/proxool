@@ -12,18 +12,19 @@ import java.sql.Statement;
  * Supports {@link InjectableInterfaceTest}
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.1 $, $Date: 2004/06/02 20:59:52 $
+ * @version $Revision: 1.2 $, $Date: 2004/06/17 21:33:54 $
  * @since 0.9.0
  */
 public interface HsqlStatementIF extends Statement {
-
-    void checkClosed() throws SQLException;
 
 }
 
 /*
  Revision history:
  $Log: HsqlStatementIF.java,v $
+ Revision 1.2  2004/06/17 21:33:54  billhorsman
+ Mistake. Can't put private classes in the interface. Doh.
+
  Revision 1.1  2004/06/02 20:59:52  billhorsman
  New injectable interface tests
 
