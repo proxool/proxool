@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:13:00 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/17 19:46:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -37,9 +37,6 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     private Properties properties = new Properties();
 
-    /** The filename that the log uses! */
-    private String logFileName;
-
     private String url;
 
     private String completeUrl;
@@ -55,8 +52,6 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private int debugLevel;
 
     private Set fatalSqlExceptions = new HashSet();
-
-    private boolean autoClean = true;
 
     /** Holds value of property houseKeepingTestSql. */
     private String houseKeepingTestSql;
@@ -148,14 +143,6 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     public void setMaximumNewConnections(int maximumNewConnections) {
         this.maximumNewConnections = maximumNewConnections;
-    }
-
-    public String getLogFileName() {
-        return logFileName;
-    }
-
-    public void setLogFileName(String logFileName) {
-        this.logFileName = logFileName;
     }
 
     public Properties getProperties() {
@@ -254,8 +241,11 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
- Revision 1.1  2002/09/13 08:13:00  billhorsman
- Initial revision
+ Revision 1.2  2002/10/17 19:46:02  billhorsman
+ removed redundant reference to logFilename (we now use Jakarta's Commons Logging component
+
+ Revision 1.1.1.1  2002/09/13 08:13:00  billhorsman
+ new
 
  Revision 1.8  2002/07/10 16:14:47  billhorsman
  widespread layout changes and move constants into ProxoolConstants

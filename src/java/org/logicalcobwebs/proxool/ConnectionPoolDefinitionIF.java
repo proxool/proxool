@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  * A full definition of everything to do with a connection.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:13:02 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/17 19:46:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -94,9 +94,6 @@ public interface ConnectionPoolDefinitionIF {
     very suspicious if it reports the version as 1.0) */
     String getJdbcDriverVersion();
 
-    /** Mandatory. This is where we write the log. You've got to have this. */
-    String getLogFileName();
-
     /**
      * Get all of the properties that are defined on the delegated driver.
      * @return
@@ -137,8 +134,11 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
- Revision 1.1  2002/09/13 08:13:02  billhorsman
- Initial revision
+ Revision 1.2  2002/10/17 19:46:02  billhorsman
+ removed redundant reference to logFilename (we now use Jakarta's Commons Logging component
+
+ Revision 1.1.1.1  2002/09/13 08:13:02  billhorsman
+ new
 
  Revision 1.6  2002/07/02 08:44:56  billhorsman
  Removed all mutators
