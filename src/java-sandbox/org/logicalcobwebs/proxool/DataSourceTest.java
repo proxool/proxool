@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 /**
  * Test for {@link org.logicalcobwebs.proxool.BasicDataSource}
- * @version $Revision: 1.1 $, $Date: 2003/04/19 13:01:01 $
+ * @version $Revision: 1.1 $, $Date: 2003/04/27 15:45:31 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
