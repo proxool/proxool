@@ -11,9 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
@@ -21,7 +19,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.10 $, $Date: 2002/10/30 21:19:17 $
+ * @version $Revision: 1.11 $, $Date: 2002/10/30 21:25:09 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -80,17 +78,16 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
             // If we have just made some sort of Statement then we should rather return
             // a proxy instead.
             if (result instanceof Statement) {
-                Class[] types = result.getClass().getInterfaces();
                 // Work out whether we were passed the sql statement during the
                 // call to get the statement object. Sometimes you do, sometimes
                 // you don't:
                 // connection.prepareCall(sql);
-                // connection.createStatement();
+                // connection.createProxyStatement();
                 String sqlStatement = null;
                 if (args != null && args.length > 0 && args[0] instanceof String) {
                     sqlStatement = (String) args[0];
                 }
-                result = Proxy.newProxyInstance(result.getClass().getClassLoader(), types, new ProxyStatement((Statement) result, connectionPool, sqlStatement));
+                result = ProxyFactory.createProxyStatement((Statement)result, connectionPool, sqlStatement);
             }
 
         } catch (InvocationTargetException e) {
@@ -347,11 +344,14 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.11  2002/10/30 21:25:09  billhorsman
+ move createStatement into ProxyFactory
+
  Revision 1.10  2002/10/30 21:19:17  billhorsman
  make use of ProxyFactory
 
  Revision 1.9  2002/10/28 19:51:34  billhorsman
- Fixed NullPointerException when calling connection.createStatement()
+ Fixed NullPointerException when calling connection.createProxyStatement()
 
  Revision 1.8  2002/10/28 19:28:25  billhorsman
  checkstyle

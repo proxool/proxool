@@ -9,6 +9,7 @@ package org.logicalcobwebs.proxool;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.DriverManager;
+import java.sql.Statement;
 import java.lang.reflect.Proxy;
 
 /**
@@ -16,7 +17,7 @@ import java.lang.reflect.Proxy;
  *
  * TODO
  *
- * @version $Revision: 1.1 $, $Date: 2002/10/30 21:19:16 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/30 21:25:08 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since GSI 5.0
@@ -49,11 +50,20 @@ class ProxyFactory {
                 new Class[]{Connection.class},
                 proxyConnection);
     }
+
+    protected static Object createProxyStatement(Statement delegate, ConnectionPool connectionPool, String sqlStatement) {
+        return Proxy.newProxyInstance(delegate.getClass().getClassLoader(), delegate.getClass().getInterfaces(), new ProxyStatement(delegate, connectionPool, sqlStatement));
+    }
+
+
 }
 
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.2  2002/10/30 21:25:08  billhorsman
+ move createStatement into ProxyFactory
+
  Revision 1.1  2002/10/30 21:19:16  billhorsman
  make use of ProxyFactory
 
