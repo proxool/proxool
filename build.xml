@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.7 $
-    $Date: 2002/10/25 16:01:04 $
+    $Revision: 1.8 $
+    $Date: 2002/10/25 17:39:50 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -56,7 +56,7 @@
         <mkdir dir="${build-dir}/deploy"/>
         <mkdir dir="${build-dir}/classes"/>
         <mkdir dir="${build-dir}/api"/>
-        <mkdir dir="${build-dir}/api-full"/>
+        <mkdir dir="${build-dir}/api-dev"/>
         <tstamp/>
     </target>
 
@@ -255,22 +255,28 @@
         name="javadoc"
         description="Produce Javadoc API"
         depends="init,build-src,compile">
+
+        <!-- Full documentation for use by developers -->
         <javadoc
-            sourcepath="${build-dir}/src/java"
-            destdir="${build-dir}/api-full"
+            destdir="${build-dir}/api-dev"
             packagenames="org.logicalcobwebs.*"
-            doctitle="Proxool API Documentation"
-            windowtitle="Proxool API Documentation"
-        />
+            doctitle="Proxool Developer's API}"
+            windowtitle="Proxool Developer's API}"
+            private="true"
+        >
+            <sourcepath path="src/java" />
+            <sourcepath path="src/java-test" />
+            <sourcepath path="src/java-ext" />
+        </javadoc>
+
+        <!-- Simple documentation for use by users -->
         <javadoc
-            sourcepath="${build-dir}/src/java"
+            sourcepath="src/java"
             destdir="${build-dir}/api"
             packagenames="org.logicalcobwebs.*"
-            doctitle="Proxool Simple API Documentation"
-            windowtitle="Proxool Simple API Documentation"
-            package="false"
-            private="false"
-            protected="false"
+            doctitle="Proxool API}"
+            windowtitle="Proxool API}"
+            public="true"
         />
     </target>
 
