@@ -5,6 +5,7 @@
  */
 package org.logicalcobwebs.proxool;
 
+import java.util.Date;
 
 
 /**
@@ -21,7 +22,7 @@ package org.logicalcobwebs.proxool;
  * }
  * </pre>
  *
- * @version $Revision: 1.6 $, $Date: 2003/01/27 18:26:35 $
+ * @version $Revision: 1.7 $, $Date: 2003/01/31 11:38:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -69,6 +70,12 @@ public interface ConnectionInfoIF {
      * since midnight, January 1, 1970 UTC.
      */
     long getBirthTime();
+
+    /**
+     * Like {@link #getBirthTime} but in Date format
+     * @return birthDate
+     */
+    Date getBirthDate();
 
     /**
      * The age in millseconds since this connection was built
@@ -123,6 +130,9 @@ public interface ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.7  2003/01/31 11:38:57  billhorsman
+ birthDate now stored as Date not long
+
  Revision 1.6  2003/01/27 18:26:35  billhorsman
  refactoring of ProxyConnection and ProxyStatement to
  make it easier to write JDK 1.2 patch

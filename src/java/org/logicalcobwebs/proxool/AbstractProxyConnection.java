@@ -15,13 +15,14 @@ import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Date;
 
 /**
  * Contains most of the functionality that we require to manipilate the
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.2 $, $Date: 2003/01/28 11:50:35 $
+ * @version $Revision: 1.3 $, $Date: 2003/01/31 11:38:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -38,7 +39,7 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
 
     private long id;
 
-    private long birthTime;
+    private Date birthDate;
 
     private long timeLastStartActive;
 
@@ -227,7 +228,14 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
      * @see ConnectionInfoIF#getBirthTime
      */
     public long getBirthTime() {
-        return birthTime;
+        return birthDate.getTime();
+    }
+
+    /**
+     * @see ConnectionInfoIF#getBirthDate
+     */
+    public Date getBirthDate() {
+        return birthDate;
     }
 
     /**
@@ -241,7 +249,7 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
      * @see ConnectionInfoIF#getBirthTime
      */
     public void setBirthTime(long birthTime) {
-        this.birthTime = birthTime;
+        birthDate = new Date(birthTime);
     }
 
     /**
@@ -461,6 +469,9 @@ abstract public class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.3  2003/01/31 11:38:57  billhorsman
+ birthDate now stored as Date not long
+
  Revision 1.2  2003/01/28 11:50:35  billhorsman
  more verbose debug
 
