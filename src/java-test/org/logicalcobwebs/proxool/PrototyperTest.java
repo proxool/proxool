@@ -8,6 +8,7 @@ package org.logicalcobwebs.proxool;
 import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.admin.SnapshotIF;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,7 +17,7 @@ import java.util.Properties;
 /**
  * Test the prototyper in ConnectionPool
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/27 18:01:48 $
+ * @version $Revision: 1.2 $, $Date: 2003/03/01 00:39:23 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -64,23 +65,17 @@ public class PrototyperTest extends TestCase {
 
             Connection[] connections = new Connection[6];
 
-            Thread.sleep(2000);
-            assertEquals("activeConnectionCount", 0, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
-            assertEquals("availableConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
+            waitForSnapshotState(alias, 0, 2);
 
             connections[0] = DriverManager.getConnection(url);
 
-            Thread.sleep(2000);
-            assertEquals("activeConnectionCount", 1, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
-            assertEquals("availableConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
+            waitForSnapshotState(alias, 1, 2);
 
             connections[1] = DriverManager.getConnection(url);
             connections[2] = DriverManager.getConnection(url);
             connections[3] = DriverManager.getConnection(url);
 
-            Thread.sleep(2000);
-            assertEquals("activeConnectionCount", 4, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
-            assertEquals("availableConnectionCount", 1, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
+            waitForSnapshotState(alias, 4, 1);
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -89,6 +84,24 @@ public class PrototyperTest extends TestCase {
             ProxoolFacade.removeConnectionPool(alias);
         }
 
+    }
+
+    private void waitForSnapshotState(String alias, int active, int available) throws ProxoolException {
+        SnapshotIF s = ProxoolFacade.getSnapshot(alias);
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < 10000) {
+            if (s.getActiveConnectionCount() == active && s.getAvailableConnectionCount() == available) {
+                break;
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                LOG.error("Awoken", e);
+            }
+            s = ProxoolFacade.getSnapshot(alias);
+        }
+        assertEquals("activeConnectionCount", active, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
+        assertEquals("availableConnectionCount", available, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
     }
 
 
@@ -129,6 +142,9 @@ public class PrototyperTest extends TestCase {
 /*
  Revision history:
  $Log: PrototyperTest.java,v $
+ Revision 1.2  2003/03/01 00:39:23  billhorsman
+ made more robust
+
  Revision 1.1  2003/02/27 18:01:48  billhorsman
  completely rethought the test structure. it's now
  more obvious. no new tests yet though.
