@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.26 $
-$Date: 2003/10/01 19:31:54 $
+$Revision: 1.27 $
+$Date: 2003/10/18 20:45:05 $
 $Author: billhorsman $
 
 0.8.0 - (October, 2003)
@@ -56,6 +56,21 @@ $Author: billhorsman $
 
 - Fix to documentation. Defining more than one type of fatal SQL exception
   is done with a comma delimited list.
+
+- Fix to ProxoolFacade.redefine() which was in fact doing an update instead of a
+  redefine. This didn't have any consequences unless you were calling this method
+  explicitly in your code.
+
+- Made the 'Attempt to use a pool with incomplete definition' exception a but more
+  informative. It is often because you are refering to an unregistered pool by its
+  alias.
+
+- SQL command logging (using the 'trace' property) now embeds the parameters into
+  the SQL (if the SQL is parametised). This means that the log is almost like a
+  journal - with the exception that any callable statements that return data retain
+  the ? (question marks) that contain the output parameters.
+
+- Batched statements are now correctly reported with the trace feature.
 
 0.7.2 - April 28, 2003
 
