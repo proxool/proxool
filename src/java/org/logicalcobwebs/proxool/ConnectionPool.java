@@ -19,7 +19,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.9 $, $Date: 2002/10/27 12:07:45 $
+ * @version $Revision: 1.10 $, $Date: 2002/10/27 13:02:45 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -517,7 +517,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             } finally {
                 if (log.isDebugEnabled()) {
                     log.debug("Connection pool has been closed down by " + finalizerName
-                        + " in " + (System.currentTimeMillis() - startFinalize) + " milliseconds.");
+                            + " in " + (System.currentTimeMillis() - startFinalize) + " milliseconds.");
                     if (!connectionClosedManually) {
                         log.debug("No connections required manual removal.");
                     }
@@ -742,17 +742,21 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
                 boolean keepAtIt = true;
                 boolean somethingDone = false;
-                while (connectionPoolUp && keepAtIt
-                        && connectionCount < getDefinition().getMaximumConnectionCount()) {
+                while (connectionPoolUp && keepAtIt) {
 
                     String reason = null;
-                    if (connectionCount < getDefinition().getMinimumConnectionCount()) {
-                        reason = "to achieve minimum of " +getDefinition().getMinimumConnectionCount();
+                    if (connectionCount < getDefinition().getMaximumConnectionCount()) {
+                        // We don't want to make any more that the maximum
+                        break;
+                    } else if (connectionCount < getDefinition().getMinimumConnectionCount()) {
+                        reason = "to achieve minimum of " + getDefinition().getMinimumConnectionCount();
                     } else if (getAvailableConnectionCount() < getDefinition().getPrototypeCount()) {
-                        reason = "to keep " +getDefinition().getPrototypeCount() + " available";
+                        reason = "to keep " + getDefinition().getPrototypeCount() + " available";
+                    } else {
+                        // Nothing to do
+                        break;
                     }
 
-                    if (reason != null) {
                     try {
                         ProxyConnection poolableConnection = createPoolableConnection(ProxyConnection.STATUS_AVAILABLE, reason);
                         addPoolableConnection(poolableConnection);
@@ -766,9 +770,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         keepAtIt = false;
                         // Don't wory, we'll start again the next time the
                         // housekeeping thread runs.
-                    }
-                    } else {
-                        break;
                     }
                 }
 
@@ -1040,6 +1041,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.10  2002/10/27 13:02:45  billhorsman
+ change to prototyper logic to make it clearer (but no functional change)
+
  Revision 1.9  2002/10/27 12:07:45  billhorsman
  fix bug where prototyper kept making connections up to maximum. Log now gives reason why connection was prototyped. Fix bug where definition with no properties was not allowed (it is now).
 
