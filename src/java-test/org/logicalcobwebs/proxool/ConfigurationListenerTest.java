@@ -9,13 +9,14 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
 import java.util.Properties;
+import java.sql.DriverManager;
 
 /**
  * Test that registering a {@link org.logicalcobwebs.proxool.ConfigurationListenerIF}
  * with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.10 $, $Date: 2003/04/10 21:48:58 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -84,6 +85,22 @@ public class ConfigurationListenerTest extends AbstractProxoolTest {
         assertEquals("definitionReceived", false, mcl1.isUpdateReceived());
         assertEquals("definitionReceived", true, mcl2.isUpdateReceived());
         mcl1.reset();
+        mcl2.reset();
+
+        // Check that just asking for another Connection (without config
+        // change) doesn't trigger another event
+        DriverManager.getConnection(url).close();
+        assertEquals("definitionReceived", false, mcl2.isUpdateReceived());
+        mcl2.reset();
+
+        // Now try again, but this time pass in the properties (without
+        // change)
+        LOG.debug("Getting another connection to trigger any pending config changes");
+        DriverManager.getConnection(url, info).close();
+        mcl2.reset();
+        LOG.debug("Getting another connection which shouldn't cause another config change");
+        DriverManager.getConnection(url, info).close();
+        assertEquals("definitionReceived", false, mcl2.isUpdateReceived());
         mcl2.reset();
 
         // Remove the second listener
@@ -211,6 +228,10 @@ public class ConfigurationListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.10  2003/04/10 21:48:58  billhorsman
+ enhanced to trap bug where config change event gets fired
+ all the time
+
  Revision 1.9  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 
