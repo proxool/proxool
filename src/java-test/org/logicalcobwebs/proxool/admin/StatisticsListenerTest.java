@@ -14,12 +14,15 @@ import org.logicalcobwebs.proxool.TestConstants;
 import org.logicalcobwebs.proxool.TestHelper;
 
 import java.sql.DriverManager;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/04 10:58:44 $
+ * @version $Revision: 1.12 $, $Date: 2003/09/05 16:27:27 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -27,6 +30,11 @@ import java.util.Properties;
 public class StatisticsListenerTest extends AbstractProxoolTest {
 
     private static final Log LOG = LogFactory.getLog(StatisticsListenerTest.class);
+
+    /**
+     * HH:mm:ss
+     */
+    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
 
     /**
      * @see junit.framework.TestCase#TestCase
@@ -59,18 +67,37 @@ public class StatisticsListenerTest extends AbstractProxoolTest {
         // Add listener
         TestListener testListener = new TestListener();
         ProxoolFacade.addStatisticsListener(alias, testListener);
-        long lap0 = System.currentTimeMillis();
+        Date lap0 = new Date();
 
-        // Wait for next statistics so we can guarantee that next set won't
+        // Wait for next statistics1 so we can guarantee that next set won't
         // be produced whilst we are building connection
         testListener.getNextStatistics();
-        long lap1 = System.currentTimeMillis();
+        Date lap1 = new Date();
 
         DriverManager.getConnection(url).close();
-        StatisticsIF statistics = testListener.getNextStatistics();
-        long lap2 = System.currentTimeMillis();
+        Date lap2 = new Date();
+        StatisticsIF statistics1 = testListener.getNextStatistics();
+        Date lap3 = new Date();
+        StatisticsIF statistics2 = testListener.getNextStatistics();
+        Date lap4 = new Date();
 
-        assertEquals("servedCount (" + (lap1 - lap0) + ", " + (lap2 - lap1) + " ms)", 1L, statistics.getServedCount());
+        StringBuffer detail = new StringBuffer();
+        detail.append("lap0:");
+        detail.append(TIME_FORMAT.format(lap0));
+        detail.append(", lap1:");
+        detail.append(TIME_FORMAT.format(lap1));
+        detail.append(", lap2:");
+        detail.append(TIME_FORMAT.format(lap2));
+        detail.append(", lap3:");
+        detail.append(TIME_FORMAT.format(lap3));
+        detail.append("(");
+        detail.append(statistics1.getServedCount());
+        detail.append("), lap4:");
+        detail.append(TIME_FORMAT.format(lap4));
+        detail.append("(");
+        detail.append(statistics2.getServedCount());
+        detail.append(")");
+        assertEquals("servedCount - " + detail, 1L, statistics1.getServedCount());
 
     }
 
@@ -122,6 +149,9 @@ public class StatisticsListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.12  2003/09/05 16:27:27  billhorsman
+ Better debug output.
+
  Revision 1.11  2003/03/04 10:58:44  billhorsman
  checkstyle
 
