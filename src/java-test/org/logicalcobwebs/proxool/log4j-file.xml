@@ -3,9 +3,9 @@
 
 <log4j:configuration>
 
-    <appender name="logtofile" class="org.apache.log4j.RollingFileAppender">
+    <appender name="file" class="org.apache.log4j.RollingFileAppender">
       <param name="File" value="logs/proxool.log"/>
-      <param name="MaxFileSize" value="1000KB"/>
+      <param name="MaxFileSize" value="5000KB"/>
       <param name="MaxBackupIndex" value="20"/>
       <layout class="org.apache.log4j.PatternLayout">
         <param name="ConversionPattern" value="%d{DATE} [%-5p] %c{4} - %m%n"/>
@@ -18,7 +18,7 @@
 
     <root>
         <priority value="ERROR"/>
-        <appender-ref ref="chainsaw"/>
+        <appender-ref ref="file"/>
     </root>
 
 </log4j:configuration>
