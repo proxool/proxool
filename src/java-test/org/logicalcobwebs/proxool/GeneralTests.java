@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.dbscript.ScriptFacade;
-import org.logicalcobwebs.dbscript.ConnectionAdapterIF;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -19,7 +18,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.17 $, $Date: 2002/11/13 18:04:22 $
+ * @version $Revision: 1.18 $, $Date: 2002/11/13 18:28:43 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -454,6 +453,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.18  2002/11/13 18:28:43  billhorsman
+ checkstyle
+
  Revision 1.17  2002/11/13 18:04:22  billhorsman
  new prototyping test
 
