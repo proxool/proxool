@@ -18,7 +18,7 @@ import java.sql.DriverManager;
  *
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.3 $, $Date: 2002/11/02 14:22:16 $
+ * @version $Revision: 1.4 $, $Date: 2002/11/07 18:56:59 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -26,6 +26,20 @@ import java.sql.DriverManager;
 public class ProxoolAdapter implements ConnectionAdapterIF {
 
     private String alias = String.valueOf(hashCode());
+
+    /**
+     * Use this constructor if you want to define the alias
+     * @param alias the alias of the pool
+     */
+    public ProxoolAdapter(String alias) {
+        this.alias = alias;
+    }
+
+    /**
+     * Default constructor. Will use the hashCode as the alias for the pool
+     */
+    public ProxoolAdapter() {
+    }
 
     public String getName() {
         return "proxool";
@@ -62,6 +76,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF {
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.4  2002/11/07 18:56:59  billhorsman
+ allow explicit definition of alias
+
  Revision 1.3  2002/11/02 14:22:16  billhorsman
  Documentation
 
