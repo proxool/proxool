@@ -11,9 +11,18 @@ import java.sql.SQLException;
 /**
  * You can listen to the lifecycle of a connection. Sometimes, you may
  * want to perform a task when the connection is born or dies. Actually,
- * the reason why we originally did this is no obsolete. But the code
- * remains here just in case.
- * @version $Revision: 1.3 $, $Date: 2002/10/23 21:04:36 $
+ * the reason why we originally did this is now obsolete. But the code
+ * remains here just in case. You need to
+ * {@linkplain ProxoolFacade#setConnectionListener register}
+ * your implementation with ProxoolFacade.
+ *
+ * <pre>
+ * String alias = "myPool";
+ * ConnectionListenerIF myConnectionListener = new MyConnectionListener();
+ * ProxoolFacade.setConnectionListener(alias, myConnectionListener);
+ * </pre>
+ *
+ * @version $Revision: 1.4 $, $Date: 2002/10/25 16:00:20 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -64,6 +73,9 @@ public interface ConnectionListenerIF {
 /*
  Revision history:
  $Log: ConnectionListenerIF.java,v $
+ Revision 1.4  2002/10/25 16:00:20  billhorsman
+ added better class javadoc
+
  Revision 1.3  2002/10/23 21:04:36  billhorsman
  checkstyle fixes (reduced max line width and lenient naming convention
 

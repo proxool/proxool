@@ -9,8 +9,20 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * A full definition of everything to do with a connection.
- * @version $Revision: 1.3 $, $Date: 2002/10/24 17:29:06 $
+ * A full definition of everything to do with a connection. You can get one of these
+ * from {@linkplain ProxoolFacade#getConnectionPoolDefinition ProxoolFacade}.
+ *
+ * <pre>
+ * String alias = "myPool";
+ * ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
+ * </pre>
+ *
+ * If you want to update the definition you should either update the properties
+ * definition next time you
+ * {@linkplain java.sql.Driver#connect ask} for a connection or call
+ * {@linkplain ProxoolFacade#updateConnectionPool Proxool} directly.
+ *
+ * @version $Revision: 1.4 $, $Date: 2002/10/25 16:00:25 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -134,6 +146,9 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.4  2002/10/25 16:00:25  billhorsman
+ added better class javadoc
+
  Revision 1.3  2002/10/24 17:29:06  billhorsman
  prototype count now defaults to zero
 

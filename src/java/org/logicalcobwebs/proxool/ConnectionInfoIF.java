@@ -6,9 +6,20 @@
 package org.logicalcobwebs.proxool;
 
 /**
- * Provides information about an individual connection.
+ * Provides information about an individual connection. You can get a collection
+ * of these from {@link ProxoolFacade#getConnectionInfos ProxoolFacade}. You
+ * get back information about all the connections in a particular pool.
  *
- * @version $Revision: 1.2 $, $Date: 2002/09/18 13:48:56 $
+ * <pre>
+ * String alias = "myPool";
+ * Iterator i = ProxoolFacade.getConnectionInfos(alias).iterator();
+ * while (i.hasNext()) {
+ *  ConnectionInfoIF c = (ConnectionInfoIF)i.next();
+ *   ...
+ * }
+ * </pre>
+ *
+ * @version $Revision: 1.3 $, $Date: 2002/10/25 16:00:19 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -106,6 +117,9 @@ public interface ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.3  2002/10/25 16:00:19  billhorsman
+ added better class javadoc
+
  Revision 1.2  2002/09/18 13:48:56  billhorsman
  checkstyle and doc
 
