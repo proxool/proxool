@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.11 $, $Date: 2003/01/30 17:20:37 $
+ * @version $Revision: 1.12 $, $Date: 2003/01/31 00:17:04 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -144,7 +144,7 @@ public interface ConnectionPoolDefinitionIF {
     /**
      * Get the list of fatal SQL exception (Strings) fragments that will
      * trigger the death of a Connection.
-     * All SQLExceptions are caught and tested for containing this 
+     * All SQLExceptions are caught and tested for containing this
      * text fragment. If it matches than this connection is considered useless
      * and it is discarded. Regardless of what happens the exception
      * is always thrown back to the user.
@@ -184,16 +184,23 @@ public interface ConnectionPoolDefinitionIF {
 
     /**
      * The sample length (in seconds) when taking statistical information,
-     * or zero to disable statistics. Default is zero.
-     * @return statistics period
+     * or null to disable statistics. Default is null. You can comma delimit
+     * a series of periods. The suffix for the period is either "s" (seconds),
+     * "m" (minutes), "h" (hours) or "d" (days). For example: "15s,1h" would
+     * give two separate sample rates: every 15 seconds and every hour.
+     * @return statistics definition
      */
-    int getStatistics();
+    String getStatistics();
 
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.12  2003/01/31 00:17:04  billhorsman
+ statistics is now a string to allow multiple,
+ comma-delimited values
+
  Revision 1.11  2003/01/30 17:20:37  billhorsman
  new statistics property
 
