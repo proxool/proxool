@@ -20,9 +20,9 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.29 $, $Date: 2003/10/30 00:13:59 $
+ * @version $Revision: 1.30 $, $Date: 2004/03/15 02:42:44 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
@@ -493,41 +493,6 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                 changed = true;
                 if (!pretend) {
                     setJndiName(value.length() > 0 ? value : null);
-                }
-            }
-        } else if (key.equals(ProxoolConstants.INITIAL_CONTEXT_FACTORY_PROPERTY)) {
-            if (isChanged(getInitialContextFactory(), value)) {
-                changed = true;
-                if (!pretend) {
-                    setInitialContextFactory(value.length() > 0 ? value : null);
-                }
-            }
-        } else if (key.equals(ProxoolConstants.PROVIDER_URL_PROPERTY)) {
-            if (isChanged(getProviderUrl(), value)) {
-                changed = true;
-                if (!pretend) {
-                    setProviderUrl(value.length() > 0 ? value : null);
-                }
-            }
-        } else if (key.equals(ProxoolConstants.SECURITY_AUTHENTICATION)) {
-            if (isChanged(getSecurityAuthentication(), value)) {
-                changed = true;
-                if (!pretend) {
-                    setSecurityAuthentication(value.length() > 0 ? value : null);
-                }
-            }
-        } else if (key.equals(ProxoolConstants.SECURITY_PRINCIPAL_PROPERTY)) {
-            if (isChanged(getSecurityPrincipal(), value)) {
-                changed = true;
-                if (!pretend) {
-                    setSecurityPrincipal(value.length() > 0 ? value : null);
-                }
-            }
-        } else if (key.equals(ProxoolConstants.SECURITY_CREDENTIALS_PROPERTY)) {
-            if (isChanged(getSecurityCredentials(), value)) {
-                changed = true;
-                if (!pretend) {
-                    setSecurityCredentials(value.length() > 0 ? value : null);
                 }
             }
         } else {
@@ -1131,6 +1096,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.30  2004/03/15 02:42:44  chr32
+ Removed explicit JNDI properties. Going for a generic approach instead.
+
  Revision 1.29  2003/10/30 00:13:59  billhorsman
  Fixed bug where all proxool properties were getting passed onto the delegate driver, and all delegate properties weren't
 
