@@ -10,14 +10,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
+ * Allows you to perform tasks just {@link #beforeCommand before} and just
+ * {@link #afterCommand after} a {@link CommandIF command} is executed.
+ * You can also {@link #catchException catch} exceptions that happen.
  *
- * TODO
- *
- * @version $Revision: 1.2 $, $Date: 2002/11/09 14:45:07 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/09 15:58:37 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 public interface CommandFilterIF {
 
@@ -51,6 +51,9 @@ public interface CommandFilterIF {
 /*
  Revision history:
  $Log: CommandFilterIF.java,v $
+ Revision 1.3  2002/11/09 15:58:37  billhorsman
+ fix and added doc
+
  Revision 1.2  2002/11/09 14:45:07  billhorsman
  now threaded and better exception handling
 

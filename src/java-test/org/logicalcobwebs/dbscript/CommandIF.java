@@ -7,14 +7,12 @@
 package org.logicalcobwebs.dbscript;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
+ * An SQL command to run.
  *
- * TODO
- *
- * @version $Revision: 1.2 $, $Date: 2002/11/09 14:45:07 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/09 15:58:54 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @since GSI 5.0
+ * @since Proxool 0.5
  */
 public interface CommandIF {
 
@@ -63,6 +61,9 @@ public interface CommandIF {
 /*
  Revision history:
  $Log: CommandIF.java,v $
+ Revision 1.3  2002/11/09 15:58:54  billhorsman
+ fix and added doc
+
  Revision 1.2  2002/11/09 14:45:07  billhorsman
  now threaded and better exception handling
 
