@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.2 $, $Date: 2003/02/26 16:05:51 $
+ * @version $Revision: 1.3 $, $Date: 2003/02/27 09:45:33 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -86,6 +86,11 @@ public class StatisticsListenerTest extends TestCase {
 
             long startWaiting = System.currentTimeMillis();
             while (tl.getStatistics() == null) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    LOG.debug("Awoken", e);
+                }
                 if (System.currentTimeMillis() - startWaiting > 20000) {
                     fail("Statistics didn't arrive within expected 20 seconds");
                 }
@@ -124,6 +129,9 @@ public class StatisticsListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.3  2003/02/27 09:45:33  billhorsman
+ sleep a little
+
  Revision 1.2  2003/02/26 16:05:51  billhorsman
  widespread changes caused by refactoring the way we
  update and redefine pool definitions.
