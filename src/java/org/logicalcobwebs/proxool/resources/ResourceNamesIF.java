@@ -7,9 +7,9 @@ package org.logicalcobwebs.proxool.resources;
 
 /**
  * Constants for Proxool resource names.
- * @version $Revision: 1.1 $, $Date: 2003/02/24 01:12:01 $
- * @author Christian Nedregård (christian.nedregard@findexa.no)
- * @author $Author: chr32 $ (current maintainer)
+ * @version $Revision: 1.2 $, $Date: 2003/02/26 16:59:54 $
+ * @author Christian Nedregaard (christian.nedregard@findexa.no)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public interface ResourceNamesIF {
@@ -25,6 +25,9 @@ public interface ResourceNamesIF {
 }
 /*
  $Log: ResourceNamesIF.java,v $
+ Revision 1.2  2003/02/26 16:59:54  billhorsman
+ fixed encoding in chr's name
+
  Revision 1.1  2003/02/24 01:12:01  chr32
  Init rev.
 
