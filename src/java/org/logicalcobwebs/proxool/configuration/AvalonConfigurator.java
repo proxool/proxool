@@ -19,11 +19,11 @@ import org.xml.sax.helpers.AttributesImpl;
  * are delegated to {@link XMLConfigurator},
  * and have exactly the same format as is documented in that class.
  *
- * @version $Revision: 1.1 $, $Date: 2002/12/15 18:48:33 $
+ * @version $Revision: 1.2 $, $Date: 2002/12/15 19:42:18 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
-public class AvalonConfigurator implements Configurable, ThreadSafe{
+public class AvalonConfigurator implements Configurable, ThreadSafe {
 
     /**
      * Check that all top level elements are named proxool and hand them to
@@ -36,8 +36,8 @@ public class AvalonConfigurator implements Configurable, ThreadSafe{
         final Configuration[] children = configuration.getChildren();
         for (int i = 0; i < children.length; ++i) {
             if (!children[i].getNamespace().equals(ProxoolConstants.PROXOOL)) {
-                throw new ConfigurationException("Found element named " + children[i].getName() + ". Only " +
-                    ProxoolConstants.PROXOOL + " top level elements are alowed.");
+                throw new ConfigurationException("Found element named " + children[i].getName() + ". Only "
+                    + ProxoolConstants.PROXOOL + " top level elements are alowed.");
             }
         }
         try {
@@ -51,7 +51,7 @@ public class AvalonConfigurator implements Configurable, ThreadSafe{
 
     // Parse the properties recursively, and report found properties to the given XMLConfigurator
     private void reportProperties(XMLConfigurator xmlConfigurator, Configuration[] properties)
-        throws ConfigurationException, SAXException{
+        throws ConfigurationException, SAXException {
         Configuration[] children = null;
         String value = null;
         String namespace = null;
@@ -81,6 +81,9 @@ public class AvalonConfigurator implements Configurable, ThreadSafe{
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.2  2002/12/15 19:42:18  chr32
+ Rewrite. Now delegates to XMLConfigurator.
+
  Revision 1.1  2002/12/15 18:48:33  chr32
  Movied in from 'ext' source tree.
 
