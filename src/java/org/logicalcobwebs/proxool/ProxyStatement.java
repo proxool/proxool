@@ -21,11 +21,11 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.25 $, $Date: 2003/12/12 19:29:47 $
+ * @version $Revision: 1.26 $, $Date: 2004/06/02 20:48:14 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
-class ProxyStatement extends AbstractProxyStatement implements InvocationHandler, MethodInterceptor {
+class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor {
 
     private static final Log LOG = LogFactory.getLog(ProxyStatement.class);
 
@@ -135,6 +135,9 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.26  2004/06/02 20:48:14  billhorsman
+ Dropped obsolete InvocationHandler reference.
+
  Revision 1.25  2003/12/12 19:29:47  billhorsman
  Now uses Cglib 2.0
 
