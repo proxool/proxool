@@ -18,7 +18,7 @@ import java.sql.DriverManager;
 /**
  * Provides Proxool connections to the {@link org.logicalcobwebs.dbscript.ScriptFacade ScriptFacade}
  *
- * @version $Revision: 1.15 $, $Date: 2003/02/06 17:41:03 $
+ * @version $Revision: 1.16 $, $Date: 2003/02/07 10:09:58 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -30,8 +30,6 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
     private String alias = String.valueOf(hashCode());
 
     private String fullUrl;
-
-    private ConnectionPoolDefinitionIF connectionPoolDefinition;
 
     private Properties changedInfo;
 
@@ -52,7 +50,6 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
     }
 
     public void defintionUpdated(ConnectionPoolDefinitionIF connectionPoolDefinition, Properties completeInfo, Properties changedInfo) {
-        setConnectionPoolDefinition(connectionPoolDefinition);
         setCompleteInfo(completeInfo);
         setChangedInfo(changedInfo);
         LOG.debug("Definition updated " + connectionPoolDefinition.getCompleteUrl());
@@ -61,15 +58,6 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
         } else {
             LOG.debug("No properties updated");
         }
-    }
-
-    public ConnectionPoolDefinitionIF getConnectionPoolDefinition() {
-        return connectionPoolDefinition;
-    }
-
-    public void setConnectionPoolDefinition(ConnectionPoolDefinitionIF connectionPoolDefinition) {
-        this.connectionPoolDefinition = connectionPoolDefinition;
-        LOG.debug("Setting cpd to " + this.connectionPoolDefinition);
     }
 
     public Properties getChangedInfo() {
@@ -110,7 +98,7 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
 
         fullUrl = TestHelper.buildProxoolUrl(alias, driver, url);
         ProxoolFacade.registerConnectionPool(fullUrl, info);
-        ProxoolFacade.setConfigurationListener(alias, this);
+        ProxoolFacade.addConfigurationListener(alias, this);
     }
 
     public Connection getConnection()
@@ -142,6 +130,9 @@ public class ProxoolAdapter implements ConnectionAdapterIF, ConfigurationListene
 /*
  Revision history:
  $Log: ProxoolAdapter.java,v $
+ Revision 1.16  2003/02/07 10:09:58  billhorsman
+ removed connectionPoolDefinition property. not needed.
+
  Revision 1.15  2003/02/06 17:41:03  billhorsman
  now uses imported logging
 
