@@ -8,7 +8,11 @@ package org.logicalcobwebs.proxool.configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.xml.sax.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -22,7 +26,7 @@ import java.io.IOException;
  * Configurator that uses JAXP to get a parser for Proxool configuration xml. The parser is validating
  * and namespace aware.<br>
  * See {@link XMLConfigurator} for the Proxool xml configuration format.
- * @version $Revision: 1.1 $, $Date: 2002/12/15 18:49:55 $
+ * @version $Revision: 1.2 $, $Date: 2002/12/15 19:43:11 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.6
@@ -37,7 +41,7 @@ public class JAXPConfigurator {
      * @param validate <code>true</code> if the parsel shall be validating, and <code>false</code> otherwise.
      * @throws ProxoolException if the configuration fails.
      */
-    public static void configure(String xmlFileName, boolean validate) throws ProxoolException{
+    public static void configure(String xmlFileName, boolean validate) throws ProxoolException {
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Configuring from xml file: " + xmlFileName);
@@ -54,7 +58,7 @@ public class JAXPConfigurator {
      * @param validate <code>true</code> if the parsel shall be validating, and <code>false</code> otherwise.
      * @throws ProxoolException if the configuration fails.
      */
-    public static void configure(InputSource inputSource, boolean validate) throws ProxoolException{
+    public static void configure(InputSource inputSource, boolean validate) throws ProxoolException {
         try {
             SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
             if (LOG.isDebugEnabled()) { LOG.debug("SAXParserFactory class: " + saxParserFactory.getClass().getName());}
@@ -83,7 +87,7 @@ public class JAXPConfigurator {
      * @param validate <code>true</code> if the parsel shall be validating, and <code>false</code> otherwise.
      * @throws ProxoolException if the configuration fails.
      */
-    public static void configure(Reader reader, boolean validate) throws ProxoolException{
+    public static void configure(Reader reader, boolean validate) throws ProxoolException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Configuring from reader: " + reader);
         }
@@ -108,6 +112,9 @@ public class JAXPConfigurator {
 /*
  Revision history:
  $Log: JAXPConfigurator.java,v $
+ Revision 1.2  2002/12/15 19:43:11  chr32
+ Style fixes.
+
  Revision 1.1  2002/12/15 18:49:55  chr32
  Init rev.
 

@@ -13,19 +13,15 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.proxool.configuration.PropertyConfigurator;
-import org.logicalcobwebs.proxool.configuration.JAXPConfigurator;
 import org.logicalcobwebs.proxool.AllTests;
 import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ProxoolAdapter;
 import org.logicalcobwebs.proxool.ProxoolConstants;
-import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.proxool.ProxoolFacade;
 
 /**
  * Tests that the various ways of configuring proxool work.
  *
- * @version $Revision: 1.1 $, $Date: 2002/12/15 19:10:49 $
+ * @version $Revision: 1.2 $, $Date: 2002/12/15 19:41:28 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
@@ -97,6 +93,9 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.2  2002/12/15 19:41:28  chr32
+ Style fixes.
+
  Revision 1.1  2002/12/15 19:10:49  chr32
  Init rev.
 

@@ -10,7 +10,6 @@ import junit.framework.TestCase;
 
 import java.sql.SQLException;
 
-import org.logicalcobwebs.proxool.configuration.JAXPConfigurator;
 import org.logicalcobwebs.proxool.AllTests;
 import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ProxoolException;
@@ -20,7 +19,7 @@ import org.logicalcobwebs.proxool.ProxoolFacade;
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.1 $, $Date: 2002/12/15 19:10:49 $
+ * @version $Revision: 1.2 $, $Date: 2002/12/15 19:41:26 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.6
@@ -41,7 +40,7 @@ public class JAXPConfiguratorTest extends TestCase {
      * @throws ProxoolException if the configuration fails.
      * @throws SQLException if ProxoolFacade operation fails.
      */
-    public void testJAXPXMLConfiguratorNoNamspaces() throws ProxoolException, SQLException{
+    public void testJAXPXMLConfiguratorNoNamspaces() throws ProxoolException, SQLException {
         final String xmlFile = "src/java-test/org/logicalcobwebs/proxool/configuration/test-no-ns.xml";
         JAXPConfigurator.configure(xmlFile, false);
         try {
@@ -65,7 +64,7 @@ public class JAXPConfiguratorTest extends TestCase {
      * @throws ProxoolException if the configuration fails.
      * @throws SQLException if ProxoolFacade operation fails.
      */
-    public void testJAXPXMLConfiguratorWithNamspaces() throws ProxoolException, SQLException{
+    public void testJAXPXMLConfiguratorWithNamspaces() throws ProxoolException, SQLException {
         final String xmlFile = "src/java-test/org/logicalcobwebs/proxool/configuration/test-ns.xml";
         JAXPConfigurator.configure(xmlFile, false);
         try {
@@ -101,6 +100,9 @@ public class JAXPConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.2  2002/12/15 19:41:26  chr32
+ Style fixes.
+
  Revision 1.1  2002/12/15 19:10:49  chr32
  Init rev.
 

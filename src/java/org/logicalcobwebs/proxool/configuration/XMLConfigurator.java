@@ -64,7 +64,7 @@ import java.util.Properties;
  *
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.1 $, $Date: 2002/12/15 18:48:33 $
+ * @version $Revision: 1.2 $, $Date: 2002/12/15 19:43:11 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
@@ -187,7 +187,7 @@ public class XMLConfigurator extends DefaultHandler {
             driverClass = value;
         } else if (localName.equals(DRIVER_URL)) {
             driverUrl = value;
-        } else if (!localName.equals(DRIVER_PROPERTIES)){
+        } else if (!localName.equals(DRIVER_PROPERTIES)) {
             final String name = insideDelegateProperties ? localName : (ProxoolConstants.PROPERTY_PREFIX + localName);
             if (LOG.isDebugEnabled()) {
                         LOG.debug("Setting property '" + name + "' to value '" + value + "'.");

@@ -79,7 +79,7 @@ public class TestHelper {
      * @throws ProxoolException if any properties are missing or have the wrong value.
      */
     public static void equalsCompleteAlternativeProperties(ConnectionPoolDefinitionIF connectionPoolDefinition)
-        throws ProxoolException{
+        throws ProxoolException {
         checkProperty("user", "sa", connectionPoolDefinition.getProperties().getProperty("user"));
         checkProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME, 40000,
             connectionPoolDefinition.getHouseKeepingSleepTime());
@@ -108,17 +108,17 @@ public class TestHelper {
         checkProperty(ProxoolConstants.PROTOTYPE_COUNT, 2,
             connectionPoolDefinition.getPrototypeCount());
     }
-    
-    private static void checkProperty(String name, String correctValue, String candidateValue) throws ProxoolException{
+
+    private static void checkProperty(String name, String correctValue, String candidateValue) throws ProxoolException {
         if (candidateValue == null) {
             throw new ProxoolException(name + " was null.");
-        } else if (! candidateValue.equals(correctValue)) {
-            throw new ProxoolException("Expected value for " + name + " was " + correctValue + " but the value was " +
-                candidateValue + ".");
+        } else if (!candidateValue.equals(correctValue)) {
+            throw new ProxoolException("Expected value for " + name + " was " + correctValue + " but the value was "
+                + candidateValue + ".");
         }
     }
 
-    private static void checkProperty(String name, int correctValue, int candidateValue) throws ProxoolException{
+    private static void checkProperty(String name, int correctValue, int candidateValue) throws ProxoolException {
             checkProperty(name, String.valueOf(correctValue), String.valueOf(candidateValue));
     }
 
