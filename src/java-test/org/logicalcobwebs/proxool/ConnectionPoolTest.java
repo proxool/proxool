@@ -16,16 +16,16 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.9 $, $Date: 2003/09/11 23:14:57 $
+ * @version $Revision: 1.1 $, $Date: 2003/10/26 16:10:46 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
-public class ConnectionPoolTests extends AbstractProxoolTest {
+public class ConnectionPoolTest extends AbstractProxoolTest {
 
-    private static final Log LOG = LogFactory.getLog(ConnectionPoolTests.class);
+    private static final Log LOG = LogFactory.getLog(ConnectionPoolTest.class);
 
-    public ConnectionPoolTests(String name) {
+    public ConnectionPoolTest(String name) {
         super(name);
     }
 
@@ -193,7 +193,10 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
 
 /*
  Revision history:
- $Log: ConnectionPoolTests.java,v $
+ $Log: ConnectionPoolTest.java,v $
+ Revision 1.1  2003/10/26 16:10:46  billhorsman
+ renamed to be more consistent
+
  Revision 1.9  2003/09/11 23:14:57  billhorsman
  New test for when maximum-connection-count = 1 and minimum-connection-count = 1
 
