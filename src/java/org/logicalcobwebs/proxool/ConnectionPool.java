@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.39 $, $Date: 2003/02/04 15:59:50 $
+ * @version $Revision: 1.40 $, $Date: 2003/02/04 17:18:30 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -129,6 +129,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 log.error("Failed to initialise statistics", e);
             }
         }
+
+        ShutdownHook.init();
     }
 
     /** Starts up house keeping and prototyper threads. */
@@ -1183,6 +1185,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.40  2003/02/04 17:18:30  billhorsman
+ move ShutdownHook init code
+
  Revision 1.39  2003/02/04 15:59:50  billhorsman
  finalize now shuts down StatsRoller timer
 
