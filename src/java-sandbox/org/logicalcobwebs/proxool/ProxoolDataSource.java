@@ -1,7 +1,7 @@
-/**
- * Clever Little Trader
- *
- * Jubilee Group and Logical Cobwebs, 2002 - 2003
+/*
+ * This software is released under a licence similar to the Apache Software Licence.
+ * See org.logicalcobwebs.proxool.package.html for details.
+ * The latest version is available at http://proxool.sourceforge.net
  */
 package org.logicalcobwebs.proxool;
 
@@ -16,10 +16,10 @@ import java.sql.SQLException;
 
 /**
  * TODO
- * @version $Revision: 1.2 $, $Date: 2003/07/23 12:38:50 $
+ * @version $Revision: 1.3 $, $Date: 2003/08/15 10:12:30 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @since CLT 0.2
+ * @since Proxool 0.8
  */
 public class ProxoolDataSource implements DataSource, Serializable {
 
@@ -68,6 +68,9 @@ public class ProxoolDataSource implements DataSource, Serializable {
 /*
   Revision History
   $Log: ProxoolDataSource.java,v $
+  Revision 1.3  2003/08/15 10:12:30  billhorsman
+  draft
+
   Revision 1.2  2003/07/23 12:38:50  billhorsman
   some fixes, but more to come
 

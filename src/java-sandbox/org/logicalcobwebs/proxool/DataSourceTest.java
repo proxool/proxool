@@ -5,23 +5,60 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.shiftone.ooc.InitialContextFactoryImpl;
+import org.logicalcobwebs.logging.Log;
+import org.logicalcobwebs.logging.LogFactory;
+
+import javax.sql.DataSource;
+import javax.naming.InitialContext;
+import javax.naming.Context;
+import javax.naming.NamingException;
 import java.sql.SQLException;
+import java.sql.Connection;
+import java.util.Hashtable;
 
 /**
  * Test for {@link org.logicalcobwebs.proxool.BasicDataSource}
- * @version $Revision: 1.2 $, $Date: 2003/07/23 06:54:48 $
+ * @version $Revision: 1.3 $, $Date: 2003/08/15 10:12:20 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class DataSourceTest extends AbstractProxoolTest {
 
+    private static final Log LOG = LogFactory.getLog(DataSourceTest.class);
+
+    private static final String JNDI_NAME = "java:comp/env/jdbc/myDB";
+
+    private Context context;
+
+    /**
+     * @see AbstractProxoolTest#AbstractProxoolTest
+     */
     public DataSourceTest(String alias) {
         super(alias);
     }
 
-    public void testDirectRegistration() throws SQLException, ProxoolException {
+    protected void setUp() throws Exception {
+        super.setUp();
 
+        Hashtable jndiEnvironment = new Hashtable();
+        jndiEnvironment.put(InitialContext.INITIAL_CONTEXT_FACTORY, org.shiftone.ooc.InitialContextFactoryImpl.class.getName());
+        context = new InitialContext(jndiEnvironment);
+        LOG.debug("Found context " + context.getClass().getName());
+    }
+
+    /**
+     * Test to see whether we can lookup the DataSource and get
+     * a connection from it
+     * @throws SQLException if there was a problem with  the connection
+     * @throws NamingException if we couldn't find the DataSource
+     */
+    public void testDataSourceLookup() throws SQLException, NamingException {
+
+        DataSource ds = (DataSource) context.lookup(JNDI_NAME);
+        Connection connection = ds.getConnection();
+        connection.close();
 
     }
 
@@ -29,5 +66,5 @@ public class DataSourceTest extends AbstractProxoolTest {
 
 /*
  Revision history:
- $Log: 
+ $Log:
  */
