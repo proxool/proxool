@@ -16,7 +16,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Provides a suite of all tests. And some utility methods for setting
  * up the logging.
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/03 17:38:47 $
+ * @version $Revision: 1.12 $, $Date: 2003/03/04 10:10:52 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -27,7 +27,7 @@ public class GlobalTest {
 
     private static boolean initialised;
 
-    public static synchronized void globalSetup() {
+    public static synchronized void globalSetup() throws ClassNotFoundException {
         if (!initialised) {
             String log4jPath = System.getProperty("log4jPath");
             if (log4jPath != null && log4jPath.length() > 0) {
@@ -37,6 +37,8 @@ public class GlobalTest {
                     LOG.debug("Can't configure logging using " + log4jPath);
                 }
             }
+
+            Class.forName(ProxoolDriver.class.getName());
 
             /* uncomment this if you want to turn on debug loggin to the console
             org.apache.log4j.BasicConfigurator.resetConfiguration();
@@ -81,6 +83,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.12  2003/03/04 10:10:52  billhorsman
+ loads ProxoolDriver
+
  Revision 1.11  2003/03/03 17:38:47  billhorsman
  leave shutdown to AbstractProxoolTest
 
