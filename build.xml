@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.19 $
-    $Date: 2002/12/18 23:39:51 $
-    $Author: chr32 $
+    $Revision: 1.20 $
+    $Date: 2003/01/15 23:55:05 $
+    $Author: billhorsman $
 
     http://proxool.sourceforge.net
 
@@ -26,7 +26,7 @@
     <property name="debug" value="false"/>
 
     <!-- Current version -->
-    <property name="version" value="CVS"/>
+    <property name="version" value="0.5.2003.1.15"/>
 
     <!-- Log4J configuration to use for testing. See proxool-ant.properties
     file for more infomation. -->
@@ -49,6 +49,7 @@
     <target
         name="init"
         >
+        <tstamp/>
         <mkdir dir="${build-dir}/src/java" description="make source directory" />
         <mkdir dir="${build-dir}/etc"/>
         <mkdir dir="${build-dir}/deploy"/>
@@ -134,6 +135,13 @@
         <antcall target="build-src-core"/>
         <antcall target="build-src-jdk1.2"/>
         <antcall target="build-src-test"/>
+
+        <replace
+            file="${build-dir}/src/java/org/logicalcobwebs/proxool/Version.java"
+            token="RELEASE = null"
+            value='RELEASE = "${version} (${TODAY})"'
+            />
+
     </target>
 
     <target
@@ -215,6 +223,7 @@
         >
         <java fork="yes" classpathref="classpath" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}" />
+            <sysproperty key="script" value="${script}" />
             <arg value="org.logicalcobwebs.proxool.GlobalTest" />
         </java>
     </target>
