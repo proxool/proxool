@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool;
+package org.logicalcobwebs.proxool.examples;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,7 +12,7 @@ import java.util.Properties;
 
 /**
  * Example showing you how to configure the pool behaviour if you don't like the default.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:14:26 $
+ * @version $Revision: 1.1 $, $Date: 2002/09/19 08:51:09 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -67,8 +67,11 @@ public class Configure {
 /*
  Revision history:
  $Log: Configure.java,v $
- Revision 1.1  2002/09/13 08:14:26  billhorsman
- Initial revision
+ Revision 1.1  2002/09/19 08:51:09  billhorsman
+ created new examples package
+
+ Revision 1.1.1.1  2002/09/13 08:14:26  billhorsman
+ new
 
  Revision 1.4  2002/07/10 16:14:47  billhorsman
  widespread layout changes and move constants into ProxoolConstants

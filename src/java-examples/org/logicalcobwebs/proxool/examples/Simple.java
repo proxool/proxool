@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool;
+package org.logicalcobwebs.proxool.examples;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 /**
  * The simplest example of all. Just gets a Connection.
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:14:27 $
+ * @version $Revision: 1.1 $, $Date: 2002/09/19 08:51:09 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -64,8 +64,11 @@ public class Simple {
 /*
  Revision history:
  $Log: Simple.java,v $
- Revision 1.1  2002/09/13 08:14:27  billhorsman
- Initial revision
+ Revision 1.1  2002/09/19 08:51:09  billhorsman
+ created new examples package
+
+ Revision 1.1.1.1  2002/09/13 08:14:27  billhorsman
+ new
 
  Revision 1.4  2002/07/10 16:14:47  billhorsman
  widespread layout changes and move constants into ProxoolConstants
