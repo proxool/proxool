@@ -14,12 +14,19 @@ import org.logicalcobwebs.proxool.util.FastArrayList;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.60 $, $Date: 2003/03/10 16:26:35 $
+ * @version $Revision: 1.61 $, $Date: 2003/03/10 23:39:51 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -37,7 +44,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      */
     private Log log;
 
-    ReaderPreferenceReadWriteLock connectionStatusReadWriteLock = new ReaderPreferenceReadWriteLock();
+    private ReaderPreferenceReadWriteLock connectionStatusReadWriteLock = new ReaderPreferenceReadWriteLock();
 
     /**
      * If you want to shutdown the pool you should get a write lock on this. And if you use the pool then
@@ -45,7 +52,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * to delay shutdown just because some greedy user has got a connection active. Shutdown should be
      * relatively immediate. So we don't ask for a read lock for the whole time that a connection is active.
      */
-    WriterPreferenceReadWriteLock primaryReadWriteLock = new WriterPreferenceReadWriteLock();
+    private WriterPreferenceReadWriteLock primaryReadWriteLock = new WriterPreferenceReadWriteLock();
 
     private static final String[] STATUS_DESCRIPTIONS = {"NULL", "AVAILABLE", "ACTIVE", "OFFLINE"};
 
@@ -370,6 +377,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
                 connectionPoolUp = false;
                 long startFinalize = System.currentTimeMillis();
+                shutdownThread = Thread.currentThread();
 
                 if (delay > 0) {
                     log.info("Shutting down '" + alias + "' pool started at "
@@ -399,18 +407,28 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     /* Patience, patience. */
 
                     if (connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE] != 0) {
-                        LOG.info("Waiting for all connections to become inactive.");
+                        LOG.info("Waiting for all connections to become inactive (active count is "
+                                + connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE] + ").");
                         try {
                             long endWait = startFinalize + delay;
-                            while (System.currentTimeMillis() < endWait) {
+                            while (true) {
                                 synchronized (Thread.currentThread()) {
                                     Thread.currentThread().wait(endWait - System.currentTimeMillis());
                                 }
-                                if (connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE] == 0) {
+                                int activeCount = connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE];
+                                if (activeCount == 0) {
                                     break;
                                 }
-                                // This means we were notified when we shouldn't have been. No matter.
-                                LOG.warn("Shutdown notified when connections still active. Recovering.");
+                                if (System.currentTimeMillis() < endWait) {
+                                    LOG.debug("Still waiting for active count to reach zero (currently " + activeCount + ").");
+                                } else {
+                                    // There are still connections active. Oh well, we're not _that_ patient
+                                    LOG.warn("Shutdown waited for "
+                                            + (System.currentTimeMillis() - startFinalize) + " milliseconds for all "
+                                            + "the connections to become inactive but the active count is still "
+                                            + activeCount + ". Shutting down anyway.");
+                                    break;
+                                }
                                 Thread.sleep(100);
                             }
                         } catch (InterruptedException e1) {
@@ -575,7 +593,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         // Check to see if shutdown is waiting for all connections to become
         // non-active
         if (shutdownThread != null && connectionCountByState[ProxyConnectionIF.STATUS_ACTIVE] == 0) {
-            shutdownThread.notify();
+            LOG.debug("Notifying shutdownThread that active count is now zero");
+            synchronized (shutdownThread) {
+                shutdownThread.notify();
+            }
         }
 
     }
@@ -692,17 +713,17 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             }
 
             cis = new TreeSet(new Comparator() {
-                            public int compare(Object o1, Object o2) {
-                                try {
-                                    Date birth1 = ((ConnectionInfoIF) o1).getBirthDate();
-                                    Date birth2 = ((ConnectionInfoIF) o2).getBirthDate();
-                                    return birth1.compareTo(birth2);
-                                } catch (ClassCastException e) {
-                                    log.error("Unexpected contents of connectionInfos Set: " + o1.getClass() + " and " + o2.getClass(), e);
-                                    return String.valueOf(o1.hashCode()).compareTo(String.valueOf(o2.hashCode()));
-                                }
-                            }
-                        });
+                public int compare(Object o1, Object o2) {
+                    try {
+                        Date birth1 = ((ConnectionInfoIF) o1).getBirthDate();
+                        Date birth2 = ((ConnectionInfoIF) o2).getBirthDate();
+                        return birth1.compareTo(birth2);
+                    } catch (ClassCastException e) {
+                        log.error("Unexpected contents of connectionInfos Set: " + o1.getClass() + " and " + o2.getClass(), e);
+                        return String.valueOf(o1.hashCode()).compareTo(String.valueOf(o2.hashCode()));
+                    }
+                }
+            });
 
             Iterator i = proxyConnections.iterator();
             while (i.hasNext()) {
@@ -963,6 +984,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.61  2003/03/10 23:39:51  billhorsman
+ shutdown is now notified when active count reaches
+ zero
+
  Revision 1.60  2003/03/10 16:26:35  billhorsman
  removed debug traces
 
