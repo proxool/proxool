@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.17 $, $Date: 2002/12/12 10:49:43 $
+ * @version $Revision: 1.18 $, $Date: 2002/12/16 10:57:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -63,7 +64,7 @@ public class ProxoolFacade {
                 throw new SQLException("Invalid URL format.");
             }
 
-            definePool(null, url, cpd, info);
+            definePool(null, url, cpd, info, null);
             connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(cpd);
             connectionPool.start();
             name = cpd.getName();
@@ -134,9 +135,10 @@ public class ProxoolFacade {
      * @return the name of the pool
      * @throws SQLException if there were any validation errors.
      */
-    protected static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException {
+    protected static String definePool(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info, ConfiguratorIF configurator) throws SQLException {
 
         Properties rememberedInfo = null;
+        Properties changedProperties = null;
         String rememberedKey = null;
         if (cp != null) {
             rememberedKey = cp.getDefinition().getCompleteUrl();
@@ -157,6 +159,8 @@ public class ProxoolFacade {
                 }
             }
 
+            changedProperties = new Properties();
+
             Iterator i = info.keySet().iterator();
             while (i.hasNext()) {
                 String key = (String) i.next();
@@ -165,85 +169,131 @@ public class ProxoolFacade {
 
                 if (key.equals(ProxoolConstants.USER_PROPERTY)) {
                     isProxoolProperty = false;
-                    cpd.setUser(value);
+                    if (isChanged(cpd.getUser(), value)) {
+                        changedProperties.setProperty(key, value);
+                        cpd.setUser(value);
+                    }
                 } else if (key.equals(ProxoolConstants.PASSWORD_PROPERTY)) {
                     isProxoolProperty = false;
-                    cpd.setPassword(value);
+                    if (isChanged(cpd.getPassword(), value)) {
+                        changedProperties.setProperty(key, value);
+                        cpd.setPassword(value);
+                    }
                 } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
                     try {
                         int valueAsInt = Integer.parseInt(value);
-                        cpd.setHouseKeepingSleepTime(valueAsInt);
+                        if (cpd.getHouseKeepingSleepTime() != valueAsInt) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setHouseKeepingSleepTime(valueAsInt);
+                        }
                     } catch (NumberFormatException e) {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
-                    cpd.setHouseKeepingTestSql(value);
+                    if (isChanged(cpd.getHouseKeepingTestSql(), value)) {
+                        changedProperties.setProperty(key, value);
+                        cpd.setHouseKeepingTestSql(value);
+                    }
                 } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY)) {
                     try {
                         int valueAsInt = Integer.parseInt(value);
-                        cpd.setMaximumConnectionCount(valueAsInt);
+                        if (cpd.getMaximumConnectionCount() != valueAsInt) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setMaximumConnectionCount(valueAsInt);
+                        }
                     } catch (NumberFormatException e) {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY)) {
                     try {
                         int valueAsInt = Integer.parseInt(value);
-                        cpd.setMaximumConnectionLifetime(valueAsInt);
+                        if (cpd.getMaximumConnectionLifetime() != valueAsInt) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setMaximumConnectionLifetime(valueAsInt);
+                        }
                     } catch (NumberFormatException e) {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY)) {
                     try {
                         int valueAsInt = Integer.parseInt(value);
-                        cpd.setMaximumNewConnections(valueAsInt);
+                        if (cpd.getMaximumNewConnections() != valueAsInt) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setMaximumNewConnections(valueAsInt);
+                        }
                     } catch (NumberFormatException e) {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY)) {
                     try {
                         int valueAsInt = Integer.parseInt(value);
-                        cpd.setMinimumConnectionCount(valueAsInt);
+                        if (cpd.getMinimumConnectionCount() != valueAsInt) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setMinimumConnectionCount(valueAsInt);
+                        }
                     } catch (NumberFormatException e) {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY)) {
                     try {
                         int valueAsInt = Integer.parseInt(value);
-                        cpd.setPrototypeCount(valueAsInt);
+                        if (cpd.getPrototypeCount() != valueAsInt) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setPrototypeCount(valueAsInt);
+                        }
                     } catch (NumberFormatException e) {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY)) {
                     try {
                         int valueAsInt = Integer.parseInt(value);
-                        cpd.setRecentlyStartedThreshold(valueAsInt);
+                        if (cpd.getRecentlyStartedThreshold() != valueAsInt) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setRecentlyStartedThreshold(valueAsInt);
+                        }
                     } catch (NumberFormatException e) {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY)) {
                     try {
                         int valueAsInt = Integer.parseInt(value);
-                        cpd.setOverloadWithoutRefusalLifetime(valueAsInt);
+                        if (cpd.getOverloadWithoutRefusalLifetime() != valueAsInt) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setOverloadWithoutRefusalLifetime(valueAsInt);
+                        }
                     } catch (NumberFormatException e) {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY)) {
                     try {
                         int valueAsInt = Integer.parseInt(value);
-                        cpd.setMaximumActiveTime(valueAsInt);
+                        if (cpd.getMaximumActiveTime() != valueAsInt) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setMaximumActiveTime(valueAsInt);
+                        }
                     } catch (NumberFormatException e) {
                         throw new SQLException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
                     }
                 } else if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
                     if (value != null && value.equals("1")) {
                         earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=1 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=true instead.");
-                        cpd.setVerbose(true);
+                        if (!cpd.isVerbose()) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setVerbose(true);
+                        }
                     } else {
                         earlyLog.warn("Use of " + ProxoolConstants.DEBUG_LEVEL_PROPERTY + "=0 is deprecated. Use " + ProxoolConstants.VERBOSE_PROPERTY + "=false instead.");
-                        cpd.setVerbose(false);
+                        if (cpd.isVerbose()) {
+                            changedProperties.setProperty(key, value);
+                            cpd.setVerbose(false);
+                        }
                     }
                 } else if (key.equals(ProxoolConstants.VERBOSE_PROPERTY)) {
-                    cpd.setVerbose(Boolean.valueOf(value).booleanValue());
+                    final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
+                    if (cpd.isVerbose() != valueAsBoolean) {
+                        changedProperties.setProperty(key, value);
+                        cpd.setVerbose(valueAsBoolean);
+                    }
                 } else if (key.equals(ProxoolConstants.TRACE_PROPERTY)) {
                     cpd.setTrace(Boolean.valueOf(value).booleanValue());
                 } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
@@ -281,7 +331,26 @@ public class ProxoolFacade {
             infos.put(rememberedKey, clone);
         }
 
+        if (configurator != null) {
+            // TODO send properties
+            configurator.defintionUpdated(cpd, null, null);
+        }
+
         return cpd.getName();
+    }
+
+    private static boolean isChanged(String oldValue, String newValue ) {
+        boolean changed = false;
+        if (oldValue == null || oldValue.length() == 0) {
+            if (newValue != null && newValue.length() > 0) {
+                changed = true;
+            }
+        } else if (newValue == null || newValue.length() == 0) {
+            changed = true;
+        } else if (!oldValue.equals(newValue)) {
+            changed = true;
+        }
+        return changed;
     }
 
     /**
@@ -352,7 +421,7 @@ public class ProxoolFacade {
         }
     }
 
-    /**
+    /**ls
      * Get real-time statistical information about how a pool is performing.
      */
     public static String getConnectionPoolStatisticsDump(String alias) throws SQLException {
@@ -460,13 +529,8 @@ public class ProxoolFacade {
         String poolName = getAlias(url);
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(poolName);
         ConnectionPoolDefinition cpd = cp.getDefinition();
-        definePool(cp, url, cpd, info);
-
         ConfiguratorIF configurator = (ConfiguratorIF) configurators.get(cpd.getName());
-        if (configurator != null) {
-            // TODO send properties
-            configurator.defintionUpdated(cpd, null, null);
-        }
+        definePool(cp, url, cpd, info, configurator);
 
     }
 
@@ -476,21 +540,31 @@ public class ProxoolFacade {
     }
 
     protected static void updatePoolByDriver(ConnectionPool cp, String url, ConnectionPoolDefinition cpd, Properties info) throws SQLException {
-        definePool(cp, url, cpd, info);
-
         ConfiguratorIF configurator = (ConfiguratorIF) configurators.get(cpd.getName());
-        if (configurator != null) {
-            cp.getLog().warn("The pool, which is associated with a configurator, has been updated on the fly. This is not recommended.");
-            // TODO send properties
-            configurator.defintionUpdated(cpd, null, null);
-        }
+        definePool(cp, url, cpd, info, configurator);
+    }
 
+    /**
+     * When you ask a connection for a {@link Statement  Statement} (or a
+     * {@link java.sql.PreparedStatement PreparedStatement} or a
+     * {@link java.sql.CallableStatement CallableStatement} then you
+     * don't actually  get the Statement passed to you from the delegate
+     * Driver. It isn't recommended, but if you need to use any driver
+     * specific methods then this is your only way.
+     * @return delegate statement
+     */
+    public static Statement getDelegateStatement(Statement statement) {
+        return ProxyFactory.getDelegateStatement(statement);
     }
 }
 
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.18  2002/12/16 10:57:48  billhorsman
+ add getDelegateStatement to allow access to the
+ delegate JDBC driver's Statement
+
  Revision 1.17  2002/12/12 10:49:43  billhorsman
  now includes properties in definitionChanged event
 

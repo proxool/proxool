@@ -28,7 +28,7 @@ import java.util.TreeMap;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.10 $, $Date: 2002/12/03 12:24:00 $
+ * @version $Revision: 1.11 $, $Date: 2002/12/16 10:57:48 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -197,6 +197,14 @@ class ProxyStatement implements InvocationHandler {
         return result;
     }
 
+    /**
+     * Gets the real Statement that we got from the delegate driver
+     * @return delegate statement
+     */
+    protected Statement getDelegateStatement() {
+        return statement;
+    }
+
     private Connection getConnection() throws SQLException {
         return statement.getConnection();
     }
@@ -205,6 +213,10 @@ class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.11  2002/12/16 10:57:48  billhorsman
+ add getDelegateStatement to allow access to the
+ delegate JDBC driver's Statement
+
  Revision 1.10  2002/12/03 12:24:00  billhorsman
  fixed fatal sql exception
 
