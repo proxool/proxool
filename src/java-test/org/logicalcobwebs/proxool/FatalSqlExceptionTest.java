@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.1 $, $Date: 2003/07/23 06:54:48 $
+ * @version $Revision: 1.2 $, $Date: 2003/08/27 18:58:11 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -37,35 +37,35 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
         String alias = testName;
 
         String url = TestHelper.buildProxoolUrl(alias,
-                "com.mysql.jdbc.Driver",
-                "jdbc:mysql://localhost/test");
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
         Properties info = new Properties();
-        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "link failure");
+        info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, "Table not found");
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         ProxoolFacade.registerConnectionPool(url, info);
 
-        for (int i = 0; i < 100; i++) {
-            Connection c = null;
-            try {
-                c = DriverManager.getConnection(url);
-                Statement s = c.createStatement();
-                s.execute("create table Z (a  int)");
-                s.execute("drop table Z");
-            } catch (SQLException e) {
-                // Expected exception (foo doesn't exist)
-                LOG.debug("Expected exception", e);
-            }
-
-            try {
-                if (c != null) {
-                    c.close();
-                }
-            } catch (SQLException e) {
-                LOG.debug("Couldn't close connection", e);
-            }
-
-            Thread.sleep(1000);
+        Connection c = null;
+        try {
+            c = DriverManager.getConnection(url);
+            Statement s = c.createStatement();
+            s.execute("drop table Z");
+        } catch (SQLException e) {
+            // Expected exception (foo doesn't exist)
+            LOG.debug("Expected exception (safe to ignore)", e);
         }
 
+        try {
+            if (c != null) {
+                c.close();
+            }
+        } catch (SQLException e) {
+            LOG.debug("Couldn't close connection", e);
+        }
+
+        Thread.sleep(1000);
+
+        // Proxool should automatically throw away that connection that caused a fatal sql exception
         assertEquals("availableConnectionCount", 0L, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
 
     }
@@ -76,6 +76,9 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: FatalSqlExceptionTest.java,v $
+ Revision 1.2  2003/08/27 18:58:11  billhorsman
+ Fixed up test
+
  Revision 1.1  2003/07/23 06:54:48  billhorsman
  draft JNDI changes (shouldn't effect normal operation)
 
