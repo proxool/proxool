@@ -25,7 +25,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.29 $, $Date: 2003/01/18 15:13:12 $
+ * @version $Revision: 1.30 $, $Date: 2003/01/19 15:21:07 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -418,6 +418,7 @@ public class ProxoolFacade {
      * Remove a connection pool. Kills all the connections. Resets everything.
      * @param alias the pool to remove
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
+     * @throws ProxoolException if we couldn't find the pool
      */
     public static void removeConnectionPool(String alias, int delay) throws ProxoolException {
         removeConnectionPool(Thread.currentThread().getName(), ConnectionPoolManager.getInstance().getConnectionPool(alias), delay);
@@ -433,6 +434,7 @@ public class ProxoolFacade {
 
     /**
      * Removes all connection pools. Kills all the connections. Resets everything.
+     * @param finalizer used to identify who is causing the pools to be removed (helps logging)
      * @param delay the time to wait for connections to become inactive before killing it (milliseconds)
      */
     protected static void removeAllConnectionPools(String finalizer, int delay) {
@@ -448,7 +450,8 @@ public class ProxoolFacade {
     /**
      * Like {@link #removeConnectionPool(java.lang.String, int)} but uses no delay. (Kills
      * everything as quickly as possible).
-     * @param alias the pool to remove
+     * @param alias to identify the pool
+     * @throws ProxoolException if we couldn't find the pool
      */
     public static void removeConnectionPool(String alias) throws ProxoolException {
         removeConnectionPool(alias, 0);
@@ -509,6 +512,8 @@ public class ProxoolFacade {
 
     /**
      * Like {@link #killAllConnections} but defaults to merciful.
+     * @param alias to identify the pool
+     * @throws ProxoolException if we couldn't find the pool
      */
     public static void killAllConnections(String alias) throws ProxoolException {
         killAllConnections(alias, MERCIFUL);
@@ -519,7 +524,8 @@ public class ProxoolFacade {
      * @param alias the pool containing the connection
      * @param id the id of the specific connection
      * @param merciful if true will only kill connections that aren't active
-     * @return true if the connection was killed, or false if it couldn't be found or killed.
+     * @return true if the connection was killed, or false if it couldn't be found.
+     * @throws ProxoolException if we couldn't find the pool
      */
     public static boolean killConnecton(String alias, long id, boolean merciful) throws ProxoolException {
         return ConnectionPoolManager.getInstance().getConnectionPool(alias).expireConnection(id, merciful);
@@ -528,6 +534,8 @@ public class ProxoolFacade {
     /**
      * Monitors the change of state of the pool (quiet, busy, overloaded, or down)
      * @param alias identifies the pool
+     * @param stateListener the new listener
+     * @throws ProxoolException if we couldn't find the pool
      */
     public static void setStateListener(String alias, StateListenerIF stateListener) throws ProxoolException {
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
@@ -537,6 +545,8 @@ public class ProxoolFacade {
     /**
      * Monitors each time a connection is made or destroyed
      * @param alias identifies the pool
+     * @param connectionListener the new listener
+     * @throws ProxoolException if we couldn't find the pool
      */
     public static void setConnectionListener(String alias, ConnectionListenerIF connectionListener) throws ProxoolException {
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
@@ -595,6 +605,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.30  2003/01/19 15:21:07  billhorsman
+ doc
+
  Revision 1.29  2003/01/18 15:13:12  billhorsman
  Signature changes (new ProxoolException
  thrown) on the ProxoolFacade API.
