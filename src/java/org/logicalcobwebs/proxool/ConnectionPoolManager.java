@@ -5,6 +5,9 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +16,7 @@ import java.util.Set;
 
 /**
  *
- * @version $Revision: 1.1 $, $Date: 2002/09/13 08:13:04 $
+ * @version $Revision: 1.2 $, $Date: 2002/10/13 13:39:03 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -24,6 +27,8 @@ class ConnectionPoolManager {
     private Set connectionPools = new HashSet();
 
     private static ConnectionPoolManager connectionPoolManager = null;
+
+    private static final Log LOG = LogFactory.getLog(ProxoolFacade.class);
 
     public static ConnectionPoolManager getInstance() {
         if (connectionPoolManager == null) {
@@ -63,15 +68,25 @@ class ConnectionPoolManager {
     }
 
     protected void removeConnectionPool(String name) {
-        connectionPoolMap.remove(name);
+        ConnectionPool cp = (ConnectionPool) connectionPoolMap.get(name);
+        if (cp != null) {
+            connectionPoolMap.remove("proxool." + cp.getDefinition().getName());
+            connectionPoolMap.remove(cp.getDefinition().getName());
+            connectionPoolMap.remove(cp.getDefinition().getCompleteUrl());
+        } else {
+            LOG.error("Ignored attempt to remove non-existent connection pool " + name);
+        }
     }
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolManager.java,v $
- Revision 1.1  2002/09/13 08:13:04  billhorsman
- Initial revision
+ Revision 1.2  2002/10/13 13:39:03  billhorsman
+ fix when removing pools (credit to Dan Milstein)
+
+ Revision 1.1.1.1  2002/09/13 08:13:04  billhorsman
+ new
 
  Revision 1.8  2002/07/10 16:14:47  billhorsman
  widespread layout changes and move constants into ProxoolConstants
