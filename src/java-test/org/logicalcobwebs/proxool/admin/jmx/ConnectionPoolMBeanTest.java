@@ -11,6 +11,8 @@ import org.logicalcobwebs.proxool.ProxoolDriver;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ProxoolException;
+import org.logicalcobwebs.proxool.TestHelper;
+import org.logicalcobwebs.proxool.TestConstants;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -30,9 +32,9 @@ import java.sql.SQLException;
 /**
  * Test {@link ConnectionPoolMBean}.
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/26 19:03:43 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/28 12:53:59 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ConnectionPoolMBeanTest extends TestCase {
@@ -205,14 +207,14 @@ public class ConnectionPoolMBeanTest extends TestCase {
     }
 
     private Properties createBasicPool(String alias) throws SQLException {
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
         Properties info = new Properties();
-        info.setProperty("user", "sa");
-        info.setProperty("password", "");
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.JMX_PROPERTY, Boolean.TRUE.toString());
         info.setProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY, alias);
-        String driverClass = "org.hsqldb.jdbcDriver";
-        String driverUrl = "jdbc:hsqldb:test";
-        String url = "proxool." + alias + ":" + driverClass + ":" + driverUrl;
         DriverManager.getConnection(url, info).close();
         return info;
     }
@@ -242,6 +244,9 @@ public class ConnectionPoolMBeanTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionPoolMBeanTest.java,v $
+ Revision 1.2  2003/02/28 12:53:59  billhorsman
+ move database to db directory and use constants where possible
+
  Revision 1.1  2003/02/26 19:03:43  chr32
  Init rev.
 
