@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.80 $, $Date: 2004/06/02 20:47:05 $
+ * @version $Revision: 1.81 $, $Date: 2004/09/29 15:43:25 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -96,16 +96,21 @@ public class ProxoolFacade {
         return alias;
     }
 
-    protected static void registerConnectionPool(ConnectionPoolDefinition connectionPoolDefinition) throws ProxoolException {
-        Properties jndiProperties = extractJndiProperties(connectionPoolDefinition);
-        ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(connectionPoolDefinition);
-        connectionPool.start();
-        compositeProxoolListener.onRegistration(connectionPoolDefinition, connectionPoolDefinition.getCompleteInfo());
-        if (isConfiguredForJMX(connectionPoolDefinition.getCompleteInfo())) {
-            registerForJmx(connectionPoolDefinition.getAlias(), connectionPoolDefinition.getCompleteInfo());
-        }
-        if (jndiProperties != null) {
-            registerDataSource(connectionPoolDefinition.getAlias(), jndiProperties);
+    protected synchronized static void registerConnectionPool(ConnectionPoolDefinition connectionPoolDefinition) throws ProxoolException {
+        // check isPoolExists once more now we are inside synchronized block.
+        if (!ConnectionPoolManager.getInstance().isPoolExists(connectionPoolDefinition.getAlias())) {
+            Properties jndiProperties = extractJndiProperties(connectionPoolDefinition);
+            ConnectionPool connectionPool = ConnectionPoolManager.getInstance().createConnectionPool(connectionPoolDefinition);
+            connectionPool.start();
+            compositeProxoolListener.onRegistration(connectionPoolDefinition, connectionPoolDefinition.getCompleteInfo());
+            if (isConfiguredForJMX(connectionPoolDefinition.getCompleteInfo())) {
+                registerForJmx(connectionPoolDefinition.getAlias(), connectionPoolDefinition.getCompleteInfo());
+            }
+            if (jndiProperties != null) {
+                registerDataSource(connectionPoolDefinition.getAlias(), jndiProperties);
+            }
+        } else {
+            LOG.debug("Ignoring duplicate attempt to register " + connectionPoolDefinition.getAlias() + " pool");
         }
     }
 
@@ -800,6 +805,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.81  2004/09/29 15:43:25  billhorsman
+ Recheck isPoolExists inside synchronized registerConnectionPool method. Credit Juergen Hoeller.
+
  Revision 1.80  2004/06/02 20:47:05  billhorsman
  Override shutdown with a zero-parameter version for Spring integration.
 
