@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.12 $, $Date: 2002/11/02 13:57:33 $
+ * @version $Revision: 1.13 $, $Date: 2002/11/06 20:26:49 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -49,6 +49,8 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 
     private static final String CLOSE_METHOD = "close";
 
+    private static final String IS_CLOSED_METHOD = "isClosed";
+
     private static final String EQUALS_METHOD = "equals";
 
     protected ProxyConnection(Connection connection, long id, ConnectionPool connectionPool) throws SQLException {
@@ -57,6 +59,10 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
         this.connectionPool = connectionPool;
         setBirthTime(System.currentTimeMillis());
         setStatus(STATUS_OFFLINE);
+
+        // We only need to call this for the first connection we make. But it returns really
+        // quickly and we don't call it that often so we shouldn't worry.
+        connectionPool.initialiseConnectionResetter(connection);
 
         if (connection == null) {
             throw new SQLException("Unable to create new connection");
@@ -71,6 +77,8 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
                 close();
             } else if (m.getName().equals(EQUALS_METHOD) && args.length == 1) {
                 result = new Boolean(connection.hashCode() == args[0].hashCode());
+            } else if (m.getName().equals(IS_CLOSED_METHOD) && args.length == 0) {
+                result = new Boolean(getStatus() != STATUS_ACTIVE);
             } else {
                 result = m.invoke(connection, args);
             }
@@ -101,6 +109,10 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
         return result;
     }
 
+    /**
+     * Close the connection for real
+     * @throws SQLException if anything goes wrong
+     */
     protected void reallyClose() throws SQLException {
         try {
             connectionPool.registerRemovedConnection(getStatus());
@@ -112,6 +124,12 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 
     }
 
+    /**
+     * Find out if the delegated connection is close. Just calling isClosed() on the
+     * proxied connection will only indicate whether it is in the pool or not.
+     * @return true if the connection is really closed, or if the connection is null
+     * @throws SQLException if anything went wrong
+     */
     protected boolean isReallyClosed() throws SQLException {
         if (connection == null) {
             return true;
@@ -121,13 +139,19 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
     }
 
     /**
-     * Doesn't really close the connection, just puts it back in the pool
+     * Doesn't really close the connection, just puts it back in the pool. And tries to
+     * reset all the methods that need resetting.
      */
     public void close() throws SQLException {
         try {
+            // This call should be as quick as possible. Should we consider only
+            // calling it if values have changed? The trouble with that is that it
+            // means keeping track when they change and that might be even
+            // slower
+            connectionPool.resetConnection(connection);
             connectionPool.putConnection(this);
         } catch (Throwable t) {
-            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during destruction: " + t);
+            connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during closure: ", t);
         }
 
     }
@@ -344,6 +368,10 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.13  2002/11/06 20:26:49  billhorsman
+ improved doc, added connection resetting, and made
+ isClosed() work correctly
+
  Revision 1.12  2002/11/02 13:57:33  billhorsman
  checkstyle
 
