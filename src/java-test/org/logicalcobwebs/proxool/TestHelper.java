@@ -89,15 +89,6 @@ public class TestHelper {
         return url;
     }
 
-    protected static String buildSimpoolUrl(String alias, String driver, String delegateUrl) {
-        String url = SimpoolDriver.PREFIX
-                + ProxoolConstants.URL_DELIMITER
-                + driver
-                + ProxoolConstants.URL_DELIMITER
-                + delegateUrl;
-        return url;
-    }
-
     protected static String getFullUrl(String alias) {
         String url = ProxoolConstants.PROXOOL
                 + ProxoolConstants.ALIAS_DELIMITER
