@@ -15,14 +15,14 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Configurator for the <a href="http://jakarta.apache.org/avalon">Avalon Framework</a>.
+ * Configurator for the <a href="http://jakarta.apache.org/avalon/framework/" target="_new">Avalon Framework</a>.
  * The configuration can contain any number of &lt;proxool&gt; elements. The &lt;proxool&gt; elements
  * are delegated to {@link XMLConfigurator},
  * and have exactly the same format as is documented in that class.
  *
- * @version $Revision: 1.4 $, $Date: 2002/12/16 11:47:00 $
+ * @version $Revision: 1.5 $, $Date: 2002/12/18 23:31:57 $
  * @author billhorsman
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  */
 public class AvalonConfigurator implements Configurable, ThreadSafe {
 
@@ -96,6 +96,9 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.5  2002/12/18 23:31:57  chr32
+ Expanded doc.
+
  Revision 1.4  2002/12/16 11:47:00  billhorsman
  checkstyle
 

@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * <p>A SAX ContentHandler that can configure Proxool from an XML source.</p>
+ * <p>A SAX 2 ContentHandler that can configure Proxool from an XML source.</p>
  *
  * <p>This is just a <a
  * href="http://www.saxproject.org/apidoc/org/xml/sax/ContentHandler.html" target="_new"
@@ -64,10 +64,28 @@ import java.util.Properties;
  * configures your whole application as the source. This configurator will
  * ignore everything apart from the elements contained within the &lt;proxool&gt;
  * element.
- *
+ *<p><a name="#validation">
+ * <b>Validation</b><br>
+ * A couple of additional steps are required if you want your SAX parser to validate your Proxool xml confguration:
+ * <ul>
+ * <li>
+ * Put your proxool configuration elements inside a root <code>proxool-config</code> element.
+ * The document must adhere to the <a href="proxool.dtd">Proxool dtd</a>.
+ * </li>
+ * <li>
+ * Add a <code>DOCTYPE</code> entry to your xml with a system id containing the <i>absolute url</i> to the Proxool
+ * dtd. The Proxool jar contains a copy of the Proxool dtd in the confguration package. You can reference that with
+ * a jar url like this:<br>
+ * <code><nobr>&lt;!DOCTYPE proxool-config SYSTEM "jar:file:///C:/Proxool/lib/proxool.jar!/org/logicalcobwebs/proxool/configuration/proxool.dtd"&gt;</nobr></code></li>
+ * <li>
+ * Configure your parser to be validating. In the {@link JAXPConfigurator} this is done by passing <code>true</code> as
+ * the second arghument to any of the <code>configure</code> methods.
+ * </li>
+ * </ul>
+ * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.5 $, $Date: 2002/12/18 03:16:03 $
+ * @version $Revision: 1.6 $, $Date: 2002/12/18 23:31:57 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */

@@ -24,11 +24,18 @@ import java.io.IOException;
 
 /**
  * Configurator that uses JAXP to get a parser for Proxool configuration xml. The parser relies on JAXP version 1.1 or higher
- * and is namespace aware.<br>
+ * and is namespace aware.
+ * <p>
  * See {@link XMLConfigurator} for the Proxool xml configuration format.
- * @version $Revision: 1.4 $, $Date: 2002/12/16 11:46:59 $
+ * </p>
+ * <p>
+ * All the <code>configure</code> methods of this class takes a boolean argument describing whether the
+ * xml should be validated or not. If you want your xml to be validated be sure to read the
+ * <a href="XMLConfigurator.html#validation">Validation</a> chapter in the JavaDoc for {@link XMLConfigurator}.
+ * </p>
+ * @version $Revision: 1.5 $, $Date: 2002/12/18 23:31:57 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.6
  */
 public class JAXPConfigurator {
@@ -119,6 +126,9 @@ public class JAXPConfigurator {
 /*
  Revision history:
  $Log: JAXPConfigurator.java,v $
+ Revision 1.5  2002/12/18 23:31:57  chr32
+ Expanded doc.
+
  Revision 1.4  2002/12/16 11:46:59  billhorsman
  checkstyle
 
