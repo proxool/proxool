@@ -16,7 +16,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,7 +26,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.71 $, $Date: 2003/10/30 00:11:15 $
+ * @version $Revision: 1.72 $, $Date: 2003/11/04 13:52:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -351,9 +350,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
             // Let's make it available for someone else
             if (!proxyConnection.setStatus(ProxyConnectionIF.STATUS_ACTIVE, ProxyConnectionIF.STATUS_AVAILABLE)) {
-                log.error("Unable to set status of connection " + proxyConnection.getId()
-                        + "from " + getStatusDescription(ProxyConnectionIF.STATUS_ACTIVE)
-                        + "to " + getStatusDescription(ProxyConnectionIF.STATUS_ACTIVE)
+                log.warn("Unable to set status of connection " + proxyConnection.getId()
+                        + " from " + getStatusDescription(ProxyConnectionIF.STATUS_ACTIVE)
+                        + "to " + getStatusDescription(ProxyConnectionIF.STATUS_AVAILABLE)
                         + ". It remains " + getStatusDescription(proxyConnection.getStatus()));
             }
         }
@@ -1090,6 +1089,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.72  2003/11/04 13:52:01  billhorsman
+ Fixed warning message
+
  Revision 1.71  2003/10/30 00:11:15  billhorsman
  Debug info and error logged if unsuccessful attempt to put connection back in pool. Plus connectioninfo comparator changed
 
