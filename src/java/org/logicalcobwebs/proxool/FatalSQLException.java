@@ -11,7 +11,7 @@ import java.sql.SQLException;
  * A type of SQLException that has been defined as fatal. It contains
  * the {@link #getOriginalSQLException original} plain SQLException
  * just in case you need it.
- * @version $Revision: 1.1 $, $Date: 2003/09/02 19:26:29 $
+ * @version $Revision: 1.2 $, $Date: 2003/09/05 17:00:09 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @see ConnectionPoolDefinitionIF#getFatalSqlExceptions
@@ -23,14 +23,17 @@ public class FatalSQLException extends SQLException {
      */
     private SQLException cause;
 
+    public FatalSQLException(SQLException cause) {
+        this(cause, cause.getMessage(), cause.getSQLState());
+    }
+
     /**
      * @param cause the SQLException that was detected as being fatal
-     * @param reason see {@link super#SQLException(java.lang.String, java.lang.String, int)}
-     * @param SQLState see {@link super#SQLException(java.lang.String, java.lang.String, int)}
-     * @param vendorCode see {@link super#SQLException(java.lang.String, java.lang.String, int)}
+     * @param reason see {@link super#SQLException(java.lang.String, java.lang.String)}
+     * @param SQLState see {@link super#SQLException(java.lang.String, java.lang.String)}
      */
-    public FatalSQLException(SQLException cause, String reason, String SQLState, int vendorCode) {
-        super(reason, SQLState, vendorCode);
+    public FatalSQLException(SQLException cause, String reason, String SQLState) {
+        super(reason, SQLState);
         this.cause = cause;
     }
 
