@@ -13,13 +13,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Collection;
-import java.util.Vector;
 import java.util.List;
+import java.util.Date;
 
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.30 $, $Date: 2003/01/15 00:07:43 $
+ * @version $Revision: 1.31 $, $Date: 2003/01/15 12:01:37 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -1107,6 +1107,13 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         return connectionResetter.reset(connection, id);
     }
 
+    /**
+     * @see ConnectionPoolStatisticsIF#getDateStarted
+     */
+    public Date getDateStarted() {
+        return reloadMonitor.getLoadDate();
+    }
+
     private static final boolean FORCE_EXPIRY = true;
 
     private static final boolean REQUEST_EXPIRY = false;
@@ -1116,6 +1123,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.31  2003/01/15 12:01:37  billhorsman
+ added getDateStarted()
+
  Revision 1.30  2003/01/15 00:07:43  billhorsman
  now uses FastArrayList instead of Vector for thread safe
  improvements
