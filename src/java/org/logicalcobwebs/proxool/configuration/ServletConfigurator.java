@@ -18,17 +18,17 @@ import java.util.Properties;
 import java.io.File;
 
 /**
- * Allows you to configure Proxool using a servlet. There are three
+ * <p>Allows you to configure Proxool using a servlet. There are three
  * different ways:
  *
  * The init parameters
  * can either directly configure Proxool (in a similar fashion to the
  * PropertyConfigurator) or they can point to separate XML or
- * property files. For example:
+ * property files. For example:</p>
  *
- * <b>1. XML file</b> delegates to {@link JAXPConfigurator} passing
+ * <p><b>1. XML file</b> delegates to {@link JAXPConfigurator} passing
  * in the filename. If the filename is not absolute then it is prepended
- * with the application directory.
+ * with the application directory.</p>
  *
   *<pre>
  *    &lt;servlet&gt;
@@ -82,7 +82,7 @@ import java.io.File;
  * <p>It will also automatically shutdown Proxool. See
  * {@link #destroy}.</p>
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/05 15:03:49 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/06 15:45:26 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -170,6 +170,9 @@ public class ServletConfigurator extends HttpServlet  {
 /*
  Revision history:
  $Log: ServletConfigurator.java,v $
+ Revision 1.2  2003/02/06 15:45:26  billhorsman
+ trivial doc changes
+
  Revision 1.1  2003/02/05 15:03:49  billhorsman
  new configuration servlet.
 
