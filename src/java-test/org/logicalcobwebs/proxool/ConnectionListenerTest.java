@@ -14,7 +14,7 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.10 $, $Date: 2003/03/04 10:58:43 $
+ * @version $Revision: 1.11 $, $Date: 2003/03/10 23:31:04 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -48,7 +48,7 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
-        info.setProperty(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY, "1");
         info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
         Connection connection1 = DriverManager.getConnection(url, info);
         ProxoolFacade.addConnectionListener(alias, new TestConnectionListener());
@@ -87,7 +87,7 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
-        info.setProperty(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.SIMULTANEOUS_BUILD_THROTTLE_PROPERTY, "1");
         info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "0");
         Connection connection1 = DriverManager.getConnection(url, info);
         TestConnectionListener testConnectionListener1 = new TestConnectionListener();
@@ -125,7 +125,7 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 
     /**
      * Calls {@link AbstractProxoolTest#setUp}
-     * @see TestCase#setUp
+     * @see junit.framework.TestCase#setUp
      */
     protected void setUp() throws Exception {
         super.setUp();
@@ -154,6 +154,9 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.11  2003/03/10 23:31:04  billhorsman
+ fixed deprecated properties and doc
+
  Revision 1.10  2003/03/04 10:58:43  billhorsman
  checkstyle
 
