@@ -85,9 +85,9 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.7 $, $Date: 2002/12/23 02:42:24 $
+ * @version $Revision: 1.8 $, $Date: 2002/12/26 11:31:49 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public class XMLConfigurator extends DefaultHandler {
     private static final Log LOG = LogFactory.getLog(XMLConfigurator.class);
@@ -103,12 +103,6 @@ public class XMLConfigurator extends DefaultHandler {
     private Properties properties = new Properties();
 
     private static final String PROXOOL = "proxool";
-
-    private static final String POOL_NAME = "pool-name";
-
-    private static final String DRIVER_CLASS = "driver-class";
-
-    private static final String DRIVER_URL = "driver-url";
 
     private static final String DRIVER_PROPERTIES = "driver-properties";
 
@@ -133,7 +127,7 @@ public class XMLConfigurator extends DefaultHandler {
         }
 
         final String elementName = getElementName(uri, lname, qname);
-        
+
         if (elementName.equals(PROXOOL)) {
             if (insideProxool) {
                 throw new SAXException("A <" + PROXOOL + "> element can't contain another <" + PROXOOL + "> element.");
@@ -179,7 +173,7 @@ public class XMLConfigurator extends DefaultHandler {
 
             // Check that we have defined the minimum information
             if (driverClass == null || driverUrl == null) {
-                throw new SAXException("You must define the " + DRIVER_CLASS + " and the " + DRIVER_URL + ".");
+                throw new SAXException("You must define the " + ProxoolConstants.DRIVER_CLASS + " and the " + ProxoolConstants.DRIVER_URL + ".");
             }
 
             // Build the URL; optinally defining a name
@@ -219,11 +213,11 @@ public class XMLConfigurator extends DefaultHandler {
     }
 
     private void setProxoolProperty(String localName, String value) {
-        if (localName.equals(POOL_NAME)) {
+        if (localName.equals(ProxoolConstants.POOL_NAME)) {
             poolName = value;
-        } else if (localName.equals(DRIVER_CLASS)) {
+        } else if (localName.equals(ProxoolConstants.DRIVER_CLASS)) {
             driverClass = value;
-        } else if (localName.equals(DRIVER_URL)) {
+        } else if (localName.equals(ProxoolConstants.DRIVER_URL)) {
             driverUrl = value;
         } else {
             if (LOG.isDebugEnabled()) {

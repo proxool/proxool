@@ -8,9 +8,9 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.6 $, $Date: 2002/12/15 19:22:51 $
+ * @version $Revision: 1.7 $, $Date: 2002/12/26 11:32:22 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ProxoolConstants {
 
@@ -130,11 +130,39 @@ public interface ProxoolConstants {
     /** @see ProxoolDriver#getPropertyInfo */
     public final String FATAL_SQL_EXCEPTION_PROPERTY = PROPERTY_PREFIX + FATAL_SQL_EXCEPTION;
 
+    /**
+     *  Un-prefixed propety name for the Proxool pool name configuration property. Value: pool-name
+     */
+    public final String POOL_NAME = "pool-name";
+    /**
+     *  Prefixed propety name for the Proxool pool name configuration property. Value: proxool.pool-name
+     */
+    public final String POOL_NAME_PROPERTY = PROPERTY_PREFIX + POOL_NAME;
+    /**
+     *  Un-prefixed propety name for the Proxool driver class  configuration property. Value: driver-class
+     */
+    public final String DRIVER_CLASS = "driver-class";
+    /**
+     *  Prefixed propety name for the Proxool driver class  configuration property. Value: proxool.driver-class
+     */
+    public final String DRIVER_CLASS_PROPERTY = PROPERTY_PREFIX + DRIVER_CLASS;;
+    /**
+     *  Un-prefixed propety name for the Proxool driver url configuration property. Value: driver-url
+     */
+    public final String DRIVER_URL = "driver-url";
+    /**
+     *  Prefixed propety name for the Proxool driver url configuration property. Value: proxool.driver-url
+     */
+    public final String DRIVER_URL_PROPERTY = PROPERTY_PREFIX + DRIVER_URL;
 }
 
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.7  2002/12/26 11:32:22  billhorsman
+ Moved POOL_NAME, DRIVER_URL and DRIVER_CLASS constants
+ from XMLConfgiurator to ProxoolConstants.
+
  Revision 1.6  2002/12/15 19:22:51  chr32
  Added constant for proxool xml namespace.
 
