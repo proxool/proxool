@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.18 $
-    $Date: 2002/12/18 03:18:47 $
+    $Revision: 1.19 $
+    $Date: 2002/12/18 23:39:51 $
     $Author: chr32 $
 
     http://proxool.sourceforge.net
@@ -259,6 +259,9 @@
             windowtitle="Proxool API}"
             public="true"
         />
+        <!-- Copy dtd's over to the doc. -->
+        <copy todir="${build-dir}/api"><fileset dir="src/java" includes="**/*.dtd" /></copy>
+        <copy todir="${build-dir}/api-dev"><fileset dir="src/java" includes="**/*.dtd" /></copy>
     </target>
 
 </project>
