@@ -27,7 +27,7 @@ import java.util.TreeSet;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.70 $, $Date: 2003/09/30 18:39:08 $
+ * @version $Revision: 1.71 $, $Date: 2003/10/30 00:11:15 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -328,7 +328,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             long now = System.currentTimeMillis();
             long start = proxyConnection.getTimeLastStartActive();
             if (now - start < 0) {
-                log.warn("Future start time detected. #" + proxyConnection.getId() + " start = " + new Date(start));
+                log.warn("Future start time detected. #" + proxyConnection.getId() + " start = " + new Date(start)
+                        + " (" + (now - start) + " milliseconds)");
             } else if (now - start > 1000000) {
                 log.warn("Suspiciously long active time. #" + proxyConnection.getId() + " start = " + new Date(start));
             }
@@ -341,18 +342,25 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 expireProxyConnection(proxyConnection, proxyConnection.getReasonForMark(), REQUEST_EXPIRY);
             }
         } else {
-            // Let's make it available for someone else
-            proxyConnection.setStatus(ProxyConnectionIF.STATUS_ACTIVE, ProxyConnectionIF.STATUS_AVAILABLE);
-        }
 
-        // Optionally, test it to see if it is ok
-        if (getDefinition().isTestAfterUse()) {
-            // It will get removed by this call if it is no good
-            testConnection(proxyConnection);
+            // Optionally, test it to see if it is ok
+            if (getDefinition().isTestAfterUse()) {
+                // It will get removed by this call if it is no good
+                testConnection(proxyConnection);
+            }
+
+            // Let's make it available for someone else
+            if (!proxyConnection.setStatus(ProxyConnectionIF.STATUS_ACTIVE, ProxyConnectionIF.STATUS_AVAILABLE)) {
+                log.error("Unable to set status of connection " + proxyConnection.getId()
+                        + "from " + getStatusDescription(ProxyConnectionIF.STATUS_ACTIVE)
+                        + "to " + getStatusDescription(ProxyConnectionIF.STATUS_ACTIVE)
+                        + ". It remains " + getStatusDescription(proxyConnection.getStatus()));
+            }
         }
 
         if (log.isDebugEnabled() && getDefinition().isVerbose()) {
-            log.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " returned");
+            log.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " returned (now "
+                    + getStatusDescription(proxyConnection.getStatus()) + ")");
         }
 
     }
@@ -810,19 +818,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     protected Collection getConnectionInfos() {
         Collection cis = null;
-        cis = new TreeSet(new Comparator() {
-            public int compare(Object o1, Object o2) {
-                try {
-                    Date birth1 = ((ConnectionInfoIF) o1).getBirthDate();
-                    Date birth2 = ((ConnectionInfoIF) o2).getBirthDate();
-                    return birth1.compareTo(birth2);
-                } catch (ClassCastException e) {
-                    log.error("Unexpected contents of connectionInfos Set: " + o1.getClass() + " and " + o2.getClass(), e);
-                    return String.valueOf(o1.hashCode()).compareTo(String.valueOf(o2.hashCode()));
-                }
-            }
-        });
-
+        cis = new TreeSet();
         Iterator i = proxyConnections.iterator();
         while (i.hasNext()) {
             ConnectionInfoIF connectionInfo = (ConnectionInfoIF) i.next();
@@ -1094,6 +1090,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.71  2003/10/30 00:11:15  billhorsman
+ Debug info and error logged if unsuccessful attempt to put connection back in pool. Plus connectioninfo comparator changed
+
  Revision 1.70  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 
