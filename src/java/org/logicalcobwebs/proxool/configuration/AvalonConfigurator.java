@@ -9,6 +9,9 @@ import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.thread.ThreadSafe;
+import org.apache.avalon.framework.component.Component;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
@@ -20,11 +23,16 @@ import org.xml.sax.helpers.AttributesImpl;
  * are delegated to {@link XMLConfigurator},
  * and have exactly the same format as is documented in that class.
  *
- * @version $Revision: 1.5 $, $Date: 2002/12/18 23:31:57 $
+ * @version $Revision: 1.6 $, $Date: 2002/12/23 02:44:44 $
  * @author billhorsman
  * @author $Author: chr32 $ (current maintainer)
  */
-public class AvalonConfigurator implements Configurable, ThreadSafe {
+public class AvalonConfigurator implements Component, Configurable, ThreadSafe {
+    private static final Log LOG = LogFactory.getLog(AvalonConfigurator.class);
+    /**
+     * Avalon ROLE id for this component.
+     */
+    public static final String ROLE = AvalonConfigurator.class.getName();
 
     /**
      * Check that all top level elements are named proxool and hand them to
@@ -36,7 +44,7 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
         final XMLConfigurator xmlConfigurator = new XMLConfigurator();
         final Configuration[] children = configuration.getChildren();
         for (int i = 0; i < children.length; ++i) {
-            if (!children[i].getNamespace().equals(ProxoolConstants.PROXOOL)) {
+            if (!children[i].getName().equals(ProxoolConstants.PROXOOL)) {
                 throw new ConfigurationException("Found element named " + children[i].getName() + ". Only "
                         + ProxoolConstants.PROXOOL + " top level elements are alowed.");
             }
@@ -62,19 +70,25 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
             if (namespace == null) {
                 namespace = "";
             }
-            xmlConfigurator.startElement(namespace, configuration.getName(), "", getAttributes(configuration));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Reporting element start for " + configuration.getName());
+            }
+            final String lName = namespace.length() == 0 ? "" : configuration.getName();
+            final String qName = namespace.length() == 0 ? configuration.getName() : "";
+
+            xmlConfigurator.startElement(namespace, lName, qName, getAttributes(configuration));
             children = configuration.getChildren();
             // If this is a leaf node, report the value,
             // else recurse.
             if (children == null || children.length < 1) {
-                value = configuration.getValue();
+                value = configuration.getValue(null);
                 if (value != null) {
                     xmlConfigurator.characters(value.toCharArray(), 0, value.length());
                 }
             } else {
                 reportProperties(xmlConfigurator, children);
             }
-            xmlConfigurator.endElement(namespace, configuration.getName(), "");
+            xmlConfigurator.endElement(namespace, lName, qName);
         }
     }
 
@@ -85,10 +99,16 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
         final String[] avalonAttributeNames = configuration.getAttributeNames();
         if (avalonAttributeNames != null && avalonAttributeNames.length > 0) {
             for (int i = 0; i < avalonAttributeNames.length; ++i) {
-                attributes.addAttribute("", avalonAttributeNames[i], "", "CDATA",
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Adding attribute " + avalonAttributeNames[i] + " with value "
+                        + configuration.getAttribute(avalonAttributeNames[i]));
+                }
+                attributes.addAttribute("", avalonAttributeNames[i], avalonAttributeNames[i], "CDATA",
                         configuration.getAttribute(avalonAttributeNames[i]));
+                    LOG.debug("In attributes: " + avalonAttributeNames[i] + " with value "
+                        + attributes.getValue(avalonAttributeNames[i]));
+                }
             }
-        }
         return attributes;
     }
 }
@@ -96,6 +116,10 @@ public class AvalonConfigurator implements Configurable, ThreadSafe {
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.6  2002/12/23 02:44:44  chr32
+ Added ROLE id and started implementing Component.
+ Improved namespace support.
+
  Revision 1.5  2002/12/18 23:31:57  chr32
  Expanded doc.
 
