@@ -10,16 +10,15 @@ import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
+import java.util.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
- * @version $Revision: 1.17 $, $Date: 2003/11/04 13:54:02 $
+ * @version $Revision: 1.18 $, $Date: 2004/06/02 20:04:54 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -27,6 +26,8 @@ import java.util.TreeMap;
 abstract class AbstractProxyStatement {
 
     private static final Log LOG = LogFactory.getLog(ProxyStatement.class);
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MMM-yyyy.HH:mm:ss");
 
     private Statement statement;
 
@@ -151,6 +152,10 @@ abstract class AbstractProxyStatement {
             parameters.put(key, "'" + value + "'");
         } else if (value instanceof Number) {
             parameters.put(key, value);
+        } else if (value instanceof Boolean) {
+            parameters.put(key, ((Boolean) value).toString());
+        } else if (value instanceof Date) {
+            parameters.put(key, "'" + getDateAsString((Date) value) + "'");
         } else {
             String className = value.getClass().getName();
             StringTokenizer st = new StringTokenizer(className, ".");
@@ -213,7 +218,23 @@ abstract class AbstractProxyStatement {
                 parameterIndex++;
                 sqlLog.append(st.nextToken());
             }
-            sqlLog.append("; ");
+            if (sqlStatement.endsWith("?")) {
+                if (parameterIndex > 0) {
+                    if (parameters != null) {
+                        final Object value = parameters.get(new Integer(parameterIndex));
+                        if (value != null) {
+                            sqlLog.append(value);
+                        } else {
+                            sqlLog.append("?");
+                        }
+                    } else {
+                            sqlLog.append("?");
+                    }
+                }
+            }
+            if (sqlStatement != null && !sqlStatement.trim().endsWith(";")) {
+                sqlLog.append("; ");
+            }
         }
         if (parameters != null) {
             parameters.clear();
@@ -234,12 +255,19 @@ abstract class AbstractProxyStatement {
             this.sqlStatement = sqlStatement;
         }
     }
+
+    protected static String getDateAsString(Date date) {
+        return DATE_FORMAT.format(date);
+    }
 }
 
 
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.18  2004/06/02 20:04:54  billhorsman
+ Fixed sql log: boolean and date now supported, and last parameter is included
+
  Revision 1.17  2003/11/04 13:54:02  billhorsman
  checkstyle
 
