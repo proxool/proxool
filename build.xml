@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.22 $
-    $Date: 2003/01/16 12:00:35 $
+    $Revision: 1.23 $
+    $Date: 2003/01/21 10:56:40 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -25,22 +25,33 @@
     <!-- Whether we include debug information in JAR file -->
     <property name="debug" value="false"/>
 
-    <!-- Current version -->
+    <!-- Current version e.g. 0.6.* -->
     <property name="version" value="0.6.*"/>
+
+    <!-- Currect release, e.g. 0.6 -->
+    <property name="release" value="0.6" />
 
     <!-- Log4J configuration to use for testing. See proxool-ant.properties
     file for more infomation. -->
     <property name="log4jPath" value=""/>
 
     <!-- Classpath -->
-    <path id="classpath" path="${build-dir}/classes" >
+    <path id="source" path="${build-dir}/classes" >
         <fileset dir="lib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    <path id="binary">
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="jar">
             <include name="**/*.jar"/>
         </fileset>
     </path>
 
     <taskdef name="checkstyle" classname="com.puppycrawl.tools.checkstyle.CheckStyleTask">
-        <classpath refid="classpath"/>
+        <classpath refid="source"/>
     </taskdef>
 
     <!--
@@ -136,12 +147,6 @@
         <antcall target="build-src-jdk1.2"/>
         <antcall target="build-src-test"/>
 
-        <replace
-            file="${build-dir}/src/java/org/logicalcobwebs/proxool/Version.java"
-            token="RELEASE = null"
-            value='RELEASE = "${version} (${TODAY})"'
-            />
-
     </target>
 
     <target
@@ -150,7 +155,7 @@
         depends="init,build-src"
         >
         <javac srcdir="${build-dir}/src/java" destdir="${build-dir}/classes" debug="${debug}">
-            <classpath refid="classpath"/>
+            <classpath refid="source"/>
 		</javac>
         <!-- Copy dtd's into the compiled classes directory. -->
         <copy todir="${build-dir}/classes">
@@ -168,7 +173,7 @@
             <attribute name="Date" value="${TODAY}"/>
         </manifest>
         <jar
-            jarfile="${build-dir}/proxool-${version}.jar"
+            jarfile="${build-dir}/proxool-${release}.jar"
             basedir="${build-dir}/classes"
             manifest="${build-dir}/etc/MANIFEST.MF"
             />
@@ -221,7 +226,7 @@
         description="Runs the JUnit tests"
         depends="init,build-test"
         >
-        <java fork="yes" classpathref="classpath" classname="junit.textui.TestRunner" >
+        <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}" />
             <sysproperty key="script" value="src/java-test/org/logicalcobwebs/proxool/script.xml" />
             <arg value="org.logicalcobwebs.proxool.GlobalTest" />
@@ -258,6 +263,22 @@
         <!-- Copy dtd's over to the doc. -->
         <copy todir="${build-dir}/api"><fileset dir="src/java" includes="**/*.dtd" /></copy>
         <copy todir="${build-dir}/api-dev"><fileset dir="src/java" includes="**/*.dtd" /></copy>
+    </target>
+
+    <target
+        name="source-version"
+        description="Outputs the source version"
+        depends="init,compile"
+        >
+        <java classpathref="source" classname="org.logicalcobwebs.proxool.Version" />
+    </target>
+
+    <target
+        name="binary-version"
+        description="Outputs the source version"
+        depends="init"
+        >
+        <java classpathref="binary" classname="org.logicalcobwebs.proxool.Version" />
     </target>
 
 </project>

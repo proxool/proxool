@@ -5,6 +5,9 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Tells you the version. You can tell what sort of release it is
  * from the version. For instance:
@@ -20,29 +23,53 @@ package org.logicalcobwebs.proxool;
  *   A snapshot release built on January 2nd. This comes after the
  *   version 1.0 and before 1.1.
  *
- * @version $Revision: 1.3 $, $Date: 2003/01/16 11:45:02 $
+ * @version $Revision: 1.4 $, $Date: 2003/01/21 10:56:40 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class Version {
 
+    private static final Log LOG = LogFactory.getLog(Version.class);
+
     /**
      * This is changed by the Ant script when you build from the
      * source code.
      */
-    private static final String RELEASE = null;
+    private static final String VERSION = null;
+
+    private static final String BUILD_DATE = null;
+
+    private static final String CVS = "cvs";
 
     public static String getVersion() {
-        if (RELEASE != null) {
-            return RELEASE;
+        StringBuffer version = new StringBuffer();
+
+        if (VERSION != null) {
+            version.append(VERSION);
         } else {
             /**
              * This means that we haven't used the Ant script so this
              * is just our best guess at the version.
              */
-            return "0.6.*";
+            version.append(CVS);
         }
+
+        if (BUILD_DATE != null) {
+            version.append(" (");
+            version.append(BUILD_DATE);
+            version.append(")");
+        }
+
+        return version.toString();
+    }
+
+    /**
+     * Convenient way of verifying version
+     * @param args none required (any sent are ignored)
+     */
+    public static void main(String[] args) {
+        LOG.info("Version " + getVersion());
     }
 
 }
@@ -50,6 +77,9 @@ public class Version {
 /*
  Revision history:
  $Log: Version.java,v $
+ Revision 1.4  2003/01/21 10:56:40  billhorsman
+ new version approach
+
  Revision 1.3  2003/01/16 11:45:02  billhorsman
  changed format from x.y+ to x.y.*
 
