@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.4 $, $Date: 2003/03/11 14:51:52 $
+ * @version $Revision: 1.5 $, $Date: 2003/04/10 08:22:33 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -69,9 +69,9 @@ public class Prototyper {
 
             while (!cancel && connectionPool.isConnectionPoolUp()) {
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Prototyping");
-                }
+//                if (log.isDebugEnabled()) {
+//                    log.debug("Prototyping");
+//                }
 
                 String reason = null;
                 if (connectionCount >= getDefinition().getMaximumConnectionCount()) {
@@ -260,6 +260,9 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.5  2003/04/10 08:22:33  billhorsman
+ removed some very frequent debug
+
  Revision 1.4  2003/03/11 14:51:52  billhorsman
  more concurrency fixes relating to snapshots
 
