@@ -13,12 +13,12 @@ package org.logicalcobwebs.dbscript;
  * or {@link #getLoops loops} are configured then it might run more than
  * once.
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/02 14:22:16 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/06 21:07:03 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
-class Command {
+class Command implements CommandIF {
 
     private String name;
 
@@ -31,10 +31,9 @@ class Command {
     private boolean ignoreException;
 
     /**
-     * The SQL statement to run
-     * @return sql
+     * @see CommandIF#getSql
      */
-    protected String getSql() {
+    public String getSql() {
         return sql;
     }
 
@@ -46,11 +45,9 @@ class Command {
     }
 
     /**
-     * How many "threads" to simulate. See {@link Script} to see how
-     * it actually implements thread-like behaviour.
-     * @return load
+     * @see CommandIF#getLoad
      */
-    protected int getLoad() {
+    public int getLoad() {
         return load;
     }
 
@@ -62,11 +59,9 @@ class Command {
     }
 
     /**
-     * The number of loops to perform. Each loop will run the {@link #getSql sql}
-     * {@link #getLoad load} times.
-     * @return loops
+     * @see CommandIF#getLoops
      */
-    protected int getLoops() {
+    public int getLoops() {
         return loops;
     }
 
@@ -78,9 +73,7 @@ class Command {
     }
 
     /**
-     * If true then errors that occur during this command are logged as debug
-     * messages but do not stop the {@link Script script} running.
-     * @return true if exceptions should be ignored
+     * @see CommandIF#isIgnoreException
      */
     public boolean isIgnoreException() {
         return ignoreException;
@@ -94,8 +87,7 @@ class Command {
     }
 
     /**
-     * A convenient name to call this command to help logging.
-     * @return name
+     * @see CommandIF#getName
      */
     public String getName() {
         return name;
@@ -113,6 +105,9 @@ class Command {
 /*
  Revision history:
  $Log: Command.java,v $
+ Revision 1.3  2002/11/06 21:07:03  billhorsman
+ Now supports the CommandIF interface
+
  Revision 1.2  2002/11/02 14:22:16  billhorsman
  Documentation
 
