@@ -44,7 +44,7 @@ import java.util.Iterator;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.1 $, $Date: 2003/02/24 10:19:44 $
+ * @version $Revision: 1.2 $, $Date: 2003/02/26 16:51:12 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -159,7 +159,7 @@ public class AdminServlet extends HttpServlet {
             printDefintionEntry(out, "Refused", statistics.getRefusedCount() + " (" + DECIMAL_FORMAT.format(statistics.getRefusedPerSecond()) + "/s)");
 
             // averageActiveTime
-            printDefintionEntry(out, "Average active time", DECIMAL_FORMAT.format(statistics.getAverageActiveTime()) + "s");
+            printDefintionEntry(out, "Average active time", DECIMAL_FORMAT.format(statistics.getAverageActiveTime() / 1000) + "s");
 
             // activityLevel
             StringBuffer activityLevelBuffer = new StringBuffer();
@@ -546,6 +546,10 @@ public class AdminServlet extends HttpServlet {
 /*
  Revision history:
  $Log: AdminServlet.java,v $
+ Revision 1.2  2003/02/26 16:51:12  billhorsman
+ fixed units for average active time. now displays
+ properly in seconds
+
  Revision 1.1  2003/02/24 10:19:44  billhorsman
  moved AdminServlet into servlet package
 
