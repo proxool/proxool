@@ -12,7 +12,7 @@ import org.logicalcobwebs.logging.LogFactory;
  * Waits for a set of results to become true with timeout
  * functionality
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.9 $, $Date: 2003/03/05 18:44:10 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -73,7 +73,7 @@ public abstract class ResultMonitor {
                     break;
                 }
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(delay);
                 } catch (InterruptedException e) {
                     LOG.error("Awoken", e);
                 }
@@ -106,6 +106,9 @@ public abstract class ResultMonitor {
 /*
  Revision history:
  $Log: ResultMonitor.java,v $
+ Revision 1.9  2003/03/05 18:44:10  billhorsman
+ fix delay and timeout
+
  Revision 1.8  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 
