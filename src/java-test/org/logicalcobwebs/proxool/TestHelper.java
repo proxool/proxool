@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.ResultSet;
 import java.util.Properties;
 
 /*
@@ -29,19 +30,17 @@ public class TestHelper {
 
     private static final String HYPERSONIC_DRIVER = "org.hsqldb.jdbcDriver";
 
-    private static final String HYPERSONIC_URL = "jdbc:hsqldb:.";
+    private static final String HYPERSONIC_URL = "jdbc:hsqldb:test";
 
-    private static final String SQL_CREATE_TEST_TABLE = "create table test (a int, b varchar)";
+    protected static final String SQL_INSERT_INTO_TEST = "INSERT INTO TEST VALUES(1);";
 
-    private static final String SQL_DROP_TEST_TABLE = "drop table test";
-
-    private static final String SQL_SELECT_FROM_TEST = "SELECT * FROM test";
+    protected static final String SQL_CHECK_TEST = "SELECT COUNT(*) FROM TEST;";
 
     protected static Properties buildProperties() {
         Properties info = new Properties();
         info.setProperty("user", USER);
         info.setProperty("password", PASSWORD);
-        info.setProperty("proxool.debug-level", "1");
+        info.setProperty("proxool.verbose", "true");
         return info;
     }
 
@@ -89,6 +88,35 @@ public class TestHelper {
         return connection;
     }
 
+    protected static int getCount(Connection connection, String table) throws SQLException {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        int count = -1;
+        try {
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("SELECT COUNT(*) FROM " + table);
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            } else {
+                LOG.warn("No rows returned from " + table);
+            }
+        } finally {
+            if (statement != null) {
+                try {
+                    if (resultSet != null) {
+                        resultSet.close();
+                    }
+                    if (statement != null) {
+                        statement.close();
+                    }
+                } catch (SQLException e) {
+                    LOG.error("Couldn't close statement", e);
+                }
+            }
+        }
+        return count;
+    }
+
     protected static void execute(Connection connection, String sql) throws SQLException {
         Statement statement = null;
         try {
@@ -97,7 +125,9 @@ public class TestHelper {
         } finally {
             if (statement != null) {
                 try {
-                    statement.close();
+                    if (statement != null) {
+                        statement.close();
+                    }
                 } catch (SQLException e) {
                     LOG.error("Couldn't close statement", e);
                 }
@@ -105,16 +135,21 @@ public class TestHelper {
         }
     }
 
-    protected static void setupDatabase() throws SQLException, ClassNotFoundException {
-        execute(getDirectConnection(), SQL_CREATE_TEST_TABLE);
+    protected static void createTable(String table) throws Exception {
+        try {
+            execute(getDirectConnection(), "CREATE TABLE " + table + " (A INT)");
+        } catch (Exception e) {
+            LOG.error("Error creating table " + table, e);
+            throw e;
+        }
     }
 
-    protected static void tearDownDatabase() throws SQLException, ClassNotFoundException {
-        execute(getDirectConnection(), SQL_DROP_TEST_TABLE);
+    protected static void dropTable(String table) throws SQLException, ClassNotFoundException {
+        execute(getDirectConnection(), "DROP TABLE " + table);
     }
 
-    protected static void testConnection(Connection connection) throws SQLException {
-        execute(connection, SQL_SELECT_FROM_TEST);
+    protected static void insertRow(Connection connection, String table) throws SQLException {
+        execute(connection, "INSERT INTO " + table + " VALUES(1)");
     }
 
 }

@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Various tests
  *
- * @version $Revision: 1.10 $, $Date: 2002/10/29 08:54:04 $
+ * @version $Revision: 1.11 $, $Date: 2002/10/29 23:17:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -25,17 +25,19 @@ public class GeneralTests extends TestCase {
 
     private static final Log LOG = LogFactory.getLog(GeneralTests.class);
 
+    private String TEST_TABLE = "test";
+
     public GeneralTests(String name) {
         super(name);
     }
 
     protected void setUp() throws Exception {
         AllTests.globalSetup();
-        TestHelper.setupDatabase();
+        TestHelper.createTable(TEST_TABLE);
     }
 
     protected void tearDown() throws Exception {
-        TestHelper.tearDownDatabase();
+        TestHelper.dropTable(TEST_TABLE);
         AllTests.globalTeardown();
     }
 
@@ -50,21 +52,21 @@ public class GeneralTests extends TestCase {
         {
             String url = TestHelper.getFullUrl(alias);
             Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.testConnection(c);
+            TestHelper.insertRow(c, TEST_TABLE);
         }
 
         // Get it back by url
         {
             String url = TestHelper.getFullUrl(alias);
             Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.testConnection(c);
+            TestHelper.insertRow(c, TEST_TABLE);
         }
 
         // Get it back by name
         {
             String url = TestHelper.getSimpleUrl(alias);
             Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.testConnection(c);
+            TestHelper.insertRow(c, TEST_TABLE);
         }
 
         ConnectionPoolStatisticsIF connectionPoolStatistics = ProxoolFacade.getConnectionPoolStatistics(alias);
@@ -85,7 +87,7 @@ public class GeneralTests extends TestCase {
         {
             String url = TestHelper.getFullUrl(alias);
             Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.testConnection(c);
+            TestHelper.insertRow(c, TEST_TABLE);
             c.close();
         }
 
@@ -110,7 +112,7 @@ public class GeneralTests extends TestCase {
             info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
             String url = TestHelper.getSimpleUrl(alias);
             Connection c = TestHelper.getProxoolConnection(url, info);
-            TestHelper.testConnection(c);
+            TestHelper.insertRow(c, TEST_TABLE);
             cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
             long mcc2 = cpd.getMaximumConnectionCount();
             assertTrue(mcc1 != mcc2);
@@ -151,7 +153,7 @@ public class GeneralTests extends TestCase {
                 String url = TestHelper.getSimpleUrl(alias);
                 connections[i] = TestHelper.getProxoolConnection(url, info);
 
-                TestHelper.testConnection(connections[i]);
+                TestHelper.insertRow(connections[i], TEST_TABLE);
                 goodHits++;
             } catch (ClassNotFoundException e) {
                 LOG.error("Problem finding driver?", e);
@@ -262,21 +264,21 @@ public class GeneralTests extends TestCase {
         {
             String url = TestHelper.getFullUrl(alias1);
             Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.testConnection(c);
+            TestHelper.insertRow(c, TEST_TABLE);
         }
 
         // #2
         {
             String url = TestHelper.getFullUrl(alias2);
             Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.testConnection(c);
+            TestHelper.insertRow(c, TEST_TABLE);
         }
 
         // #2
         {
             String url = TestHelper.getFullUrl(alias2);
             Connection c = TestHelper.getProxoolConnection(url);
-            TestHelper.testConnection(c);
+            TestHelper.insertRow(c, TEST_TABLE);
         }
 
         ConnectionPoolStatisticsIF cps1 = ProxoolFacade.getConnectionPoolStatistics(alias1);
@@ -292,6 +294,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.11  2002/10/29 23:17:38  billhorsman
+ Cleaned up SQL stuff
+
  Revision 1.10  2002/10/29 08:54:04  billhorsman
  fixed testUpdate (wasn't closing a connection)
 
