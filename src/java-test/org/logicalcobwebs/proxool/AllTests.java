@@ -13,9 +13,9 @@ import junit.framework.TestSuite;
 /**
  * Run all tests
  *
- * @version $Revision: 1.11 $, $Date: 2003/02/06 17:41:02 $
+ * @version $Revision: 1.12 $, $Date: 2003/02/18 16:51:19 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: billhorsman $ (current maintainer)
+ * @author $Author: chr32 $ (current maintainer)
  * @since Proxool 0.5
  */
 public class AllTests {
@@ -30,6 +30,7 @@ public class AllTests {
         suite.addTestSuite(HypersonicTest.class);
         suite.addTestSuite(GeneralTests.class);
         suite.addTestSuite(ConnectionResetterTest.class);
+        suite.addTestSuite(ConnectionListenerTest.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -46,6 +47,9 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
+ Revision 1.12  2003/02/18 16:51:19  chr32
+ Added tests for ConnectionListeners.
+
  Revision 1.11  2003/02/06 17:41:02  billhorsman
  now uses imported logging
 
