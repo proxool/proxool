@@ -1,9 +1,27 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.32 $
-$Date: 2003/12/13 12:21:54 $
+$Revision: 1.33 $
+$Date: 2004/03/23 21:33:23 $
 $Author: billhorsman $
+
+0.9.0
+
+- New DataSource implementation. TODO more
+
+- All connections are now wrapped in disposable wrappers. TODO more
+
+- Connections, Statements, PreparedStatements, and CallableStatements now implement
+  all the public intefaces that the delegate connection does. This means that you can,
+  for instance, cast a Connection directly to the driver specific one. Or more precisely,
+  any of the interfaces that the driver object implements. 
+
+- ProxoolFacade now has killConnection that accepts the Connection object
+  itself, so you don't have to know the pool alias and connection ID.
+
+- ProxoolFacade now has getId() which will give you the ID for any connection.
+
+- ProxoolFacade now has getAlias() which will give you the pool alias for any connection.
 
 0.8.3 - 14 December 2003
 
