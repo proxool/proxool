@@ -24,7 +24,7 @@ import java.util.Properties;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.13 $, $Date: 2002/11/09 15:56:31 $
+ * @version $Revision: 1.14 $, $Date: 2002/11/13 11:28:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -213,6 +213,8 @@ public class ProxoolFacade {
                     }
                 } else if (key.equals(ProxoolConstants.VERBOSE_PROPERTY)) {
                     cpd.setVerbose(Boolean.valueOf(value).booleanValue());
+                } else if (key.equals(ProxoolConstants.TRACE_PROPERTY)) {
+                    cpd.setTrace(Boolean.valueOf(value).booleanValue());
                 } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
                     cpd.setFatalSqlException(value);
                 } else {
@@ -433,6 +435,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.14  2002/11/13 11:28:38  billhorsman
+ trace property wasn't being configured
+
  Revision 1.13  2002/11/09 15:56:31  billhorsman
  log if serConnectionListener couldn't find pool
 
