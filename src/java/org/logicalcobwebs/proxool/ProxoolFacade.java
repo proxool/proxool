@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.24 $, $Date: 2002/12/16 17:15:03 $
+ * @version $Revision: 1.25 $, $Date: 2003/01/14 23:50:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -149,6 +149,10 @@ public class ProxoolFacade {
 
         final String alias = getAlias(url);
         Log earlyLog = LogFactory.getLog("org.logicalcobwebs.proxool." + alias);
+
+        if (cpd.getDriver() == null) {
+            earlyLog.info("Proxool " + Version.getVersion());
+        }
 
         try {
             int endOfPrefix = url.indexOf(':');
@@ -596,6 +600,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.25  2003/01/14 23:50:58  billhorsman
+ logs version
+
  Revision 1.24  2002/12/16 17:15:03  billhorsman
  fix for url
 
