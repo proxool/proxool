@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.27 $
-    $Date: 2003/02/08 14:29:03 $
-    $Author: chr32 $
+    $Revision: 1.28 $
+    $Date: 2003/02/11 00:33:08 $
+    $Author: billhorsman $
 
     http://proxool.sourceforge.net
 
@@ -50,7 +50,7 @@
     <taskdef name="checkstyle" classname="com.puppycrawl.tools.checkstyle.CheckStyleTask">
         <classpath refid="source"/>
     </taskdef>
-    
+
     <!--
         Build necessary directories
        -->
@@ -280,7 +280,7 @@
     <target
         name="test"
         description="Runs the JUnit tests"
-        depends="init,build-test"
+        depends="init,build-test,deleteTestDb"
         >
         <java fork="yes" classpathref="source" classname="junit.textui.TestRunner" >
             <sysproperty key="log4jPath" value="${log4jPath}" />
