@@ -1,10 +1,20 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.21 $
-$Date: 2003/04/27 22:11:58 $
+$Revision: 1.22 $
+$Date: 2003/07/08 22:15:35 $
 $Author: billhorsman $
 
+0.7.3 - (coming soon)
+
+- Connections that are about to be expired no longer bother to reset
+  themselves (because they'll never be used again anyway). This was
+  causing problems if the connection had connectivity problems to the
+  database which then caused problems during the reset.
+
+- Fixed ConcurrentModificationException that happened in some
+  environments during automatic statement closure.
+   
 0.7.2 - April 28, 2003
 
 - Moved DataSourceTest into Sandbox so that the Ant test target
