@@ -1,21 +1,21 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.15 $
-$Date: 2003/02/12 00:33:51 $
+$Revision: 1.16 $
+$Date: 2003/02/21 11:50:51 $
 $Author: billhorsman $
 
-0.7 - scheduled for February 12, 2003
+0.7 - scheduled for February, 2003
 
 - We have dropped the dependency on commons-logging.jar
   by copying the code into our own project (retaining credit to
   the Jakarta team, naturally).
 
-- New monitor package provides statistical
+- New admin package provides statistical
   and snapshot information so you can measure how well Proxool, and
   your database, is doing.
 
-- New MonitorServlet provides statistical
+- New AdminServlet provides statistical
   information for your web application.
 
 - The JDK 1.2 patch code has been brought up to date and now
@@ -34,12 +34,23 @@ $Author: billhorsman $
 - By using ShutdownHooks (with JDK1.3 or later) we get a cleaner, more
   reliable shutdown of the pools when the JVM stops.
 
+- Removed ReloadMonitor (added in 0.5) because it made use of
+  SystemProperties and this is prohbited by J2SE. You are now responsible
+  for ensuring Proxool is shutdown if your application is reloaded within
+  the same environment (as can sometimes happen in a web application).
+  See ProxoolFacade.shutdown().
+
 - Fixed bug when you asked DatabaseMetaData for the connection. It
   now gives you back the Proxool connection, not the underlying delegate
   connection.
 
 - Fixed bug where if you registered, removed and then re-registered a pool
   then the new pool would not notice the Properties passed to it.
+
+- If a connection encounters a fatal SQLException (as defined by the
+  fatal-sql-exception property) it now wakes up the house keeper thread
+  so other connections are tested as soon as possible (with the
+  house-keeper-test-sql) rather than waiting for the next scheduled sweep.
 
 0.6 (January 23, 2003)
 
