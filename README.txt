@@ -1,21 +1,21 @@
 About Proxool
 ------------
 
-$Revision: 1.1 $
-$Date: 2002/09/13 08:12:27 $
+$Revision: 1.2 $
+$Date: 2002/09/24 09:34:38 $
 $Author: billhorsman $
 
-This code you have downloaded from cvs is in transition. Well,
-not the code itself, but the structure of the directories. The
-Ant script is new. The separation of source code is new. This
-file is new.
+A Java SQL Driver that provides a connection pool wrapper around another
+Driver of your choice. Very simple to migrate existing code. Fully
+configurable. Fast, mature and robust. Transparently adds connection
+pooling to your existing JDBC driver.
 
-By the end of September I will have this all documented properly
-and the web site will accurately reflect the changes I have made.
-Right now I am away from home and unable to make these changes
-easily.
+You can take a look at BUILD.txt, CHANGES.txt and LICENCE.txt but you might
+have better luck looking at the documentation at doc/index.html.
 
-Okay. Expect release 0.4 in the next few weeks then.
+I would welcome any comments you would like to make on Proxool. Good or
+bad.
 
-Regards,
-Bill
+Bill Horsman
+19 September 2002
+billhorsman@users.sourceforge.net

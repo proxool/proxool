@@ -1,32 +1,30 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.1 $
-$Date: 2002/09/13 08:12:32 $
+$Revision: 1.2 $
+$Date: 2002/09/24 09:34:38 $
 $Author: billhorsman $
 
-I N T R O D U C T I O N
+0.4
 
-A Java SQL Driver that provides a connection pool wrapper around another
-Driver of your choice. Very simple to migrate existing code. Fully configurable.
-Fast, mature and robust. Transparently adds connection pooling to your
-existing JDBC driver.F I L E S
+- Rethink of how we organise our source code so that we can easily build
+  to include different optional components.
 
-doc/index.html
-  Snapshot of http://proxool.sourceforge.net
+- Use the Jakarta Commons' ultra-thin log wrapper. This allows you to
+  plugin whatever logging component you like.
 
-doc/api/index.html
-  Javadoc API
+- Switched to use of the Proxy class so that we are not tied to a particular
+  version of the JDK. However, this does mean a bit of patching to work with
+  JDK 1.2 (Proxy was introduced in 1.3). Fortunately, this patch is handled
+  easily using Ant.
 
-src/java
-  The core Java source code (this is all you need to use proxool)
+- Test classes now make use of Hypersonic. A pure Java database with a very
+  small footprint. This means we can run the tests without having to rely on
+  the existence of a separate database.
 
-src/java-jdk1.2
-  A patch that allows you to use JDK1.2. Use the Ant build.xml file to build a
-  patched source tree that avoids the use of JDK1.3's Proxy class.
+- Layout and code style changes in accordance with CheckStyle
 
-src/java-test
-  JUnit tests that you might find interesting but are not required to use Proxool
+- New XMLConfigurator using JAXP to configure your connection pools.
 
-src/java-ext
-  Some useful files to help you integrate Proxool into your application.
+- Improvments in Junit testing.
+
