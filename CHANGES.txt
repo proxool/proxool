@@ -1,11 +1,45 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.2 $
-$Date: 2002/09/24 09:34:38 $
+$Revision: 1.3 $
+$Date: 2002/10/25 11:06:01 $
 $Author: billhorsman $
 
-0.4
+0.5 (scheduled for November 15, 2002)
+
+- Fix finalisation of old instances. If you deploy to some environments in
+  a certain way then it is possible for the class to be reloaded without the
+  finalize() method being called. This will result in spurious house keeping
+  threads remaining. The new ReloadMonitor avoids this.
+
+- Various improvements to the logging to make it more informative and
+  cleaner.
+
+- Checkstyle improvements. We now enforce variable names and line length.
+  Javadoc enforcement to come soon.
+
+- Made the onBirth() method of ConnectionListenerIF interface failsafe. And
+  removed obsolete cleanupClob() method (which was never called anyway)..
+
+- Removed redundant logFilename stuff from ConnectionPoolDefinition. All
+  logging is handled by Jakarta Commons's Logging anyway.
+
+- Fix when removing pools that meant that when you tried to add them again
+  Proxool thought it was a duplicate (credit to Dan Milstein).
+
+- Improvements to the way Proxool detects changes to the pool definition
+  when resending the Properties object when you get a connection. Now
+  detects when it has changed which means that we don't do
+  unnecessary configuration and log is improved (we now loh properties
+  as they are set or updated).
+
+- Fix to the ProxyConnection within the equals() method that was causing
+  identical conections to be incorrectly reported as unequals (which leads to
+  problems when adding them to some collections).
+
+- Improvements to test classes. Lots more tests.
+
+0.4 - September 19, 2002
 
 - Rethink of how we organise our source code so that we can easily build
   to include different optional components.
