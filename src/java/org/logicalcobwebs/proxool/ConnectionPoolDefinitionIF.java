@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.18 $, $Date: 2003/09/05 16:59:42 $
+ * @version $Revision: 1.19 $, $Date: 2003/09/29 17:48:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -228,13 +228,14 @@ public interface ConnectionPoolDefinitionIF {
     String getDelegateProperty(String name);
 
     /**
-     * If true then if a fatal SQLException is detected then it will be wrapped up
-     * in a {@link FatalSQLException} and that will be thrown instead.
-     * Range: true, false
-     * Default: false (original exception is thrown)
-     * @return whether fatal SQLExceptions are wrapped up
+     * If this is not-null then any fatal SQLException is wrapped up inside
+     * an instance of this class. If null, then the original exception is
+     * thrown.
+     * Range: any valid class name that is a subclass of SQLException or RuntimeException
+     * Default: null (original exception is thrown)
+     * @return the class name to use for fatal SQL exceptions
      */
-    boolean isWrapFatalSqlExceptions();
+    String getFatalSqlExceptionWrapper();
 
     /**
      * JNDI property
@@ -277,6 +278,10 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.19  2003/09/29 17:48:08  billhorsman
+ New fatal-sql-exception-wrapper-class allows you to define what exception is used as a wrapper. This means that you
+ can make it a RuntimeException if you need to.
+
  Revision 1.18  2003/09/05 16:59:42  billhorsman
  Added wrap-fatal-sql-exceptions property
 

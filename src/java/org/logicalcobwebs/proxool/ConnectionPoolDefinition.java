@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.22 $, $Date: 2003/09/05 16:59:42 $
+ * @version $Revision: 1.23 $, $Date: 2003/09/29 17:48:08 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -104,7 +104,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      */
     private String fatalSqlExceptionsAsString;
 
-    private boolean wrapFatalSqlExceptions = false;
+    private String fatalSqlExceptionWrapper = null;
 
     private String houseKeepingTestSql;
 
@@ -362,12 +362,11 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                     setFatalSqlExceptionsAsString(value);
                 }
             }
-        } else if (key.equals(ProxoolConstants.WRAP_FATAL_SQL_EXCEPTIONS_PROPERTY)) {
-            final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
-            if (valueAsBoolean != wrapFatalSqlExceptions) {
+        } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY)) {
+            if (isChanged(fatalSqlExceptionWrapper, value)) {
                 changed = true;
                 if (!pretend) {
-                    setWrapFatalSqlExceptions(valueAsBoolean);
+                    setFatalSqlExceptionWrapper(value);
                 }
             }
         } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
@@ -406,7 +405,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      * Subset of {@link #setAnyProperty} to avoid overly long method
      * @see #setAnyProperty
      */
-    private boolean setLoggingProperty(String key, String value, boolean pretend) throws ProxoolException {
+    private boolean setLoggingProperty(String key, String value, boolean pretend) {
         boolean changed = false;
         if (key.equals(ProxoolConstants.DEBUG_LEVEL_PROPERTY)) {
             if (value != null && value.equals("1")) {
@@ -450,7 +449,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      * Subset of {@link #setAnyProperty} to avoid overly long method
      * @see #setAnyProperty
      */
-    private boolean setJndiProperty(String key, String value, boolean pretend) throws ProxoolException {
+    private boolean setJndiProperty(String key, String value, boolean pretend) {
         boolean changed = false;
         if (key.equals(ProxoolConstants.JNDI_NAME_PROPERTY)) {
             if (isChanged(getJndiName(), value)) {
@@ -909,17 +908,27 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     }
 
     /**
-     * @see ConnectionPoolDefinitionIF#isWrapFatalSqlExceptions
+     * @see ConnectionPoolDefinitionIF#getFatalSqlExceptionWrapper
      */
-    public boolean isWrapFatalSqlExceptions() {
-        return wrapFatalSqlExceptions;
+    public String getFatalSqlExceptionWrapper() {
+        return fatalSqlExceptionWrapper;
     }
 
     /**
-     * @see ConnectionPoolDefinitionIF#isWrapFatalSqlExceptions
+     * @see ConnectionPoolDefinitionIF#getFatalSqlExceptionWrapper
      */
-    public void setWrapFatalSqlExceptions(boolean wrapFatalSqlExceptions) {
-        this.wrapFatalSqlExceptions = wrapFatalSqlExceptions;
+    public void setFatalSqlExceptionWrapper(String fatalSqlExceptionWrapper) throws ProxoolException {
+
+        //  Test it out. That's the best way.
+        try {
+            FatalSqlExceptionHelper.throwFatalSQLException(fatalSqlExceptionWrapper, new SQLException("Test"));
+        } catch (SQLException e) {
+            // That's OK, we were expecting one of these
+        } catch (RuntimeException e) {
+            // That's OK, we were expecting one of these
+        }
+
+        this.fatalSqlExceptionWrapper = fatalSqlExceptionWrapper;
     }
 
     /**
@@ -1054,6 +1063,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.23  2003/09/29 17:48:08  billhorsman
+ New fatal-sql-exception-wrapper-class allows you to define what exception is used as a wrapper. This means that you
+ can make it a RuntimeException if you need to.
+
  Revision 1.22  2003/09/05 16:59:42  billhorsman
  Added wrap-fatal-sql-exceptions property
 

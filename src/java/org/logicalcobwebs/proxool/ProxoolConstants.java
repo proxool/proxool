@@ -8,7 +8,7 @@ package org.logicalcobwebs.proxool;
 /**
  * All constants here please.
  *
- * @version $Revision: 1.17 $, $Date: 2003/09/05 17:00:42 $
+ * @version $Revision: 1.18 $, $Date: 2003/09/29 17:48:21 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -142,11 +142,11 @@ public interface ProxoolConstants {
     /** @see ProxoolDriver#getPropertyInfo */
     public final String FATAL_SQL_EXCEPTION_PROPERTY = PROPERTY_PREFIX + FATAL_SQL_EXCEPTION;
 
-    /** @see #WRAP_FATAL_SQL_EXCEPTIONS_PROPERTY**/
-    public final String WRAP_FATAL_SQL_EXCEPTIONS = "wrap-fatal-sql-exceptions";
+    /** @see #FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY**/
+    public final String FATAL_SQL_EXCEPTION_WRAPPER_CLASS = "fatal-sql-exception-wrapper-class";
 
     /** @see ProxoolDriver#getPropertyInfo */
-    public final String WRAP_FATAL_SQL_EXCEPTIONS_PROPERTY = PROPERTY_PREFIX + WRAP_FATAL_SQL_EXCEPTIONS;
+    public final String FATAL_SQL_EXCEPTION_WRAPPER_CLASS_PROPERTY = PROPERTY_PREFIX + FATAL_SQL_EXCEPTION_WRAPPER_CLASS;
 
     public static final String STATISTICS = "statistics";
 
@@ -252,6 +252,10 @@ public interface ProxoolConstants {
 /*
  Revision history:
  $Log: ProxoolConstants.java,v $
+ Revision 1.18  2003/09/29 17:48:21  billhorsman
+ New fatal-sql-exception-wrapper-class allows you to define what exception is used as a wrapper. This means that you
+ can make it a RuntimeException if you need to.
+
  Revision 1.17  2003/09/05 17:00:42  billhorsman
  New wrap-fatal-sql-exceptions property.
 

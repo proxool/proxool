@@ -19,9 +19,9 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.20 $, $Date: 2003/09/10 22:21:04 $
+ * @version $Revision: 1.21 $, $Date: 2003/09/29 17:48:49 $
  * @author billhorsman
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 class ProxyStatement extends AbstractProxyStatement implements InvocationHandler {
 
@@ -83,9 +83,7 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
                 final SQLException sqlException = (SQLException) e.getTargetException();
                 if (testException(sqlException)) {
                     // This is really a fatal one
-                    if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
-                        throw new FatalSQLException(sqlException);
-                    }
+                    FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), sqlException);
                 }
             }
             throw e.getTargetException();
@@ -95,9 +93,7 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
                 final SQLException sqlException = (SQLException) e;
                 if (testException(sqlException)) {
                     // This is really a fatal one
-                    if (getConnectionPool().getDefinition().isWrapFatalSqlExceptions()) {
-                        throw new FatalSQLException(sqlException);
-                    }
+                    FatalSqlExceptionHelper.throwFatalSQLException(getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), sqlException);
                 }
             }
             throw e;
@@ -122,6 +118,10 @@ class ProxyStatement extends AbstractProxyStatement implements InvocationHandler
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.21  2003/09/29 17:48:49  billhorsman
+ New fatal-sql-exception-wrapper-class allows you to define what exception is used as a wrapper. This means that you
+ can make it a RuntimeException if you need to.
+
  Revision 1.20  2003/09/10 22:21:04  chr32
  Removing > jdk 1.2 dependencies.
 
