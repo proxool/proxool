@@ -8,7 +8,6 @@ package org.logicalcobwebs.proxool;
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.xml.DOMConfigurator;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,55 +15,58 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Various tests
  *
- * @version $Revision: 1.5 $, $Date: 2002/09/19 10:34:47 $
+ * @version $Revision: 1.6 $, $Date: 2002/10/19 17:00:38 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 public class GeneralTests extends TestCase {
 
-    private static final String USER = "sa";
-
-    private static final String PASSWORD = "";
-
     private static final Log LOG = LogFactory.getLog(GeneralTests.class);
 
     public GeneralTests(String name) {
         super(name);
-
-        DOMConfigurator.configure("log4j.xml");
-
+        TestHelper.configureLog4J();
     }
 
     protected void setUp() throws Exception {
-        super.setUp();
-        execute(prefix + "setup" + urlSuffix, "create table test (a int, b varchar)");
+        TestHelper.setup();
     }
 
     protected void tearDown() throws Exception {
-        super.tearDown();
-        execute(prefix + "setup" + urlSuffix, "drop table test");
+        TestHelper.tearDown();
     }
 
     /**
      * Can we refer to the same pool by either the complete URL or the alias?
      */
-    public void testAlias() throws SQLException {
+    public void testAlias() throws SQLException, ClassNotFoundException {
 
         String alias = "alias";
 
         // Register pool
-        execute(prefix + alias + urlSuffix, SELECT_SQL);
+        {
+            String url = TestHelper.getFullUrl(alias);
+            Connection c = TestHelper.getProxoolConnection(url);
+            TestHelper.testConnection(c);
+        }
 
         // Get it back by url
-        execute(prefix + alias + urlSuffix, SELECT_SQL);
+        {
+            String url = TestHelper.getFullUrl(alias);
+            Connection c = TestHelper.getProxoolConnection(url);
+            TestHelper.testConnection(c);
+        }
 
         // Get it back by name
-        execute(prefix + alias, SELECT_SQL);
+        {
+            String url = TestHelper.getSimpleUrl(alias);
+            Connection c = TestHelper.getProxoolConnection(url);
+            TestHelper.testConnection(c);
+        }
 
         ConnectionPoolStatisticsIF connectionPoolStatistics = ProxoolFacade.getConnectionPoolStatistics(alias);
 
@@ -76,18 +78,23 @@ public class GeneralTests extends TestCase {
     /**
      * Can we update a pool definition by passing a new Properties object?
      */
-    public void testUpdate() throws SQLException {
+    public void testUpdate() throws SQLException, ClassNotFoundException {
 
         String alias = "update";
 
-        execute(prefix + alias + urlSuffix, SELECT_SQL);
+        // Register pool
+        {
+            String url = TestHelper.getFullUrl(alias);
+            Connection c = TestHelper.getProxoolConnection(url);
+            TestHelper.testConnection(c);
+        }
 
         ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
         long mcc1 = cpd.getMaximumConnectionCount();
 
         {
             // Update explicitly using ProxoolFacade
-            Properties info = buildProperties();
+            Properties info = TestHelper.buildProperties();
             info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "2");
             ProxoolFacade.updateConnectionPool(alias, info);
             cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
@@ -99,9 +106,11 @@ public class GeneralTests extends TestCase {
 
         {
             // Update on-the-fly using the driver
-            Properties info = buildProperties();
+            Properties info = TestHelper.buildProperties();
             info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
-            execute(prefix + alias + urlSuffix, info, SELECT_SQL);
+            String url = TestHelper.getSimpleUrl(alias);
+            Connection c = TestHelper.getProxoolConnection(url, info);
+            TestHelper.testConnection(c);
             cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
             long mcc2 = cpd.getMaximumConnectionCount();
             assertTrue(mcc1 != mcc2);
@@ -111,65 +120,16 @@ public class GeneralTests extends TestCase {
     }
 
     /**
-     * Check that the logging works
-     */
-    public void testLog() throws SQLException {
-
-        String alias = "log";
-
-        Properties info = buildProperties();
-        ProxoolFacade.registerConnectionPool(prefix + alias + urlSuffix, info);
-        execute(prefix + alias + urlSuffix, SELECT_SQL);
-
-        // Wait for a while for some prototyping and for the log to write.
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            System.out.println(e);
-        }
-
-    }
-
-    /**
-     * Check that the FileLogger works
-     */
-    public void testDefinition() throws SQLException {
-
-        String alias = "def";
-
-        Properties info = buildProperties();
-        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "17");
-        ProxoolFacade.registerConnectionPool(prefix + alias + urlSuffix, info);
-
-        {
-            ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
-            assertTrue(cpd != null);
-            assertEquals(17, cpd.getMaximumConnectionCount());
-        }
-
-        {
-            ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition("proxool." + alias);
-            assertTrue(cpd != null);
-            assertEquals(17, cpd.getMaximumConnectionCount());
-        }
-
-        {
-            ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(prefix + alias + urlSuffix);
-            assertTrue(cpd != null);
-            assertEquals(17, cpd.getMaximumConnectionCount());
-        }
-    }
-
-    /**
      * If we ask for more simultaneous connections then we have allowed we should gracefully
      * refuse them.
      */
     public void testLoad() throws SQLException {
 
         String alias = "load";
-        Properties info = buildProperties();
+
+        Properties info = TestHelper.buildProperties();
         info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "5");
-        ProxoolFacade.registerConnectionPool(prefix + alias + urlSuffix, info);
+        TestHelper.registerPool(alias, info);
 
         final int load = 6;
         final int count = 20;
@@ -185,28 +145,13 @@ public class GeneralTests extends TestCase {
 
             connections[i] = null;
             try {
-                Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
-
                 if (info == null) {
-                    info = buildProperties();
+                    info = TestHelper.buildProperties();
                 }
-                connections[i] = DriverManager.getConnection(prefix + alias, info);
+                connections[i] = TestHelper.getProxoolConnection(alias, info);
 
-                Statement statement = null;
-                try {
-                    statement = connections[i].createStatement();
-                    statement.execute(SELECT_SQL);
-                    goodHits++;
-                } finally {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        } catch (SQLException e) {
-                            LOG.error("Couldn't close statement", e);
-                        }
-                    }
-                }
-
+                TestHelper.testConnection(connections[i]);
+                goodHits++;
             } catch (ClassNotFoundException e) {
                 LOG.error("Problem finding driver?", e);
             } catch (SQLException e) {
@@ -229,14 +174,15 @@ public class GeneralTests extends TestCase {
      * If we ask for more simultaneous connections then we have allowed we should gracefully
      * refuse them.
      */
-    public void testInfo() throws SQLException {
+    public void testInfo() throws SQLException, ClassNotFoundException {
 
         String alias = "info";
-        Properties info = buildProperties();
+        Properties info = TestHelper.buildProperties();
         info.setProperty("proxool.prototype-count", "0");
         info.setProperty("proxool.minimum-connection-count", "0");
         info.setProperty("proxool.maximum-connection-count", "5");
-        ProxoolFacade.registerConnectionPool(prefix + alias + urlSuffix, info);
+        TestHelper.registerPool(alias, info);
+
         Collection connectionInfos = null;
         final int ARRAY_SIZE = 5;
 
@@ -244,7 +190,7 @@ public class GeneralTests extends TestCase {
         try {
 
             // Open 1 connection
-            connections[0] = getConnection(alias);
+            connections[0] = TestHelper.getProxoolConnection(alias);
             {
                 connectionInfos = ProxoolFacade.getConnectionInfos(alias);
                 assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 1);
@@ -254,7 +200,7 @@ public class GeneralTests extends TestCase {
             }
 
             // Open another
-            connections[1] = getConnection(alias);
+            connections[1] = TestHelper.getProxoolConnection(alias);
             {
                 connectionInfos = ProxoolFacade.getConnectionInfos(alias);
                 assertEquals("Unexpected ConnectionInfo count", connectionInfos.size(), 2);
@@ -301,45 +247,28 @@ public class GeneralTests extends TestCase {
 
     }
 
-    private Connection getConnection(String alias) {
-        Connection connection = null;
-        try {
-            Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
-
-            connection = DriverManager.getConnection(prefix + alias);
-
-        } catch (ClassNotFoundException e) {
-            LOG.error("Problem finding driver?", e);
-        } catch (SQLException e) {
-            LOG.debug("Ignorable SQLException", e);
-        } catch (Exception e) {
-            LOG.error("Unexpected Exception", e);
-        }
-        return connection;
-    }
-
-    private static Properties buildProperties() {
-        Properties info = new Properties();
-        info.setProperty("user", USER);
-        info.setProperty("password", PASSWORD);
-        info.setProperty("proxool.debug-level", "1");
-        return info;
-    }
-
     /**
      * Can we have multiple pools?
      */
-    public void testMultiple() throws SQLException {
+    public void testMultiple() throws SQLException, ClassNotFoundException {
 
         String alias1 = "pool#1";
         String alias2 = "pool#2";
 
         // #1
-        execute(prefix + alias1 + urlSuffix, SELECT_SQL);
+        {
+            String url = TestHelper.getFullUrl(alias1);
+            Connection c = TestHelper.getProxoolConnection(url);
+            TestHelper.testConnection(c);
+        }
 
         // #2
-        execute(prefix + alias2 + urlSuffix, SELECT_SQL);
-        execute(prefix + alias2 + urlSuffix, SELECT_SQL);
+        {
+            String url = TestHelper.getFullUrl(alias2);
+            Connection c = TestHelper.getProxoolConnection(url);
+            TestHelper.testConnection(c);
+            TestHelper.testConnection(c);
+        }
 
         ConnectionPoolStatisticsIF cps1 = ProxoolFacade.getConnectionPoolStatistics(alias1);
         assertEquals(1L, cps1.getConnectionsServedCount());
@@ -349,63 +278,14 @@ public class GeneralTests extends TestCase {
 
     }
 
-    private static void execute(String urlToUse, String sql) {
-        execute(urlToUse, null, sql);
-    }
-
-    private static void execute(String urlToUse, Properties info, String sql) {
-        Connection connection = null;
-        try {
-            Class.forName("org.logicalcobwebs.proxool.ProxoolDriver");
-
-            if (info == null) {
-                info = buildProperties();
-            }
-            connection = DriverManager.getConnection(urlToUse, info);
-
-            Statement statement = null;
-            try {
-                statement = connection.createStatement();
-                statement.execute(sql);
-            } finally {
-                if (statement != null) {
-                    try {
-                        statement.close();
-                    } catch (SQLException e) {
-                        LOG.error("Couldn't close statement", e);
-                    }
-                }
-            }
-
-        } catch (ClassNotFoundException e) {
-            LOG.error("Problem finding driver?", e);
-        } catch (SQLException e) {
-            LOG.debug("Ignorable SQLException", e);
-        } finally {
-            try {
-                if (connection != null) {
-                    // This doesn't really close the connection. It just makes it
-                    // available in the pool again.
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                LOG.error("Problem closing connection", e);
-            }
-        }
-
-    }
-
-    private static String urlSuffix = ":org.hsqldb.jdbcDriver:jdbc:hsqldb:.";
-
-    private static String prefix = "proxool.";
-
-    private static final String SELECT_SQL = "SELECT * FROM test";
-
 }
 
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.6  2002/10/19 17:00:38  billhorsman
+ added performance test, and created TestHelper to make it all simpler
+
  Revision 1.5  2002/09/19 10:34:47  billhorsman
  new testInfo test
 
