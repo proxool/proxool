@@ -18,19 +18,24 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.Comparator;
 
 /**
  * Delegates to Statement for all calls. But also, for all execute methods, it
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.3 $, $Date: 2002/10/25 15:59:32 $
+ * @version $Revision: 1.4 $, $Date: 2002/10/28 08:20:23 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 class ProxyStatement implements InvocationHandler {
 
-    private static final Log LOG = LogFactory.getLog(ProxoolFacade.class);
+    private static final Log LOG = LogFactory.getLog(ProxyStatement.class);
 
     private Statement statement;
 
@@ -44,9 +49,14 @@ class ProxyStatement implements InvocationHandler {
 
     private static final String EQUALS_METHOD = "equals";
 
-    public ProxyStatement(Statement statement, ConnectionPool connectionPool) {
+    private Map parameters;
+
+    private String sqlStatement;
+
+    public ProxyStatement(Statement statement, ConnectionPool connectionPool, String sqlStatement) {
         this.statement = statement;
         this.connectionPool = connectionPool;
+        this.sqlStatement = sqlStatement;
     }
 
     private void testException(SQLException e) {
@@ -79,6 +89,72 @@ class ProxyStatement implements InvocationHandler {
                 result = new Boolean(statement.hashCode() == args[0].hashCode());
             } else {
                 result = method.invoke(statement, args);
+            }
+
+            // We only dump sql calls if we are in verbose mode and debug is enabled
+            if (LOG.isDebugEnabled() && connectionPool.getDefinition().isVerbose()) {
+                try {
+
+                    // Lazily instantiate parameters if necessary
+                    if (parameters == null) {
+                        parameters = new TreeMap(new Comparator() {
+                            public int compare(Object o1, Object o2) {
+                                int c = 0;
+
+                                if (o1 instanceof Integer && o2 instanceof Integer) {
+                                    c = ((Integer) o1).compareTo(((Integer) o2));
+                                }
+
+                                return c;
+                            }
+                        });
+                    }
+
+                    // What sort of method is it
+                    if (method.getName().startsWith("set") && args.length == 2) {
+                        // Okay, we're probably setting a parameter
+                        if (method.getName().equals("setNull")) {
+                            // Treat setNull as a special case
+                            parameters.put(args[0], "*");
+                        } else {
+                            if (args[1] == null) {
+                                parameters.put(args[0], "*");
+                            } else if (args[1] instanceof String) {
+                                parameters.put(args[0], "'" + args[1] + "'");
+                            } else if (args[1] instanceof Number) {
+                                parameters.put(args[0], args[1]);
+                            } else {
+                                String className = args[1].getClass().getName();
+                                StringTokenizer st = new StringTokenizer(className, ".");
+                                while (st.hasMoreTokens()) {
+                                    className = st.nextToken();
+                                }
+                                parameters.put(args[0], className);
+                            }
+                        }
+                    } else if (method.getName().startsWith("execute")) {
+                        // Looks like we are executing the method now. Time to dump.
+
+                        // TODO we were optionally passed the sqlStatement during
+                        // instantiation (from the connections's prepareCall() method)
+                        // but it's also possible to be passed it in the execute statement
+                        // itself. So check for it here too.
+
+                        if (sqlStatement != null) {
+                            // TODO it would be nice to format this a bit more nicely.
+                            // Maybe replace the ? in the sql with the real values. I think
+                            // the goal should be that this dump should be executable
+                            // sql. At least, it should be when we call the onExecute()
+                            // method below. That is supposed to contain performance
+                            // information and the sql that was executed.
+                            this.connectionPool.getLog().debug(parameters + " -> " + sqlStatement);
+                            parameters.clear();
+                        }
+                    }
+                } catch (Exception e) {
+                    // We don't want an error during dump screwing up the transaction
+                    LOG.error("Ignoring error during dump", e);
+                }
             }
         } catch (InvocationTargetException e) {
             exception = e;
@@ -116,6 +192,9 @@ class ProxyStatement implements InvocationHandler {
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.4  2002/10/28 08:20:23  billhorsman
+ draft sql dump stuff
+
  Revision 1.3  2002/10/25 15:59:32  billhorsman
  made non-public where possible
 

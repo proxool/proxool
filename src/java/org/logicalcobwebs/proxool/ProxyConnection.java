@@ -5,6 +5,9 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,11 +21,13 @@ import java.text.DecimalFormat;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.6 $, $Date: 2002/10/25 15:59:32 $
+ * @version $Revision: 1.7 $, $Date: 2002/10/28 08:20:23 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
+
+    private static final Log LOG = LogFactory.getLog(ProxyConnection.class);
 
     private Connection connection;
 
@@ -88,7 +93,17 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
             // If we have just made some sort of Statement then we should rather return
             // a proxy instead.
             if (result instanceof Statement) {
-                Proxy.newProxyInstance(Statement.class.getClassLoader(), Statement.class.getInterfaces(), new ProxyStatement((Statement) result, connectionPool));
+                Class[] types = result.getClass().getInterfaces();
+                // Work out whether we were passed the sql statement during the
+                // call to get the statement object. Sometimes you do, sometimes
+                // you don't:
+                // connection.prepareCall(sql);
+                // connection.createStatement();
+                String sqlStatement = null;
+                if (args.length > 0 && args[0] instanceof String) {
+                    sqlStatement = (String)args[0];
+                }
+                result = Proxy.newProxyInstance(result.getClass().getClassLoader(), types, new ProxyStatement((Statement) result, connectionPool, sqlStatement));
             }
 
         } catch (InvocationTargetException e) {
@@ -97,6 +112,7 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
             throw new RuntimeException("unexpected invocation exception: "
                     + e.getMessage());
         }
+
         return result;
     }
 
@@ -343,6 +359,9 @@ class ProxyConnection implements InvocationHandler, ConnectionInfoIF {
 /*
  Revision history:
  $Log: ProxyConnection.java,v $
+ Revision 1.7  2002/10/28 08:20:23  billhorsman
+ draft sql dump stuff
+
  Revision 1.6  2002/10/25 15:59:32  billhorsman
  made non-public where possible
 
