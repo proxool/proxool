@@ -18,7 +18,7 @@ import java.util.Vector;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.28 $, $Date: 2002/12/17 17:15:39 $
+ * @version $Revision: 1.29 $, $Date: 2002/12/18 12:16:22 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -614,6 +614,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
                     int recentlyStartedActiveConnectionCountTemp = 0;
 
+                    // sanity check
+                    int[] verifiedConnectionCountByState = new int[4];
+
                     // Loop through backwards so that we can cope with connections being removed
                     // as we go along.  If an element is removed (and it is was one haven't reached
                     // yet) the only risk is that we test the same connection twice (which doesn't
@@ -622,6 +625,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                     for (int i = proxyConnections.size() - 1; i >= 0; i--) {
                         proxyConnection = getProxyConnection(i);
                         connection = proxyConnection.getConnection();
+
                         // First lets check whether the connection still works. We should only validate
                         // connections that are not is use!  SetOffline only succeeds if the connection
                         // is available.
@@ -708,6 +712,34 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                                         + proxyConnection.getRequester() + "'.");
 
                             }
+
+                        }
+
+                        // What have we got?
+                        verifiedConnectionCountByState[proxyConnection.getStatus()]++;
+
+                    }
+
+                    // Let's see whether our counts agree
+                    if (getDefinition().isVerbose() && log.isDebugEnabled()) {
+                        if (verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE] != connectionCountByState[ProxyConnection.STATUS_ACTIVE]) {
+                            log.warn("Warning: ACTIVE connections = " + verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE] + ". not " + connectionCountByState[ProxyConnection.STATUS_ACTIVE] + " as expected.");
+                        }
+                        if (verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE] != connectionCountByState[ProxyConnection.STATUS_AVAILABLE]) {
+                            log.warn("Warning: AVAILABLE connections = " + verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE] + ". not " + connectionCountByState[ProxyConnection.STATUS_AVAILABLE] + " as expected.");
+                        }
+                        if (verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE] != connectionCountByState[ProxyConnection.STATUS_OFFLINE]) {
+                            log.warn("Warning: OFFLINE connections = " + verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE] + ". not " + connectionCountByState[ProxyConnection.STATUS_OFFLINE] + " as expected.");
+                        }
+
+                        int total = connectionCountByState[ProxyConnection.STATUS_ACTIVE]
+                            + connectionCountByState[ProxyConnection.STATUS_AVAILABLE]
+                            + connectionCountByState[ProxyConnection.STATUS_OFFLINE];
+                        int verifiedTotal = verifiedConnectionCountByState[ProxyConnection.STATUS_ACTIVE]
+                            + verifiedConnectionCountByState[ProxyConnection.STATUS_AVAILABLE]
+                            + verifiedConnectionCountByState[ProxyConnection.STATUS_OFFLINE];
+                        if (total != verifiedTotal) {
+                            log.warn("Warning: TOTAL connections = " + verifiedTotal + ". not " + total + " as expected.");
                         }
 
                     }
@@ -1069,6 +1101,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.29  2002/12/18 12:16:22  billhorsman
+ double checking of connection state counts
+
  Revision 1.28  2002/12/17 17:15:39  billhorsman
  Better synchronization of status stuff
 
