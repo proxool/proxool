@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/04 15:59:49 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/05 00:20:27 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -114,19 +114,19 @@ public class Monitor {
      * @param cpd used to help populate the snapshot
      * @return snapshot
      */
-    public SnapshotIF getSnapshot(ConnectionPoolStatisticsIF cps, ConnectionPoolDefinitionIF cpd, Set connectionInfos) {
-        Snapshot status = new Snapshot(new Date());
+    public static SnapshotIF getSnapshot(ConnectionPoolStatisticsIF cps, ConnectionPoolDefinitionIF cpd, Set connectionInfos) {
+        Snapshot snapshot = new Snapshot(new Date());
 
-        status.setDateStarted(cps.getDateStarted());
-        status.setActiveConnectionCount(cps.getActiveConnectionCount());
-        status.setAvailableConnectionCount(cps.getAvailableConnectionCount());
-        status.setOfflineConnectionCount(cps.getOfflineConnectionCount());
-        status.setMaximumConnectionCount(cpd.getMaximumConnectionCount());
-        status.setServedCount(cps.getConnectionsServedCount());
-        status.setRefusedCount(cps.getConnectionsRefusedCount());
-        status.setConnectionInfos(connectionInfos);
+        snapshot.setDateStarted(cps.getDateStarted());
+        snapshot.setActiveConnectionCount(cps.getActiveConnectionCount());
+        snapshot.setAvailableConnectionCount(cps.getAvailableConnectionCount());
+        snapshot.setOfflineConnectionCount(cps.getOfflineConnectionCount());
+        snapshot.setMaximumConnectionCount(cpd.getMaximumConnectionCount());
+        snapshot.setServedCount(cps.getConnectionsServedCount());
+        snapshot.setRefusedCount(cps.getConnectionsRefusedCount());
+        snapshot.setConnectionInfos(connectionInfos);
 
-        return status;
+        return snapshot;
     }
 
 }
@@ -135,6 +135,9 @@ public class Monitor {
 /*
  Revision history:
  $Log: Monitor.java,v $
+ Revision 1.5  2003/02/05 00:20:27  billhorsman
+ getSnapshot is now static (because it can be)
+
  Revision 1.4  2003/02/04 15:59:49  billhorsman
  finalize now shuts down StatsRoller timer
 
