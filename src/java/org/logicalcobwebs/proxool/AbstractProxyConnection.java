@@ -23,7 +23,7 @@ import java.util.Date;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.9 $, $Date: 2003/02/12 12:28:27 $
+ * @version $Revision: 1.10 $, $Date: 2003/02/12 12:30:10 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -87,7 +87,7 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
     public boolean equals(Object obj) {
         if (obj != null) {
             if (obj instanceof ProxyConnection) {
-                return connection.hashCode() == ((ProxyConnection)obj).getConnection().hashCode();
+                return connection.hashCode() == ((ProxyConnection) obj).getConnection().hashCode();
             } else if (obj instanceof Connection) {
                 return connection.hashCode() == obj.hashCode();
             } else {
@@ -511,6 +511,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.10  2003/02/12 12:30:10  billhorsman
+ checkstyle
+
  Revision 1.9  2003/02/12 12:28:27  billhorsman
  added url, proxyHashcode and delegateHashcode to
  ConnectionInfoIF
