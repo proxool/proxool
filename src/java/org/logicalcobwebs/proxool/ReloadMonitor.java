@@ -11,11 +11,12 @@ import org.apache.commons.logging.LogFactory;
 import java.util.Date;
 
 /**
- * <link rel="stylesheet" href="{@docRoot}/cg.css" type="text/css">
+ * Responsible for checking whether a thread is running that was started before
+ * a class was reloaded. In to put it another way, in some situations, it is
+ * possible to "hot deploy" Proxool without killing all the threads from a
+ * previous instance. This class solves that.
  *
- * TODO
- *
- * @version $Revision: 1.2 $, $Date: 2002/10/25 15:59:32 $
+ * @version $Revision: 1.3 $, $Date: 2002/11/09 15:54:34 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -99,6 +100,9 @@ class ReloadMonitor {
 /*
  Revision history:
  $Log: ReloadMonitor.java,v $
+ Revision 1.3  2002/11/09 15:54:34  billhorsman
+ added doc
+
  Revision 1.2  2002/10/25 15:59:32  billhorsman
  made non-public where possible
 
