@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.23 $, $Date: 2003/08/15 10:13:24 $
+ * @version $Revision: 1.24 $, $Date: 2003/09/05 16:59:42 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -109,7 +109,7 @@ public class ProxoolDriver implements Driver {
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
             throws SQLException {
 
-        DriverPropertyInfo[] dpi = new DriverPropertyInfo[17];
+        DriverPropertyInfo[] dpi = new DriverPropertyInfo[18];
         ConnectionPool cp = null;
         try {
             cp = ConnectionPoolManager.getInstance().getConnectionPool(url);
@@ -164,10 +164,13 @@ public class ProxoolDriver implements Driver {
         dpi[14] = buildDriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY,
                 String.valueOf(cpd.getFatalSqlExceptions()));
 
-        dpi[15] = buildDriverPropertyInfo(ProxoolConstants.STATISTICS_PROPERTY,
+        dpi[15] = buildDriverPropertyInfo(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY,
+                String.valueOf(cpd.getFatalSqlExceptions()));
+
+        dpi[16] = buildDriverPropertyInfo(ProxoolConstants.STATISTICS_PROPERTY,
                 String.valueOf(cpd.getStatistics()));
 
-        dpi[16] = buildDriverPropertyInfo(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY,
+        dpi[17] = buildDriverPropertyInfo(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY,
                 String.valueOf(cpd.getStatisticsLogLevel()));
 
         return dpi;
@@ -208,6 +211,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.24  2003/09/05 16:59:42  billhorsman
+ Added wrap-fatal-sql-exceptions property
+
  Revision 1.23  2003/08/15 10:13:24  billhorsman
  remove finalize() method
 

@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.17 $, $Date: 2003/07/23 06:54:48 $
+ * @version $Revision: 1.18 $, $Date: 2003/09/05 16:59:42 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -227,16 +227,49 @@ public interface ConnectionPoolDefinitionIF {
 
     String getDelegateProperty(String name);
 
+    /**
+     * If true then if a fatal SQLException is detected then it will be wrapped up
+     * in a {@link FatalSQLException} and that will be thrown instead.
+     * Range: true, false
+     * Default: false (original exception is thrown)
+     * @return whether fatal SQLExceptions are wrapped up
+     */
+    boolean isWrapFatalSqlExceptions();
+
+    /**
+     * JNDI property
+     * @return the initial context factory
+     */
     String getInitialContextFactory();
 
+    /**
+     * JNDI property
+     * @return provider URL
+     */
     String getProviderUrl();
 
+    /**
+     * JNDI property
+     * @return security authentication
+     */
     String getSecurityAuthentication();
 
+    /**
+     * JNDI property
+     * @return security principal
+     */
     String getSecurityPrincipal();
 
+    /**
+     * JNDI property
+     * @return security credentials
+     */
     String getSecurityCredentials();
 
+    /**
+     * JNDI property
+     * @return JNDI name
+     */
     String getJndiName();
 
 }
@@ -244,6 +277,9 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.18  2003/09/05 16:59:42  billhorsman
+ Added wrap-fatal-sql-exceptions property
+
  Revision 1.17  2003/07/23 06:54:48  billhorsman
  draft JNDI changes (shouldn't effect normal operation)
 

@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.21 $, $Date: 2003/08/30 14:54:04 $
+ * @version $Revision: 1.22 $, $Date: 2003/09/05 16:59:42 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -103,6 +103,8 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      * {@link ConnectionPoolDefinitionIF#FATAL_SQL_EXCEPTIONS_DELIMITER}
      */
     private String fatalSqlExceptionsAsString;
+
+    private boolean wrapFatalSqlExceptions = false;
 
     private String houseKeepingTestSql;
 
@@ -358,6 +360,14 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                 changed = true;
                 if (!pretend) {
                     setFatalSqlExceptionsAsString(value);
+                }
+            }
+        } else if (key.equals(ProxoolConstants.WRAP_FATAL_SQL_EXCEPTIONS_PROPERTY)) {
+            final boolean valueAsBoolean = Boolean.valueOf(value).booleanValue();
+            if (valueAsBoolean != wrapFatalSqlExceptions) {
+                changed = true;
+                if (!pretend) {
+                    setWrapFatalSqlExceptions(valueAsBoolean);
                 }
             }
         } else if (key.equals(ProxoolConstants.STATISTICS_PROPERTY)) {
@@ -899,6 +909,20 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     }
 
     /**
+     * @see ConnectionPoolDefinitionIF#isWrapFatalSqlExceptions
+     */
+    public boolean isWrapFatalSqlExceptions() {
+        return wrapFatalSqlExceptions;
+    }
+
+    /**
+     * @see ConnectionPoolDefinitionIF#isWrapFatalSqlExceptions
+     */
+    public void setWrapFatalSqlExceptions(boolean wrapFatalSqlExceptions) {
+        this.wrapFatalSqlExceptions = wrapFatalSqlExceptions;
+    }
+
+    /**
      * @see ConnectionPoolDefinitionIF#getHouseKeepingTestSql
      */
     public String getHouseKeepingTestSql() {
@@ -1030,6 +1054,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.22  2003/09/05 16:59:42  billhorsman
+ Added wrap-fatal-sql-exceptions property
+
  Revision 1.21  2003/08/30 14:54:04  billhorsman
  Checkstyle
 
