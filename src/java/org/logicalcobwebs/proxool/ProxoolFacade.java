@@ -17,6 +17,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.lang.reflect.Method;
 import java.sql.Statement;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ import java.util.Hashtable;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.68 $, $Date: 2003/07/23 12:38:50 $
+ * @version $Revision: 1.69 $, $Date: 2003/08/27 18:03:20 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -525,7 +526,21 @@ public class ProxoolFacade {
         try {
             return ProxyFactory.getDelegateStatement(statement);
         } catch (IllegalArgumentException e) {
-            throw new ProxoolException("Statement argument is not one provided by Proxool (it's " + statement.getClass() + ")");
+            throw new ProxoolException("Statement argument is not one provided by Proxool (it's a " + statement.getClass() + ")");
+        }
+    }
+
+    /**
+     * When you ask for a  connection then you don't actually get the Connection
+     * created by the delegate Driver. It isn't recommended, but if you need to
+     * use any driver specific methods then this is your only way.
+     * @return delegate connection
+     */
+    public static Connection getDelegateConnection(Connection connection) throws ProxoolException {
+        try {
+            return ProxyFactory.getDelegateConnection(connection);
+        } catch (IllegalArgumentException e) {
+            throw new ProxoolException("Connection argument is not one provided by Proxool (it's a " + connection.getClass() + ")");
         }
     }
 
@@ -647,6 +662,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.69  2003/08/27 18:03:20  billhorsman
+ added new getDelegateConnection() method
+
  Revision 1.68  2003/07/23 12:38:50  billhorsman
  some fixes, but more to come
 

@@ -23,7 +23,7 @@ import java.util.Properties;
  * A central place to build proxy objects ({@link ProxyConnection connections}
  * and {@link ProxyStatement statements}).
  *
- * @version $Revision: 1.20 $, $Date: 2003/03/11 14:51:54 $
+ * @version $Revision: 1.21 $, $Date: 2003/08/27 18:03:20 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -62,6 +62,7 @@ class ProxyFactory {
 
     /**
      * Gets the real Statement that we got from the delegate driver
+     * @param statement proxy statement
      * @return delegate statement
      */
     protected static Statement getDelegateStatement(Statement statement) {
@@ -69,6 +70,18 @@ class ProxyFactory {
         ProxyStatement ps = (ProxyStatement) Proxy.getInvocationHandler(statement);
         ds = ps.getDelegateStatement();
         return ds;
+    }
+
+    /**
+     * Gets the real Connection that we got from the delegate driver
+     * @param connection proxy connection
+     * @return deletgate connection
+     */
+    public static Connection getDelegateConnection(Connection connection) {
+        Connection c = connection;
+        ProxyConnection pc = (ProxyConnection) Proxy.getInvocationHandler(connection);
+        c = pc.getConnection();
+        return c;
     }
 
     protected static Statement createProxyStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection,  String sqlStatement) {
@@ -110,6 +123,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.21  2003/08/27 18:03:20  billhorsman
+ added new getDelegateConnection() method
+
  Revision 1.20  2003/03/11 14:51:54  billhorsman
  more concurrency fixes relating to snapshots
 

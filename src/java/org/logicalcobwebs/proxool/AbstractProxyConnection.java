@@ -12,7 +12,7 @@ import org.logicalcobwebs.logging.LogFactory;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.Statement
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,7 +23,7 @@ import java.util.Set;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
  *
- * @version $Revision: 1.20 $, $Date: 2003/07/08 22:24:43 $
+ * @version $Revision: 1.21 $, $Date: 2003/08/27 18:03:20 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -447,6 +447,9 @@ abstract class AbstractProxyConnection implements ProxyConnectionIF {
 /*
  Revision history:
  $Log: AbstractProxyConnection.java,v $
+ Revision 1.21  2003/08/27 18:03:20  billhorsman
+ added new getDelegateConnection() method
+
  Revision 1.20  2003/07/08 22:24:43  billhorsman
  damn. no need to build the iterator now.
 
