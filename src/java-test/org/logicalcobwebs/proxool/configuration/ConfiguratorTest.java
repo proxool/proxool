@@ -13,17 +13,17 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.proxool.AllTests;
 import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ProxoolAdapter;
 import org.logicalcobwebs.proxool.ProxoolConstants;
+import org.logicalcobwebs.proxool.GlobalTest;
 
 /**
  * Tests that the various ways of configuring proxool work.
  *
- * @version $Revision: 1.2 $, $Date: 2002/12/15 19:41:28 $
+ * @version $Revision: 1.3 $, $Date: 2002/12/16 17:06:53 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class ConfiguratorTest extends TestCase {
@@ -40,7 +40,7 @@ public class ConfiguratorTest extends TestCase {
     }
 
     protected void setUp() throws Exception {
-        AllTests.globalSetup();
+        GlobalTest.globalSetup();
         try {
             TestHelper.createTable(TEST_TABLE);
         } catch (Exception e) {
@@ -50,7 +50,7 @@ public class ConfiguratorTest extends TestCase {
 
     protected void tearDown() throws Exception {
         TestHelper.dropTable(TEST_TABLE);
-        AllTests.globalTeardown();
+        GlobalTest.globalTeardown();
     }
 
 
@@ -93,6 +93,9 @@ public class ConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.3  2002/12/16 17:06:53  billhorsman
+ new test structure
+
  Revision 1.2  2002/12/15 19:41:28  chr32
  Style fixes.
 

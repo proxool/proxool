@@ -19,7 +19,7 @@ import java.sql.SQLException;
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.5 $, $Date: 2002/11/09 16:01:53 $
+ * @version $Revision: 1.6 $, $Date: 2002/12/16 17:05:05 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -33,11 +33,11 @@ public class PerformanceTest extends TestCase {
     }
 
     protected void setUp() throws Exception {
-        AllTests.globalSetup();
+        GlobalTest.globalSetup();
     }
 
     protected void tearDown() throws Exception {
-        AllTests.globalTeardown();
+        GlobalTest.globalTeardown();
     }
 
     public void testScript() throws ParserConfigurationException, SAXException, IOException, SQLException {
@@ -55,6 +55,9 @@ public class PerformanceTest extends TestCase {
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.6  2002/12/16 17:05:05  billhorsman
+ new test structure
+
  Revision 1.5  2002/11/09 16:01:53  billhorsman
  fix doc
 

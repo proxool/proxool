@@ -10,18 +10,18 @@ import junit.framework.TestCase;
 
 import java.sql.SQLException;
 
-import org.logicalcobwebs.proxool.AllTests;
 import org.logicalcobwebs.proxool.TestHelper;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
+import org.logicalcobwebs.proxool.GlobalTest;
 
 /**
  * Tests that the JAXPConfgiuration works in various scenarios.
  * This is also a test of the {@link XMLConfigurator}, as it is delegated to.
  *
- * @version $Revision: 1.3 $, $Date: 2002/12/16 02:35:40 $
+ * @version $Revision: 1.4 $, $Date: 2002/12/16 17:06:41 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class JAXPConfiguratorTest extends TestCase {
@@ -95,14 +95,14 @@ public class JAXPConfiguratorTest extends TestCase {
      * @see TestCase#setUp()
      */
     protected void setUp() throws Exception {
-        AllTests.globalSetup();
+        GlobalTest.globalSetup();
     }
 
     /**
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception {
-        AllTests.globalTeardown();
+        GlobalTest.globalTeardown();
     }
 
 }
@@ -110,6 +110,9 @@ public class JAXPConfiguratorTest extends TestCase {
 /*
  Revision history:
  $Log: JAXPConfiguratorTest.java,v $
+ Revision 1.4  2002/12/16 17:06:41  billhorsman
+ new test structure
+
  Revision 1.3  2002/12/16 02:35:40  chr32
  Updated to new driver-properties xml format.
 

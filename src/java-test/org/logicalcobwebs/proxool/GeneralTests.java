@@ -19,7 +19,7 @@ import java.util.Iterator;
 /**
  * Various tests
  *
- * @version $Revision: 1.24 $, $Date: 2002/12/16 16:42:19 $
+ * @version $Revision: 1.25 $, $Date: 2002/12/16 17:05:54 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -34,7 +34,7 @@ public class GeneralTests extends TestCase {
     }
 
     protected void setUp() throws Exception {
-        AllTests.globalSetup();
+        GlobalTest.globalSetup();
         try {
             TestHelper.createTable(TEST_TABLE);
         } catch (Exception e) {
@@ -44,7 +44,7 @@ public class GeneralTests extends TestCase {
 
     protected void tearDown() throws Exception {
         TestHelper.dropTable(TEST_TABLE);
-        AllTests.globalTeardown();
+        GlobalTest.globalTeardown();
     }
 
     /**
@@ -104,7 +104,7 @@ public class GeneralTests extends TestCase {
     /**
      * Test the {@link ConfiguratorIF#defintionUpdated} event.
      */
-    public void templateDefintionUpdated() {
+    public void testDefintionUpdated() {
 
         String testName = "defintionUpdated";
         ProxoolAdapter adapter = null;
@@ -118,9 +118,10 @@ public class GeneralTests extends TestCase {
             newInfo.setProperty(ProxoolConstants.PROTOTYPE_COUNT_PROPERTY, "3");
             adapter.update(newInfo);
             assertEquals("Wrong number of properties updated", adapter.getChangedInfo().size(), 1);
-            adapter.update(adapter.getFullUrl() + "zzz");
+            final String newUrl = "proxool.defintionUpdated:org.hsqldb.jdbcDriver:jdbc:hsqldb:different";
+            adapter.update(newUrl);
             assertTrue("Mp properties should have been updated", adapter.getChangedInfo() == null);
-            assertTrue("URL has not been updated", (adapter.getConnectionPoolDefinition().getCompleteUrl().indexOf("zzz") > -1));
+            assertTrue("URL has not been updated", (adapter.getConnectionPoolDefinition().getCompleteUrl().equals(newUrl)));
 
         } catch (Exception e) {
             LOG.error("Whilst performing " + testName, e);
@@ -517,6 +518,9 @@ public class GeneralTests extends TestCase {
 /*
  Revision history:
  $Log: GeneralTests.java,v $
+ Revision 1.25  2002/12/16 17:05:54  billhorsman
+ new test structure
+
  Revision 1.24  2002/12/16 16:42:19  billhorsman
  allow URL updates to pool
 

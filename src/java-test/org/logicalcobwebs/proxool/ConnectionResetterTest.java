@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.6 $, $Date: 2002/12/03 10:53:08 $
+ * @version $Revision: 1.7 $, $Date: 2002/12/16 17:05:38 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -33,19 +33,19 @@ public class ConnectionResetterTest extends TestCase {
     }
 
     /**
-     * Calls {@link AllTests#globalSetup}
+     * Calls {@link GlobalTest#globalSetup}
      * @see TestCase#setUp
      */
     protected void setUp() throws Exception {
-        AllTests.globalSetup();
+        GlobalTest.globalSetup();
     }
 
     /**
-     * Calls {@link AllTests#globalTeardown}
+     * Calls {@link GlobalTest#globalTeardown}
      * @see TestCase#setUp
      */
     protected void tearDown() throws Exception {
-        AllTests.globalTeardown();
+        GlobalTest.globalTeardown();
     }
 
     /**
@@ -126,6 +126,9 @@ public class ConnectionResetterTest extends TestCase {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.7  2002/12/16 17:05:38  billhorsman
+ new test structure
+
  Revision 1.6  2002/12/03 10:53:08  billhorsman
  checkstyle
 

@@ -4,7 +4,7 @@
 * This software is the proprietary information of Findexa AS.
 * Use is subject to license terms.
 */
-package org.logicalcobwebs.proxool;
+package org.logicalcobwebs.proxool.configuration;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -14,11 +14,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.configuration.ConfiguratorTest;
 import org.logicalcobwebs.proxool.configuration.JAXPConfiguratorTest;
+import org.logicalcobwebs.proxool.HypersonicTest;
+import org.logicalcobwebs.proxool.PerformanceTest;
+import org.logicalcobwebs.proxool.GeneralTests;
+import org.logicalcobwebs.proxool.ConnectionResetterTest;
+import org.logicalcobwebs.proxool.ThreadTest;
+import org.logicalcobwebs.proxool.GlobalTest;
 
 /**
  * Run all tests
  *
- * @version $Revision: 1.8 $, $Date: 2002/12/16 17:06:10 $
+ * @version $Revision: 1.1 $, $Date: 2002/12/16 17:06:26 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -34,11 +40,8 @@ public class AllTests {
      */
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(HypersonicTest.class);
-        suite.addTestSuite(PerformanceTest.class);
-        suite.addTestSuite(GeneralTests.class);
-        suite.addTestSuite(ConnectionResetterTest.class);
-        suite.addTestSuite(ThreadTest.class);
+        suite.addTestSuite(ConfiguratorTest.class);
+        suite.addTestSuite(JAXPConfiguratorTest.class);
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -55,7 +58,7 @@ public class AllTests {
 /*
  Revision history:
  $Log: AllTests.java,v $
- Revision 1.8  2002/12/16 17:06:10  billhorsman
+ Revision 1.1  2002/12/16 17:06:26  billhorsman
  new test structure
 
  Revision 1.7  2002/12/15 19:16:58  chr32

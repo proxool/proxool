@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * Test how well Proxool works in a threaded test.
  *
- * @version $Revision: 1.2 $, $Date: 2002/11/09 16:09:06 $
+ * @version $Revision: 1.3 $, $Date: 2002/12/16 17:04:37 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -38,11 +38,11 @@ public class ThreadTest extends TestCase {
     }
 
     protected void setUp() throws Exception {
-        AllTests.globalSetup();
+        GlobalTest.globalSetup();
     }
 
     protected void tearDown() throws Exception {
-        AllTests.globalTeardown();
+        GlobalTest.globalTeardown();
     }
 
     /**
@@ -104,6 +104,9 @@ public class ThreadTest extends TestCase {
 /*
  Revision history:
  $Log: ThreadTest.java,v $
+ Revision 1.3  2002/12/16 17:04:37  billhorsman
+ new test structure
+
  Revision 1.2  2002/11/09 16:09:06  billhorsman
  checkstyle
 

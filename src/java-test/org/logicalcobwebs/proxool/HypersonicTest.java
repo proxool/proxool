@@ -16,7 +16,7 @@ import java.sql.SQLException;
 /**
  * Very basic test to see if Hypersonic test database is working
  *
- * @version $Revision: 1.4 $, $Date: 2002/11/09 16:01:38 $
+ * @version $Revision: 1.5 $, $Date: 2002/12/16 17:04:55 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -32,13 +32,13 @@ public class HypersonicTest extends TestCase {
     }
 
     protected void setUp() throws Exception {
-        AllTests.globalSetup();
+        GlobalTest.globalSetup();
         TestHelper.createTable(TEST_TABLE);
     }
 
     protected void tearDown() throws Exception {
         TestHelper.dropTable(TEST_TABLE);
-        AllTests.globalTeardown();
+        GlobalTest.globalTeardown();
     }
 
     public void testInsert() throws SQLException, ClassNotFoundException {
@@ -58,6 +58,9 @@ public class HypersonicTest extends TestCase {
 /*
  Revision history:
  $Log: HypersonicTest.java,v $
+ Revision 1.5  2002/12/16 17:04:55  billhorsman
+ new test structure
+
  Revision 1.4  2002/11/09 16:01:38  billhorsman
  fix doc
 
