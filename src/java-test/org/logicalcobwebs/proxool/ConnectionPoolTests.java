@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/12 00:14:12 $
+ * @version $Revision: 1.9 $, $Date: 2003/09/11 23:14:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -59,6 +59,50 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
         }
 
         assertEquals("activeConnectionCount", 2, ProxoolFacade.getSnapshot(alias, true).getActiveConnectionCount());
+
+    }
+
+    /**
+     * test what happens if maximum = minimum = 1
+     */
+    public void testMaximumEqualsMinimumConnectionCount() throws Exception {
+
+        String testName = "maximumEqualsMinimumConnectionCount";
+        String alias = testName;
+
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, "true");
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        // opening and closing a connection should have no effect
+        Connection c1 = DriverManager.getConnection(url);
+        c1.close();
+
+        // Leave this one open for a while
+        Connection c2 = DriverManager.getConnection(url);
+
+        try {
+            Connection c3 = DriverManager.getConnection(url);
+            c3.close();
+            fail("Didn't expect to get third connection");
+        } catch (SQLException e) {
+            LOG.debug("Ignoring expected exception", e);
+        }
+
+        assertEquals("activeConnectionCount", 1, ProxoolFacade.getSnapshot(alias, true).getActiveConnectionCount());
+        c2.close();
+
+        // Just check it all still works
+        DriverManager.getConnection(url).close();
+
+        assertEquals("activeConnectionCount", 0, ProxoolFacade.getSnapshot(alias, true).getActiveConnectionCount());
 
     }
 
@@ -150,6 +194,9 @@ public class ConnectionPoolTests extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionPoolTests.java,v $
+ Revision 1.9  2003/09/11 23:14:57  billhorsman
+ New test for when maximum-connection-count = 1 and minimum-connection-count = 1
+
  Revision 1.8  2003/03/12 00:14:12  billhorsman
  change thresholds
 
