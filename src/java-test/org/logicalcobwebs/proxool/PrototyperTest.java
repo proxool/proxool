@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Test the prototyper in ConnectionPool
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/04 10:24:40 $
+ * @version $Revision: 1.7 $, $Date: 2003/03/05 18:45:17 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -92,7 +92,7 @@ public class PrototyperTest extends AbstractProxoolTest {
                         && s.getAvailableConnectionCount() == 1);
             }
         };
-        srm.getResult();
+        assertEquals("Timeout", ResultMonitor.SUCCESS, srm.getResult());
         assertEquals("activeConnectionCount", 4, srm.getSnapshot().getActiveConnectionCount());
         assertEquals("availableConnectionCount", 1, srm.getSnapshot().getAvailableConnectionCount());
 
@@ -104,7 +104,7 @@ public class PrototyperTest extends AbstractProxoolTest {
     public void testMinimumConnectionCount() throws Exception {
 
         String testName = "miniumumConnectionCount";
-        String alias = testName;
+        final String alias = testName;
 
         Properties info = new Properties();
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
@@ -117,7 +117,14 @@ public class PrototyperTest extends AbstractProxoolTest {
         String url = TestHelper.buildProxoolUrl(alias, TestConstants.HYPERSONIC_DRIVER, TestConstants.HYPERSONIC_TEST_URL);
         ProxoolFacade.registerConnectionPool(url, info);
 
-        Thread.sleep(2000);
+        ResultMonitor srm = new SnapshotResultMonitor(alias) {
+            public boolean check(SnapshotIF snapshot) throws Exception {
+                SnapshotIF s = ProxoolFacade.getSnapshot(alias);
+                return (s.getAvailableConnectionCount() == 2);
+            }
+        };
+        assertEquals("Timeout", ResultMonitor.SUCCESS, srm.getResult());
+
         assertEquals("availableConnectionCount", 2, ProxoolFacade.getSnapshot(alias, false).getAvailableConnectionCount());
 
     }
@@ -128,6 +135,9 @@ public class PrototyperTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: PrototyperTest.java,v $
+ Revision 1.7  2003/03/05 18:45:17  billhorsman
+ better threading
+
  Revision 1.6  2003/03/04 10:24:40  billhorsman
  removed try blocks around each test
 
