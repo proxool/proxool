@@ -7,7 +7,7 @@ package org.logicalcobwebs.proxool;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicalcobwebs.proxool.stats.Stats;
+import org.logicalcobwebs.proxool.monitor.Monitor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.35 $, $Date: 2003/01/31 00:20:05 $
+ * @version $Revision: 1.36 $, $Date: 2003/01/31 11:49:28 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -44,7 +44,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     private List proxyConnections;
 
     /** This allows us to have a unique ID for each connection */
-    private long nextConnectionId = 0;
+    private long nextConnectionId = 1;
 
     /** This is the "round robin" that makes sure we use all the connections */
     private int nextAvailableConnection = 0;
@@ -99,7 +99,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     private static boolean loggedLegend;
 
-    private Stats stats;
+    private Monitor monitor;
+
+    private Object POOL_LOCK = "poolLock";
+
+    private boolean locked = false;
 
     /**
      * Initialised in {@link ConnectionPool#ConnectionPool constructor}.
@@ -123,7 +127,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         if (definition.getStatistics() != null) {
             try {
-                stats = new Stats(definition.getAlias(), definition.getStatistics());
+                monitor = new Monitor(definition.getAlias(), definition.getStatistics());
             } catch (ProxoolException e) {
                 log.error("Failed to initialise statistics", e);
             }
@@ -168,8 +172,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
         if (connectionCount >= getDefinition().getMaximumConnectionCount() && getAvailableConnectionCount() < 1) {
             connectionsRefusedCount++;
-            if (stats != null) {
-                stats.connectionRefused();
+            if (monitor != null) {
+                monitor.connectionRefused();
             }
             log.info(displayStatistics() + " - " + MSG_MAX_CONNECTION_COUNT);
             timeMillisOfLastRefusal = System.currentTimeMillis();
@@ -241,8 +245,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 calculateUpState();
             } else {
                 connectionsRefusedCount++;
-                if (stats != null) {
-                    stats.connectionRefused();
+                if (monitor != null) {
+                    monitor.connectionRefused();
                 }
                 timeMillisOfLastRefusal = System.currentTimeMillis();
                 calculateUpState();
@@ -261,7 +265,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     private void throwSQLException(String message) throws SQLException {
-        throw new SQLException(message + " [stats: " + displayStatistics() + "]");
+        throw new SQLException(message + " [monitor: " + displayStatistics() + "]");
     }
 
     private ProxyConnectionIF createPoolableConnection(int state, String creator) throws SQLException {
@@ -395,8 +399,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     protected void putConnection(ProxyConnectionIF proxyConnection) {
         try {
 
-            if (stats != null) {
-                stats.connectionReturned(System.currentTimeMillis() - proxyConnection.getTimeLastStartActive());
+            if (monitor != null) {
+                monitor.connectionReturned(System.currentTimeMillis() - proxyConnection.getTimeLastStartActive());
             }
 
             // It's possible that this connection is due for expiry
@@ -1153,11 +1157,23 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     /**
-     * Get the stats for this pool
-     * @return stats
+     * Get the monitor for this pool
+     * @return monitor
      */
-    protected Stats getStats() {
-        return stats;
+    protected Monitor getMonitor() {
+        return monitor;
+    }
+
+    protected boolean isLocked() {
+        return locked;
+    }
+
+    protected void lock() {
+        locked = true;
+    }
+
+    protected void unlock() {
+        locked = false;
     }
 
     private static final boolean FORCE_EXPIRY = true;
@@ -1169,6 +1185,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.36  2003/01/31 11:49:28  billhorsman
+ use Monitor instead of Stats
+
  Revision 1.35  2003/01/31 00:20:05  billhorsman
  statistics is now a string to allow multiple,
  comma-delimited values (plus better logging of errors
