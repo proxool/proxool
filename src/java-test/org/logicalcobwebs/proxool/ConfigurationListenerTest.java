@@ -16,7 +16,7 @@ import java.sql.DriverManager;
  * with the {@link org.logicalcobwebs.proxool.ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.10 $, $Date: 2003/04/10 21:48:58 $
+ * @version $Revision: 1.11 $, $Date: 2003/04/27 15:44:19 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -101,6 +101,13 @@ public class ConfigurationListenerTest extends AbstractProxoolTest {
         LOG.debug("Getting another connection which shouldn't cause another config change");
         DriverManager.getConnection(url, info).close();
         assertEquals("definitionReceived", false, mcl2.isUpdateReceived());
+        mcl2.reset();
+
+        // This time pass in the properties (WITH change)
+        LOG.debug("Expecting a change now");
+        info.setProperty(ProxoolConstants.VERBOSE_PROPERTY, Boolean.FALSE.toString());
+        DriverManager.getConnection(url, info).close();
+        assertEquals("definitionReceived", true, mcl2.isUpdateReceived());
         mcl2.reset();
 
         // Remove the second listener
@@ -228,6 +235,9 @@ public class ConfigurationListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConfigurationListenerTest.java,v $
+ Revision 1.11  2003/04/27 15:44:19  billhorsman
+ better tests
+
  Revision 1.10  2003/04/10 21:48:58  billhorsman
  enhanced to trap bug where config change event gets fired
  all the time
