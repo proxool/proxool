@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import java.util.Date;
 
@@ -11,7 +11,7 @@ import java.util.Date;
  * Provides statistical performance information for a period ot
  * time.
  *
- * @version $Revision: 1.3 $, $Date: 2003/01/31 16:53:23 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -82,6 +82,9 @@ public interface StatisticsIF {
 /*
  Revision history:
  $Log: StatisticsIF.java,v $
+ Revision 1.1  2003/02/19 23:36:51  billhorsman
+ renamed monitor package to admin
+
  Revision 1.3  2003/01/31 16:53:23  billhorsman
  checkstyle
 

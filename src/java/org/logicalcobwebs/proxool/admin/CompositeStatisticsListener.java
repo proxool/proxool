@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
 import org.logicalcobwebs.logging.Log;
@@ -18,7 +18,7 @@ import java.util.Iterator;
  * which provides methods for
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
- * @version $Revision: 1.2 $, $Date: 2003/02/07 17:20:17 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -52,6 +52,9 @@ public class CompositeStatisticsListener extends AbstractListenerContainer imple
 /*
  Revision history:
  $Log: CompositeStatisticsListener.java,v $
+ Revision 1.1  2003/02/19 23:36:51  billhorsman
+ renamed monitor package to admin
+
  Revision 1.2  2003/02/07 17:20:17  billhorsman
  checkstyle
 

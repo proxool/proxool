@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Implementation of SnapshotIF
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/12 12:28:28 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -43,112 +43,112 @@ class Snapshot implements SnapshotIF {
     private Set connectionInfos;
 
     /**
-     * @param snapshotDate see {@link org.logicalcobwebs.proxool.monitor.SnapshotIF#getSnapshotDate}
+     * @param snapshotDate see {@link org.logicalcobwebs.proxool.admin.SnapshotIF#getSnapshotDate}
      */
     public Snapshot(Date snapshotDate) {
         this.snapshotDate = snapshotDate;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getDateStarted
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getDateStarted
      */
     public Date getDateStarted() {
         return dateStarted;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getDateStarted
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getDateStarted
      */
     public void setDateStarted(Date dateStarted) {
         this.dateStarted = dateStarted;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getServedCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getServedCount
      */
     public long getServedCount() {
         return servedCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getServedCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getServedCount
      */
     public void setServedCount(long servedCount) {
         this.servedCount = servedCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getRefusedCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getRefusedCount
      */
     public long getRefusedCount() {
         return refusedCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getRefusedCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getRefusedCount
      */
     public void setRefusedCount(long refusedCount) {
         this.refusedCount = refusedCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getActiveConnectionCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getActiveConnectionCount
      */
     public int getActiveConnectionCount() {
         return activeConnectionCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getActiveConnectionCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getActiveConnectionCount
      */
     public void setActiveConnectionCount(int activeConnectionCount) {
         this.activeConnectionCount = activeConnectionCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getAvailableConnectionCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getAvailableConnectionCount
      */
     public int getAvailableConnectionCount() {
         return availableConnectionCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getAvailableConnectionCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getAvailableConnectionCount
      */
     public void setAvailableConnectionCount(int availableConnectionCount) {
         this.availableConnectionCount = availableConnectionCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getOfflineConnectionCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getOfflineConnectionCount
      */
     public int getOfflineConnectionCount() {
         return offlineConnectionCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getOfflineConnectionCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getOfflineConnectionCount
      */
     public void setOfflineConnectionCount(int offlineConnectionCount) {
         this.offlineConnectionCount = offlineConnectionCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getMaximumConnectionCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getMaximumConnectionCount
      */
     public int getMaximumConnectionCount() {
         return maximumConnectionCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getMaximumConnectionCount
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getMaximumConnectionCount
      */
     public void setMaximumConnectionCount(int maximumConnectionCount) {
         this.maximumConnectionCount = maximumConnectionCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.SnapshotIF#getSnapshotDate
+     * @see org.logicalcobwebs.proxool.admin.SnapshotIF#getSnapshotDate
      */
     public Date getSnapshotDate() {
         return snapshotDate;
@@ -195,6 +195,9 @@ class Snapshot implements SnapshotIF {
 /*
  Revision history:
  $Log: Snapshot.java,v $
+ Revision 1.1  2003/02/19 23:36:51  billhorsman
+ renamed monitor package to admin
+
  Revision 1.4  2003/02/12 12:28:28  billhorsman
  added url, proxyHashcode and delegateHashcode to
  ConnectionInfoIF

@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 /**
  * Listen for new {@link StatisticsIF statistics} as they are produced.
@@ -16,7 +16,7 @@ package org.logicalcobwebs.proxool.monitor;
  * ProxoolFacade.{@link org.logicalcobwebs.proxool.ProxoolFacade#addStatisticsListener addStatisticsListener}(alias, myStatisticsListener);
  * </pre>
 
- * @version $Revision: 1.2 $, $Date: 2003/02/08 00:35:29 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -35,6 +35,9 @@ public interface StatisticsListenerIF {
 /*
  Revision history:
  $Log: StatisticsListenerIF.java,v $
+ Revision 1.1  2003/02/19 23:36:51  billhorsman
+ renamed monitor package to admin
+
  Revision 1.2  2003/02/08 00:35:29  billhorsman
  doc
 

@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import junit.framework.TestCase;
 import org.logicalcobwebs.logging.Log;
@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.4 $, $Date: 2003/02/19 15:14:30 $
+ * @version $Revision: 1.5 $, $Date: 2003/02/19 23:36:50 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -117,6 +117,9 @@ public class StatisticsListenerTest extends TestCase {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.5  2003/02/19 23:36:50  billhorsman
+ renamed monitor package to admin
+
  Revision 1.4  2003/02/19 15:14:30  billhorsman
  fixed copyright (copy and paste error,
  not copyright change)
@@ -128,6 +131,6 @@ public class StatisticsListenerTest extends TestCase {
  checkstyle
 
  Revision 1.1  2003/02/07 15:10:37  billhorsman
- new monitor tests
+ new admin tests
 
  */

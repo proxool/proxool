@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.proxool.ProxoolConstants;
@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * Listens to statistics and logs them
- * @version $Revision: 1.1 $, $Date: 2003/02/07 14:16:46 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -75,6 +75,9 @@ public class StatisticsLogger implements StatisticsListenerIF {
 /*
  Revision history:
  $Log: StatisticsLogger.java,v $
+ Revision 1.1  2003/02/19 23:36:51  billhorsman
+ renamed monitor package to admin
+
  Revision 1.1  2003/02/07 14:16:46  billhorsman
  support for StatisticsListenerIF
 

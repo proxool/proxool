@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
@@ -19,9 +19,9 @@ import java.util.TimerTask;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.11 $, $Date: 2003/02/08 14:27:51 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
  * @author bill
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 class StatsRoller {
@@ -121,7 +121,7 @@ class StatsRoller {
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.Monitor#connectionReturned
+     * @see org.logicalcobwebs.proxool.admin.Admin#connectionReturned
      */
     public void connectionReturned(long activeTime) {
         if (!isCurrent()) {
@@ -131,7 +131,7 @@ class StatsRoller {
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.Monitor#connectionRefused
+     * @see org.logicalcobwebs.proxool.admin.Admin#connectionRefused
      */
     public void connectionRefused() {
         if (!isCurrent()) {
@@ -149,6 +149,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.1  2003/02/19 23:36:51  billhorsman
+ renamed monitor package to admin
+
  Revision 1.11  2003/02/08 14:27:51  chr32
  Style fixes.
  Also tried to fix the dublicate linebreaks in the logging classes.

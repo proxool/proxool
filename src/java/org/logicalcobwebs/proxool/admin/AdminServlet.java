@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
@@ -26,30 +26,30 @@ import java.util.Date;
 import java.util.Iterator;
 
 /**
- * Use this to monitor each pool within Proxool. It acts like a normal
+ * Use this to admin each pool within Proxool. It acts like a normal
  * servlet., so just configure it within your web app as you see fit.
  * For example, within web.xml:
  *
  * <pre>
  *   &lt;servlet&gt;
- *       &lt;servlet-name&gt;Monitor&lt;/servlet-name&gt;
- *       &lt;servlet-class&gt;org.logicalcobwebs.proxool.monitor.MonitorServlet&lt;/servlet-class&gt;
+ *       &lt;servlet-name&gt;Admin&lt;/servlet-name&gt;
+ *       &lt;servlet-class&gt;org.logicalcobwebs.proxool.admin.AdminServlet&lt;/servlet-class&gt;
  *   &lt;/servlet&gt;
  *
  *   &lt;servlet-mapping&gt;
- *       &lt;servlet-name&gt;Monitor&lt;/servlet-name&gt;
- *       &lt;url-pattern&gt;/monitor&lt;/url-pattern&gt;
+ *       &lt;servlet-name&gt;Admin&lt;/servlet-name&gt;
+ *       &lt;url-pattern&gt;/admin&lt;/url-pattern&gt;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.10 $, $Date: 2003/02/12 12:28:27 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class MonitorServlet extends HttpServlet {
+public class AdminServlet extends HttpServlet {
 
-    private static final Log LOG = LogFactory.getLog(MonitorServlet.class);
+    private static final Log LOG = LogFactory.getLog(AdminServlet.class);
 
     protected static final String ACTION_LIST = "list";
     private static final String ACTION_STATS = "stats";
@@ -474,7 +474,7 @@ public class MonitorServlet extends HttpServlet {
     }
 
     private void openHtml(ServletOutputStream out) throws IOException {
-        out.println("<html><header><title>Proxool Monitor</title></header><body BGCOLOR=\"#eeeeee\">");
+        out.println("<html><header><title>Proxool Admin</title></header><body BGCOLOR=\"#eeeeee\">");
     }
 
     private void closeHtml(ServletOutputStream out) throws IOException {
@@ -543,7 +543,10 @@ public class MonitorServlet extends HttpServlet {
 
 /*
  Revision history:
- $Log: MonitorServlet.java,v $
+ $Log: AdminServlet.java,v $
+ Revision 1.1  2003/02/19 23:36:51  billhorsman
+ renamed monitor package to admin
+
  Revision 1.10  2003/02/12 12:28:27  billhorsman
  added url, proxyHashcode and delegateHashcode to
  ConnectionInfoIF

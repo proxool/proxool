@@ -3,14 +3,14 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import java.util.Date;
 
 /**
  * Implementation of StatisticsIF
  *
- * @version $Revision: 1.3 $, $Date: 2003/01/31 16:53:22 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -28,14 +28,14 @@ class Statistics implements StatisticsIF {
     private long totalActiveTime;
 
     /**
-     * @param startDate see {@link org.logicalcobwebs.proxool.monitor.StatisticsIF#getStartDate}
+     * @param startDate see {@link org.logicalcobwebs.proxool.admin.StatisticsIF#getStartDate}
      */
     protected Statistics(Date startDate) {
         this.startDate = startDate;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.Monitor#connectionReturned
+     * @see org.logicalcobwebs.proxool.admin.Admin#connectionReturned
      */
     protected void connectionReturned(long activeTime) {
         totalActiveTime += activeTime;
@@ -43,35 +43,35 @@ class Statistics implements StatisticsIF {
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.Monitor#connectionRefused
+     * @see org.logicalcobwebs.proxool.admin.Admin#connectionRefused
      */
     protected void connectionRefused() {
         refusedCount++;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getStopDate
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getStopDate
      */
     protected void setStopDate(Date stopDate) {
         this.stopDate = stopDate;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getStartDate
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getStartDate
      */
     public Date getStartDate() {
         return startDate;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getStopDate
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getStopDate
      */
     public Date getStopDate() {
         return stopDate;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getPeriod
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getPeriod
      */
     public long getPeriod() {
         if (stopDate != null) {
@@ -82,7 +82,7 @@ class Statistics implements StatisticsIF {
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getAverageActiveTime
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getAverageActiveTime
      */
     public double getAverageActiveTime() {
         if (servedCount > 0) {
@@ -93,35 +93,35 @@ class Statistics implements StatisticsIF {
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getAverageActiveCount
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getAverageActiveCount
      */
     public double getAverageActiveCount() {
         return (double) totalActiveTime / (double) getPeriod();
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getServedPerSecond
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getServedPerSecond
      */
     public double getServedPerSecond() {
         return (double) servedCount / ((double) getPeriod() / 1000.0);
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getRefusedPerSecond
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getRefusedPerSecond
      */
     public double getRefusedPerSecond() {
         return (double) refusedCount / ((double) getPeriod() / 1000.0);
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getServedCount
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getServedCount
      */
     public long getServedCount() {
         return servedCount;
     }
 
     /**
-     * @see org.logicalcobwebs.proxool.monitor.StatisticsIF#getRefusedCount
+     * @see org.logicalcobwebs.proxool.admin.StatisticsIF#getRefusedCount
      */
     public long getRefusedCount() {
         return refusedCount;
@@ -133,6 +133,9 @@ class Statistics implements StatisticsIF {
 /*
  Revision history:
  $Log: Statistics.java,v $
+ Revision 1.1  2003/02/19 23:36:51  billhorsman
+ renamed monitor package to admin
+
  Revision 1.3  2003/01/31 16:53:22  billhorsman
  checkstyle
 

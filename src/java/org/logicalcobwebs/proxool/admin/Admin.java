@@ -3,7 +3,7 @@
  * package.html for details. The latest version is available at
  * http://proxool.sourceforge.net
  */
-package org.logicalcobwebs.proxool.monitor;
+package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
@@ -23,12 +23,12 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.8 $, $Date: 2003/02/07 15:08:51 $
+ * @version $Revision: 1.1 $, $Date: 2003/02/19 23:36:51 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
-public class Monitor {
+public class Admin {
 
     private Log log;
 
@@ -40,7 +40,7 @@ public class Monitor {
      * @param definition gives access to pool definition
      * @param definition see {@link org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF#getStatistics definition}
      */
-    public Monitor(ConnectionPoolDefinitionIF definition) throws ProxoolException {
+    public Admin(ConnectionPoolDefinitionIF definition) throws ProxoolException {
         log = LogFactory.getLog("org.logicalcobwebs.proxool.stats." + definition.getAlias());
 
         StringTokenizer st = new StringTokenizer(definition.getStatistics(), ",");
@@ -145,7 +145,10 @@ public class Monitor {
 
 /*
  Revision history:
- $Log: Monitor.java,v $
+ $Log: Admin.java,v $
+ Revision 1.1  2003/02/19 23:36:51  billhorsman
+ renamed monitor package to admin
+
  Revision 1.8  2003/02/07 15:08:51  billhorsman
  removed redundant accessor
 
