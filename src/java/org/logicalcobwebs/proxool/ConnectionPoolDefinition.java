@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.19 $, $Date: 2003/07/23 06:54:48 $
+ * @version $Revision: 1.20 $, $Date: 2003/08/30 11:37:31 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -866,7 +866,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         if (fatalSqlExceptionsAsString != null) {
             StringTokenizer st = new StringTokenizer(fatalSqlExceptionsAsString, FATAL_SQL_EXCEPTIONS_DELIMITER);
             while (st.hasMoreTokens()) {
-                fatalSqlExceptions.add(st.nextToken());
+                fatalSqlExceptions.add(st.nextToken().trim());
             }
         }
     }
@@ -1010,6 +1010,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.20  2003/08/30 11:37:31  billhorsman
+ Trim fatal-sql-exception messages so that whitespace around the comma delimiters does not
+ get used to match against exception message.
+
  Revision 1.19  2003/07/23 06:54:48  billhorsman
  draft JNDI changes (shouldn't effect normal operation)
 
