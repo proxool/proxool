@@ -14,12 +14,11 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Vector;
-import java.lang.reflect.Proxy;
 
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.24 $, $Date: 2002/12/03 12:24:00 $
+ * @version $Revision: 1.25 $, $Date: 2002/12/12 10:48:47 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -1070,6 +1069,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.25  2002/12/12 10:48:47  billhorsman
+ checkstyle
+
  Revision 1.24  2002/12/03 12:24:00  billhorsman
  fixed fatal sql exception
 
