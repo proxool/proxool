@@ -85,7 +85,7 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.14 $, $Date: 2003/02/06 17:41:05 $
+ * @version $Revision: 1.15 $, $Date: 2003/02/13 10:05:13 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -235,7 +235,11 @@ public class XMLConfigurator extends DefaultHandler {
                 + "Name: '" + name + "' Value: '" + value + "'.");
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Adding driver property " + name + " with value " + value + ".");
+            if (name.toLowerCase().indexOf("password") > -1) {
+                LOG.debug("Adding driver property: " + name + "=" + "*******");
+            } else {
+                LOG.debug("Adding driver property: " + name + "=" + value);
+            }
         }
         properties.put(name, value);
     }
