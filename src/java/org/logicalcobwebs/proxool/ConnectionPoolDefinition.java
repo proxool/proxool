@@ -21,7 +21,7 @@ import java.lang.reflect.Modifier;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.32 $, $Date: 2004/06/02 20:19:14 $
+ * @version $Revision: 1.33 $, $Date: 2005/05/04 16:24:59 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -575,6 +575,51 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     }
 
     /**
+     * Deep clone of definition
+     * @return the new definition
+     * @throws CloneNotSupportedException
+     */
+    protected Object clone() throws CloneNotSupportedException {
+        ConnectionPoolDefinition clone = new ConnectionPoolDefinition();
+
+        clone.setCompleteUrl(completeUrl);
+        clone.setDelegateProperties((Properties) delegateProperties.clone());
+        clone.setCompleteInfo((Properties) completeInfo.clone());
+        clone.clearChangedInfo();
+
+        clone.setAlias(alias);
+        clone.setUrl(url);
+        clone.setDriver(driver);
+        clone.setMaximumConnectionLifetime(maximumConnectionLifetime);
+        clone.setPrototypeCount(prototypeCount);
+        clone.setMinimumConnectionCount(minimumConnectionCount);
+        clone.setMaximumConnectionCount(maximumConnectionCount);
+        clone.setHouseKeepingSleepTime(houseKeepingSleepTime);
+        clone.setHouseKeepingTestSql(houseKeepingTestSql);
+        clone.setTestAfterUse(testAfterUse);
+        clone.setTestBeforeUse(testBeforeUse);
+        clone.setSimultaneousBuildThrottle(simultaneousBuildThrottle);
+        clone.setRecentlyStartedThreshold(recentlyStartedThreshold);
+        clone.setOverloadWithoutRefusalLifetime(overloadWithoutRefusalLifetime);
+        clone.setMaximumActiveTime(maximumActiveTime);
+        clone.setVerbose(verbose);
+        clone.setTrace(trace);
+        clone.setStatistics(statistics);
+        clone.setStatisticsLogLevel(statisticsLogLevel);
+        clone.setFatalSqlExceptionsAsString(fatalSqlExceptionsAsString);
+        try {
+            clone.setFatalSqlExceptionWrapper(fatalSqlExceptionWrapper);
+        } catch (ProxoolException e) {
+            throw new IllegalArgumentException("Problem cloning fatalSqlExceptionWrapper: " + fatalSqlExceptionWrapper);
+        }
+        return clone;
+    }
+
+    private void clearChangedInfo() {
+        changedInfo.clear();
+    }
+
+    /**
      * Reset all properties to their default values
      */
     private void reset() {
@@ -611,6 +656,15 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
      */
     protected Properties getCompleteInfo() {
         return completeInfo;
+    }
+
+    /**
+     * Overwrite the complete info
+     * @param completeInfo the new properties
+     * @see #getCompleteInfo()
+     */
+    public void setCompleteInfo(Properties completeInfo) {
+        this.completeInfo = completeInfo;
     }
 
     /**
@@ -819,6 +873,15 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     public void setDelegateProperty(String name, String value) {
         connectionPropertiesChanged = true;
         getDelegateProperties().setProperty(name, value);
+    }
+
+    /**
+     * Overwrite the delegate properties
+     * @param delegateProperties the new properties
+     * @see ConnectionPoolDefinitionIF#getProperties
+     */
+    public void setDelegateProperties(Properties delegateProperties) {
+        this.delegateProperties = delegateProperties;
     }
 
     /**
@@ -1297,6 +1360,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.33  2005/05/04 16:24:59  billhorsman
+ Now supports cloning.
+
  Revision 1.32  2004/06/02 20:19:14  billhorsman
  Added injectable interface properties
 
