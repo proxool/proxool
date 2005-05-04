@@ -20,7 +20,7 @@ import java.sql.Connection;
 
 /**
  * Wraps up a {@link ProxyConnection}. It is proxied as a {@link java.sql.Connection}
- * @version $Revision: 1.3 $, $Date: 2004/07/13 21:06:21 $
+ * @version $Revision: 1.4 $, $Date: 2005/05/04 16:31:41 $
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -60,7 +60,7 @@ public class WrappedConnection implements MethodInterceptor {
     public WrappedConnection(ProxyConnection proxyConnection) {
         this.proxyConnection = proxyConnection;
         this.id = proxyConnection.getId();
-        this.alias= proxyConnection.getConnectionPool().getDefinition().getAlias();
+        this.alias= proxyConnection.getDefinition().getAlias();
     }
 
     /**
@@ -174,16 +174,16 @@ public class WrappedConnection implements MethodInterceptor {
 
         } catch (InvocationTargetException e) {
             // We might get a fatal exception here. Let's test for it.
-            if (FatalSqlExceptionHelper.testException(proxyConnection.getConnectionPool().getDefinition(), e.getTargetException())) {
-                FatalSqlExceptionHelper.throwFatalSQLException(proxyConnection.getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), e.getTargetException());
+            if (FatalSqlExceptionHelper.testException(proxyConnection.getDefinition(), e.getTargetException())) {
+                FatalSqlExceptionHelper.throwFatalSQLException(proxyConnection.getDefinition().getFatalSqlExceptionWrapper(), e.getTargetException());
             }
             throw e.getTargetException();
         } catch (SQLException e) {
             throw new SQLException("Couldn't perform the operation " + concreteMethod.getName());
         } catch (Exception e) {
             LOG.error("Unexpected invocation exception", e);
-            if (FatalSqlExceptionHelper.testException(proxyConnection.getConnectionPool().getDefinition(), e)) {
-                FatalSqlExceptionHelper.throwFatalSQLException(proxyConnection.getConnectionPool().getDefinition().getFatalSqlExceptionWrapper(), e);
+            if (FatalSqlExceptionHelper.testException(proxyConnection.getDefinition(), e)) {
+                FatalSqlExceptionHelper.throwFatalSQLException(proxyConnection.getDefinition().getFatalSqlExceptionWrapper(), e);
             }
             throw new RuntimeException("Unexpected invocation exception: "
                     + e.getMessage());
@@ -241,6 +241,9 @@ public class WrappedConnection implements MethodInterceptor {
 /*
  Revision history:
  $Log: WrappedConnection.java,v $
+ Revision 1.4  2005/05/04 16:31:41  billhorsman
+ Use the definition referenced by the proxy connection rather than the pool instead.
+
  Revision 1.3  2004/07/13 21:06:21  billhorsman
  Fix problem using injectable interfaces on methods that are declared in non-public classes.
 

@@ -26,7 +26,7 @@ import java.lang.reflect.Modifier;
  * object given a proxy.
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.29 $, $Date: 2004/07/27 21:44:15 $
+ * @version $Revision: 1.30 $, $Date: 2005/05/04 16:31:41 $
  * @since Proxool 0.5
  */
 class ProxyFactory {
@@ -59,7 +59,7 @@ class ProxyFactory {
 */
         Object delegate = Enhancer.create(
                 null,
-                getInterfaces(proxyConnection.getConnection().getClass(), proxyConnection.getConnectionPool()),
+                getInterfaces(proxyConnection.getConnection().getClass(), proxyConnection.getDefinition()),
                 wrappedConnection);
         return (Connection) delegate;
     }
@@ -99,7 +99,7 @@ class ProxyFactory {
     protected static Statement getStatement(Statement delegate, ConnectionPool connectionPool, ProxyConnectionIF proxyConnection, String sqlStatement) {
         Object o = Enhancer.create(
                 null,
-                getInterfaces(delegate.getClass(), connectionPool),
+                getInterfaces(delegate.getClass(), proxyConnection.getDefinition()),
                 new ProxyStatement(delegate, connectionPool, proxyConnection, sqlStatement));
 /*
         Object o = Enhancer.create(
@@ -123,17 +123,17 @@ class ProxyFactory {
      * @param clazz the class to examine.
      * @return an array of classes (all interfaces) that this class implements.
      */
-    private static Class[] getInterfaces(Class clazz, ConnectionPool connectionPool) {
+    private static Class[] getInterfaces(Class clazz, ConnectionPoolDefinitionIF cpd) {
         Class[] interfaceArray = (Class[]) interfaceMap.get(clazz);
         if (interfaceArray == null) {
             Set interfaces = new HashSet();
             traverseInterfacesRecursively(interfaces, clazz);
-            if (connectionPool != null) {
+            if (cpd != null) {
                 // Work out which interface we should be injecting (if it has been configured). Make sure
                 // we check CallableStatement then PreparedStatement then Statement or all three will get
                 // caught by Statement
                 if (Connection.class.isAssignableFrom(clazz)) {
-                    Class injectableClass = connectionPool.getDefinition().getInjectableConnectionInterface();
+                    Class injectableClass = cpd.getInjectableConnectionInterface();
                     // Inject it if it was configured.
                     if (injectableClass != null) {
                         interfaces.add(injectableClass);
@@ -146,7 +146,7 @@ class ProxyFactory {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Getting injectableCallableStatementInterface");
                     }
-                    Class injectableClass = connectionPool.getDefinition().getInjectableCallableStatementInterface();
+                    Class injectableClass = cpd.getInjectableCallableStatementInterface();
                     // Inject it if it was configured.
                     if (injectableClass != null) {
                         interfaces.add(injectableClass);
@@ -156,7 +156,7 @@ class ProxyFactory {
                     }
                 }
                 if (PreparedStatement.class.isAssignableFrom(clazz)) {
-                    Class injectableClass = connectionPool.getDefinition().getInjectablePreparedStatementInterface();
+                    Class injectableClass = cpd.getInjectablePreparedStatementInterface();
                     // Inject it if it was configured.
                     if (injectableClass != null) {
                         interfaces.add(injectableClass);
@@ -166,7 +166,7 @@ class ProxyFactory {
                     }
                 }
                 if (Statement.class.isAssignableFrom(clazz)) {
-                    Class injectableClass = connectionPool.getDefinition().getInjectableStatementInterface();
+                    Class injectableClass = cpd.getInjectableStatementInterface();
                     // Inject it if it was configured.
                     if (injectableClass != null) {
                         interfaces.add(injectableClass);
@@ -286,6 +286,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.30  2005/05/04 16:31:41  billhorsman
+ Use the definition referenced by the proxy connection rather than the pool instead.
+
  Revision 1.29  2004/07/27 21:44:15  billhorsman
  Remove insane amount of debug logging.
 
