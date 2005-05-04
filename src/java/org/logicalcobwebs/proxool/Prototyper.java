@@ -13,9 +13,9 @@ import org.logicalcobwebs.logging.LogFactory;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.9 $, $Date: 2004/03/25 22:02:15 $
+ * @version $Revision: 1.10 $, $Date: 2005/05/04 16:27:54 $
  * @author bill
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class Prototyper {
@@ -155,7 +155,8 @@ public class Prototyper {
 
         try {
             // get a new *real* connection
-            realConnection = connectionBuilder.buildConnection(connectionPool.getDefinition());
+            final ConnectionPoolDefinition definition = connectionPool.getDefinition();
+            realConnection = connectionBuilder.buildConnection(definition);
             
             // build a proxy around it
             
@@ -163,8 +164,8 @@ public class Prototyper {
             // supplied in the ConnectionPoolDefinition. That's where it got the URL...
             // The ProxyConnection is passed the ConnectionPoolDefinition as well so it doesn't 
             // need the url in its constructor...
-            String url = connectionPool.getDefinition().getUrl();
-			proxyConnection = new ProxyConnection(realConnection, id, url, connectionPool, status);
+            String url = definition.getUrl();
+			proxyConnection = new ProxyConnection(realConnection, id, url, connectionPool, definition, status);
 
             try {
                 connectionPool.onBirth(realConnection);
@@ -178,8 +179,7 @@ public class Prototyper {
             // connection from the Prototyper. This would clearly separate the responsibilities: 
             // ConnectionPool maintains the pool and its integrity, the Prototyper creates new 
             // connections when instructed. 
-            connectionPool.addProxyConnection(proxyConnection);
-
+            boolean added = connectionPool.addProxyConnection(proxyConnection);
             if (log.isDebugEnabled()) {
                 StringBuffer out = new StringBuffer(connectionPool.displayStatistics());
                 out.append(" - Connection #");
@@ -202,7 +202,18 @@ public class Prototyper {
                     out.append(Thread.currentThread().getName());
                 }
                 log.debug(out);
+                if (!added) {
+                    out = new StringBuffer(connectionPool.displayStatistics());
+                    out.append(" - Connection #");
+                    out.append(proxyConnection.getId());
+                    out.append(" has been discarded immediately because the definition it was built with is out of date");
+                    log.debug(out);
+                }
             }
+            if (!added) {
+                proxyConnection.reallyClose();
+            }
+
         } catch (SQLException e) {
             // log.error(displayStatistics() + " - Couldn't initialise connection #" + proxyConnection.getId() + ": " + e);
             throw e;
@@ -290,6 +301,9 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.10  2005/05/04 16:27:54  billhorsman
+ Check to see whether a new connection was really added to the pool.
+
  Revision 1.9  2004/03/25 22:02:15  brenuart
  First step towards pluggable ConnectionBuilderIF & ConnectionValidatorIF.
  Include some minor refactoring that lead to deprecation of some PrototyperController methods.
