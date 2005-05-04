@@ -1,7 +1,7 @@
 /*
- * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/SimpleLog.java,v 1.3 2003/03/11 00:02:10 billhorsman Exp $
- * $Revision: 1.3 $
- * $Date: 2003/03/11 00:02:10 $
+ * $Header: /cvsroot/proxool/proxool/src/java/org/logicalcobwebs/logging/impl/Attic/SimpleLog.java,v 1.4 2005/05/04 16:02:05 billhorsman Exp $
+ * $Revision: 1.4 $
+ * $Date: 2005/05/04 16:02:05 $
  *
  * ====================================================================
  *
@@ -105,7 +105,7 @@ import java.util.Properties;
  * @author Rod Waldhoff
  * @author Robert Burrell Donkin
  *
- * @version $Id: SimpleLog.java,v 1.3 2003/03/11 00:02:10 billhorsman Exp $
+ * @version $Id: SimpleLog.java,v 1.4 2005/05/04 16:02:05 billhorsman Exp $
  */
 public class SimpleLog implements Log {
 
@@ -158,9 +158,9 @@ public class SimpleLog implements Log {
 
         try {
             // add all system props that start with the specified prefix
-            Enumeration enum = System.getProperties ().propertyNames ();
-            while (enum.hasMoreElements ()) {
-                String name = (String) (enum.nextElement ());
+            Enumeration propertyNames = System.getProperties ().propertyNames ();
+            while (propertyNames.hasMoreElements ()) {
+                String name = (String) (propertyNames.nextElement ());
                 if (null != name && name.startsWith (SYSTEM_PREFIX)) {
                     SIMLE_LOG_PROPS.setProperty (name, System.getProperty (name));
                 }
