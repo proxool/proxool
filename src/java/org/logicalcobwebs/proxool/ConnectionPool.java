@@ -25,9 +25,9 @@ import org.logicalcobwebs.proxool.util.FastArrayList;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.78 $, $Date: 2004/03/25 22:02:15 $
+ * @version $Revision: 1.79 $, $Date: 2005/05/04 16:26:31 $
  * @author billhorsman
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  */
 class ConnectionPool implements ConnectionPoolStatisticsIF {
 
@@ -302,15 +302,22 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     /**
      * Add a ProxyConnection to the pool
      * @param proxyConnection new connection
+     * @return true if the connection was added or false if it wasn't (for instance, if the definition it
+     * was built with is out of date).
      */
-    protected void addProxyConnection(ProxyConnectionIF proxyConnection) {
+    protected boolean addProxyConnection(ProxyConnectionIF proxyConnection) {
+        boolean added = false;
         try {
             acquireConnectionStatusWriteLock();
-            proxyConnections.add(proxyConnection);
-            connectionCountByState[proxyConnection.getStatus()]++;
+            if (proxyConnection.getDefinition() == getDefinition()) {
+                proxyConnections.add(proxyConnection);
+                connectionCountByState[proxyConnection.getStatus()]++;
+                added = true;
+            }
         } finally {
             releaseConnectionStatusWriteLock();
         }
+        return added;
     }
 
     protected static String getStatusDescription(int status) {
@@ -1098,6 +1105,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.79  2005/05/04 16:26:31  billhorsman
+ Only add a new connection if the definition matches
+
  Revision 1.78  2004/03/25 22:02:15  brenuart
  First step towards pluggable ConnectionBuilderIF & ConnectionValidatorIF.
  Include some minor refactoring that lead to deprecation of some PrototyperController methods.
