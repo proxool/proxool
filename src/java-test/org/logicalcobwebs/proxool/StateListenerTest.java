@@ -17,7 +17,7 @@ import java.util.Properties;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.12 $, $Date: 2004/06/02 21:05:19 $
+ * @version $Revision: 1.13 $, $Date: 2005/05/04 16:03:23 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -92,7 +92,11 @@ public class StateListenerTest extends AbstractProxoolTest {
         assertEquals("Timeout waiting for QUIET", ResultMonitor.SUCCESS, srm.getResult());
 
         // Bogus definition -> should be down
-        ProxoolFacade.updateConnectionPool("proxool." + alias + ":blah:foo", null);
+        try {
+            ProxoolFacade.updateConnectionPool("proxool." + alias + ":blah:foo", null);
+        } catch (ProxoolException e) {
+            LOG.debug("Ignoring expected exception when trying to register a pool with a bogus driver", e);
+        }
         srm.setExpectedUpState(StateListenerIF.STATE_DOWN);
         assertEquals("Timeout waiting for DOWN", ResultMonitor.SUCCESS, srm.getResult());
 
@@ -156,6 +160,9 @@ public class StateListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.13  2005/05/04 16:03:23  billhorsman
+ Now catches ProxoolException when pool is updated with bogus driver.
+
  Revision 1.12  2004/06/02 21:05:19  billhorsman
  Don't log worrying stack traces for expected exceptions.
 
