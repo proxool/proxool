@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.81 $, $Date: 2004/09/29 15:43:25 $
+ * @version $Revision: 1.82 $, $Date: 2005/05/04 16:32:31 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -532,8 +532,14 @@ public class ProxoolFacade {
     public static void redefineConnectionPool(String url, Properties info) throws ProxoolException {
         String alias = getAlias(url);
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
-        ConnectionPoolDefinition cpd = cp.getDefinition();
-        cpd.redefine(url, info);
+        try {
+            // Clone the old one
+            ConnectionPoolDefinition cpd = (ConnectionPoolDefinition) cp.getDefinition().clone();
+            cpd.redefine(url, info);
+            cp.setDefinition(cpd);
+        } catch (CloneNotSupportedException e) {
+            throw new ProxoolException("Funny, why couldn't we clone a definition?", e);
+        }
     }
 
 
@@ -548,8 +554,14 @@ public class ProxoolFacade {
     public static void updateConnectionPool(String url, Properties info) throws ProxoolException {
         String alias = getAlias(url);
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
-        ConnectionPoolDefinition cpd = cp.getDefinition();
-        cpd.update(url, info);
+        try {
+            // Clone the old one
+            ConnectionPoolDefinition cpd = (ConnectionPoolDefinition) cp.getDefinition().clone();
+            cpd.update(url, info);
+            cp.setDefinition(cpd);
+        } catch (CloneNotSupportedException e) {
+            throw new ProxoolException("Funny, why couldn't we clone a definition?", e);
+        }
     }
 
     protected void finalize() throws Throwable {
@@ -805,6 +817,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.82  2005/05/04 16:32:31  billhorsman
+ Clone the definition when redefining or updating the pool.
+
  Revision 1.81  2004/09/29 15:43:25  billhorsman
  Recheck isPoolExists inside synchronized registerConnectionPool method. Credit Juergen Hoeller.
 
