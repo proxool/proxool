@@ -14,7 +14,7 @@ import java.sql.Statement;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
 
- * @version $Revision: 1.4 $, $Date: 2003/03/10 15:26:49 $
+ * @version $Revision: 1.5 $, $Date: 2005/05/04 16:24:13 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -123,12 +123,16 @@ public interface ProxyConnectionIF extends ConnectionInfoIF {
      */
     boolean isReallyClosed() throws SQLException;
 
+    ConnectionPoolDefinitionIF getDefinition();
 }
 
 
 /*
  Revision history:
  $Log: ProxyConnectionIF.java,v $
+ Revision 1.5  2005/05/04 16:24:13  billhorsman
+ include a reference to the definition so we can spot it changing.
+
  Revision 1.4  2003/03/10 15:26:49  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

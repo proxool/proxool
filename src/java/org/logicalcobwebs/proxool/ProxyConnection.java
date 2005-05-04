@@ -20,7 +20,7 @@ import java.text.DecimalFormat;
 /**
  * Manages a connection. This is wrapped up inside a...
  *
- * @version $Revision: 1.33 $, $Date: 2004/03/26 20:00:37 $
+ * @version $Revision: 1.34 $, $Date: 2005/05/04 16:24:13 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.10
@@ -53,6 +53,8 @@ public class ProxyConnection implements ProxyConnectionIF {
 
     private ConnectionPool connectionPool;
 
+    private ConnectionPoolDefinitionIF definition;
+
     private String requester;
 
     private Set openStatements = new HashSet();
@@ -64,11 +66,23 @@ public class ProxyConnection implements ProxyConnectionIF {
      */
     private boolean needToReset = false;
 
-    protected ProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool, int status) throws SQLException {
+    /**
+     *
+     * @param connection the real connection that is used
+     * @param id unique ID
+     * @param delegateUrl
+     * @param connectionPool the pool it is a member of
+     * @param definition the definition that was used to build it (could possibly be different from
+     * the one held in the connectionPool)
+     * @param status {@link #STATUS_ACTIVE}, {@link #STATUS_AVAILABLE}, {@link #STATUS_FORCE}, {@link #STATUS_NULL}, or {@link #STATUS_OFFLINE}
+     * @throws SQLException
+     */
+    protected ProxyConnection(Connection connection, long id, String delegateUrl, ConnectionPool connectionPool, ConnectionPoolDefinitionIF definition, int status) throws SQLException {
         this.connection = connection;
         this.delegateUrl = delegateUrl;
         setId(id);
         this.connectionPool = connectionPool;
+        this.definition = definition;
         setBirthTime(System.currentTimeMillis());
 
         this.status = status;
@@ -127,11 +141,19 @@ public class ProxyConnection implements ProxyConnectionIF {
     }
 
     /**
-     * The ConnectionPool that was used to create this connection
+     * The ConnectionPool that this connection belongs to
      * @return connectionPool
      */
     protected ConnectionPool getConnectionPool() {
         return connectionPool;
+    }
+
+    /**
+     * Get the definition that was used to create this connection
+     * @return definition
+     */
+    public ConnectionPoolDefinitionIF getDefinition() {
+        return definition;
     }
 
     /**
