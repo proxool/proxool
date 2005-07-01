@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 /**
  * Will wrap up exceptions in another exception which can be defined at runtime.
- * @version $Revision: 1.3 $, $Date: 2003/09/30 18:39:08 $
+ * @version $Revision: 1.4 $, $Date: 2005/07/01 08:02:50 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -114,7 +114,7 @@ class FatalSqlExceptionHelper {
         boolean fatalSqlExceptionDetected = false;
         Iterator i = cpd.getFatalSqlExceptions().iterator();
         while (i.hasNext()) {
-            if (t.getMessage().indexOf((String) i.next()) > -1) {
+            if (t.getMessage() != null && t.getMessage().indexOf((String) i.next()) > -1) {
                 // This SQL exception indicates a fatal problem with this connection.
                 fatalSqlExceptionDetected = true;
             }
@@ -197,6 +197,9 @@ class FatalSqlExceptionHelper {
 /*
  Revision history:
  $Log: FatalSqlExceptionHelper.java,v $
+ Revision 1.4  2005/07/01 08:02:50  billhorsman
+ Check for exception message being null
+
  Revision 1.3  2003/09/30 18:39:08  billhorsman
  New test-before-use, test-after-use and fatal-sql-exception-wrapper-class properties.
 
