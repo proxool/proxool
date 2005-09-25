@@ -9,14 +9,16 @@ import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
 
 import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Properties;
 
 /**
  * Test that we can update the definition of a pool
  *
- * @version $Revision: 1.7 $, $Date: 2004/05/26 17:19:10 $
+ * @version $Revision: 1.8 $, $Date: 2005/09/25 21:48:09 $
  * @author bill
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class UpdateDefinitionTest extends AbstractProxoolTest {
@@ -106,6 +108,49 @@ public class UpdateDefinitionTest extends AbstractProxoolTest {
     }
 
     /**
+     * If we request a connection using exactly the same URL and properties check that it doesn't trigger an update
+     * which forces the pool to be restarted (all existing connections destroyed).
+     */
+    public void testDefinitionNotChanging() throws SQLException, ProxoolException {
+
+        String testName = "definitionNotChanging";
+        String alias = testName;
+
+
+        Connection c1 = null;
+        try {
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
+            c1 = DriverManager.getConnection(url, info);
+            assertEquals("id=1", 1L, ProxoolFacade.getId(c1));
+        } finally {
+            c1.close();
+        }
+        // The second attempt (using the same definition) should give back the same connection ID
+        Connection c2 = null;
+        try {
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+            info.setProperty(ProxoolConstants.MAXIMUM_CONNECTION_COUNT_PROPERTY, "1");
+            c2 = DriverManager.getConnection(url, info);
+            assertEquals("id=1", 1L, ProxoolFacade.getId(c2));
+        } finally {
+            c2.close();
+        }
+        // Not the same object. It's wrapped.
+        assertNotSame("c1!=c2", c1, c2);
+    }
+
+    /**
      * Can we update a pool definition by calling updateConnectionPool?
      */
     public void testUpdateUsingAPI() throws Exception, ClassNotFoundException {
@@ -150,6 +195,9 @@ public class UpdateDefinitionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: UpdateDefinitionTest.java,v $
+ Revision 1.8  2005/09/25 21:48:09  billhorsman
+ New test to check that asking for a connection using the same URL and properties doesn't redefine the pool.
+
  Revision 1.7  2004/05/26 17:19:10  brenuart
  Allow JUnit tests to be executed against another database.
  By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
