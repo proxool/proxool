@@ -51,7 +51,7 @@ import java.util.Properties;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.9 $, $Date: 2005/09/26 13:31:14 $
+ * @version $Revision: 1.10 $, $Date: 2005/09/26 21:47:46 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -580,8 +580,8 @@ public class AdminServlet extends HttpServlet {
                     "div.version {font-weight: bold; font-size: 100%; margin-bottom: 8px;}\n" +
                     "h1 {font-weight: bold; font-size: 100%}\n" +
                     "table.data {font-size: 90%; border-collapse: collapsed; border: 1px solid black;}\n" +
-                    "table.data th {background: #bddeff; width: 200px; text-align: left; padding-right: 8px; font-weight: normal;}\n" +
-                    "table.data td {background: #ffffff; vertical-align: top;}\n" +
+                    "table.data th {background: #bddeff; width: 20em; text-align: left; padding-right: 8px; font-weight: normal;}\n" +
+                    "table.data td {background: #ffffff; vertical-align: top; padding: 0px 2px 0px 2px;}\n" +
                     "td.null {background: yellow;}\n" +
                     "td.available {font-color: black;}\n" +
                     "td.active {font-color: red;}\n" +
@@ -675,6 +675,9 @@ public class AdminServlet extends HttpServlet {
 /*
  Revision history:
  $Log: AdminServlet.java,v $
+ Revision 1.10  2005/09/26 21:47:46  billhorsman
+ no message
+
  Revision 1.9  2005/09/26 13:31:14  billhorsman
  Smartened up AdminServlet
 
