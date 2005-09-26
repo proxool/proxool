@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.82 $, $Date: 2005/05/04 16:32:31 $
+ * @version $Revision: 1.83 $, $Date: 2005/09/26 09:54:14 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -694,14 +694,18 @@ public class ProxoolFacade {
 
         if (detail) {
             try {
-                cp.acquireConnectionStatusReadLock();
-                LOG.debug("Starting snapshot");
-                snapshot = Admin.getSnapshot(cp, cp.getDefinition(), cp.getConnectionInfos());
-                LOG.debug("Finishing snapshot");
+                // Only try for 10 seconds!
+                long start = System.currentTimeMillis();
+                if (cp.attemptConnectionStatusReadLock(10000)) {
+                    snapshot = Admin.getSnapshot(cp, cp.getDefinition(), cp.getConnectionInfos());
+                } else {
+                    LOG.warn("Give up waiting for detailed snapshot after " + (System.currentTimeMillis() - start) + " milliseconds. Serving standard snapshot instead.");
+                }
             } finally {
                 cp.releaseConnectionStatusReadLock();
             }
-        } else {
+        }
+        if (snapshot == null) {
             snapshot = Admin.getSnapshot(cp, cp.getDefinition(), null);
         }
 
@@ -817,6 +821,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.83  2005/09/26 09:54:14  billhorsman
+ Avoid suspected deadlock when getting a detailed snapshot. Only attempt to get the concurrent lock for 10 seconds before giving up.
+
  Revision 1.82  2005/05/04 16:32:31  billhorsman
  Clone the definition when redefining or updating the pool.
 

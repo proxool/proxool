@@ -25,7 +25,7 @@ import org.logicalcobwebs.proxool.util.FastArrayList;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.79 $, $Date: 2005/05/04 16:26:31 $
+ * @version $Revision: 1.80 $, $Date: 2005/09/26 09:54:14 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -849,6 +849,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             ci.setDelegateUrl(connectionInfo.getDelegateUrl());
             ci.setProxyHashcode(connectionInfo.getProxyHashcode());
             ci.setDelegateHashcode(connectionInfo.getDelegateHashcode());
+            ci.setLastSqlCall(connectionInfo.getLastSqlCall());
             cis.add(ci);
         }
         return cis;
@@ -1084,11 +1085,18 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     protected void acquireConnectionStatusReadLock() {
         try {
-//            LOG.debug("About to acquire connectionStatus read lock");
             connectionStatusReadWriteLock.readLock().acquire();
-//            LOG.debug("Acquired connectionStatus read lock");
         } catch (InterruptedException e) {
             log.error("Couldn't acquire connectionStatus read lock", e);
+        }
+    }
+
+    protected boolean attemptConnectionStatusReadLock(long msecs) {
+        try {
+            return connectionStatusReadWriteLock.readLock().attempt(msecs);
+        } catch (InterruptedException e) {
+            log.error("Couldn't acquire connectionStatus read lock", e);
+            return false;
         }
     }
 
@@ -1105,6 +1113,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.80  2005/09/26 09:54:14  billhorsman
+ Avoid suspected deadlock when getting a detailed snapshot. Only attempt to get the concurrent lock for 10 seconds before giving up.
+
  Revision 1.79  2005/05/04 16:26:31  billhorsman
  Only add a new connection if the definition matches
 
