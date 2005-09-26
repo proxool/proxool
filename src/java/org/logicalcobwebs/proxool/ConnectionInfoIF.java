@@ -22,7 +22,7 @@ import java.util.Date;
  * }
  * </pre>
  *
- * @version $Revision: 1.10 $, $Date: 2003/10/30 00:05:50 $
+ * @version $Revision: 1.11 $, $Date: 2005/09/26 10:01:31 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -146,11 +146,21 @@ public interface ConnectionInfoIF extends Comparable {
      */
     String getDelegateUrl();
 
+    /**
+     * A log of the last SQL used on this connection. Only populated
+     * if {@link org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF#isTrace()}
+     * is enabled.
+     * @return the most recent SQL to be used
+     */
+    String getLastSqlCall();
 }
 
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.11  2005/09/26 10:01:31  billhorsman
+ Added lastSqlCall when trace is on.
+
  Revision 1.10  2003/10/30 00:05:50  billhorsman
  now implements Comparable (using ID)
 

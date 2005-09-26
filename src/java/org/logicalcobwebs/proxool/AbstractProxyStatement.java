@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
- * @version $Revision: 1.18 $, $Date: 2004/06/02 20:04:54 $
+ * @version $Revision: 1.19 $, $Date: 2005/09/26 10:01:31 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -182,6 +182,7 @@ abstract class AbstractProxyStatement {
             }
             // Send to any listener
             connectionPool.onExecute(sqlLog.toString(), (System.currentTimeMillis() - startTime), exception);
+            ((ProxyConnection) proxyConnection).setLastSqlCall(sqlLog.toString());
         }
 
         // Clear parameters for next time
@@ -265,6 +266,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.19  2005/09/26 10:01:31  billhorsman
+ Added lastSqlCall when trace is on.
+
  Revision 1.18  2004/06/02 20:04:54  billhorsman
  Fixed sql log: boolean and date now supported, and last parameter is included
 

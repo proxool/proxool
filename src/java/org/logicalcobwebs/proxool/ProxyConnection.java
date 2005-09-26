@@ -20,7 +20,7 @@ import java.text.DecimalFormat;
 /**
  * Manages a connection. This is wrapped up inside a...
  *
- * @version $Revision: 1.34 $, $Date: 2005/05/04 16:24:13 $
+ * @version $Revision: 1.35 $, $Date: 2005/09/26 10:01:31 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.10
@@ -61,6 +61,7 @@ public class ProxyConnection implements ProxyConnectionIF {
 
     private DecimalFormat idFormat = new DecimalFormat("0000");
 
+    private String lastSqlCall;
     /**
      * Whether we have invoked a method that requires us to reset
      */
@@ -467,4 +468,11 @@ public class ProxyConnection implements ProxyConnectionIF {
         return new Long(((ConnectionInfoIF) o).getId()).compareTo(new Long(getId()));
     }
 
+    public String getLastSqlCall() {
+        return lastSqlCall;
+    }
+
+    public void setLastSqlCall(String lastSqlCall) {
+        this.lastSqlCall = lastSqlCall;
+    }
 }

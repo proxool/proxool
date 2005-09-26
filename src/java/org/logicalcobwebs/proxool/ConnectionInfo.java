@@ -11,7 +11,7 @@ import java.util.Date;
  * Implementation of ConnectionInfoIF. Unlike ConnectionPool it is
  * frozen and will not change. Used with a {@link org.logicalcobwebs.proxool.admin.SnapshotIF snapshot}
  *
- * @version $Revision: 1.6 $, $Date: 2003/10/30 00:05:50 $
+ * @version $Revision: 1.7 $, $Date: 2005/09/26 10:01:31 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -42,6 +42,7 @@ class ConnectionInfo implements ConnectionInfoIF {
 
     private String delegateHashcode;
 
+    private String lastSqlCall;
 
     public Date getBirthDate() {
         return birthDate;
@@ -152,12 +153,23 @@ class ConnectionInfo implements ConnectionInfoIF {
     public int compareTo(Object o) {
         return new Long(((ConnectionInfoIF) o).getId()).compareTo(new Long(getId()));
     }
+
+    public String getLastSqlCall() {
+        return lastSqlCall;
+    }
+
+    public void setLastSqlCall(String lastSqlCall) {
+        this.lastSqlCall = lastSqlCall;
+    }
 }
 
 
 /*
  Revision history:
  $Log: ConnectionInfo.java,v $
+ Revision 1.7  2005/09/26 10:01:31  billhorsman
+ Added lastSqlCall when trace is on.
+
  Revision 1.6  2003/10/30 00:05:50  billhorsman
  now implements Comparable (using ID)
 
