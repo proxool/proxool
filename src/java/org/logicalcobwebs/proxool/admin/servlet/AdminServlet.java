@@ -30,7 +30,7 @@ import java.util.Properties;
  * Use this to admin each pool within Proxool. It acts like a normal
  * servlet., so just configure it within your web app as you see fit.
  * For example, within web.xml:
- *
+ * <p/>
  * <pre>
  *   &lt;servlet&gt;
  *       &lt;servlet-name&gt;Admin&lt;/servlet-name&gt;
@@ -44,16 +44,16 @@ import java.util.Properties;
  *            &lt;param-value&gt;/my_path/my.css&lt;/param-value&gt;
  *        &lt;/init-param&gt;
  *   &lt;/servlet&gt;
- *
+ * <p/>
  *   &lt;servlet-mapping&gt;
  *       &lt;servlet-name&gt;Admin&lt;/servlet-name&gt;
  *       &lt;url-pattern&gt;/admin&lt;/url-pattern&gt;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
- * @version $Revision: 1.10 $, $Date: 2005/09/26 21:47:46 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
+ * @version $Revision: 1.11 $, $Date: 2005/10/02 09:45:49 $
  * @since Proxool 0.7
  */
 public class AdminServlet extends HttpServlet {
@@ -104,6 +104,7 @@ public class AdminServlet extends HttpServlet {
 
     /**
      * HH:mm:ss
+     *
      * @see #formatMilliseconds
      */
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
@@ -167,7 +168,6 @@ public class AdminServlet extends HttpServlet {
         // If we are showing the snapshot, are we drilling down into a connection?
         String snapshotConnectionId = request.getParameter(CONNECTION_ID);
 
-
         try {
             if (output.equals(OUTPUT_FULL)) {
                 response.setContentType("text/html");
@@ -188,8 +188,8 @@ public class AdminServlet extends HttpServlet {
                 if (tab.equals(TAB_DEFINITION)) {
                     doDefinition(response.getOutputStream(), def);
                 } else if (tab.equals(TAB_SNAPSHOT)) {
-                    doSnapshot(response.getOutputStream(), alias, link, snapshotDetail, snapshotConnectionId);
-                } else if (tab.equals(TAB_STATISTICS)){
+                    doSnapshot(response.getOutputStream(), def, link, snapshotDetail, snapshotConnectionId);
+                } else if (tab.equals(TAB_STATISTICS)) {
                     doStatistics(response.getOutputStream(), statisticsArray, def);
                 } else {
                     throw new ServletException("Unrecognised tab '" + tab + "'");
@@ -202,7 +202,6 @@ public class AdminServlet extends HttpServlet {
         if (output.equals(OUTPUT_FULL)) {
             closeHtml(response.getOutputStream());
         }
-
 
     }
 
@@ -218,13 +217,14 @@ public class AdminServlet extends HttpServlet {
         out.println("</ul>");
     }
 
-
     private void doStatistics(ServletOutputStream out, StatisticsIF[] statisticsArray, ConnectionPoolDefinitionIF cpd) throws IOException {
 
         for (int i = 0; i < statisticsArray.length; i++) {
             StatisticsIF statistics = statisticsArray[i];
 
             openDataTable(out);
+
+            printDefinitionEntry(out, ProxoolConstants.ALIAS, cpd.getAlias(), CORE_PROPERTY);
 
             // Period
             printDefinitionEntry(out, "Period", TIME_FORMAT.format(statistics.getStartDate()) + " to " + TIME_FORMAT.format(statistics.getStopDate()), STATISTIC);
@@ -332,13 +332,15 @@ public class AdminServlet extends HttpServlet {
 
     }
 
-    private void doSnapshot(ServletOutputStream out, String alias, String link, String level, String connectionId) throws IOException, ProxoolException {
+    private void doSnapshot(ServletOutputStream out, ConnectionPoolDefinitionIF cpd, String link, String level, String connectionId) throws IOException, ProxoolException {
         boolean detail = (level != null && level.equals(DETAIL_MORE));
-        SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, detail);
+        SnapshotIF snapshot = ProxoolFacade.getSnapshot(cpd.getAlias(), detail);
 
         if (snapshot != null) {
 
             openDataTable(out);
+
+            printDefinitionEntry(out, ProxoolConstants.ALIAS, cpd.getAlias(), CORE_PROPERTY);
 
             // dateStarted
             printDefinitionEntry(out, "Start date", DATE_FORMAT.format(snapshot.getDateStarted()), SNAPSHOT);
@@ -360,7 +362,7 @@ public class AdminServlet extends HttpServlet {
             connectionsBuffer.append(" (max)<br/>");
             String[] colours = {"ff9999", "66cc66", "cccccc"};
             int[] lengths = {snapshot.getActiveConnectionCount(), snapshot.getAvailableConnectionCount(),
-                             snapshot.getMaximumConnectionCount() - snapshot.getActiveConnectionCount() - snapshot.getAvailableConnectionCount()};
+                    snapshot.getMaximumConnectionCount() - snapshot.getActiveConnectionCount() - snapshot.getAvailableConnectionCount()};
             drawBarChart(connectionsBuffer, colours, lengths);
             printDefinitionEntry(out, "Connections", connectionsBuffer.toString(), SNAPSHOT);
 
@@ -373,7 +375,7 @@ public class AdminServlet extends HttpServlet {
             if (!detail) {
                 out.println("    <tr>");
                 out.print("        <td colspan=\"2\" align=\"right\"><form action=\"" + link + "\" method=\"GET\">");
-                out.print("<input type=\"hidden\" name=\"" + ALIAS + "\" value=\"" + alias + "\">");
+                out.print("<input type=\"hidden\" name=\"" + ALIAS + "\" value=\"" + cpd.getAlias() + "\">");
                 out.print("<input type=\"hidden\" name=\"" + TAB + "\" value=\"" + TAB_SNAPSHOT + "\">");
                 out.print("<input type=\"hidden\" name=\"" + DETAIL + "\" value=\"" + DETAIL_MORE + "\">");
                 out.print("<input type=\"submit\" value=\"More information&gt;\">");
@@ -387,7 +389,7 @@ public class AdminServlet extends HttpServlet {
                 out.println("</th>");
                 out.print("      <td>");
 
-                doSnapshotDetails(out, alias, snapshot, link, connectionId);
+                doSnapshotDetails(out, cpd, snapshot, link, connectionId);
 
                 out.println("</td>");
                 out.println("    </tr>");
@@ -412,7 +414,7 @@ public class AdminServlet extends HttpServlet {
 
                 out.println("    <tr>");
                 out.print("        <td colspan=\"2\" align=\"right\"><form action=\"" + link + "\" method=\"GET\">");
-                out.print("<input type=\"hidden\" name=\"" + ALIAS + "\" value=\"" + alias + "\">");
+                out.print("<input type=\"hidden\" name=\"" + ALIAS + "\" value=\"" + cpd.getAlias() + "\">");
                 out.print("<input type=\"hidden\" name=\"" + TAB + "\" value=\"" + TAB_SNAPSHOT + "\">");
                 out.print("<input type=\"hidden\" name=\"" + DETAIL + "\" value=\"" + DETAIL_LESS + "\">");
                 out.print("<input type=\"submit\" value=\"&lt; Less information\">");
@@ -424,7 +426,7 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-    private void doSnapshotDetails(ServletOutputStream out, String alias, SnapshotIF snapshot, String link, String connectionId) throws IOException {
+    private void doSnapshotDetails(ServletOutputStream out, ConnectionPoolDefinitionIF cpd, SnapshotIF snapshot, String link, String connectionId) throws IOException {
 
         long drillDownConnectionId = 0;
         if (connectionId != null) {
@@ -473,7 +475,7 @@ public class AdminServlet extends HttpServlet {
                         out.print("?");
                         out.print(ALIAS);
                         out.print("=");
-                        out.print(alias);
+                        out.print(cpd.getAlias());
                         out.print("&");
                         out.print(TAB);
                         out.print("=");
@@ -572,29 +574,31 @@ public class AdminServlet extends HttpServlet {
 
     private void openHtml(ServletOutputStream out) throws IOException {
         out.println("<html><header><title>Proxool Admin</title>");
+        out.println("<style media=\"screen\">");
+        out.println("body {background-color: #93bde6;}\n" +
+                "div.version {font-weight: bold; font-size: 100%; margin-bottom: 8px;}\n" +
+                "h1 {font-weight: bold; font-size: 100%}\n" +
+                "option {padding: 2px 24px 2px 4px;}\n" +
+                "input {margin: 0px 0px 4px 12px;}\n" +
+                "table.data {font-size: 90%; border-collapse: collapse; border: 1px solid black;}\n" +
+                "table.data th {background: #bddeff; width: 25em; text-align: left; padding-right: 8px; font-weight: normal; border: 1px solid black;}\n" +
+                "table.data td {background: #ffffff; vertical-align: top; padding: 0px 2px 0px 2px; border: 1px solid black;}\n" +
+                "td.null {background: yellow;}\n" +
+                "td.available {color: black;}\n" +
+                "td.active {color: red;}\n" +
+                "td.offline {color: blue;}\n" +
+                "div.drill-down {}\n" +
+                "ul {list-style: none; padding: 0px; margin: 0px; position: relative; font-size: 90%;}\n" +
+                "li {padding: 0px; margin: 0px 4px 0px 0px; display: inline; border: 1px solid black; border-width: 1px 1px 0px 1px;}\n" +
+                "li.active {background: #bddeff;}\n" +
+                "li.inactive {background: #eeeeee;}\n" +
+                "li.disabled {background: #dddddd; color: #999999; padding: 0px 4px 0px 4px;}\n" +
+                "a.quiet {color: black; text-decoration: none; padding: 0px 4px 0px 4px; }\n" +
+                "a.quiet:hover {background: white;}\n");
+        out.println("</style>");
+        // If we have configured a cssFile then that will override what we have above
         if (cssFile != null) {
-            out.println("<script type=\"text/css\" src=\"" + cssFile + "\"></script>");
-        } else {
-            out.println("<style>");
-            out.println("body {background-color: #93bde6;}\n" +
-                    "div.version {font-weight: bold; font-size: 100%; margin-bottom: 8px;}\n" +
-                    "h1 {font-weight: bold; font-size: 100%}\n" +
-                    "table.data {font-size: 90%; border-collapse: collapsed; border: 1px solid black;}\n" +
-                    "table.data th {background: #bddeff; width: 20em; text-align: left; padding-right: 8px; font-weight: normal;}\n" +
-                    "table.data td {background: #ffffff; vertical-align: top; padding: 0px 2px 0px 2px;}\n" +
-                    "td.null {background: yellow;}\n" +
-                    "td.available {font-color: black;}\n" +
-                    "td.active {font-color: red;}\n" +
-                    "td.offline {font-color: blue;}\n" +
-                    "div.drill-down {}\n" +
-                    "ul {list-style: none; padding: 0px; margin: 0px; position: relative;}\n" +
-                    "li {padding: 0px; margin: 0px 4px 0px 0px; display: inline; border: 1px solid black; border-width: 1px 1px 0px 1px;}\n" +
-                    "li.active {background: #bddeff;}\n" +
-                    "li.inactive {background: #eeeeee;}\n" +
-                    "li.disabled {background: #dddddd; color: #999999; padding: 0px 4px 0px 4px;}\n" +
-                    "a.quiet {color: black; text-decoration: none; padding: 0px 4px 0px 4px; }\n" +
-                    "a.quiet:hover {background: white;}\n");
-            out.println("</style>");
+            out.println("<link rel=\"stylesheet\" media=\"screen\" type=\"text/css\" href=\"" + cssFile + "\"></script>");
         }
         out.println("</header><body>");
     }
@@ -613,7 +617,6 @@ public class AdminServlet extends HttpServlet {
         out.println("</table>");
         out.println("<br/>");
     }
-
 
     private void printDefinitionEntry(ServletOutputStream out, String name, String value, String type) throws IOException {
         out.println("    <tr>");
@@ -659,6 +662,7 @@ public class AdminServlet extends HttpServlet {
 
     /**
      * Express time in an easy to read HH:mm:ss format
+     *
      * @param time in milliseconds
      * @return time (e.g. 180000 = 00:30:00)
      * @see #TIME_FORMAT
@@ -671,75 +675,77 @@ public class AdminServlet extends HttpServlet {
     }
 }
 
-
 /*
- Revision history:
- $Log: AdminServlet.java,v $
- Revision 1.10  2005/09/26 21:47:46  billhorsman
- no message
+Revision history:
+$Log: AdminServlet.java,v $
+Revision 1.11  2005/10/02 09:45:49  billhorsman
+Layout
 
- Revision 1.9  2005/09/26 13:31:14  billhorsman
- Smartened up AdminServlet
+Revision 1.10  2005/09/26 21:47:46  billhorsman
+no message
 
- Revision 1.8  2003/09/29 17:49:19  billhorsman
- Includes new fatal-sql-exception-wrapper-class in display
+Revision 1.9  2005/09/26 13:31:14  billhorsman
+Smartened up AdminServlet
 
- Revision 1.7  2003/08/06 20:08:58  billhorsman
- fix timezone display of time (for millisecond based properties)
+Revision 1.8  2003/09/29 17:49:19  billhorsman
+Includes new fatal-sql-exception-wrapper-class in display
 
- Revision 1.6  2003/03/10 23:43:14  billhorsman
- reapplied checkstyle that i'd inadvertently let
- IntelliJ change...
+Revision 1.7  2003/08/06 20:08:58  billhorsman
+fix timezone display of time (for millisecond based properties)
 
- Revision 1.5  2003/03/10 15:26:51  billhorsman
- refactoringn of concurrency stuff (and some import
- optimisation)
+Revision 1.6  2003/03/10 23:43:14  billhorsman
+reapplied checkstyle that i'd inadvertently let
+IntelliJ change...
 
- Revision 1.4  2003/03/03 11:12:00  billhorsman
- fixed licence
+Revision 1.5  2003/03/10 15:26:51  billhorsman
+refactoringn of concurrency stuff (and some import
+optimisation)
 
- Revision 1.3  2003/02/26 16:59:18  billhorsman
- fixed spelling error in method name
+Revision 1.4  2003/03/03 11:12:00  billhorsman
+fixed licence
 
- Revision 1.2  2003/02/26 16:51:12  billhorsman
- fixed units for average active time. now displays
- properly in seconds
+Revision 1.3  2003/02/26 16:59:18  billhorsman
+fixed spelling error in method name
 
- Revision 1.1  2003/02/24 10:19:44  billhorsman
- moved AdminServlet into servlet package
+Revision 1.2  2003/02/26 16:51:12  billhorsman
+fixed units for average active time. now displays
+properly in seconds
 
- Revision 1.1  2003/02/19 23:36:51  billhorsman
- renamed monitor package to admin
+Revision 1.1  2003/02/24 10:19:44  billhorsman
+moved AdminServlet into servlet package
 
- Revision 1.10  2003/02/12 12:28:27  billhorsman
- added url, proxyHashcode and delegateHashcode to
- ConnectionInfoIF
+Revision 1.1  2003/02/19 23:36:51  billhorsman
+renamed monitor package to admin
 
- Revision 1.9  2003/02/11 00:30:28  billhorsman
- add version
+Revision 1.10  2003/02/12 12:28:27  billhorsman
+added url, proxyHashcode and delegateHashcode to
+ConnectionInfoIF
 
- Revision 1.8  2003/02/06 17:41:05  billhorsman
- now uses imported logging
+Revision 1.9  2003/02/11 00:30:28  billhorsman
+add version
 
- Revision 1.7  2003/02/06 15:42:21  billhorsman
- display changes
+Revision 1.8  2003/02/06 17:41:05  billhorsman
+now uses imported logging
 
- Revision 1.6  2003/02/05 17:04:02  billhorsman
- fixed date format
+Revision 1.7  2003/02/06 15:42:21  billhorsman
+display changes
 
- Revision 1.5  2003/02/05 15:06:16  billhorsman
- removed dependency on JDK1.4 imaging.
+Revision 1.6  2003/02/05 17:04:02  billhorsman
+fixed date format
 
- Revision 1.4  2003/01/31 16:53:21  billhorsman
- checkstyle
+Revision 1.5  2003/02/05 15:06:16  billhorsman
+removed dependency on JDK1.4 imaging.
 
- Revision 1.3  2003/01/31 16:38:52  billhorsman
- doc (and removing public modifier for classes where possible)
+Revision 1.4  2003/01/31 16:53:21  billhorsman
+checkstyle
 
- Revision 1.2  2003/01/31 11:35:57  billhorsman
- improvements to servlet (including connection details)
+Revision 1.3  2003/01/31 16:38:52  billhorsman
+doc (and removing public modifier for classes where possible)
 
- Revision 1.1  2003/01/31 00:38:22  billhorsman
- *** empty log message ***
+Revision 1.2  2003/01/31 11:35:57  billhorsman
+improvements to servlet (including connection details)
 
- */
+Revision 1.1  2003/01/31 00:38:22  billhorsman
+*** empty log message ***
+
+*/
