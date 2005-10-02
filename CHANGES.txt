@@ -1,17 +1,21 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.37 $
-$Date: 2004/06/17 21:59:07 $
+$Revision: 1.38 $
+$Date: 2005/10/02 15:01:04 $
 $Author: billhorsman $
 
 0.9.0 
 
-- New DataSource implementation. TODO more
+- New DataSource implementation. This has been tested with Tomcat 5.5. DataSource configuration
+  is so specific to the container that it is safer to only state where it has been tested. We
+  have no reason to suspect that it would not work in other containers.
 
 - All connections are now wrapped in disposable wrappers. This means that once you have closed
   a connection (thereby returning it to the pool) you can no longer do anything to it that
-  might influence its behaviour for the next client that picks it up.
+  might influence its behaviour for the next client that picks it up. It also means that if
+  a connection is closed automatically by Proxool then the client gets an exception if it tries
+  to do anything other than call close() or isClosed().
 
 - Connections, Statements, PreparedStatements, and CallableStatements now implement
   all the public intefaces that the delegate connection does. This means that you can,
@@ -39,6 +43,13 @@ $Author: billhorsman $
 - ProxoolDriver no longer logs all SQLExceptions. It's up to the client to log exceptions as it
   sees fit. (With some changes to the tests, this means that we no longer get any stack traces
   output during testing when we encounter *expected* errors).
+
+- AdminServlet has been updated. Nicer layout. Separate tabs for definition, snapshot and statistics.
+  Uses a list box for aliases in case there are a lot.
+
+- When you ask for a detailed snapshot (see ProxoolFacade.getSnapshot()) then it only attempts to
+  get one for 10 seconds before giving up. A detailed snapshot needs to get a lock on the pool
+  concerned and if the pool is really busy that might take a while. Belt and braces really.
 
 0.8.3 - 14 December 2003
 
