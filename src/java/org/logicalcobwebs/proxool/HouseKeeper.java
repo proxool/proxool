@@ -14,7 +14,7 @@ import java.sql.Statement;
 /**
  * Responisble for house keeping one pool
  *
- * @version $Revision: 1.3 $, $Date: 2003/09/11 23:57:48 $
+ * @version $Revision: 1.4 $, $Date: 2005/10/02 12:35:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -138,10 +138,17 @@ class HouseKeeper {
                        // going to kill it :)
                        connectionPool.removeProxyConnection(proxyConnection,
                                "it has been active for too long", ConnectionPool.FORCE_EXPIRY, true);
-
+                       String lastSqlCallMsg;
+                       if (proxyConnection.getLastSqlCall() != null) {
+                           lastSqlCallMsg = ", and the last SQL it performed is '" + proxyConnection.getLastSqlCall() + "'.";
+                       } else if (!proxyConnection.getDefinition().isTrace()) {
+                           lastSqlCallMsg = ", but the last SQL it performed is unknown because the trace property is not enabled.";
+                       } else {
+                           lastSqlCallMsg = ", but the last SQL it performed is unknown.";
+                       }
                        log.warn("#" + FormatHelper.formatMediumNumber(proxyConnection.getId()) + " was active for " + activeTime
                                + " milliseconds and has been removed automaticaly. The Thread responsible was named '"
-                               + proxyConnection.getRequester() + "'.");
+                               + proxyConnection.getRequester() + "'" + lastSqlCallMsg);
 
                    }
 
@@ -252,6 +259,9 @@ class HouseKeeper {
 /*
  Revision history:
  $Log: HouseKeeper.java,v $
+ Revision 1.4  2005/10/02 12:35:06  billhorsman
+ Improve message when closing a connection that has been active for too long
+
  Revision 1.3  2003/09/11 23:57:48  billhorsman
  Test SQL now traps Throwable, not just SQLException.
 
