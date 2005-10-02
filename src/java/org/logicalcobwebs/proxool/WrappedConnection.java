@@ -20,7 +20,7 @@ import java.sql.Connection;
 
 /**
  * Wraps up a {@link ProxyConnection}. It is proxied as a {@link java.sql.Connection}
- * @version $Revision: 1.4 $, $Date: 2005/05/04 16:31:41 $
+ * @version $Revision: 1.5 $, $Date: 2005/10/02 12:32:58 $
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -53,6 +53,14 @@ public class WrappedConnection implements MethodInterceptor {
     private long id;
 
     private String alias;
+
+    /**
+     * This gets set if the close() method is explicitly called. The {@link #getProxyConnection() proxyConnection}
+     * could still be {@link org.logicalcobwebs.proxool.ProxyConnectionIF#isReallyClosed() really closed} without
+     * this wrapper knowing about it yet.
+     */
+    private boolean manuallyClosed;
+
     /**
      * Construct this wrapper around the proxy connection
      * @param proxyConnection to wrap
@@ -103,13 +111,30 @@ public class WrappedConnection implements MethodInterceptor {
             concreteMethod = InvokerFacade.getConcreteMethod(proxyConnection.getConnection().getClass(), method);
         }
         try {
+            if (proxyConnection != null && proxyConnection.isReallyClosed()) {
+                // The user is trying to do something to this connection and it's been closed.
+                if (concreteMethod.getName().equals(IS_CLOSED_METHOD)) {
+                    // That's cool. No problem checking as many times as you like.
+                } else if (concreteMethod.getName().equals(CLOSE_METHOD)) {
+                    // That's cool. You can call close as often as you like.
+                } else if (manuallyClosed) {
+                    // We've already manually closed this connection yet we trying to do something
+                    // to it that isn't another close(). That is bad client coding :)
+                    throw new SQLException("You can't perform any operations on a connection after you've called close()");
+                } else {
+                    // The connection has been closed automatically. The client probably wasn't expecting
+                    // that. Still, throw an exception so that they know it's all gone pear shaped.
+                    throw new SQLException("You can't perform any operations on this connection. It has been automatically closed by Proxool for some reason (see logs).");
+                }
+            }
             if (concreteMethod.getName().equals(CLOSE_METHOD)) {
                 // It's okay to close a connection twice. Only we ignore the
                 // second time.
-                if (proxyConnection != null) {
+                if (proxyConnection != null && !proxyConnection.isReallyClosed()) {
                     proxyConnection.close();
                     // Set it to null so that we can't do anything else to it.
                     proxyConnection = null;
+                    manuallyClosed = true;
                 }
             } else if (concreteMethod.getName().equals(EQUALS_METHOD) && argCount == 1) {
                 result = equals(args[0]) ? Boolean.TRUE : Boolean.FALSE;
@@ -179,7 +204,7 @@ public class WrappedConnection implements MethodInterceptor {
             }
             throw e.getTargetException();
         } catch (SQLException e) {
-            throw new SQLException("Couldn't perform the operation " + concreteMethod.getName());
+            throw new SQLException("Couldn't perform the operation " + concreteMethod.getName() + ": " + e.getMessage());
         } catch (Exception e) {
             LOG.error("Unexpected invocation exception", e);
             if (FatalSqlExceptionHelper.testException(proxyConnection.getDefinition(), e)) {
@@ -241,6 +266,9 @@ public class WrappedConnection implements MethodInterceptor {
 /*
  Revision history:
  $Log: WrappedConnection.java,v $
+ Revision 1.5  2005/10/02 12:32:58  billhorsman
+ Improve the trapping of operations after a wrapped connection is closed.
+
  Revision 1.4  2005/05/04 16:31:41  billhorsman
  Use the definition referenced by the proxy connection rather than the pool instead.
 
