@@ -7,6 +7,7 @@ package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.admin.SnapshotIF;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,7 +18,7 @@ import java.util.Properties;
 /**
  * Test the house keeper in ConnectionPool
  *
- * @version $Revision: 1.9 $, $Date: 2004/06/02 21:05:19 $
+ * @version $Revision: 1.10 $, $Date: 2005/10/02 12:30:59 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -46,13 +47,15 @@ public class HouseKeeperTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY, "1000");
+        info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.TRACE_PROPERTY, "true");
         info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
         ProxoolFacade.registerConnectionPool(url, info);
 
         assertEquals("Shouldn't be any active connections yet", 0, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
         final Connection connection = DriverManager.getConnection(url);
-        ;
+        connection.createStatement().executeQuery(TestConstants.HYPERSONIC_TEST_SQL);
         long start = System.currentTimeMillis();
 
         assertEquals("We just opened 1 connection", 1, ProxoolFacade.getSnapshot(alias, false).getServedCount());
@@ -70,8 +73,30 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 
         long elapsed = System.currentTimeMillis() - start;
         assertTrue("Connection has not been closed after " + elapsed + " milliseconds as expected", connection.isClosed());
-
         assertEquals("Expected the connection to be inactive", 0, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
+
+        try {
+            connection.createStatement().executeQuery(TestConstants.HYPERSONIC_TEST_SQL);
+            fail("Calling createStatement() on a closed connection should fail");
+        } catch (Exception e) {
+            // s'okay. We expected this
+            LOG.debug("Ignoring expected exception: " + e.getMessage());
+        }
+
+        // Now close the connection ourselves. It's already been closed by the House Keeper but nothing bad should
+        // happen if we do it again now.
+        connection.close();
+
+        // Let's see if the prototyper builds another one
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            LOG.debug("Awoken.");
+        }
+        SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, false);
+        assertEquals("activeConnectionCount", 0, snapshot.getActiveConnectionCount());
+        assertEquals("availableConnectionCount", 1, snapshot.getAvailableConnectionCount());
+        assertEquals("connectionCount", 1, snapshot.getConnectionCount());
 
     }
 
@@ -225,6 +250,9 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: HouseKeeperTest.java,v $
+ Revision 1.10  2005/10/02 12:30:59  billhorsman
+ Improved test by checking connectionCount
+
  Revision 1.9  2004/06/02 21:05:19  billhorsman
  Don't log worrying stack traces for expected exceptions.
 
