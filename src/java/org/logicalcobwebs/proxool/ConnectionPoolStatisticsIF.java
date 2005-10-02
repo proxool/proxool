@@ -16,7 +16,7 @@ import java.util.Date;
  * ConnectionPoolStatisticsIF cps = ProxoolFacade.getConnectionPoolStatistics(alias);
  * </pre>
  *
- * @version $Revision: 1.5 $, $Date: 2003/03/03 11:11:57 $
+ * @version $Revision: 1.6 $, $Date: 2005/10/02 12:32:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -62,11 +62,15 @@ public interface ConnectionPoolStatisticsIF {
      */
     Date getDateStarted();
 
+    long getConnectionCount();
 }
 
 /*
  Revision history:
  $Log: ConnectionPoolStatisticsIF.java,v $
+ Revision 1.6  2005/10/02 12:32:02  billhorsman
+ Make connectionCount available to statistics
+
  Revision 1.5  2003/03/03 11:11:57  billhorsman
  fixed licence
 

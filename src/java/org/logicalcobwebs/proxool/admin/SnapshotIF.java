@@ -12,7 +12,7 @@ import java.util.Date;
 /**
  * Provides a snapshot of a pool
  *
- * @version $Revision: 1.2 $, $Date: 2003/03/03 11:11:59 $
+ * @version $Revision: 1.3 $, $Date: 2005/10/02 12:32:01 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -93,12 +93,17 @@ public interface SnapshotIF {
      * @see #getConnectionInfos
      */
     boolean isDetail();
+
+    long getConnectionCount();
 }
 
 
 /*
  Revision history:
  $Log: SnapshotIF.java,v $
+ Revision 1.3  2005/10/02 12:32:01  billhorsman
+ Make connectionCount available to statistics
+
  Revision 1.2  2003/03/03 11:11:59  billhorsman
  fixed licence
 

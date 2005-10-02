@@ -25,7 +25,7 @@ import org.logicalcobwebs.proxool.util.FastArrayList;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.80 $, $Date: 2005/09/26 09:54:14 $
+ * @version $Revision: 1.81 $, $Date: 2005/10/02 12:32:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -63,12 +63,6 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
     /** This is the "round robin" that makes sure we use all the connections */
     private int nextAvailableConnection = 0;
-
-    /**
-     * This is usually the same as poolableConnections.size() but it sometimes higher.  It is
-     * alwasy right, since a connection exists before it is added to the pool
-     */
-    private int connectionCount = 0;
 
     private long connectionsServedCount = 0;
 
@@ -160,7 +154,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
          * only happen when we're right at or near maximum connections anyway.
          */
 
-        if (connectionCount >= getDefinition().getMaximumConnectionCount() && getAvailableConnectionCount() < 1) {
+        if (prototyper.quickRefuse()) {
             connectionsRefusedCount++;
             if (admin != null) {
                 admin.connectionRefused();
@@ -476,7 +470,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 
             acquirePrimaryWriteLock();
 
-            if (connectionPoolUp == true) {
+            if (connectionPoolUp) {
 
                 connectionPoolUp = false;
                 long startFinalize = System.currentTimeMillis();
@@ -699,10 +693,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     protected void registerRemovedConnection(int status) {
-        connectionCount--;
-
         prototyper.connectionRemoved();
-        
         connectionCountByState[status]--;
     }
 
@@ -1108,11 +1099,18 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     protected Prototyper getPrototyper() {
         return prototyper;
     }
+
+    public long getConnectionCount() {
+        return getPrototyper().getConnectionCount();
+    }
 }
 
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.81  2005/10/02 12:32:02  billhorsman
+ Make connectionCount available to statistics
+
  Revision 1.80  2005/09/26 09:54:14  billhorsman
  Avoid suspected deadlock when getting a detailed snapshot. Only attempt to get the concurrent lock for 10 seconds before giving up.
 

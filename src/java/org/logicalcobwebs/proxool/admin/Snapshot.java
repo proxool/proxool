@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * Implementation of SnapshotIF
  *
- * @version $Revision: 1.3 $, $Date: 2003/03/10 15:26:51 $
+ * @version $Revision: 1.4 $, $Date: 2005/10/02 12:32:01 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -41,6 +41,8 @@ class Snapshot implements SnapshotIF {
     private Date snapshotDate;
 
     private Collection connectionInfos;
+
+    private long connectionCount;
 
     /**
      * @param snapshotDate see {@link org.logicalcobwebs.proxool.admin.SnapshotIF#getSnapshotDate}
@@ -189,12 +191,22 @@ class Snapshot implements SnapshotIF {
         return connectionInfos != null;
     }
 
+    public long getConnectionCount() {
+        return connectionCount;
+    }
+
+    public void setConnectionCount(long connectionCount) {
+        this.connectionCount = connectionCount;
+    }
 }
 
 
 /*
  Revision history:
  $Log: Snapshot.java,v $
+ Revision 1.4  2005/10/02 12:32:01  billhorsman
+ Make connectionCount available to statistics
+
  Revision 1.3  2003/03/10 15:26:51  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

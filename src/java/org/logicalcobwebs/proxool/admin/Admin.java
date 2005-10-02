@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.7 $, $Date: 2003/10/27 20:26:19 $
+ * @version $Revision: 1.8 $, $Date: 2005/10/02 12:32:01 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -146,6 +146,7 @@ public class Admin {
         s.setServedCount(cps.getConnectionsServedCount());
         s.setRefusedCount(cps.getConnectionsRefusedCount());
         s.setConnectionInfos(connectionInfos);
+        s.setConnectionCount(cps.getConnectionCount());
 
         /*
         if (s.getActiveConnectionCount() != getCount(s.getConnectionInfos(), ConnectionInfoIF.STATUS_ACTIVE)) {
@@ -168,6 +169,9 @@ public class Admin {
 /*
  Revision history:
  $Log: Admin.java,v $
+ Revision 1.8  2005/10/02 12:32:01  billhorsman
+ Make connectionCount available to statistics
+
  Revision 1.7  2003/10/27 20:26:19  billhorsman
  connectionReturned() and connectionRefused() calls will now log any errors and continue rather than
  possibly throwing RuntimeExceptions back to the caller. In principle, stats should not cause problems
