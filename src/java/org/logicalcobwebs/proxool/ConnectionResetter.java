@@ -22,7 +22,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.14 $, $Date: 2003/03/10 23:43:10 $
+ * @version $Revision: 1.15 $, $Date: 2005/10/07 08:21:53 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -54,6 +54,11 @@ public class ConnectionResetter {
     protected static final String MUTATOR_PREFIX = "set";
 
     private String driverName;
+
+    /**
+     * @see #isTriggerResetException() 
+     */
+    protected static boolean triggerResetException;
 
     /**
      * Pass in the log to use
@@ -287,6 +292,11 @@ public class ConnectionResetter {
             }
         }
 
+        if (isTriggerResetException()) {
+            log.warn("Triggering pretend exception during reset");
+            errorsEncountered = true;
+        }
+
         if (errorsEncountered) {
 
             log.warn(id + " - There were some problems resetting the connection (see debug output for details). It will not be used again "
@@ -300,11 +310,26 @@ public class ConnectionResetter {
         return !errorsEncountered;
     }
 
+    private static boolean isTriggerResetException() {
+        return triggerResetException;
+    }
+
+    /**
+     * Called by a unit test.
+     * @param triggerResetException true it we should trigger a pretend exception.
+     * @see #isTriggerResetException()
+     */
+    protected static void setTriggerResetException(boolean triggerResetException) {
+        ConnectionResetter.triggerResetException = triggerResetException;
+    }
 }
 
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.15  2005/10/07 08:21:53  billhorsman
+ New hook to allow unit tests to trigger a deliberate exception during reset
+
  Revision 1.14  2003/03/10 23:43:10  billhorsman
  reapplied checkstyle that i'd inadvertently let
  IntelliJ change...
