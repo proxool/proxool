@@ -25,7 +25,7 @@ import org.logicalcobwebs.proxool.util.FastArrayList;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.81 $, $Date: 2005/10/02 12:32:02 $
+ * @version $Revision: 1.82 $, $Date: 2005/10/07 08:19:05 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -258,6 +258,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         if (log.isDebugEnabled() && getDefinition().isVerbose()) {
             log.debug(displayStatistics() + " - Connection #" + proxyConnection.getId() + " served");
         }
+
+        // This gives the proxy connection a chance to reset itself before it is served.
+        proxyConnection.open();
 
         return ProxyFactory.getWrappedConnection(proxyConnection);
     }
@@ -840,7 +843,10 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             ci.setDelegateUrl(connectionInfo.getDelegateUrl());
             ci.setProxyHashcode(connectionInfo.getProxyHashcode());
             ci.setDelegateHashcode(connectionInfo.getDelegateHashcode());
-            ci.setLastSqlCall(connectionInfo.getLastSqlCall());
+            String[] sqlCalls = connectionInfo.getSqlCalls();
+            for (int j = 0; j < sqlCalls.length; j++) {
+                ci.addSqlCall(sqlCalls[j]);
+            }
             cis.add(ci);
         }
         return cis;
@@ -1108,6 +1114,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.82  2005/10/07 08:19:05  billhorsman
+ New sqlCalls gives list of SQL calls rather than just he most recent (for when a connection makes more than one call before being returned to the pool)
+
  Revision 1.81  2005/10/02 12:32:02  billhorsman
  Make connectionCount available to statistics
 

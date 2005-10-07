@@ -8,6 +8,7 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 import org.logicalcobwebs.logging.Log;
 import org.logicalcobwebs.logging.LogFactory;
+import org.logicalcobwebs.proxool.util.FastArrayList;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -15,12 +16,13 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
 import java.text.DecimalFormat;
 
 /**
  * Manages a connection. This is wrapped up inside a...
  *
- * @version $Revision: 1.35 $, $Date: 2005/09/26 10:01:31 $
+ * @version $Revision: 1.36 $, $Date: 2005/10/07 08:18:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.10
@@ -61,7 +63,8 @@ public class ProxyConnection implements ProxyConnectionIF {
 
     private DecimalFormat idFormat = new DecimalFormat("0000");
 
-    private String lastSqlCall;
+    private List sqlCalls = new FastArrayList();
+
     /**
      * Whether we have invoked a method that requires us to reset
      */
@@ -209,7 +212,7 @@ public class ProxyConnection implements ProxyConnectionIF {
      */
     public void close() throws SQLException {
         try {
-
+            boolean removed = false;
             if (isMarkedForExpiry()) {
                 if (connectionPool.getLog().isDebugEnabled()) {
                     connectionPool.getLog().debug("Closing connection quickly (without reset) because it's marked for expiry anyway");
@@ -233,15 +236,28 @@ public class ProxyConnection implements ProxyConnectionIF {
                     // slower
                     if (!connectionPool.resetConnection(connection, "#" + getId())) {
                         connectionPool.removeProxyConnection(this, "it couldn't be reset", true, true);
+                        removed = true;
                     }
                     needToReset = false;
                 }
             }
-            connectionPool.putConnection(this);
+            // If we removed it above then putting it back will only cause a confusing log event later when
+            // it is unable to be changed from ACTIVE to AVAILABLE.
+            if (!removed) {
+                connectionPool.putConnection(this);
+            }
         } catch (Throwable t) {
             connectionPool.getLog().error("#" + idFormat.format(getId()) + " encountered errors during closure: ", t);
         }
 
+    }
+
+    /**
+     * This gets called /just/ before a connection is served. You can use it to reset some of the attributes.
+     * The lifecycle is: {@link #open()} then {@link #close()}
+     */
+    protected void open() {
+        sqlCalls.clear();
     }
 
     public int getMark() {
@@ -468,11 +484,19 @@ public class ProxyConnection implements ProxyConnectionIF {
         return new Long(((ConnectionInfoIF) o).getId()).compareTo(new Long(getId()));
     }
 
-    public String getLastSqlCall() {
-        return lastSqlCall;
+    public String[] getSqlCalls() {
+        return (String[]) sqlCalls.toArray(new String[0]);
     }
 
-    public void setLastSqlCall(String lastSqlCall) {
-        this.lastSqlCall = lastSqlCall;
+    public String getLastSqlCall() {
+        if (sqlCalls != null && sqlCalls.size() > 0) {
+            return (String) sqlCalls.get(sqlCalls.size() - 1);
+        } else {
+            return null;
+        }
+    }
+
+    public void addSqlCall(String sqlCall) {
+        this.sqlCalls.add(sqlCall);
     }
 }

@@ -5,13 +5,16 @@
  */
 package org.logicalcobwebs.proxool;
 
+import org.logicalcobwebs.proxool.util.FastArrayList;
+
 import java.util.Date;
+import java.util.List;
 
 /**
  * Implementation of ConnectionInfoIF. Unlike ConnectionPool it is
  * frozen and will not change. Used with a {@link org.logicalcobwebs.proxool.admin.SnapshotIF snapshot}
  *
- * @version $Revision: 1.7 $, $Date: 2005/09/26 10:01:31 $
+ * @version $Revision: 1.8 $, $Date: 2005/10/07 08:18:23 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -42,7 +45,7 @@ class ConnectionInfo implements ConnectionInfoIF {
 
     private String delegateHashcode;
 
-    private String lastSqlCall;
+    private List sqlCalls = new FastArrayList();
 
     public Date getBirthDate() {
         return birthDate;
@@ -154,12 +157,12 @@ class ConnectionInfo implements ConnectionInfoIF {
         return new Long(((ConnectionInfoIF) o).getId()).compareTo(new Long(getId()));
     }
 
-    public String getLastSqlCall() {
-        return lastSqlCall;
+    public String[] getSqlCalls() {
+        return (String[]) sqlCalls.toArray(new String[0]);
     }
 
-    public void setLastSqlCall(String lastSqlCall) {
-        this.lastSqlCall = lastSqlCall;
+    public void addSqlCall(String sqlCall) {
+        this.sqlCalls.add(sqlCall);
     }
 }
 
@@ -167,6 +170,9 @@ class ConnectionInfo implements ConnectionInfoIF {
 /*
  Revision history:
  $Log: ConnectionInfo.java,v $
+ Revision 1.8  2005/10/07 08:18:23  billhorsman
+ New sqlCalls gives list of SQL calls rather than just he most recent (for when a connection makes more than one call before being returned to the pool)
+
  Revision 1.7  2005/09/26 10:01:31  billhorsman
  Added lastSqlCall when trace is on.
 

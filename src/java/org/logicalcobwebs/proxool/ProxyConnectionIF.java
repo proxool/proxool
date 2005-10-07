@@ -14,7 +14,7 @@ import java.sql.Statement;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
 
- * @version $Revision: 1.6 $, $Date: 2005/09/26 10:01:31 $
+ * @version $Revision: 1.7 $, $Date: 2005/10/07 08:18:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -125,12 +125,21 @@ public interface ProxyConnectionIF extends ConnectionInfoIF {
 
     ConnectionPoolDefinitionIF getDefinition();
 
+    /**
+     * Get the most recent of all the {@link #getSqlCalls()}
+     * @return the SQL (could be a batch of SQLs)
+     */
+    String getLastSqlCall();
+
 }
 
 
 /*
  Revision history:
  $Log: ProxyConnectionIF.java,v $
+ Revision 1.7  2005/10/07 08:18:24  billhorsman
+ New sqlCalls gives list of SQL calls rather than just he most recent (for when a connection makes more than one call before being returned to the pool)
+
  Revision 1.6  2005/09/26 10:01:31  billhorsman
  Added lastSqlCall when trace is on.
 

@@ -22,7 +22,7 @@ import java.util.Date;
  * }
  * </pre>
  *
- * @version $Revision: 1.11 $, $Date: 2005/09/26 10:01:31 $
+ * @version $Revision: 1.12 $, $Date: 2005/10/07 08:18:23 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -152,12 +152,16 @@ public interface ConnectionInfoIF extends Comparable {
      * is enabled.
      * @return the most recent SQL to be used
      */
-    String getLastSqlCall();
+    String[] getSqlCalls();
+    
 }
 
 /*
  Revision history:
  $Log: ConnectionInfoIF.java,v $
+ Revision 1.12  2005/10/07 08:18:23  billhorsman
+ New sqlCalls gives list of SQL calls rather than just he most recent (for when a connection makes more than one call before being returned to the pool)
+
  Revision 1.11  2005/09/26 10:01:31  billhorsman
  Added lastSqlCall when trace is on.
 
