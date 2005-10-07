@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.38 $
-$Date: 2005/10/02 15:01:04 $
+$Revision: 1.39 $
+$Date: 2005/10/07 08:26:10 $
 $Author: billhorsman $
 
 0.9.0 
@@ -50,6 +50,16 @@ $Author: billhorsman $
 - When you ask for a detailed snapshot (see ProxoolFacade.getSnapshot()) then it only attempts to
   get one for 10 seconds before giving up. A detailed snapshot needs to get a lock on the pool
   concerned and if the pool is really busy that might take a while. Belt and braces really.
+
+- Fixes for when a connection that exceeds the maximum-active-time and then the connection encounters
+  errors during removal. It ended up getting removed twice and that meant that the pool appeared to be
+  smaller than it was.
+
+- If a connection is removed because it was active for too long the SQL that it was performing is logged
+  (if "trace" is enabled).
+
+- If trace is enabled then the AdminServlet displays the SQL that each connection has performed (or is in
+  process of performing). This is only overwritten when the connection is served the next time.
 
 0.8.3 - 14 December 2003
 
