@@ -10,9 +10,9 @@ package org.logicalcobwebs.proxool;
  * 
  * Note: these values will be overriden at startup by the GlobalTest init procedure.
  *
- * @version $Revision: 1.6 $, $Date: 2004/05/26 17:19:09 $
+ * @version $Revision: 1.7 $, $Date: 2005/10/07 08:10:33 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class TestConstants {
@@ -58,6 +58,11 @@ public class TestConstants {
     public static String HYPERSONIC_TEST_SQL = "SELECT COUNT(1) FROM SYSTEM_CATALOGS";
 
     /**
+     * SQL statement that should always succeed
+     */
+    public static String HYPERSONIC_TEST_SQL_2 = "SELECT COUNT(2) FROM SYSTEM_CATALOGS";
+
+    /**
      * SQL statement that should always fail
      */
     public static String FATAL_SQL_STATEMENT = "drop table Z";
@@ -71,6 +76,9 @@ public class TestConstants {
 /*
  Revision history:
  $Log: TestConstants.java,v $
+ Revision 1.7  2005/10/07 08:10:33  billhorsman
+ Second test SQL
+
  Revision 1.6  2004/05/26 17:19:09  brenuart
  Allow JUnit tests to be executed against another database.
  By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.
