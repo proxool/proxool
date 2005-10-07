@@ -22,7 +22,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.28 $, $Date: 2004/07/13 21:06:18 $
+ * @version $Revision: 1.29 $, $Date: 2005/10/07 08:15:00 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -58,6 +58,26 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
         final int argCount = args != null ? args.length : 0;
 
         Method concreteMethod = InvokerFacade.getConcreteMethod(getStatement().getClass(), method);
+
+        // This gets called /before/ the method has run
+        if (concreteMethod.getName().equals(ADD_BATCH_METHOD)) {
+            // If we have just added a batch call then we need to update the sql log
+            if (argCount > 0 && args[0] instanceof String) {
+                setSqlStatementIfNull((String) args[0]);
+            }
+            appendToSqlLog();
+        } else if (concreteMethod.getName().equals(EXECUTE_BATCH_METHOD)) {
+            // executing a batch should do a trace
+            startExecute();
+        } else if (concreteMethod.getName().startsWith(EXECUTE_FRAGMENT)) {
+            // executing should update the log and do a trace
+            if (argCount > 0 && args[0] instanceof String) {
+                setSqlStatementIfNull((String) args[0]);
+            }
+            appendToSqlLog();
+            startExecute();
+        }
+
         // We need to remember an exceptions that get thrown so that we can optionally
         // pass them to the onExecute() call below
         Exception exception = null;
@@ -121,21 +141,8 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
             throw e;
         } finally {
 
-            if (concreteMethod.getName().equals(ADD_BATCH_METHOD)) {
-                // If we have just added a batch call then we need to update the sql log
-                if (argCount > 0 && args[0] instanceof String) {
-                    setSqlStatementIfNull((String) args[0]);
-                }
-                appendToSqlLog();
-            } else if (concreteMethod.getName().equals(EXECUTE_BATCH_METHOD)) {
-                // executing a batch should do a trace
-                trace(startTime, exception);
-            } else if (concreteMethod.getName().startsWith(EXECUTE_FRAGMENT)) {
-                // executing should update the log and do a trace
-                if (argCount > 0 && args[0] instanceof String) {
-                    setSqlStatementIfNull((String) args[0]);
-                }
-                appendToSqlLog();
+            // This gets called /after/ the method has run
+            if (concreteMethod.getName().equals(EXECUTE_BATCH_METHOD) || concreteMethod.getName().startsWith(EXECUTE_FRAGMENT)) {
                 trace(startTime, exception);
             }
 
@@ -150,6 +157,9 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.29  2005/10/07 08:15:00  billhorsman
+ Update sqlCalls /before/ we execute so that we can see what slow calls are doing before they finish.
+
  Revision 1.28  2004/07/13 21:06:18  billhorsman
  Fix problem using injectable interfaces on methods that are declared in non-public classes.
 
