@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.14 $, $Date: 2003/03/04 10:58:43 $
+ * @version $Revision: 1.15 $, $Date: 2005/10/07 08:12:58 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -49,9 +49,9 @@ public class ConnectionResetterTest extends AbstractProxoolTest {
         ProxoolFacade.registerConnectionPool(url, info);
 
         Connection c1 = DriverManager.getConnection(url);
-        ;
+
         Connection c2 = DriverManager.getConnection(url);
-        ;
+
 
         c1.setAutoCommit(false);
         c1.close();
@@ -61,6 +61,39 @@ public class ConnectionResetterTest extends AbstractProxoolTest {
 
         c2.close();
         c1.close();
+        assertEquals("connectionCount", 2, ProxoolFacade.getSnapshot(alias).getConnectionCount());
+
+    }
+
+    /**
+     * Test connectionCount when we deliberately introduce an exception during connection reset.
+     */
+    public void testFailedReset() throws Exception {
+
+        try {
+            // This is a bit of a hack to force an exception during reset
+            ConnectionResetter.setTriggerResetException(true);
+
+            String testName = "failedReset";
+            String alias = testName;
+
+            String url = TestHelper.buildProxoolUrl(alias,
+                    TestConstants.HYPERSONIC_DRIVER,
+                    TestConstants.HYPERSONIC_TEST_URL);
+            Properties info = new Properties();
+            info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+            info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+            ProxoolFacade.registerConnectionPool(url, info);
+
+            Connection c1 = DriverManager.getConnection(url);
+            c1.setAutoCommit(false);
+            c1.close();
+
+            assertEquals("connectionCount", 0, ProxoolFacade.getSnapshot(alias).getConnectionCount());
+        } finally {
+            // Back to normal
+            ConnectionResetter.setTriggerResetException(false);
+        }
 
     }
 
@@ -105,6 +138,9 @@ public class ConnectionResetterTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.15  2005/10/07 08:12:58  billhorsman
+ Test deliberate exception durinng reset
+
  Revision 1.14  2003/03/04 10:58:43  billhorsman
  checkstyle
 
