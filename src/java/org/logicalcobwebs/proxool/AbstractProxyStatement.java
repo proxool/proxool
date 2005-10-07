@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
- * @version $Revision: 1.19 $, $Date: 2005/09/26 10:01:31 $
+ * @version $Revision: 1.20 $, $Date: 2005/10/07 08:25:15 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -182,7 +182,6 @@ abstract class AbstractProxyStatement {
             }
             // Send to any listener
             connectionPool.onExecute(sqlLog.toString(), (System.currentTimeMillis() - startTime), exception);
-            ((ProxyConnection) proxyConnection).setLastSqlCall(sqlLog.toString());
         }
 
         // Clear parameters for next time
@@ -192,6 +191,12 @@ abstract class AbstractProxyStatement {
         sqlStatement = null;
         sqlLog.setLength(0);
 
+    }
+
+    protected void startExecute() {
+        if (isTrace()) {
+            ((ProxyConnection) proxyConnection).addSqlCall(sqlLog.toString());
+        }
     }
 
     /**
@@ -243,8 +248,7 @@ abstract class AbstractProxyStatement {
     }
 
     protected boolean isTrace() {
-        boolean isTrace = getConnectionPool().isConnectionListenedTo() || (getConnectionPool().getDefinition().isTrace() && getConnectionPool().getLog().isDebugEnabled());
-        return isTrace;
+        return getConnectionPool().isConnectionListenedTo() || (getConnectionPool().getDefinition().isTrace());
     }
 
     /**
@@ -260,12 +264,16 @@ abstract class AbstractProxyStatement {
     protected static String getDateAsString(Date date) {
         return DATE_FORMAT.format(date);
     }
+
 }
 
 
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.20  2005/10/07 08:25:15  billhorsman
+ Support new sqlCalls list and isTrace() is now true if the connection pool is being listened to or if trace is on. It no longer depends on the log level. This is because the sqlCalls are available in AdminServlet and not just the logs.
+
  Revision 1.19  2005/09/26 10:01:31  billhorsman
  Added lastSqlCall when trace is on.
 
