@@ -16,12 +16,13 @@ import org.logicalcobwebs.proxool.TestHelper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.Properties;
 
 /**
  * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.12 $, $Date: 2003/03/10 23:46:43 $
+ * @version $Revision: 1.13 $, $Date: 2005/10/07 08:13:46 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -52,6 +53,7 @@ public class SnapshotTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.STATISTICS_PROPERTY, "10s,15s");
         info.setProperty(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY, "1");
+        info.setProperty(ProxoolConstants.TRACE_PROPERTY, "true");
 
         // We don't test whether anything is logged, but this line should make something appear
         info.setProperty(ProxoolConstants.STATISTICS_LOG_LEVEL_PROPERTY, ProxoolConstants.STATISTICS_LOG_LEVEL_DEBUG);
@@ -60,7 +62,9 @@ public class SnapshotTest extends AbstractProxoolTest {
         ProxoolFacade.registerConnectionPool(url, info);
 
         {
-            DriverManager.getConnection(url).close();
+            Connection connection = DriverManager.getConnection(url);
+            connection.createStatement().execute(TestConstants.HYPERSONIC_TEST_SQL);
+            connection.close();
 
             SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
 
@@ -71,10 +75,14 @@ public class SnapshotTest extends AbstractProxoolTest {
             ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
             assertTrue("connectionInfos.length != 0",  connectionInfos.length != 0);
             assertEquals("connectionInfos activeCount", 0, getCount(connectionInfos, ConnectionInfoIF.STATUS_ACTIVE));
+            assertEquals("connectionInfos sql count", 1, connectionInfos[0].getSqlCalls().length);
+            assertEquals("connectionInfos lastSql", TestConstants.HYPERSONIC_TEST_SQL, connectionInfos[0].getSqlCalls()[0].replace(';', ' ').trim());
         }
 
         {
-            Connection c = DriverManager.getConnection(url);
+            Connection connection = DriverManager.getConnection(url);
+            connection.createStatement().execute(TestConstants.HYPERSONIC_TEST_SQL);
+            connection.createStatement().execute(TestConstants.HYPERSONIC_TEST_SQL_2);
 
             SnapshotIF snapshot = ProxoolFacade.getSnapshot(alias, true);
 
@@ -85,8 +93,11 @@ public class SnapshotTest extends AbstractProxoolTest {
             ConnectionInfoIF[] connectionInfos = snapshot.getConnectionInfos();
             assertTrue("connectionInfos.length != 0",  connectionInfos.length != 0);
             assertEquals("connectionInfos activeCount", 1, getCount(connectionInfos, ConnectionInfoIF.STATUS_ACTIVE));
+            assertEquals("connectionInfos sql count", 2, connectionInfos[0].getSqlCalls().length);
+            assertEquals("connectionInfos lastSql", TestConstants.HYPERSONIC_TEST_SQL, connectionInfos[0].getSqlCalls()[0].replace(';', ' ').trim());
+            assertEquals("connectionInfos lastSql", TestConstants.HYPERSONIC_TEST_SQL_2, connectionInfos[0].getSqlCalls()[1].replace(';', ' ').trim());
 
-            c.close();
+            connection.close();
         }
 
     }
@@ -106,6 +117,9 @@ public class SnapshotTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: SnapshotTest.java,v $
+ Revision 1.13  2005/10/07 08:13:46  billhorsman
+ Test new sqlCalls property of snapshot
+
  Revision 1.12  2003/03/10 23:46:43  billhorsman
  checkstyle
 
