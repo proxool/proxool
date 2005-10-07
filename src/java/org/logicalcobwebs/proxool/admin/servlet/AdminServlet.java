@@ -30,7 +30,6 @@ import java.util.Properties;
  * Use this to admin each pool within Proxool. It acts like a normal
  * servlet., so just configure it within your web app as you see fit.
  * For example, within web.xml:
- * <p/>
  * <pre>
  *   &lt;servlet&gt;
  *       &lt;servlet-name&gt;Admin&lt;/servlet-name&gt;
@@ -44,39 +43,94 @@ import java.util.Properties;
  *            &lt;param-value&gt;/my_path/my.css&lt;/param-value&gt;
  *        &lt;/init-param&gt;
  *   &lt;/servlet&gt;
- * <p/>
  *   &lt;servlet-mapping&gt;
  *       &lt;servlet-name&gt;Admin&lt;/servlet-name&gt;
- *       &lt;url-pattern&gt;/admin&lt;/url-pattern&gt;
+ *       &lt;url-pattern&gt;/proxool&lt;/url-pattern&gt;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  *
+ * Options:
+ * <ul>
+ *   <li>output: full|simple. "full" means with HTML header and body tags "simple" means
+ *   just the HTML. Choose "simple" if you are including this servlet within your own
+ *   web page. Note that if you choose simple output then you're probably going to want
+ *   to consider supplying some CSS to make it look nice.</li>
+ *   <li>cssFile: If you choose full output (see above) then some CSS is included, inline,
+ *   in the HTML header. If you specify a URL here then that file is also linked to. It is
+ *   linked after the inline CSS so you only have to override thos styles you want to be
+ *   different.</li>
+ * </ul>
+ *
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.11 $, $Date: 2005/10/02 09:45:49 $
+ * @version $Revision: 1.12 $, $Date: 2005/10/07 08:23:10 $
  * @since Proxool 0.7
  */
 public class AdminServlet extends HttpServlet {
 
     private static final Log LOG = LogFactory.getLog(AdminServlet.class);
 
+    /**
+     * The CSS class for a connection in different states:
+     * <ul>
+     *   <li>null</li>
+     *   <li>available</li>
+     *   <li>active</li>
+     *   <li>offline</li>
+     * </ul>
+     */
     private static final String[] STATUS_CLASSES = {"null", "available", "active", "offline"};
 
-    protected static final String TYPE = "type";
-    protected static final String TYPE_CONNECTIONS = "1";
-    protected static final String TYPE_ACTIVITY_LEVEL = "2";
-
+    /**
+     * OUtput full HTML including &lt;HTML&gt;, &lt;HEAD&gt; and &lt;BODY&gt; tags.
+     * @see #output
+     * @see AdminServlet configuration
+     */
     public static final String OUTPUT_FULL = "full";
 
+    /**
+     * OUtput simple HTML <em>excluding</em> &lt;HTML&gt;, &lt;HEAD&gt; and &lt;BODY&gt; tags.
+     * @see #output
+     * @see AdminServlet configuration
+     */
     public static final String OUTPUT_SIMPLE = "simple";
 
+    /**
+     * Either {@link #OUTPUT_FULL} (default) or {@link #OUTPUT_SIMPLE}
+     * @see AdminServlet configuration
+     */
     private String output;
 
+    /**
+     * A valid URLL that can be linked to to override default, inline CSS.
+     * @see AdminServlet configuration
+     */
+
     private String cssFile;
+
+    /**
+     * Used as part of the CSS class
+     */
     private static final String STATISTIC = "statistic";
+
+    /**
+     * Used as part of the CSS class
+     */
     private static final String CORE_PROPERTY = "core-property";
+
+    /**
+     * Used as part of the CSS class
+     */
     private static final String STANDARD_PROPERTY = "standard-property";
+
+    /**
+     * Used as part of the CSS class
+     */
     private static final String DELEGATED_PROPERTY = "delegated-property";
+
+    /**
+     * Used as part of the CSS class
+     */
     private static final String SNAPSHOT = "snapshot";
 
     public void init(ServletConfig servletConfig) throws ServletException {
@@ -104,28 +158,68 @@ public class AdminServlet extends HttpServlet {
 
     /**
      * HH:mm:ss
-     *
      * @see #formatMilliseconds
      */
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
+    /**
+     * dd-MMM-yyyy HH:mm:ss
+     */
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+
     private static final String DETAIL = "detail";
     private static final String DETAIL_MORE = "more";
     private static final String DETAIL_LESS = "less";
+
+    /**
+     * The request parameter name that defines:
+     * <ol>
+     *   <li>{@link #TAB_DEFINITION} (default)</li>
+     *   <li>{@link #TAB_SNAPSHOT}</li>
+     *   <li>{@link #TAB_STATISTICS}</li>
+     *  </ol>
+     */
     private static final String TAB = "tab";
+
+    /**
+     * @see #TAB
+     */
     private static final String TAB_DEFINITION = "definition";
+
+    /**
+     * @see #TAB
+     */
     private static final String TAB_SNAPSHOT = "snapshot";
+
+    /**
+     * @see #TAB
+     */
     private static final String TAB_STATISTICS = "statistics";
+
+    /**
+     * The request parameter name that defines the pool
+     */
     private static final String ALIAS = "alias";
+
+    /**
+     * If we are drilling down into a connection (on the {@link #TAB_SNAPSHOT snapshot} tab then
+     * this points to the {@link org.logicalcobwebs.proxool.ProxyConnection#getId() ID} we are
+     * getting detailed information for.
+     */
     private static final String CONNECTION_ID = "id";
 
+    /**
+     * Delegate to {@link #doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)}
+     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
     }
 
+    /**
+     * Show the details for a pool.
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         response.setHeader("Pragma", "no-cache");
@@ -205,6 +299,15 @@ public class AdminServlet extends HttpServlet {
 
     }
 
+    /**
+     * Output the tabs that we are showing at the top of the page
+     * @param out where to write the HTNL to
+     * @param alias the current pool
+     * @param link the URL to get back to this servlet
+     * @param tab the active tab
+     * @param statisticsAvailable whether statistics are available (true if configured and ready)
+     * @param statisticsComingSoon whether statistics will be available (true if configured but not ready yet)
+     */
     private void doTabs(ServletOutputStream out, String alias, String link, String tab, boolean statisticsAvailable, boolean statisticsComingSoon) throws IOException {
         out.println("<ul>");
         out.println("<li class=\"" + (tab.equals(TAB_DEFINITION) ? "active" : "inactive") + "\"><a class=\"quiet\" href=\"" + link + "?alias=" + alias + "&tab=" + TAB_DEFINITION + "\">Definition</a></li>");
@@ -217,6 +320,12 @@ public class AdminServlet extends HttpServlet {
         out.println("</ul>");
     }
 
+    /**
+     * Output the statistics. If there are more than one set of statistics then show them all.
+     * @param out where to write HTML to
+     * @param statisticsArray the statistics we have ready to see
+     * @param cpd defines the connection
+     */
     private void doStatistics(ServletOutputStream out, StatisticsIF[] statisticsArray, ConnectionPoolDefinitionIF cpd) throws IOException {
 
         for (int i = 0; i < statisticsArray.length; i++) {
@@ -252,6 +361,13 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
+    /**
+     * We can draw a bar chart simply enough. The two arrays passed as parameters must be of equal length
+     * @param out where to write the HTML
+     * @param colours the colur (CSS valid string) for each segment
+     * @param lengths the length of each segment. Can be any size since the chart just takes up as much room
+     * as possible as uses the relative length of each segment.
+     */
     private void drawBarChart(StringBuffer out, String[] colours, int[] lengths) {
         out.append("<table style=\"margin: 8px; font-size: 50%;\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr>");
 
@@ -276,9 +392,17 @@ public class AdminServlet extends HttpServlet {
         out.append("</tr></table>");
     }
 
+    /**
+     * Output the {@link ConnectionPoolDefinitionIF definition}
+     * @param out where to write the HTML
+     * @param cpd the definition
+     */
     private void doDefinition(ServletOutputStream out, ConnectionPoolDefinitionIF cpd) throws IOException {
         openDataTable(out);
 
+        /*
+            TODO: it would be nice to have meta-data in the definition so that this is much easier.
+         */
         printDefinitionEntry(out, ProxoolConstants.ALIAS, cpd.getAlias(), CORE_PROPERTY);
         printDefinitionEntry(out, ProxoolConstants.DRIVER_URL, cpd.getUrl(), CORE_PROPERTY);
         printDefinitionEntry(out, ProxoolConstants.DRIVER_CLASS, cpd.getDriver(), CORE_PROPERTY);
@@ -317,11 +441,13 @@ public class AdminServlet extends HttpServlet {
         printDefinitionEntry(out, ProxoolConstants.STATISTICS_LOG_LEVEL, cpd.getStatisticsLogLevel(), STANDARD_PROPERTY);
         printDefinitionEntry(out, ProxoolConstants.VERBOSE, String.valueOf(cpd.isVerbose()), STANDARD_PROPERTY);
         printDefinitionEntry(out, ProxoolConstants.TRACE, String.valueOf(cpd.isTrace()), STANDARD_PROPERTY);
+        // Now all the properties that are forwarded to the delegate driver.
         Properties p = cpd.getDelegateProperties();
         Iterator i = p.keySet().iterator();
         while (i.hasNext()) {
             String name = (String) i.next();
             String value = p.getProperty(name);
+            // Better hide the password!
             if (name.toLowerCase().indexOf("password") > -1 || name.toLowerCase().indexOf("passwd") > -1) {
                 value = "******";
             }
@@ -332,6 +458,14 @@ public class AdminServlet extends HttpServlet {
 
     }
 
+    /**
+     * Output a {@link SnapshotIF snapshot} of the pool.
+     * @param out where to write the HTML
+     * @param cpd defines the pool
+     * @param link the URL back to this servlet
+     * @param level either {@link #DETAIL_LESS} or {@link #DETAIL_MORE}
+     * @param connectionId the connection we want to drill into (optional)
+     */
     private void doSnapshot(ServletOutputStream out, ConnectionPoolDefinitionIF cpd, String link, String level, String connectionId) throws IOException, ProxoolException {
         boolean detail = (level != null && level.equals(DETAIL_MORE));
         SnapshotIF snapshot = ProxoolFacade.getSnapshot(cpd.getAlias(), detail);
@@ -426,6 +560,17 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
+    /**
+     * If we want a {@link #DETAIL_MORE more} detailed {@link SnapshotIF snapshot} then {@link #doSnapshot(javax.servlet.ServletOutputStream, org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF, String, String, String)}
+     * calls this too
+     * @param out where to write the HTML
+     * @param cpd defines the pool
+     * @param snapshot snapshot
+     * @param link the URL back to this servlet
+     * @param connectionId the connection we want to drill into (optional)
+     * @param connectionId
+     * @throws IOException
+     */
     private void doSnapshotDetails(ServletOutputStream out, ConnectionPoolDefinitionIF cpd, SnapshotIF snapshot, String link, String connectionId) throws IOException {
 
         long drillDownConnectionId = 0;
@@ -533,6 +678,12 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
+    /**
+     * What CSS class to use for a particular connection.
+     * @param info so we know the {@link org.logicalcobwebs.proxool.ConnectionInfoIF#getStatus()} status
+     * @return the CSS class
+     * @see #STATUS_CLASSES
+     */
     private static String getStatusClass(ConnectionInfoIF info) {
         try {
             return STATUS_CLASSES[info.getStatus()];
@@ -544,11 +695,13 @@ public class AdminServlet extends HttpServlet {
 
     private void doDrillDownConnection(ServletOutputStream out, ConnectionInfoIF drillDownConnection) throws IOException {
 
-        // proxy
-        if (drillDownConnection.getLastSqlCall() != null) {
+        // sql calls
+        String[] sqlCalls = drillDownConnection.getSqlCalls();
+        for (int i = 0; sqlCalls != null && i < sqlCalls.length; i++) {
+            String sqlCall = sqlCalls[i];
             out.print("<div class=\"drill-down\">");
             out.print("sql = ");
-            out.print(drillDownConnection.getLastSqlCall());
+            out.print(sqlCall);
             out.print("</div>");
         }
 
@@ -633,6 +786,14 @@ public class AdminServlet extends HttpServlet {
         out.println("    </tr>");
     }
 
+    /**
+     * Output the list of available connection pools. If there are none then display a message saying that.
+     * If there is only one then just display nothing (and the pool will displayed by default)
+     * @param out where to write the HTML
+     * @param alias identifies the current pool
+     * @param tab identifies the tab we are on so that changing pools doesn't change the tab
+     * @param link the URL back to this servlet
+     */
     private void doList(ServletOutputStream out, String alias, String tab, String link) throws IOException {
 
         String[] aliases = ProxoolFacade.getAliases();
@@ -678,6 +839,9 @@ public class AdminServlet extends HttpServlet {
 /*
 Revision history:
 $Log: AdminServlet.java,v $
+Revision 1.12  2005/10/07 08:23:10  billhorsman
+Doc
+
 Revision 1.11  2005/10/02 09:45:49  billhorsman
 Layout
 
