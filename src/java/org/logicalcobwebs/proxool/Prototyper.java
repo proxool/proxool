@@ -13,7 +13,7 @@ import org.logicalcobwebs.logging.LogFactory;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.11 $, $Date: 2005/10/02 12:36:30 $
+ * @version $Revision: 1.12 $, $Date: 2006/01/16 23:10:41 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -230,14 +230,9 @@ public class Prototyper {
         } finally {
             synchronized (lock) {
                 if (proxyConnection == null) {
-/*
-    Actually, connectionCount only get incremented if it was successfully created. Don't
-    decrement the counter.
-
                     // If there has been an exception then we won't be using this one and
                     // we need to decrement the counter
                     connectionCount--;
-*/
                 }
                 connectionsBeingMade--;
             }
@@ -318,6 +313,9 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.12  2006/01/16 23:10:41  billhorsman
+ Doh. /Do/ decrement connectionCount if we didn't make one.
+
  Revision 1.11  2005/10/02 12:36:30  billhorsman
  New quickRefuse() method checks whether we are overloaded without checking whole pool for an available connection.
 
