@@ -22,7 +22,7 @@ import java.sql.Statement;
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.29 $, $Date: 2005/10/07 08:15:00 $
+ * @version $Revision: 1.30 $, $Date: 2006/01/16 23:09:28 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -39,6 +39,8 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
     private static final String EQUALS_METHOD = "equals";
 
     private static final String CLOSE_METHOD = "close";
+
+    private static final String FINALIZE_METHOD = "finalize";
 
     private static final String SET_NULL_METHOD = "setNull";
 
@@ -83,9 +85,11 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
         Exception exception = null;
         try {
             if (concreteMethod.getName().equals(EQUALS_METHOD) && argCount == 1) {
-                result = new Boolean(equals(args[0]));
+                result = (equals(args[0])) ? Boolean.TRUE : Boolean.FALSE;
             } else if (concreteMethod.getName().equals(CLOSE_METHOD) && argCount == 0) {
                 close();
+            } else if (concreteMethod.getName().equals(FINALIZE_METHOD) && argCount == 0) {
+                finalize();
             } else {
                 try {
                     result = concreteMethod.invoke(getStatement(), args);
@@ -157,6 +161,9 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.30  2006/01/16 23:09:28  billhorsman
+ Call concrete finalize() method
+
  Revision 1.29  2005/10/07 08:15:00  billhorsman
  Update sqlCalls /before/ we execute so that we can see what slow calls are doing before they finish.
 
