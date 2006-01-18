@@ -6,8 +6,8 @@
 package org.logicalcobwebs.proxool;
 
 import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.FastArrayList;
 
 import java.sql.Connection;
@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
 /**
  * Manages a connection. This is wrapped up inside a...
  *
- * @version $Revision: 1.36 $, $Date: 2005/10/07 08:18:24 $
+ * @version $Revision: 1.37 $, $Date: 2006/01/18 14:40:02 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.10

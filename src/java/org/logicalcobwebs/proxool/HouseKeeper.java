@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -14,7 +14,7 @@ import java.sql.Statement;
 /**
  * Responisble for house keeping one pool
  *
- * @version $Revision: 1.4 $, $Date: 2005/10/02 12:35:06 $
+ * @version $Revision: 1.5 $, $Date: 2006/01/18 14:40:01 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -259,6 +259,9 @@ class HouseKeeper {
 /*
  Revision history:
  $Log: HouseKeeper.java,v $
+ Revision 1.5  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.4  2005/10/02 12:35:06  billhorsman
  Improve message when closing a connection that has been active for too long
 

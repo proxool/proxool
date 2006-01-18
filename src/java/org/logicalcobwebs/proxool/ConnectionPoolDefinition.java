@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -21,7 +21,7 @@ import java.lang.reflect.Modifier;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.33 $, $Date: 2005/05/04 16:24:59 $
+ * @version $Revision: 1.34 $, $Date: 2006/01/18 14:40:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -1360,6 +1360,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.34  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.33  2005/05/04 16:24:59  billhorsman
  Now supports cloning.
 

@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ProxoolConstants;
@@ -22,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsIF}
  *
- * @version $Revision: 1.21 $, $Date: 2003/03/06 22:28:31 $
+ * @version $Revision: 1.22 $, $Date: 2006/01/18 14:40:06 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -123,6 +123,9 @@ public class StatisticsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StatisticsTest.java,v $
+ Revision 1.22  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.21  2003/03/06 22:28:31  billhorsman
  another go at statistics threading (in tests)
 

@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ConnectionPoolStatisticsIF;
 import org.logicalcobwebs.proxool.ProxoolException;
@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * Provides statistics about the performance of a pool.
  *
- * @version $Revision: 1.8 $, $Date: 2005/10/02 12:32:01 $
+ * @version $Revision: 1.9 $, $Date: 2006/01/18 14:39:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -169,6 +169,9 @@ public class Admin {
 /*
  Revision history:
  $Log: Admin.java,v $
+ Revision 1.9  2006/01/18 14:39:57  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.8  2005/10/02 12:32:01  billhorsman
  Make connectionCount available to statistics
 

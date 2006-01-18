@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.72 $
-    $Date: 2005/09/26 21:47:46 $
+    $Revision: 1.73 $
+    $Date: 2006/01/18 14:40:06 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -26,7 +26,7 @@
     <property name="debug" value="true"/>
 
     <!-- Currect release, e.g. 0.6 -->
-    <property name="release" value="0.8.9b5"/>
+    <property name="release" value="0.9.0RC1"/>
 
     <!-- Currect release, e.g. 0.6 -->
     <property name="junit-report-description" value="Unit Test Report for CVS Snapshot"/>

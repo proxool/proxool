@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.naming.spi.ObjectFactory;
 import javax.naming.Name;
@@ -28,9 +28,9 @@ import java.io.PrintWriter;
  * </ul>
  *
  * TODO - expand
- * @version $Revision: 1.4 $, $Date: 2004/08/19 12:28:28 $
+ * @version $Revision: 1.5 $, $Date: 2006/01/18 14:40:01 $
  * @author bill
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
  */
 public class ProxoolDataSource implements DataSource, ObjectFactory {
@@ -645,6 +645,9 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.5  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.4  2004/08/19 12:28:28  chr32
  Removed factory type test.
 

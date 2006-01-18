@@ -5,7 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -22,7 +23,7 @@ import java.util.Set;
  * is made (for each pool) so that we don't make any assumptions about
  * what the default values are.
  *
- * @version $Revision: 1.15 $, $Date: 2005/10/07 08:21:53 $
+ * @version $Revision: 1.16 $, $Date: 2006/01/18 14:40:01 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -327,6 +328,9 @@ public class ConnectionResetter {
 /*
  Revision history:
  $Log: ConnectionResetter.java,v $
+ Revision 1.16  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.15  2005/10/07 08:21:53  billhorsman
  New hook to allow unit tests to trigger a deliberate exception during reset
 

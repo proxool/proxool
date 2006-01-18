@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
- * @version $Revision: 1.20 $, $Date: 2005/10/07 08:25:15 $
+ * @version $Revision: 1.21 $, $Date: 2006/01/18 14:40:00 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -271,6 +271,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.21  2006/01/18 14:40:00  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.20  2005/10/07 08:25:15  billhorsman
  Support new sqlCalls list and isTrace() is now true if the connection pool is being listened to or if trace is on. It no longer depends on the log level. This is because the sqlCalls are available in AdminServlet and not just the logs.
 

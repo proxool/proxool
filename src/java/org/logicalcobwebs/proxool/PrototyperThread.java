@@ -5,13 +5,13 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Responsible for running {@link Prototyper#sweep sweep}. There
  * could be just one of the objects, or more.
- * @version $Revision: 1.5 $, $Date: 2004/03/26 15:58:56 $
+ * @version $Revision: 1.6 $, $Date: 2006/01/18 14:40:01 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -82,6 +82,9 @@ public class PrototyperThread extends Thread {
 /*
  Revision history:
  $Log: PrototyperThread.java,v $
+ Revision 1.6  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.5  2004/03/26 15:58:56  billhorsman
  Fixes to ensure that house keeper and prototyper threads finish after shutdown.
 

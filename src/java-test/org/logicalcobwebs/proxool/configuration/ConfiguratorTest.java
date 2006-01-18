@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ProxoolConstants;
@@ -19,7 +19,7 @@ import java.util.Properties;
 /**
  * Tests that the programatic configuration of Proxool works.
  *
- * @version $Revision: 1.15 $, $Date: 2003/03/04 10:24:41 $
+ * @version $Revision: 1.16 $, $Date: 2006/01/18 14:40:06 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -65,6 +65,9 @@ public class ConfiguratorTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConfiguratorTest.java,v $
+ Revision 1.16  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.15  2003/03/04 10:24:41  billhorsman
  removed try blocks around each test
 

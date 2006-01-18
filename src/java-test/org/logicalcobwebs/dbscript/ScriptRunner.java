@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.dbscript;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
 
 import java.sql.SQLException;
@@ -14,7 +14,7 @@ import java.sql.SQLException;
 /**
  * Run a {@link Script script}.
  *
- * @version $Revision: 1.11 $, $Date: 2003/03/03 11:12:03 $
+ * @version $Revision: 1.12 $, $Date: 2006/01/18 14:40:05 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -91,6 +91,9 @@ public class ScriptRunner {
 /*
  Revision history:
  $Log: ScriptRunner.java,v $
+ Revision 1.12  2006/01/18 14:40:05  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.11  2003/03/03 11:12:03  billhorsman
  fixed licence
 

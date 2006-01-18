@@ -10,8 +10,8 @@ import net.sf.hibernate.Session;
 import net.sf.hibernate.SessionFactory;
 import net.sf.hibernate.cfg.Configuration;
 import net.sf.hibernate.cfg.Environment;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -20,7 +20,7 @@ import java.util.Properties;
  * Tests that we are able to get a connection from
  * <a href="http://www.hibernate.org">Hibernate</a>.
  * (Code contributed by Mark Eagle)
- * @version $Revision: 1.1 $, $Date: 2003/09/28 09:38:30 $
+ * @version $Revision: 1.2 $, $Date: 2006/01/18 14:40:06 $
  * @author Bill Horsman {bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -231,6 +231,9 @@ public class HibernateTest extends AbstractProxoolTest {
 /*
 Revision history:
 $Log: HibernateTest.java,v $
+Revision 1.2  2006/01/18 14:40:06  billhorsman
+Unbundled Jakarta's Commons Logging.
+
 Revision 1.1  2003/09/28 09:38:30  billhorsman
 New unit test for Hibernate.
 

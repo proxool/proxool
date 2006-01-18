@@ -9,14 +9,14 @@ import org.apache.avalon.framework.CascadingThrowable;
 import org.apache.log.LogEvent;
 import org.apache.log.Priority;
 import org.apache.log.output.AbstractOutputTarget;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * An Avalon LogKit target that delegates to a Jakarta Commons <code>org.logicalcobwebs.logging.Log</code>.
+ * An Avalon LogKit target that delegates to a Jakarta Commons <code>org.apache.commons.logging.Log</code>.
  * Can be used to make Avalons internal logging go the same output as
  * the Proxool internal logging.
- * @version $Revision: 1.5 $, $Date: 2003/03/04 10:24:41 $
+ * @version $Revision: 1.6 $, $Date: 2006/01/18 14:40:06 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -104,6 +104,9 @@ public class LogKitTargetAdapter extends AbstractOutputTarget {
 /*
  Revision history:
  $Log: LogKitTargetAdapter.java,v $
+ Revision 1.6  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.5  2003/03/04 10:24:41  billhorsman
  removed try blocks around each test
 

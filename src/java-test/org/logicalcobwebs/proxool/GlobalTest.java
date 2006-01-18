@@ -14,8 +14,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.apache.log4j.xml.DOMConfigurator;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides a suite of all tests. And some utility methods for setting
@@ -23,9 +23,9 @@ import org.logicalcobwebs.logging.LogFactory;
  * 
  * The test configuration can be specified using the env property "testConfig"
  *
- * @version $Revision: 1.20 $, $Date: 2004/05/26 22:30:21 $
+ * @version $Revision: 1.21 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
  */
 public class GlobalTest {
@@ -143,7 +143,6 @@ public class GlobalTest {
         suite.addTest(org.logicalcobwebs.proxool.admin.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.admin.jmx.AllTests.suite());
         suite.addTest(org.logicalcobwebs.proxool.util.AllTests.suite());
-        suite.addTest(org.logicalcobwebs.logging.AllTests.suite());
 
         // create a wrapper for global initialization code.
         TestSetup wrapper = new TestSetup(suite) {
@@ -164,6 +163,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.21  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.20  2004/05/26 22:30:21  brenuart
  Fix issue where testConfig env property was not correctly handled
 

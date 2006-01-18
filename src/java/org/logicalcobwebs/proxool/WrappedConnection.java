@@ -8,8 +8,8 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.cglib.proxy.InvocationHandler;
 import org.logicalcobwebs.cglib.proxy.MethodInterceptor;
 import org.logicalcobwebs.cglib.proxy.MethodProxy;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.proxy.InvokerFacade;
 
 import java.lang.reflect.Method;
@@ -20,7 +20,7 @@ import java.sql.Connection;
 
 /**
  * Wraps up a {@link ProxyConnection}. It is proxied as a {@link java.sql.Connection}
- * @version $Revision: 1.5 $, $Date: 2005/10/02 12:32:58 $
+ * @version $Revision: 1.6 $, $Date: 2006/01/18 14:40:02 $
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -266,6 +266,9 @@ public class WrappedConnection implements MethodInterceptor {
 /*
  Revision history:
  $Log: WrappedConnection.java,v $
+ Revision 1.6  2006/01/18 14:40:02  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.5  2005/10/02 12:32:58  billhorsman
  Improve the trapping of operations after a wrapped connection is closed.
 

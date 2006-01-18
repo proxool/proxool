@@ -17,15 +17,15 @@ import java.util.TreeSet;
 
 import org.logicalcobwebs.concurrent.ReaderPreferenceReadWriteLock;
 import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.admin.Admin;
 import org.logicalcobwebs.proxool.util.FastArrayList;
 
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.82 $, $Date: 2005/10/07 08:19:05 $
+ * @version $Revision: 1.83 $, $Date: 2006/01/18 14:40:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -1114,6 +1114,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.83  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.82  2005/10/07 08:19:05  billhorsman
  New sqlCalls gives list of SQL calls rather than just he most recent (for when a connection makes more than one call before being returned to the pool)
 

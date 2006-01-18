@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.logicalcobwebs.cglib.proxy.MethodInterceptor;
 import org.logicalcobwebs.cglib.proxy.MethodProxy;
@@ -19,7 +19,7 @@ import java.sql.DatabaseMetaData;
 /**
  * Delegates to a normal Coonection for everything but the close()
  * method (when it puts itself back into the pool instead).
- * @version $Revision: 1.8 $, $Date: 2004/06/02 20:50:47 $
+ * @version $Revision: 1.9 $, $Date: 2006/01/18 14:40:02 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -110,6 +110,9 @@ class ProxyDatabaseMetaData implements MethodInterceptor {
 /*
  Revision history:
  $Log: ProxyDatabaseMetaData.java,v $
+ Revision 1.9  2006/01/18 14:40:02  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.8  2004/06/02 20:50:47  billhorsman
  Dropped obsolete InvocationHandler reference and injectable interface stuff.
 

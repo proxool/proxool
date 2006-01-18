@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.DriverManager;
 import java.sql.Connection;
@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test that we can update the definition of a pool
  *
- * @version $Revision: 1.8 $, $Date: 2005/09/25 21:48:09 $
+ * @version $Revision: 1.9 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -195,6 +195,9 @@ public class UpdateDefinitionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: UpdateDefinitionTest.java,v $
+ Revision 1.9  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.8  2005/09/25 21:48:09  billhorsman
  New test to check that asking for a connection using the same URL and properties doesn't redefine the pool.
 

@@ -5,15 +5,15 @@
  */
 package org.logicalcobwebs.dbscript;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An SQL command that isrun by a {@link Script}. If {@link #getLoad load}
  * or {@link #getLoops loops} are configured then it might run more than
  * once.
  *
- * @version $Revision: 1.8 $, $Date: 2003/03/03 11:12:02 $
+ * @version $Revision: 1.9 $, $Date: 2006/01/18 14:40:04 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -142,6 +142,9 @@ class Command implements CommandIF {
 /*
  Revision history:
  $Log: Command.java,v $
+ Revision 1.9  2006/01/18 14:40:04  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.8  2003/03/03 11:12:02  billhorsman
  fixed licence
 

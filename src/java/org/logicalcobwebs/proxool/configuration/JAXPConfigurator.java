@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -33,9 +33,9 @@ import java.io.Reader;
  * xml should be validated or not. If you want your xml to be validated be sure to read the
  * <a href="XMLConfigurator.html#validation">Validation</a> chapter in the JavaDoc for {@link XMLConfigurator}.
  * </p>
- * @version $Revision: 1.11 $, $Date: 2004/05/14 21:15:47 $
+ * @version $Revision: 1.12 $, $Date: 2006/01/18 14:39:58 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
  */
 public class JAXPConfigurator {
@@ -126,6 +126,9 @@ public class JAXPConfigurator {
 /*
  Revision history:
  $Log: JAXPConfigurator.java,v $
+ Revision 1.12  2006/01/18 14:39:58  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.11  2004/05/14 21:15:47  brenuart
  Fix type in method name
 

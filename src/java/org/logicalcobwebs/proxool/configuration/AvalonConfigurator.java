@@ -11,8 +11,8 @@ import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.thread.ThreadSafe;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
@@ -43,7 +43,7 @@ import java.util.List;
  * <br>Legal values are <code>true</code> or <code>false</code>. Default: <code>true</code>.
  * </p>
  *
- * @version $Revision: 1.13 $, $Date: 2003/03/10 15:26:53 $
+ * @version $Revision: 1.14 $, $Date: 2006/01/18 14:39:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -184,6 +184,9 @@ public class AvalonConfigurator implements Component, Configurable, ThreadSafe, 
 /*
  Revision history:
  $Log: AvalonConfigurator.java,v $
+ Revision 1.14  2006/01/18 14:39:58  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.13  2003/03/10 15:26:53  billhorsman
  refactoringn of concurrency stuff (and some import
  optimisation)

@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * This is instantiated statically by ProxoolFacade. It will automatically
  * close down all the connections when the JVM stops.
- * @version $Revision: 1.11 $, $Date: 2003/12/16 09:09:32 $
+ * @version $Revision: 1.12 $, $Date: 2006/01/18 14:40:02 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -99,6 +99,9 @@ class ShutdownHook implements Runnable {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.12  2006/01/18 14:40:02  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.11  2003/12/16 09:09:32  billhorsman
  Switched from getCause() to getTargetException() so that we can trap the IllegalStateException in all JDKs.
 

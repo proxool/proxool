@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.FastArrayList;
 
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 /**
  * Schedules when to run the house keeper
- * @version $Revision: 1.5 $, $Date: 2004/06/02 20:38:32 $
+ * @version $Revision: 1.6 $, $Date: 2006/01/18 14:40:01 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -130,6 +130,9 @@ public class HouseKeeperController {
 /*
  Revision history:
  $Log: HouseKeeperController.java,v $
+ Revision 1.6  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.5  2004/06/02 20:38:32  billhorsman
  More robust round robin of house keepers.
 

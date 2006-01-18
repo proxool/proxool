@@ -1,7 +1,7 @@
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,7 +11,7 @@ import java.util.Properties;
 /**
  * Helper for all tests
  *
- * @version $Revision: 1.21 $, $Date: 2003/09/30 18:39:50 $
+ * @version $Revision: 1.22 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -140,6 +140,9 @@ public class TestHelper {
 /*
  Revision history:
  $Log: TestHelper.java,v $
+ Revision 1.22  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.21  2003/09/30 18:39:50  billhorsman
  New test sql syntax constant
 

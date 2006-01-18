@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.DriverManager;
 import java.util.Properties;
@@ -14,7 +14,7 @@ import java.util.Properties;
 /**
  * Tests {@link ProxoolDriver}
  *
- * @version $Revision: 1.5 $, $Date: 2003/04/29 12:04:18 $
+ * @version $Revision: 1.6 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -66,6 +66,9 @@ public class DriverTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: DriverTest.java,v $
+ Revision 1.6  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.5  2003/04/29 12:04:18  billhorsman
  fix test
 

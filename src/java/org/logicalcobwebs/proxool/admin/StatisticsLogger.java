@@ -5,7 +5,7 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import org.logicalcobwebs.logging.Log;
+import org.apache.commons.logging.Log;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 
 import java.text.DateFormat;
@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * Listens to statistics and logs them
- * @version $Revision: 1.2 $, $Date: 2003/03/03 11:11:59 $
+ * @version $Revision: 1.3 $, $Date: 2006/01/18 14:39:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -75,6 +75,9 @@ public class StatisticsLogger implements StatisticsListenerIF {
 /*
  Revision history:
  $Log: StatisticsLogger.java,v $
+ Revision 1.3  2006/01/18 14:39:57  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.2  2003/03/03 11:11:59  billhorsman
  fixed licence
 

@@ -12,8 +12,8 @@ import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolListenerIF;
 import org.logicalcobwebs.proxool.ConfigurationListenerIF;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
@@ -83,9 +83,9 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.14 $, $Date: 2003/10/20 07:37:07 $
+ * @version $Revision: 1.15 $, $Date: 2006/01/18 14:39:55 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, NotificationBroadcaster,
@@ -721,6 +721,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.15  2006/01/18 14:39:55  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.14  2003/10/20 07:37:07  chr32
  Bettered handling of empty values. Now not setting attributes that has not changed.
 

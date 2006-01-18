@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.admin.SnapshotResultMonitor;
 import org.logicalcobwebs.proxool.admin.SnapshotIF;
 
@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Test whether Proxool is happy to run lots of pools. Is it scalable?
  *
- * @version $Revision: 1.3 $, $Date: 2004/07/13 20:36:57 $
+ * @version $Revision: 1.4 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -74,6 +74,9 @@ public class ManyPoolsTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ManyPoolsTest.java,v $
+ Revision 1.4  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.3  2004/07/13 20:36:57  billhorsman
  Open a different database for each pool. Otherwise Hypersonic has some threading issues.
 

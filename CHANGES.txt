@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.39 $
-$Date: 2005/10/07 08:26:10 $
+$Revision: 1.40 $
+$Date: 2006/01/18 14:40:06 $
 $Author: billhorsman $
 
 0.9.0 
@@ -61,6 +61,11 @@ $Author: billhorsman $
 - If trace is enabled then the AdminServlet displays the SQL that each connection has performed (or is in
   process of performing). This is only overwritten when the connection is served the next time.
 
+- Jakarta's Commons Logging is now longer bundled with the source and is now a dependency.
+  We had forked this component (at their version 1.02) to make it simpler for us to deploy but
+  there are advantages, particular with respect to configuration, to just using
+  the component direct from Jakarta.
+  
 0.8.3 - 14 December 2003
 
 - Switched to Cglib 2.0 and ASM 1.4. Repackaged them both to org.logicalcobwebs.clgib and

@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,9 +17,9 @@ import java.util.Properties;
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.7 $, $Date: 2004/05/26 17:19:09 $
+ * @version $Revision: 1.8 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class FatalSqlExceptionTest extends AbstractProxoolTest {
@@ -227,6 +227,9 @@ public class FatalSqlExceptionTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: FatalSqlExceptionTest.java,v $
+ Revision 1.8  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.7  2004/05/26 17:19:09  brenuart
  Allow JUnit tests to be executed against another database.
  By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.

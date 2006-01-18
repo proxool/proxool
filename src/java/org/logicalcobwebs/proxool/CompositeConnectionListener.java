@@ -8,8 +8,8 @@ package org.logicalcobwebs.proxool;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
 
 /**
@@ -20,9 +20,9 @@ import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
  * 
- * @version $Revision: 1.5 $, $Date: 2004/03/16 08:48:32 $
+ * @version $Revision: 1.6 $, $Date: 2006/01/18 14:40:01 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
  */
 public class CompositeConnectionListener extends AbstractListenerContainer implements ConnectionListenerIF {
@@ -112,6 +112,9 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
 /*
  Revision history:
  $Log: CompositeConnectionListener.java,v $
+ Revision 1.6  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.5  2004/03/16 08:48:32  brenuart
  Changes in the AbstractListenerContainer:
  - provide more efficient concurrent handling;

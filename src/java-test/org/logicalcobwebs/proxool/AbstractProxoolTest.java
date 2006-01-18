@@ -6,15 +6,15 @@
 package org.logicalcobwebs.proxool;
 
 import junit.framework.TestCase;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.concurrent.ReaderPreferenceReadWriteLock;
 
 import java.util.Stack;
 
 /**
  * Provides common code for all Proxool tests
- * @version $Revision: 1.5 $, $Date: 2004/03/26 16:00:23 $
+ * @version $Revision: 1.6 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -64,6 +64,9 @@ public abstract class AbstractProxoolTest extends TestCase {
 /*
  Revision history:
  $Log: AbstractProxoolTest.java,v $
+ Revision 1.6  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.5  2004/03/26 16:00:23  billhorsman
  Make sure we release lock on tearDown. I don't think this was a problem, but it was unrobust.
 

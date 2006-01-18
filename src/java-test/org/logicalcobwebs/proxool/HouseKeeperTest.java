@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.admin.SnapshotIF;
 
 import java.sql.Connection;
@@ -20,7 +20,7 @@ import java.util.Properties;
  *
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.11 $, $Date: 2005/10/07 08:11:34 $
+ * @version $Revision: 1.12 $, $Date: 2006/01/18 14:40:06 $
  * @since Proxool 0.8
  */
 public class HouseKeeperTest extends AbstractProxoolTest {
@@ -327,6 +327,9 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 /*
 Revision history:
 $Log: HouseKeeperTest.java,v $
+Revision 1.12  2006/01/18 14:40:06  billhorsman
+Unbundled Jakarta's Commons Logging.
+
 Revision 1.11  2005/10/07 08:11:34  billhorsman
 New test for reset failure
 

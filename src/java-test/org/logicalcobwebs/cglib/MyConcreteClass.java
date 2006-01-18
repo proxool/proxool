@@ -5,12 +5,12 @@
  */
 package org.logicalcobwebs.cglib;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * See {@link EnhancerTest}
- * @version $Revision: 1.2 $, $Date: 2004/06/17 21:40:06 $
+ * @version $Revision: 1.3 $, $Date: 2006/01/18 14:40:03 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -33,6 +33,9 @@ public class MyConcreteClass implements MyInterfaceIF {
 /*
  Revision history:
  $Log: MyConcreteClass.java,v $
+ Revision 1.3  2006/01/18 14:40:03  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.2  2004/06/17 21:40:06  billhorsman
  Log message should be debug not error
 

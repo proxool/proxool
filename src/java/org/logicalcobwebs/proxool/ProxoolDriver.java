@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.resources.ResourceNamesIF;
 
 import java.sql.Connection;
@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 /**
  * This is the Proxool implementation of the java.sql.Driver interface.
- * @version $Revision: 1.27 $, $Date: 2004/06/02 20:41:13 $
+ * @version $Revision: 1.28 $, $Date: 2006/01/18 14:40:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -226,6 +226,9 @@ public class ProxoolDriver implements Driver {
 /*
  Revision history:
  $Log: ProxoolDriver.java,v $
+ Revision 1.28  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.27  2004/06/02 20:41:13  billhorsman
  Don't log SQLExceptions. Leave that up to the client.
 

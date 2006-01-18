@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
@@ -85,7 +85,7 @@ import java.util.Properties;
  * </p>
  *<p>This class is not thread safe.</p>
  *
- * @version $Revision: 1.17 $, $Date: 2003/03/05 23:28:56 $
+ * @version $Revision: 1.18 $, $Date: 2006/01/18 14:39:58 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */

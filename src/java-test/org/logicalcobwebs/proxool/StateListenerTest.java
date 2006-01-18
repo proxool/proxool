@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,7 +17,7 @@ import java.util.Properties;
  * Test that registering a {@link ConfigurationListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.13 $, $Date: 2005/05/04 16:03:23 $
+ * @version $Revision: 1.14 $, $Date: 2006/01/18 14:40:06 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -160,6 +160,9 @@ public class StateListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StateListenerTest.java,v $
+ Revision 1.14  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.13  2005/05/04 16:03:23  billhorsman
  Now catches ProxoolException when pool is updated with bogus driver.
 

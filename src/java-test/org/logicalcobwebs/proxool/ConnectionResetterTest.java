@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Test whether the {@link ConnectionResetter} works.
  *
- * @version $Revision: 1.15 $, $Date: 2005/10/07 08:12:58 $
+ * @version $Revision: 1.16 $, $Date: 2006/01/18 14:40:06 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -138,6 +138,9 @@ public class ConnectionResetterTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionResetterTest.java,v $
+ Revision 1.16  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.15  2005/10/07 08:12:58  billhorsman
  Test deliberate exception durinng reset
 

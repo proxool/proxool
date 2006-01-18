@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.admin.servlet;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.*;
 import org.logicalcobwebs.proxool.admin.SnapshotIF;
 import org.logicalcobwebs.proxool.admin.StatisticsIF;
@@ -63,7 +63,7 @@ import java.util.Properties;
  *
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.12 $, $Date: 2005/10/07 08:23:10 $
+ * @version $Revision: 1.13 $, $Date: 2006/01/18 14:39:56 $
  * @since Proxool 0.7
  */
 public class AdminServlet extends HttpServlet {
@@ -839,6 +839,9 @@ public class AdminServlet extends HttpServlet {
 /*
 Revision history:
 $Log: AdminServlet.java,v $
+Revision 1.13  2006/01/18 14:39:56  billhorsman
+Unbundled Jakarta's Commons Logging.
+
 Revision 1.12  2005/10/07 08:23:10  billhorsman
 Doc
 

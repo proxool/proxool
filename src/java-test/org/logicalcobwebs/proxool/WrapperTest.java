@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.DriverManager;
 import java.sql.Connection;
@@ -18,7 +18,7 @@ import java.util.Properties;
  * Tests whether we are wrapping up connections correctly. There disposable
  * wrappers stop the user doing nasty things to the connection after it has
  * been closed.
- * @version $Revision: 1.3 $, $Date: 2004/06/02 21:11:24 $
+ * @version $Revision: 1.4 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9

@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.configuration;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
@@ -70,7 +70,7 @@ import java.util.Properties;
  * delegate JDBC driver.
  * </p>
  *
- * @version $Revision: 1.10 $, $Date: 2003/03/05 23:28:56 $
+ * @version $Revision: 1.11 $, $Date: 2006/01/18 14:39:58 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -170,6 +170,9 @@ public class PropertyConfigurator {
 /*
  Revision history:
  $Log: PropertyConfigurator.java,v $
+ Revision 1.11  2006/01/18 14:39:58  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.10  2003/03/05 23:28:56  billhorsman
  deprecated maximum-new-connections property in favour of
  more descriptive simultaneous-build-throttle

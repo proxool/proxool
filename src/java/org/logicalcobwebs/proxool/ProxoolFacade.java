@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.admin.Admin;
 import org.logicalcobwebs.proxool.admin.SnapshotIF;
 import org.logicalcobwebs.proxool.admin.StatisticsIF;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.83 $, $Date: 2005/09/26 09:54:14 $
+ * @version $Revision: 1.84 $, $Date: 2006/01/18 14:40:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -821,6 +821,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.84  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.83  2005/09/26 09:54:14  billhorsman
  Avoid suspected deadlock when getting a detailed snapshot. Only attempt to get the concurrent lock for 10 seconds before giving up.
 

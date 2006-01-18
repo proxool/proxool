@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.examples;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,7 +15,7 @@ import java.sql.SQLException;
 /**
  * The simplest example of all. Just gets a Connection.
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/03 11:12:02 $
+ * @version $Revision: 1.7 $, $Date: 2006/01/18 14:40:03 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -102,6 +102,9 @@ public class Simple {
 /*
  Revision history:
  $Log: Simple.java,v $
+ Revision 1.7  2006/01/18 14:40:03  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.6  2003/03/03 11:12:02  billhorsman
  fixed licence
 

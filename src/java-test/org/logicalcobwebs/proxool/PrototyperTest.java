@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.admin.SnapshotIF;
 import org.logicalcobwebs.proxool.admin.SnapshotResultMonitor;
 
@@ -17,9 +17,9 @@ import java.util.Properties;
 /**
  * Test the prototyper in ConnectionPool
  *
- * @version $Revision: 1.10 $, $Date: 2004/05/26 17:19:09 $
+ * @version $Revision: 1.11 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class PrototyperTest extends AbstractProxoolTest {
@@ -138,6 +138,9 @@ public class PrototyperTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: PrototyperTest.java,v $
+ Revision 1.11  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.10  2004/05/26 17:19:09  brenuart
  Allow JUnit tests to be executed against another database.
  By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.

@@ -6,8 +6,8 @@
 package org.logicalcobwebs.proxool.admin;
 
 import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
 
 import java.util.Calendar;
@@ -18,7 +18,7 @@ import java.util.Calendar;
  * whenever it should. It provides access to the latest complete set
  * when it is available.
  *
- * @version $Revision: 1.8 $, $Date: 2003/10/27 20:24:48 $
+ * @version $Revision: 1.9 $, $Date: 2006/01/18 14:39:58 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -186,6 +186,9 @@ class StatsRoller {
 /*
  Revision history:
  $Log: StatsRoller.java,v $
+ Revision 1.9  2006/01/18 14:39:58  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.8  2003/10/27 20:24:48  billhorsman
  roll() now makes an additional call to isCurrent() *before* it asks for a write lock. Before it
  was getting a write lock every five seconds which effectively blocks all connections (if only briefly).

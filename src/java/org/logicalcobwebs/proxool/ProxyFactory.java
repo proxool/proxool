@@ -8,8 +8,8 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.cglib.proxy.Enhancer;
 import org.logicalcobwebs.cglib.proxy.Factory;
 import org.logicalcobwebs.cglib.proxy.Callback;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -27,7 +27,7 @@ import java.lang.reflect.Modifier;
  * object given a proxy.
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.31 $, $Date: 2005/09/26 09:59:22 $
+ * @version $Revision: 1.32 $, $Date: 2006/01/18 14:40:02 $
  * @since Proxool 0.5
  */
 class ProxyFactory {
@@ -244,6 +244,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.32  2006/01/18 14:40:02  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.31  2005/09/26 09:59:22  billhorsman
  Explicitly use the ProxyFactory class loader when using Cglib's Enhancer to avoid class loading issues.
 

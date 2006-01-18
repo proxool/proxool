@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ConnectionInfoIF;
 import org.logicalcobwebs.proxool.ProxoolConstants;
@@ -22,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link SnapshotIF}
  *
- * @version $Revision: 1.13 $, $Date: 2005/10/07 08:13:46 $
+ * @version $Revision: 1.14 $, $Date: 2006/01/18 14:40:05 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -117,6 +117,9 @@ public class SnapshotTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: SnapshotTest.java,v $
+ Revision 1.14  2006/01/18 14:40:05  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.13  2005/10/07 08:13:46  billhorsman
  Test new sqlCalls property of snapshot
 

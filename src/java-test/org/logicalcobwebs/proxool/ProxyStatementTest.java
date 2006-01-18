@@ -12,13 +12,13 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Properties;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.11 $, $Date: 2004/07/13 21:32:41 $
+ * @version $Revision: 1.12 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -178,6 +178,9 @@ public class ProxyStatementTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ProxyStatementTest.java,v $
+ Revision 1.12  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.11  2004/07/13 21:32:41  billhorsman
  Close the first connection first before opening the real connection (directly) otherwise you get a "database already in use"error on Windows.
 

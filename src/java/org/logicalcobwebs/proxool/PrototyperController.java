@@ -5,14 +5,14 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Iterator;
 
 /**
  * Controls the {@link Prototyper prototypers}
- * @version $Revision: 1.9 $, $Date: 2004/04/05 22:54:57 $
+ * @version $Revision: 1.10 $, $Date: 2006/01/18 14:40:01 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -109,6 +109,9 @@ public class PrototyperController {
 /*
  Revision history:
  $Log: PrototyperController.java,v $
+ Revision 1.10  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.9  2004/04/05 22:54:57  billhorsman
  Check if notify thread has been shutdown before triggering it.
 

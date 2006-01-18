@@ -9,8 +9,8 @@ import org.logicalcobwebs.proxool.ConnectionPoolDefinitionIF;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolException;
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -23,9 +23,9 @@ import java.util.List;
 
 /**
  * Utilities for Proxool JMX instrumentation.
- * @version $Revision: 1.6 $, $Date: 2003/05/06 23:15:56 $
+ * @version $Revision: 1.7 $, $Date: 2006/01/18 14:39:56 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
  */
 public class ProxoolJMXHelper {
@@ -143,6 +143,9 @@ public class ProxoolJMXHelper {
 /*
  Revision history:
  $Log: ProxoolJMXHelper.java,v $
+ Revision 1.7  2006/01/18 14:39:56  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.6  2003/05/06 23:15:56  chr32
  Moving JMX classes back in from sandbox.
 

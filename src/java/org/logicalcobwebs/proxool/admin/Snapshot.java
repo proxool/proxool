@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ConnectionInfoIF;
 
 import java.util.Collection;
@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * Implementation of SnapshotIF
  *
- * @version $Revision: 1.4 $, $Date: 2005/10/02 12:32:01 $
+ * @version $Revision: 1.5 $, $Date: 2006/01/18 14:39:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -204,6 +204,9 @@ class Snapshot implements SnapshotIF {
 /*
  Revision history:
  $Log: Snapshot.java,v $
+ Revision 1.5  2006/01/18 14:39:57  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.4  2005/10/02 12:32:01  billhorsman
  Make connectionCount available to statistics
 

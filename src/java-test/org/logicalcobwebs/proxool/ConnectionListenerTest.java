@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -20,7 +20,7 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.13 $, $Date: 2004/06/02 20:04:00 $
+ * @version $Revision: 1.14 $, $Date: 2006/01/18 14:40:06 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -255,6 +255,9 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.14  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.13  2004/06/02 20:04:00  billhorsman
  Added test for onExecute command
 

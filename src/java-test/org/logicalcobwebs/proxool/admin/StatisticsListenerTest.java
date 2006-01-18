@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.AbstractProxoolTest;
 import org.logicalcobwebs.proxool.ProxoolConstants;
 import org.logicalcobwebs.proxool.ProxoolFacade;
@@ -22,7 +22,7 @@ import java.util.Properties;
 /**
  * Test {@link StatisticsListenerIF}
  *
- * @version $Revision: 1.12 $, $Date: 2003/09/05 16:27:27 $
+ * @version $Revision: 1.13 $, $Date: 2006/01/18 14:40:05 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -149,6 +149,9 @@ public class StatisticsListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: StatisticsListenerTest.java,v $
+ Revision 1.13  2006/01/18 14:40:05  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.12  2003/09/05 16:27:27  billhorsman
  Better debug output.
 

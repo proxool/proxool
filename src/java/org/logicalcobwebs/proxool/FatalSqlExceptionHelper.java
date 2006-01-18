@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 /**
  * Will wrap up exceptions in another exception which can be defined at runtime.
- * @version $Revision: 1.4 $, $Date: 2005/07/01 08:02:50 $
+ * @version $Revision: 1.5 $, $Date: 2006/01/18 14:40:01 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -197,6 +197,9 @@ class FatalSqlExceptionHelper {
 /*
  Revision history:
  $Log: FatalSqlExceptionHelper.java,v $
+ Revision 1.5  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.4  2005/07/01 08:02:50  billhorsman
  Check for exception message being null
 

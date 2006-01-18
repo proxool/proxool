@@ -5,9 +5,9 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
-import org.logicalcobwebs.logging.impl.SimpleLog;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.SimpleLog;
 
 import java.sql.DriverManager;
 import java.util.Properties;
@@ -16,7 +16,7 @@ import java.util.Properties;
  * A minimal check to see what libraries we need to include with
  * our binary distribution
  *
- * @version $Revision: 1.2 $, $Date: 2003/11/04 13:54:02 $
+ * @version $Revision: 1.3 $, $Date: 2006/01/18 14:40:06 $
  * @author Bill Horsman {bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -64,6 +64,9 @@ public class DependencyCheck {
 /*
  Revision history:
  $Log: DependencyCheck.java,v $
+ Revision 1.3  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.2  2003/11/04 13:54:02  billhorsman
  checkstyle
 

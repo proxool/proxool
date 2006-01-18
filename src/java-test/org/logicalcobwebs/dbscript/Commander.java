@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.dbscript;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -15,7 +15,7 @@ import java.sql.Statement;
 /**
  * A thread that can run a single command many times.
  *
- * @version $Revision: 1.6 $, $Date: 2003/03/03 11:12:03 $
+ * @version $Revision: 1.7 $, $Date: 2006/01/18 14:40:05 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -132,6 +132,9 @@ class Commander implements Runnable {
 /*
  Revision history:
  $Log: Commander.java,v $
+ Revision 1.7  2006/01/18 14:40:05  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.6  2003/03/03 11:12:03  billhorsman
  fixed licence
 

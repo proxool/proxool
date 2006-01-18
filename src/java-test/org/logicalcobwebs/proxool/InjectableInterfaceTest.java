@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Properties;
 import java.sql.Connection;
@@ -17,7 +17,7 @@ import java.sql.CallableStatement;
 
 /**
  * Tests whether we can inject a new interface into one of the proxy objects
- * @version $Revision: 1.2 $, $Date: 2004/06/17 21:36:39 $
+ * @version $Revision: 1.3 $, $Date: 2006/01/18 14:40:06 $
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -126,6 +126,9 @@ public class InjectableInterfaceTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: InjectableInterfaceTest.java,v $
+ Revision 1.3  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.2  2004/06/17 21:36:39  billhorsman
  Removed call to private methods. They're going to fail anyway.
 

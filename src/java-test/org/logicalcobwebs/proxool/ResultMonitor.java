@@ -5,14 +5,14 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Waits for a set of results to become true with timeout
  * functionality
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/05 18:44:10 $
+ * @version $Revision: 1.10 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -106,6 +106,9 @@ public abstract class ResultMonitor {
 /*
  Revision history:
  $Log: ResultMonitor.java,v $
+ Revision 1.10  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.9  2003/03/05 18:44:10  billhorsman
  fix delay and timeout
 

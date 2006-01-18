@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.admin.StatisticsIF;
 import org.logicalcobwebs.proxool.admin.StatisticsListenerIF;
 import org.logicalcobwebs.proxool.admin.SnapshotIF;
@@ -21,7 +21,7 @@ import java.text.DecimalFormat;
 /**
  * Tests how fast Proxool is compared to the "perfect" pool, {@link SimpoolAdapter}.
  *
- * @version $Revision: 1.17 $, $Date: 2003/11/04 13:54:02 $
+ * @version $Revision: 1.18 $, $Date: 2006/01/18 14:40:06 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -326,6 +326,9 @@ public class PerformanceTest extends AbstractProxoolTest  implements StatisticsL
 /*
  Revision history:
  $Log: PerformanceTest.java,v $
+ Revision 1.18  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.17  2003/11/04 13:54:02  billhorsman
  checkstyle
 

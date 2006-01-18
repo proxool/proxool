@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test {@link ConnectionPool}
  *
- * @version $Revision: 1.2 $, $Date: 2004/06/02 21:05:19 $
+ * @version $Revision: 1.3 $, $Date: 2006/01/18 14:40:06 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -196,6 +196,9 @@ public class ConnectionPoolTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionPoolTest.java,v $
+ Revision 1.3  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.2  2004/06/02 21:05:19  billhorsman
  Don't log worrying stack traces for expected exceptions.
 

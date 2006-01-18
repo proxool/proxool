@@ -5,8 +5,8 @@
  */
 package org.logicalcobwebs.proxool.admin;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.ProxoolFacade;
 import org.logicalcobwebs.proxool.ResultMonitor;
@@ -14,7 +14,7 @@ import org.logicalcobwebs.proxool.ResultMonitor;
 /**
  * A ResultMonitor specifically for Snapshots
  *
- * @version $Revision: 1.9 $, $Date: 2003/03/06 22:39:05 $
+ * @version $Revision: 1.10 $, $Date: 2006/01/18 14:40:06 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -91,6 +91,9 @@ public class StatisticsResultMonitor extends ResultMonitor {
 /*
  Revision history:
  $Log: StatisticsResultMonitor.java,v $
+ Revision 1.10  2006/01/18 14:40:06  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.9  2003/03/06 22:39:05  billhorsman
  fix
 

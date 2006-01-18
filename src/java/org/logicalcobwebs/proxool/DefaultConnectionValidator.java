@@ -8,8 +8,8 @@ package org.logicalcobwebs.proxool;
 import java.sql.Connection;
 import java.sql.Statement;
 
-import org.logicalcobwebs.logging.Log;
-import org.logicalcobwebs.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Bertrand Renuart
@@ -85,6 +85,9 @@ public class DefaultConnectionValidator implements ConnectionValidatorIF {
 /*
  Revision history:
  $Log: DefaultConnectionValidator.java,v $
+ Revision 1.2  2006/01/18 14:40:01  billhorsman
+ Unbundled Jakarta's Commons Logging.
+
  Revision 1.1  2004/03/25 22:02:15  brenuart
  First step towards pluggable ConnectionBuilderIF & ConnectionValidatorIF.
  Include some minor refactoring that lead to deprecation of some PrototyperController methods.
