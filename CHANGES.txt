@@ -1,11 +1,11 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.40 $
-$Date: 2006/01/18 14:40:06 $
+$Revision: 1.41 $
+$Date: 2006/03/02 11:29:44 $
 $Author: billhorsman $
 
-0.9.0 
+0.9.0RC1 
 
 - New DataSource implementation. This has been tested with Tomcat 5.5. DataSource configuration
   is so specific to the container that it is safer to only state where it has been tested. We
