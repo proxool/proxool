@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Test whether ProxyStatement works
  *
- * @version $Revision: 1.12 $, $Date: 2006/01/18 14:40:06 $
+ * @version $Revision: 1.13 $, $Date: 2006/03/03 09:58:26 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -172,12 +172,36 @@ public class ProxyStatementTest extends AbstractProxoolTest {
         
         return url;
 	}
+
+    public void testCloseByStatement() throws Exception {
+
+        String testName = "snapshot";
+        final String alias = testName;
+        String url = TestHelper.buildProxoolUrl(alias,
+                TestConstants.HYPERSONIC_DRIVER,
+                TestConstants.HYPERSONIC_TEST_URL);
+        Properties info = new Properties();
+        info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
+        info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
+        ProxoolFacade.registerConnectionPool(url, info);
+
+        // get a connection from the pool and create a statement with it
+        Connection c = DriverManager.getConnection(url);
+        Statement  s = c.createStatement();
+        // Even if we ask the statement to close it it should still work.
+        s.getConnection().close();
+        assertEquals("servedCount", 0, ProxoolFacade.getSnapshot(alias).getActiveConnectionCount());
+
+    }
 }
 
 
 /*
  Revision history:
  $Log: ProxyStatementTest.java,v $
+ Revision 1.13  2006/03/03 09:58:26  billhorsman
+ Fix for statement.getConnection(). See bug 1149834.
+
  Revision 1.12  2006/01/18 14:40:06  billhorsman
  Unbundled Jakarta's Commons Logging.
 

@@ -16,13 +16,14 @@ import org.logicalcobwebs.proxool.proxy.InvokerFacade;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Statement;
+import java.sql.Connection;
 
 /**
  * Delegates to Statement for all calls. But also, for all execute methods, it
  * checks the SQLException and compares it to the fatalSqlException list in the
  * ConnectionPoolDefinition. If it detects a fatal exception it will destroy the
  * Connection so that it isn't used again.
- * @version $Revision: 1.31 $, $Date: 2006/01/18 14:40:02 $
+ * @version $Revision: 1.32 $, $Date: 2006/03/03 09:58:26 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -39,6 +40,8 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
     private static final String EQUALS_METHOD = "equals";
 
     private static final String CLOSE_METHOD = "close";
+
+    private static final String GET_CONNECTION_METHOD = "getConnection";
 
     private static final String FINALIZE_METHOD = "finalize";
 
@@ -88,6 +91,8 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
                 result = (equals(args[0])) ? Boolean.TRUE : Boolean.FALSE;
             } else if (concreteMethod.getName().equals(CLOSE_METHOD) && argCount == 0) {
                 close();
+            } else if (concreteMethod.getName().equals(GET_CONNECTION_METHOD) && argCount == 0) {
+                result = getConnection();
             } else if (concreteMethod.getName().equals(FINALIZE_METHOD) && argCount == 0) {
                 finalize();
             } else {
@@ -161,6 +166,9 @@ class ProxyStatement extends AbstractProxyStatement implements MethodInterceptor
 /*
  Revision history:
  $Log: ProxyStatement.java,v $
+ Revision 1.32  2006/03/03 09:58:26  billhorsman
+ Fix for statement.getConnection(). See bug 1149834.
+
  Revision 1.31  2006/01/18 14:40:02  billhorsman
  Unbundled Jakarta's Commons Logging.
 
