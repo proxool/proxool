@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.73 $
-    $Date: 2006/01/18 14:40:06 $
+    $Revision: 1.74 $
+    $Date: 2006/03/09 10:28:59 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -26,7 +26,7 @@
     <property name="debug" value="true"/>
 
     <!-- Currect release, e.g. 0.6 -->
-    <property name="release" value="0.9.0RC1"/>
+    <property name="release" value="0.9.0RC1+"/>
 
     <!-- Currect release, e.g. 0.6 -->
     <property name="junit-report-description" value="Unit Test Report for CVS Snapshot"/>
@@ -48,8 +48,9 @@
     <path id="source" path="${build-dir}/classes">
         <fileset dir="lib">
             <include name="**/*.jar"/>
-	    <include name="**/*.zip"/>
+    	    <include name="**/*.zip"/>
         </fileset>
+        <path path="build/lib/proxool-cglib.jar"/>
     </path>
     <path id="binary">
         <fileset dir="lib">
@@ -194,10 +195,11 @@
     <target
         name="compile"
         description="Compiles the code"
-        depends="init,build-src"
+        depends="init,build-src,repackage-dependencies"
         >
         <javac srcdir="${build-dir}/src/java" destdir="${build-dir}/classes" debug="${debug}">
             <classpath refid="source"/>
+            <classpath path="build/proxool-cglib.jar"/>
         </javac>
         <!-- Copy dtd's and properties into the compiled classes directory. -->
         <copy todir="${build-dir}/classes">
@@ -215,11 +217,18 @@
             <attribute name="Proxool-Version" value="${release}"/>
             <attribute name="Date" value="${TODAY}"/>
         </manifest>
-        <jar
-            jarfile="${build-dir}/proxool-${release}.jar"
-            basedir="${build-dir}/classes"
-            manifest="${build-dir}/etc/MANIFEST.MF"
-            />
+        <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="jarjar/jarjar-0.6.jar"/>
+        <jarjar
+                verbose="true"
+                jarfile="${build-dir}/proxool-${release}.jar"
+                basedir="${build-dir}/classes"
+                manifest="${build-dir}/etc/MANIFEST.MF">
+            <zipfileset src="jarjar/cglib-nodep-2.1_3.jar"/>
+            <rule pattern="net.sf.cglib.**" result="org.logicalcobwebs.cglib.@1"/>
+            <zap pattern="net.sf.cglib.transform.**"/>
+            <zap pattern="net.sf.cglib.beans.**"/>
+            <zap pattern="net.sf.cglib.util.**"/>
+        </jarjar>
     </target>
 
     <target
@@ -264,6 +273,7 @@
         >
         <property name="build-test" value="true"/>
         <antcall target="build-src"/>
+        <antcall target="repackage-dependencies"/>
         <antcall target="compile"/>
 
         <copy todir="${build-dir}/classes">
@@ -282,6 +292,18 @@
             <jvmarg line="${jvmargs}"/>
         </java>
         <echo message="Note! These unit tests have probably produced some worrying exceptions. As long as the tests passed then you can ignore these exceptions. They are part of the tests."/> 
+    </target>
+
+    <target name="repackage-dependencies" description="Repackage the Cglib project into Proxool">
+        <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="jarjar/jarjar-0.6.jar"/>
+        <mkdir dir="build/lib"/>
+        <jarjar verbose="true" jarfile="build/lib/proxool-cglib.jar">
+            <zipfileset src="jarjar/cglib-nodep-2.1_3.jar"/>
+            <rule pattern="net.sf.cglib.**" result="org.logicalcobwebs.cglib.@1"/>
+            <zap pattern="net.sf.cglib.transform.**"/>
+            <zap pattern="net.sf.cglib.beans.**"/>
+            <zap pattern="net.sf.cglib.util.**"/>
+        </jarjar>
     </target>
 
     <target
