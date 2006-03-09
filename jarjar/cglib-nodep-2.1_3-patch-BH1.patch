@@ -1,0 +1,12 @@
+diff -ru cglib/src/proxy/net/sf/cglib/proxy/Enhancer.java cglib-patch/src/proxy/net/sf/cglib/proxy/Enhancer.java
+--- cglib/src/proxy/net/sf/cglib/proxy/Enhancer.java    2006-03-06 11:16:29.000000000 +0000
++++ cglib-patch/src/proxy/net/sf/cglib/proxy/Enhancer.java      2006-03-06 10:59:46.000000000 +0000
+@@ -87,7 +87,7 @@
+     private static final Type CALLBACK =
+       TypeUtils.parseType("net.sf.cglib.proxy.Callback");
+     private static final Type CALLBACK_ARRAY =
+-      TypeUtils.parseType("net.sf.cglib.proxy.Callback[]");
++      TypeUtils.parseType("org.logicalcobwebs.cglib.proxy.Callback[]");
+     private static final Signature CSTRUCT_NULL =
+       TypeUtils.parseConstructor("");
+     private static final Signature SET_THREAD_CALLBACKS =
