@@ -1,11 +1,22 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.41 $
-$Date: 2006/03/02 11:29:44 $
+$Revision: 1.42 $
+$Date: 2006/03/09 10:29:14 $
 $Author: billhorsman $
 
-0.9.0RC1 
+0.9.0RC2
+
+- The Statement.getConnection() method now returns the wrapped connection rather than the
+  delegate, aloowing you to close() it safely.
+
+- Repackaged Cglib 2.1_3 (including its own repackaged version of ASM). Cglib is now repackaged
+  using JarJar (see the repackage-cglib Ant target in the source distribution). One of the goals
+  of this upgrade is to get Proxool to work with JDK 1.6 - more testing is needed before we can
+  know the status of that. (Note that you can't build Proxool from source with 1.6 yet because if
+  unimplemented methods in DataSource).
+
+0.9.0RC1 (3 March 2006)
 
 - New DataSource implementation. This has been tested with Tomcat 5.5. DataSource configuration
   is so specific to the container that it is safer to only state where it has been tested. We
