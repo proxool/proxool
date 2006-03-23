@@ -20,8 +20,8 @@ import tyrex.naming.MemoryContextFactory;
  * Tests the Proxool datasources.
  *
  * @author Christian Nedregaard (christian_nedregaard@email.com)
- * @author $Author: chr32 $ (current maintainer)
- * @version $Revision: 1.1 $, $Date: 2004/03/18 17:10:01 $
+ * @author $Author: billhorsman $ (current maintainer)
+ * @version $Revision: 1.2 $, $Date: 2006/03/23 11:51:24 $
  * @since Proxool 0.9
  */
 public class ProxoolDataSourceTest extends AbstractProxoolTest {
@@ -76,6 +76,7 @@ public class ProxoolDataSourceTest extends AbstractProxoolTest {
         dataSource.setDriverUrl(TestConstants.HYPERSONIC_TEST_URL);
         dataSource.setUser(TestConstants.HYPERSONIC_USER);
         dataSource.setPassword(TestConstants.HYPERSONIC_PASSWORD);
+        dataSource.setDelegateProperties("dummy=foo,anotherDummy=bar");
 
         Hashtable env = new Hashtable();
         env.put(Context.INITIAL_CONTEXT_FACTORY, MemoryContextFactory.class.getName());
@@ -91,6 +92,11 @@ public class ProxoolDataSourceTest extends AbstractProxoolTest {
         context = new InitialContext(env);
         DataSource clientDataSource = (DataSource) context.lookup(jndiName);
         assertNotNull("Connection was null.", clientDataSource.getConnection());
+
+        ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
+        assertEquals("dummy", "foo", cpd.getDelegateProperty("dummy"));
+        assertEquals("dummy", "bar", cpd.getDelegateProperty("anotherDummy"));
+
         ProxoolFacade.removeConnectionPool(alias);
         context.close();
     }
@@ -108,6 +114,8 @@ public class ProxoolDataSourceTest extends AbstractProxoolTest {
         reference.add(new StringRefAddr(ProxoolConstants.DRIVER_URL_PROPERTY, TestConstants.HYPERSONIC_TEST_URL));
         reference.add(new StringRefAddr(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER));
         reference.add(new StringRefAddr(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD));
+        reference.add(new StringRefAddr("dummy", "foo"));
+        reference.add(new StringRefAddr("anotherDummy", "bar"));
 
         // pretend to be a JNDI aware container that builds the DataSource
         // using its factory
@@ -125,6 +133,11 @@ public class ProxoolDataSourceTest extends AbstractProxoolTest {
         context = new InitialContext(env);
         DataSource clientDataSource = (DataSource) context.lookup(jndiName);
         assertNotNull("Connection was null.", clientDataSource.getConnection());
+
+        ConnectionPoolDefinitionIF cpd = ProxoolFacade.getConnectionPoolDefinition(alias);
+        assertEquals("dummy", "foo", cpd.getDelegateProperty("dummy"));
+        assertEquals("dummy", "bar", cpd.getDelegateProperty("anotherDummy"));
+
         ProxoolFacade.removeConnectionPool(alias);
         context.close();
     }
@@ -134,6 +147,9 @@ public class ProxoolDataSourceTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ProxoolDataSourceTest.java,v $
+ Revision 1.2  2006/03/23 11:51:24  billhorsman
+ Allow for delegate properties
+
  Revision 1.1  2004/03/18 17:10:01  chr32
  Renamed DataSourceTest -> ProxoolDataSourceTest. Added test for factory-configured mode.
 

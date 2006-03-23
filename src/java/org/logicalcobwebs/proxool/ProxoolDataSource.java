@@ -13,10 +13,14 @@ import javax.naming.Name;
 import javax.naming.Context;
 import javax.naming.Reference;
 import javax.naming.RefAddr;
+import javax.naming.StringRefAddr;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Hashtable;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.StringTokenizer;
 import java.io.PrintWriter;
 
 /**
@@ -28,7 +32,7 @@ import java.io.PrintWriter;
  * </ul>
  *
  * TODO - expand
- * @version $Revision: 1.5 $, $Date: 2006/01/18 14:40:01 $
+ * @version $Revision: 1.6 $, $Date: 2006/03/23 11:51:23 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -63,6 +67,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     private String jmxAgentId;
     private boolean testBeforeUse;
     private boolean testAfterUse;
+    private Properties delegateProperties = new Properties();
 
     /**
      * A String of all the fatalSqlExceptions delimited by
@@ -129,6 +134,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
             cpd.setJmxAgentId(getJmxAgentId());
             cpd.setTestAfterUse(isTestAfterUse());
             cpd.setTestBeforeUse(isTestBeforeUse());
+            cpd.setDelegateProperties(delegateProperties);
             ProxoolFacade.registerConnectionPool(cpd);
         }
     }
@@ -503,6 +509,23 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
         this.testAfterUse = testAfterUse;
     }
 
+    /**
+     * Set any property that should be handed to the delegate driver.
+     * E.g. <code>foo=1,bar=true</code>
+     * @param properties a comma delimited list of name=value pairs
+     * @see ConnectionPoolDefinitionIF#getDelegateProperties()
+     */
+    public void setDelegateProperties(String properties) {
+        StringTokenizer stOuter = new StringTokenizer(properties, ",");
+        while (stOuter.hasMoreTokens()) {
+            StringTokenizer stInner = new StringTokenizer(stOuter.nextToken(), "=");
+            if (stInner.countTokens() != 2) {
+                throw new IllegalArgumentException("Unexpected delegateProperties value: '" + properties + "'. Expected 'name=value'");
+            }
+            delegateProperties.put(stInner.nextToken().trim(), stInner.nextToken().trim());
+        }
+    }
+
     private void populatePropertiesFromReference(Reference reference) {
         RefAddr property = reference.get(ProxoolConstants.ALIAS_PROPERTY);
         if (property != null) {
@@ -596,6 +619,16 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
         if (property != null) {
             setTestAfterUse("true".equalsIgnoreCase(property.getContent().toString()));
         }
+        // Pick up any properties that we don't recognise
+        Enumeration e = reference.getAll();
+        while (e.hasMoreElements()) {
+            StringRefAddr stringRefAddr = (StringRefAddr) e.nextElement();
+            String name = stringRefAddr.getType();
+            String content = stringRefAddr.getContent().toString();
+            if (name.indexOf(ProxoolConstants.PROPERTY_PREFIX) != 0) {
+                delegateProperties.put(name, content);
+            }
+        }
     }
 
     /**
@@ -618,6 +651,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
         trace = false;
         statistics = null;
         statisticsLogLevel = null;
+        delegateProperties.clear();
     }
 
     public PrintWriter getLogWriter() throws SQLException {
@@ -645,6 +679,9 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.6  2006/03/23 11:51:23  billhorsman
+ Allow for delegate properties
+
  Revision 1.5  2006/01/18 14:40:01  billhorsman
  Unbundled Jakarta's Commons Logging.
 
