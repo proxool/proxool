@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Responsible for prototyping connections for all pools
- * @version $Revision: 1.13 $, $Date: 2006/01/18 14:40:01 $
+ * @version $Revision: 1.14 $, $Date: 2006/03/23 11:44:57 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -299,13 +299,15 @@ public class Prototyper {
      * Give a quick answer to whether we should attempt to build a connection. This can be quicker
      * if we are massively overloaded rather than cycling through each connection in the pool to
      * see if it's free
-     * @return true if it's okay to attempt to get a connection, false if we should give up now. Just
-     * because this method returns true it doesn't guarantee that one will be available. There is a slight
+     * @throws SQLException if it is a waste of time even trying to get a connaction. Just because this method
+     * doesn't throw an exception it doesn't guarantee that one will be available. There is a slight
      * risk that we might tell the client to give up when a connection could become available in the next few
      * milliseconds but our policy is to refuse connections quickly when overloaded.
      */
-    public boolean quickRefuse() {
-        return connectionCount >= getDefinition().getMaximumConnectionCount() && connectionPool.getAvailableConnectionCount() < 1;
+    public void quickRefuse() throws SQLException {
+        if (connectionCount >= getDefinition().getMaximumConnectionCount() && connectionPool.getAvailableConnectionCount() < 1) {
+            throw new SQLException("Couldn't get connection because we are at maximum connection count (" + connectionCount + "/" + getDefinition().getMaximumConnectionCount() + ") and there are none available");
+        }
     }
 }
 
@@ -313,6 +315,9 @@ public class Prototyper {
 /*
  Revision history:
  $Log: Prototyper.java,v $
+ Revision 1.14  2006/03/23 11:44:57  billhorsman
+ More information when quickly refusing
+
  Revision 1.13  2006/01/18 14:40:01  billhorsman
  Unbundled Jakarta's Commons Logging.
 

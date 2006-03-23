@@ -25,7 +25,7 @@ import org.logicalcobwebs.proxool.util.FastArrayList;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.83 $, $Date: 2006/01/18 14:40:01 $
+ * @version $Revision: 1.84 $, $Date: 2006/03/23 11:44:57 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -154,7 +154,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
          * only happen when we're right at or near maximum connections anyway.
          */
 
-        if (prototyper.quickRefuse()) {
+        try {
+            prototyper.quickRefuse();
+        } catch (SQLException e) {
             connectionsRefusedCount++;
             if (admin != null) {
                 admin.connectionRefused();
@@ -162,7 +164,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             log.info(displayStatistics() + " - " + MSG_MAX_CONNECTION_COUNT);
             timeOfLastRefusal = System.currentTimeMillis();
             setUpState(StateListenerIF.STATE_OVERLOADED);
-            throw new SQLException(MSG_MAX_CONNECTION_COUNT);
+            throw e;
         }
 
         prototyper.checkSimultaneousBuildThrottle();       
@@ -1114,6 +1116,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.84  2006/03/23 11:44:57  billhorsman
+ More information when quickly refusing
+
  Revision 1.83  2006/01/18 14:40:01  billhorsman
  Unbundled Jakarta's Commons Logging.
 
