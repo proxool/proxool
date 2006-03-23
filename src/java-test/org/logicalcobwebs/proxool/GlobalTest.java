@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * The test configuration can be specified using the env property "testConfig"
  *
- * @version $Revision: 1.21 $, $Date: 2006/01/18 14:40:06 $
+ * @version $Revision: 1.22 $, $Date: 2006/03/23 11:52:28 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -96,7 +96,7 @@ public class GlobalTest {
     	catch(Exception e)
 		{
     		LOG.error("Problem while loading test configuration", e);
-    		throw e;
+    		throw new IllegalArgumentException("Couldn't load resources from " + resourceName, e);
 		}
     	finally {
     		if( resourceStream != null ) {
@@ -163,6 +163,9 @@ public class GlobalTest {
 /*
  Revision history:
  $Log: GlobalTest.java,v $
+ Revision 1.22  2006/03/23 11:52:28  billhorsman
+ Improve exception message
+
  Revision 1.21  2006/01/18 14:40:06  billhorsman
  Unbundled Jakarta's Commons Logging.
 
