@@ -13,6 +13,7 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Properties;
 
@@ -20,7 +21,7 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.14 $, $Date: 2006/01/18 14:40:06 $
+ * @version $Revision: 1.15 $, $Date: 2006/03/23 11:42:20 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -108,43 +109,33 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
         final TestConnectionListener tcl = new TestConnectionListener();
         ProxoolFacade.addConnectionListener(alias, tcl);
 
+        Statement createStatement = connection1.createStatement();
+        createStatement.execute("CREATE TABLE NOTHING (a boolean, b datetime, c integer, d decimal, e varchar)");
+
+
         // provoke execution error
-        java.util.Date date = null;
-        try {
-            PreparedStatement ps = connection1.prepareStatement("select * from NOTHING where a = ? and b = ? and c = ? and d = ? and e = ?");
-            ps.setBoolean(1, true);
-            Calendar c = Calendar.getInstance();
-            date = c.getTime();
-            ps.setDate(2, new Date(c.getTime().getTime()));
-            ps.setInt(3, 3);
-            ps.setDouble(4, 4.0);
-            ps.setString(5, "test");
-            ps.execute();
-        } catch (SQLException e) {
-            // we expect this
-        }
+        java.util.Date date = new java.util.Date();
+        PreparedStatement ps = connection1.prepareStatement("select * from NOTHING where a = ? and b = ? and c = ? and d = ? and e = ?");
+        ps.setBoolean(1, true);
+        ps.setDate(2, new Date(date.getTime()));
+        ps.setInt(3, 3);
+        ps.setDouble(4, 4.0);
+        ps.setString(5, "test");
+        ps.execute();
         LOG.debug(tcl.getCommand());
         assertEquals("command", "select * from NOTHING where a = true and b = '" + AbstractProxyStatement.getDateAsString(date) + "' and c = 3 and d = 4.0 and e = 'test';", tcl.getCommand().trim());
 
         // Check that it works with no parameters
         final String s2 = "select * from NOTHING;";
-        try {
-            tcl.clear();
-            PreparedStatement ps = connection1.prepareStatement(s2);
-            ps.execute();
-        } catch (SQLException e) {
-            // we expect this
-        }
+        tcl.clear();
+        ps = connection1.prepareStatement(s2);
+        ps.execute();
         LOG.debug(tcl.getCommand());
         assertEquals("command", s2, tcl.getCommand().trim());
 
-        try {
-            tcl.clear();
-            PreparedStatement ps = connection1.prepareStatement(s2);
-            ps.execute();
-        } catch (SQLException e) {
-            // we expect this
-        }
+        tcl.clear();
+        ps = connection1.prepareStatement(s2);
+        ps.execute();
         LOG.debug(tcl.getCommand());
         assertEquals("command", s2, tcl.getCommand().trim());
 
@@ -255,6 +246,9 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.15  2006/03/23 11:42:20  billhorsman
+ Create dummy table so test statements work. With HSQL 1.8 it is the prepareStatement() that throws the exception, not the execute() which means the listeners never gets the event.
+
  Revision 1.14  2006/01/18 14:40:06  billhorsman
  Unbundled Jakarta's Commons Logging.
 
