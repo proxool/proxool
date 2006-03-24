@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC
+        "-//SPRING//DTD BEAN//EN"
+        "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+    <!-- ============================== PERSISTENCE DEFINITIONS ============================== -->
+
+    <bean id="dataSource" class="org.logicalcobwebs.proxool.ProxoolDataSource" destroy-method="close">
+        <property name="alias" value="memtest"/>
+        <property name="driver" value="org.hsqldb.jdbcDriver"/>
+        <property name="driverUrl" value="jdbc:hsqldb:mem:test"/>
+        <property name="user" value="sa"/>
+        <property name="password" value=""/>
+        <property name="minimumConnectionCount" value="1"/>
+        <property name="maximumConnectionCount" value="10"/>
+        <property name="delegateProperties" value="autoCommit=true, foo=5"/>
+        <!--<property name="houseKeepingTestSql" value="values(current TimeStamp)"/>-->
+        <!--<property name="testBeforeUse" value="true"/>-->
+        <!--<property name="testAfterUse" value="true"/>-->
+    </bean>
+
+    <!-- Choose the dialect that matches your "dataSource" definition -->
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="schemaUpdate">
+            <value>false</value>
+        </property>
+        <property name="dataSource">
+            <ref local="dataSource"/>
+        </property>
+        <!--<property name="annotatedClasses">
+            <list>
+                <value></value>
+            </list>
+        </property>-->
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+                <!-- This property is required for DB2 and required to be *COMMENTED* for MySQL -->
+                <!--<prop key="hibernate.default_schema"></prop>-->
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.cglib.use_reflection_optimizer">true</prop>
+                <!-- these properties are unique to Hibernate 3.1+ -->
+                <!--<prop key="hibernate.query.factory_class">org.hibernate.hql.ast.ASTQueryTranslatorFactory</prop>-->
+                <prop key="hibernate.query.factory_class">
+                    org.hibernate.hql.classic.ClassicQueryTranslatorFactory</prop>
+                <!--<prop key="hibernate.connection.release_mode">on_close</prop>-->
+
+            </props>
+        </property>
+    </bean>
+
+    <!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory">
+            <ref local="sessionFactory"/>
+        </property>
+    </bean>
+
+    <!-- ***** ABSTRACT TRANSACTIONPROXYFACTORYBEAN DEFINITION *****-->
+   <!-- <bean id="abstractTxDefinition"
+          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+          lazy-init="true" abstract="true">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>-->
+
+</beans>

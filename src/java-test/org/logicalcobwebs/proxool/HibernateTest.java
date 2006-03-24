@@ -18,9 +18,9 @@ import java.util.Properties;
 
 /**
  * Tests that we are able to get a connection from
- * <a href="http://www.hibernate.org">Hibernate</a>.
+ * <a href="http://www.hibernate.org">Hibernate 2.x</a>.
  * (Code contributed by Mark Eagle)
- * @version $Revision: 1.2 $, $Date: 2006/01/18 14:40:06 $
+ * @version $Revision: 1.3 $, $Date: 2006/03/24 00:14:59 $
  * @author Bill Horsman {bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -231,6 +231,9 @@ public class HibernateTest extends AbstractProxoolTest {
 /*
 Revision history:
 $Log: HibernateTest.java,v $
+Revision 1.3  2006/03/24 00:14:59  billhorsman
+Changes for Hibernate 3
+
 Revision 1.2  2006/01/18 14:40:06  billhorsman
 Unbundled Jakarta's Commons Logging.
 
