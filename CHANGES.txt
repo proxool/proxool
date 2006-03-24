@@ -1,8 +1,8 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.42 $
-$Date: 2006/03/09 10:29:14 $
+$Revision: 1.43 $
+$Date: 2006/03/24 00:07:12 $
 $Author: billhorsman $
 
 0.9.0RC2
@@ -15,6 +15,8 @@ $Author: billhorsman $
   of this upgrade is to get Proxool to work with JDK 1.6 - more testing is needed before we can
   know the status of that. (Note that you can't build Proxool from source with 1.6 yet because if
   unimplemented methods in DataSource).
+
+- You can now configure the DataSource with delegate properties. Use the delegateProperties property.
 
 0.9.0RC1 (3 March 2006)
 
