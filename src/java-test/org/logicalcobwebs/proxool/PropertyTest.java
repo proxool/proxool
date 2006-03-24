@@ -16,9 +16,9 @@ import java.util.Properties;
 /**
  * Tests whether {@link ConnectionPoolDefinition} recognises properties
  * properly
- * @version $Revision: 1.2 $, $Date: 2004/05/26 17:19:09 $
+ * @version $Revision: 1.3 $, $Date: 2006/03/24 00:18:46 $
  * @author billhorsman
- * @author $Author: brenuart $ (current maintainer)
+ * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8.2
  */
 public class PropertyTest extends AbstractProxoolTest {
@@ -49,7 +49,7 @@ public class PropertyTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.USER_PROPERTY, TestConstants.HYPERSONIC_USER);
         info.setProperty(ProxoolConstants.PASSWORD_PROPERTY, TestConstants.HYPERSONIC_PASSWORD);
         info.setProperty(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY, TestConstants.HYPERSONIC_TEST_SQL);
-        
+
         Connection c = null;
         try {
             c = DriverManager.getConnection(url, info);
@@ -72,6 +72,10 @@ public class PropertyTest extends AbstractProxoolTest {
                 c = null;
             }
         }
+/*
+     This doesn't work with HSQLDB 1.8.0. They don't seem to mention the strict_md propertry in their
+     documentation anymore.
+
         // And now test with the strict meta data
         info.setProperty("jdbc.strict_md", "true");
         try {
@@ -91,11 +95,16 @@ public class PropertyTest extends AbstractProxoolTest {
                 c.close();
             }
         }
+*/
+
     }
 }
 /*
  Revision history:
  $Log: PropertyTest.java,v $
+ Revision 1.3  2006/03/24 00:18:46  billhorsman
+ Changes for HSQL 1.8
+
  Revision 1.2  2004/05/26 17:19:09  brenuart
  Allow JUnit tests to be executed against another database.
  By default the test configuration will be taken from the 'testconfig-hsqldb.properties' file located in the org.logicalcobwebs.proxool package.

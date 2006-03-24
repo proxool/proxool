@@ -10,7 +10,7 @@ package org.logicalcobwebs.proxool;
  * 
  * Note: these values will be overriden at startup by the GlobalTest init procedure.
  *
- * @version $Revision: 1.7 $, $Date: 2005/10/07 08:10:33 $
+ * @version $Revision: 1.8 $, $Date: 2006/03/24 00:19:10 $
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.5
@@ -55,12 +55,12 @@ public class TestConstants {
     /**
      * SQL statement that should always succeed
      */
-    public static String HYPERSONIC_TEST_SQL = "SELECT COUNT(1) FROM SYSTEM_CATALOGS";
+    public static String HYPERSONIC_TEST_SQL = "SELECT COUNT(1) FROM INFORMATION_SCHEMA.SYSTEM_TABLES";
 
     /**
      * SQL statement that should always succeed
      */
-    public static String HYPERSONIC_TEST_SQL_2 = "SELECT COUNT(2) FROM SYSTEM_CATALOGS";
+    public static String HYPERSONIC_TEST_SQL_2 = "SELECT COUNT(2) FROM INFORMATION_SCHEMA.SYSTEM_TABLES";
 
     /**
      * SQL statement that should always fail
@@ -76,6 +76,9 @@ public class TestConstants {
 /*
  Revision history:
  $Log: TestConstants.java,v $
+ Revision 1.8  2006/03/24 00:19:10  billhorsman
+ Changes for HSQL 1.8
+
  Revision 1.7  2005/10/07 08:10:33  billhorsman
  Second test SQL
 
