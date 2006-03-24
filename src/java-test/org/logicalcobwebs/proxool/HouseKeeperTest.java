@@ -20,7 +20,7 @@ import java.util.Properties;
  *
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.12 $, $Date: 2006/01/18 14:40:06 $
+ * @version $Revision: 1.13 $, $Date: 2006/03/24 00:17:32 $
  * @since Proxool 0.8
  */
 public class HouseKeeperTest extends AbstractProxoolTest {
@@ -111,7 +111,7 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 
         try {
             ConnectionResetter.setTriggerResetException(true);
-            String testName = "maximumActiveTime";
+            String testName = "maximumActiveTimeWithResetFailure";
             String alias = testName;
 
             String url = TestHelper.buildProxoolUrl(alias,
@@ -327,6 +327,9 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 /*
 Revision history:
 $Log: HouseKeeperTest.java,v $
+Revision 1.13  2006/03/24 00:17:32  billhorsman
+Correct alias name
+
 Revision 1.12  2006/01/18 14:40:06  billhorsman
 Unbundled Jakarta's Commons Logging.
 
