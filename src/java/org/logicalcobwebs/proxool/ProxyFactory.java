@@ -8,6 +8,8 @@ package org.logicalcobwebs.proxool;
 import org.logicalcobwebs.cglib.proxy.Enhancer;
 import org.logicalcobwebs.cglib.proxy.Factory;
 import org.logicalcobwebs.cglib.proxy.Callback;
+import org.logicalcobwebs.cglib.core.NamingPolicy;
+import org.logicalcobwebs.cglib.core.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,7 +29,7 @@ import java.lang.reflect.Modifier;
  * object given a proxy.
  * @author Bill Horsman (bill@logicalcobwebs.co.uk)
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.32 $, $Date: 2006/01/18 14:40:02 $
+ * @version $Revision: 1.33 $, $Date: 2006/04/09 21:08:43 $
  * @since Proxool 0.5
  */
 class ProxyFactory {
@@ -35,6 +37,41 @@ class ProxyFactory {
     private static final Log LOG = LogFactory.getLog(ProxyFactory.class);
 
     private static Map interfaceMap = new HashMap();
+
+    /**
+     * This naming policy stops conflicts with other Cglib instances that are running
+     * (Even ones in different packages). Without using our own naming policy we end
+     * up with exceptions like:
+     * <pre>
+     * java.lang.LinkageError: duplicate class definition:
+     *   $java/lang/Object$$FastClassByCGLIB$$3f697993
+     * </pre>
+     */
+    private static NamingPolicy NAMING_POLICY = new NamingPolicy() {
+        public String getClassName(String prefix, String source, Object key, Predicate names) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(
+                    (prefix != null) ?
+                            (
+                                    prefix.startsWith("java") ?
+                                            "$" + prefix : prefix
+                            )
+                            : "net.sf.cglib.empty.Object"
+            );
+            sb.append("$$");
+            sb.append(source.substring(source.lastIndexOf('.') + 1));
+            sb.append("ByProxool$$");
+            sb.append(Integer.toHexString(key.hashCode()));
+            String base = sb.toString();
+            String attempt = base;
+            int index = 2;
+            while (names.evaluate(attempt)) {
+                attempt = base + "_" + index++;
+            }
+
+            return attempt;
+        }
+    };
 
     /**
      * Wraps up a proxyConnection inside a {@link WrappedConnection} and then proxies it as a
@@ -72,6 +109,7 @@ class ProxyFactory {
 
     private static Object getProxy(Object delegate, Callback callback, ConnectionPoolDefinitionIF def) {
         Enhancer e = new Enhancer();
+        e.setNamingPolicy(NAMING_POLICY);
         e.setInterfaces(getInterfaces(delegate.getClass(), def));
         e.setCallback(callback);
         e.setClassLoader(ProxyFactory.class.getClassLoader());
@@ -244,6 +282,9 @@ class ProxyFactory {
 /*
  Revision history:
  $Log: ProxyFactory.java,v $
+ Revision 1.33  2006/04/09 21:08:43  billhorsman
+ Use our own naming policy for Cglib to avoid duplicate class definition exceptions.
+
  Revision 1.32  2006/01/18 14:40:02  billhorsman
  Unbundled Jakarta's Commons Logging.
 
