@@ -32,7 +32,7 @@ import java.io.PrintWriter;
  * </ul>
  *
  * TODO - expand
- * @version $Revision: 1.6 $, $Date: 2006/03/23 11:51:23 $
+ * @version $Revision: 1.7 $, $Date: 2006/05/23 21:17:55 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -555,6 +555,10 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
         if (property != null) {
             setMaximumConnectionLifetime(Integer.valueOf(property.getContent().toString()).intValue());
         }
+        property = reference.get(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY);
+        if (property != null) {
+            setMaximumActiveTime(Integer.valueOf(property.getContent().toString()).intValue());
+        }
         property = reference.get(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY);
         if (property != null) {
             setMinimumConnectionCount(Integer.valueOf(property.getContent().toString()).intValue());
@@ -679,6 +683,9 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.7  2006/05/23 21:17:55  billhorsman
+ Add in maximum-active-time. Credit to Paolo Di Tommaso.
+
  Revision 1.6  2006/03/23 11:51:23  billhorsman
  Allow for delegate properties
 
