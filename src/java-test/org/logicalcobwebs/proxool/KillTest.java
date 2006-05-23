@@ -11,7 +11,7 @@ import java.sql.DriverManager;
 
 /**
  * Tests whether we can kill connections when we want to
- * @version $Revision: 1.1 $, $Date: 2004/03/23 21:14:24 $
+ * @version $Revision: 1.2 $, $Date: 2006/05/23 21:33:52 $
  * @author <a href="mailto:bill@logicalcobwebs.co.uk">Bill Horsman</a>
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -97,9 +97,12 @@ public class KillTest extends AbstractProxoolTest {
         ProxoolFacade.killConnecton(alias, id1, MERCIFUL);
         // One left
         assertEquals("Connection count", 1, ProxoolFacade.getSnapshot(alias, DETAILED).getConnectionInfos().length);
+        assertEquals("Active count", 0, ProxoolFacade.getSnapshot(alias, DETAILED).getActiveConnectionCount());
         Connection c3 = DriverManager.getConnection(url, info);
+        assertEquals("Active count", 1, ProxoolFacade.getSnapshot(alias, DETAILED).getActiveConnectionCount());
         long id3 = ProxoolFacade.getId(c3);
         Connection c4 = DriverManager.getConnection(url, info);
+        assertEquals("Active count", 2, ProxoolFacade.getSnapshot(alias, DETAILED).getActiveConnectionCount());
         long id4 = ProxoolFacade.getId(c4);
         c3.close();
         c4.close();
@@ -143,6 +146,9 @@ public class KillTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: KillTest.java,v $
+ Revision 1.2  2006/05/23 21:33:52  billhorsman
+ More asserts
+
  Revision 1.1  2004/03/23 21:14:24  billhorsman
  new tests
 
