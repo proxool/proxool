@@ -63,7 +63,7 @@ import java.util.Properties;
  *
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.13 $, $Date: 2006/01/18 14:39:56 $
+ * @version $Revision: 1.14 $, $Date: 2006/06/09 17:32:54 $
  * @since Proxool 0.7
  */
 public class AdminServlet extends HttpServlet {
@@ -804,7 +804,7 @@ public class AdminServlet extends HttpServlet {
             // Don't bother listing. Just show it.
         } else {
             out.println("<form action=\"" + link + "\" method=\"GET\" name=\"alias\">");
-            out.println("<select name=\"alias\" size=\"" + Math.min(aliases.length, 5) + "\"");
+            out.println("<select name=\"alias\" size=\"" + Math.min(aliases.length, 5) + "\">");
             for (int i = 0; i < aliases.length; i++) {
                 out.print("  <option value=\"");
                 out.print(aliases[i]);
@@ -839,6 +839,9 @@ public class AdminServlet extends HttpServlet {
 /*
 Revision history:
 $Log: AdminServlet.java,v $
+Revision 1.14  2006/06/09 17:32:54  billhorsman
+Fix closing tag for select. Credit to Paolo Di Tommaso.
+
 Revision 1.13  2006/01/18 14:39:56  billhorsman
 Unbundled Jakarta's Commons Logging.
 
