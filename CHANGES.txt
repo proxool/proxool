@@ -1,9 +1,22 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.43 $
-$Date: 2006/03/24 00:07:12 $
+$Revision: 1.44 $
+$Date: 2006/06/09 18:39:17 $
 $Author: billhorsman $
+
+0.9.0RC3
+
+- New naming policy for Cglib stops conflicts with other Cglib instances that are running
+  (Even ones in different packages). Without using our own naming policy we end
+  up with exceptions like:
+    java.lang.LinkageError: duplicate class definition:
+    $java/lang/Object$$FastClassByCGLIB$$3f697993
+
+- Fixed bug in ProxoolDataSource to add in maximum-active-time. Credit to Paolo Di Tommaso.
+
+- Fixed bug in AdminServlet where select HTML tag was not closed properly. Credit to Paolo Di
+  Tommaso.
 
 0.9.0RC2
 
