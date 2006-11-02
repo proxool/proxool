@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.84 $, $Date: 2006/01/18 14:40:01 $
+ * @version $Revision: 1.85 $, $Date: 2006/11/02 10:00:34 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -51,6 +51,12 @@ public class ProxoolFacade {
      * shutdownHook. It is removed during shutdown.
      */
     private static Thread shutdownHook;
+
+    /**
+     * If you setthis to false then it us up to you to call shutdown explicitly
+     * @see #shutdown(String, int)
+     */
+    private static boolean shutdownHookEnabled = true;
 
     /**
      * Build a ConnectionPool based on this definition and then start it.
@@ -239,6 +245,33 @@ public class ProxoolFacade {
         PrototyperController.shutdown();
         HouseKeeperController.shutdown();
 
+    }
+
+    /**
+     * If you call this then you'll have to call shutdown explicitly
+     * @see #shutdown(String, int)
+     */
+    public static void disableShutdownHook() {
+        ProxoolFacade.shutdownHookEnabled = false;
+    }
+
+    /**
+     * Call this if you change your mind about {@link #disableShutdownHook() disabling} it.
+     * The default behaviour is to have it enabled so unless you have disabled it then
+     * there's nothing to do.
+     */
+    public static void enableShutdownHook() {
+        ProxoolFacade.shutdownHookEnabled = true;
+    }
+
+    /**
+     * Whether the {@link ShutdownHook} should do anything.
+     * @see #disableShutdownHook()
+     * @see #enableShutdownHook()
+     * @return true if the shutdown hook should clean up
+     */
+    public static boolean isShutdownHookEnabled() {
+        return shutdownHookEnabled;
     }
 
     /**
@@ -821,6 +854,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.85  2006/11/02 10:00:34  billhorsman
+ Added ProxoolFacade.disableShutdownHook.
+
  Revision 1.84  2006/01/18 14:40:01  billhorsman
  Unbundled Jakarta's Commons Logging.
 

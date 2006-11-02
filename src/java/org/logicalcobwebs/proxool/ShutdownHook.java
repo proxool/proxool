@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * This is instantiated statically by ProxoolFacade. It will automatically
  * close down all the connections when the JVM stops.
- * @version $Revision: 1.12 $, $Date: 2006/01/18 14:40:02 $
+ * @version $Revision: 1.13 $, $Date: 2006/11/02 10:00:34 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -84,13 +84,18 @@ class ShutdownHook implements Runnable {
     }
 
     /**
-     * Remove all connection pools without delay
+     * Remove all connection pools without delay. Only runs if the
+     * shutdown hook is {@link org.logicalcobwebs.proxool.ProxoolFacade#isShutdownHookEnabled() enabled}.
      * @see ProxoolFacade#removeAllConnectionPools
      */
     public void run() {
-        LOG.debug("Running ShutdownHook");
-        Thread.currentThread().setName("Shutdown Hook");
-        ProxoolFacade.shutdown(0);
+        if (ProxoolFacade.isShutdownHookEnabled()) {
+            LOG.debug("Running ShutdownHook");
+            Thread.currentThread().setName("Shutdown Hook");
+            ProxoolFacade.shutdown(0);
+        } else {
+            LOG.debug("Skipping ShutdownHook because it's been disabled");
+        }
     }
 
 }
@@ -99,6 +104,9 @@ class ShutdownHook implements Runnable {
 /*
  Revision history:
  $Log: ShutdownHook.java,v $
+ Revision 1.13  2006/11/02 10:00:34  billhorsman
+ Added ProxoolFacade.disableShutdownHook.
+
  Revision 1.12  2006/01/18 14:40:02  billhorsman
  Unbundled Jakarta's Commons Logging.
 
