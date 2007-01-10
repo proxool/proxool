@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
 /**
  * Manages a connection. This is wrapped up inside a...
  *
- * @version $Revision: 1.37 $, $Date: 2006/01/18 14:40:02 $
+ * @version $Revision: 1.38 $, $Date: 2007/01/10 23:47:39 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.10
@@ -177,7 +177,7 @@ public class ProxyConnection implements ProxyConnectionIF {
         if (openStatements.contains(statement)) {
             openStatements.remove(statement);
         } else {
-            connectionPool.getLog().warn(connectionPool.displayStatistics() + " - #" + getId() + " registered a statement as closed which wasn't known to be open.");
+            connectionPool.getLog().warn(connectionPool.displayStatistics() + " - #" + getId() + " registered a statement as closed which wasn't known to be open. This could happen if you close a statement twice.");
         }
     }
 
