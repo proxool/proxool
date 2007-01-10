@@ -1,22 +1,22 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.45 $
-$Date: 2006/11/02 10:01:11 $
+$Revision: 1.46 $
+$Date: 2007/01/10 09:24:35 $
 $Author: billhorsman $
 
 0.9.0RC3
 
 - New naming policy for Cglib stops conflicts with other Cglib instances that are running
-  (Even ones in different packages). Without using our own naming policy we end
+  (even ones in different packages). Without using our own naming policy we end
   up with exceptions like:
     java.lang.LinkageError: duplicate class definition:
     $java/lang/Object$$FastClassByCGLIB$$3f697993
 
 - Added ProxoolFacade.disableShutdownHook so that you can choose to explicitly shutdown
   Proxool programatically. This is useful because the order that the JVM calls shutdown
-  hooks isn't easily controlled and you might want to shutdown Proxool *after* you've 
-  done some cleaning up yourself.
+  hooks isn't easily controlled and you might want to shutdown Proxool *after* you've
+  done some cleaning up yourself. Suggested by Alex Lemaire.
 
 - Fixed bug in ProxoolDataSource to add in maximum-active-time. Credit to Paolo Di Tommaso.
 
