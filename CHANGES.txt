@@ -1,9 +1,13 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.46 $
-$Date: 2007/01/10 09:24:35 $
+$Revision: 1.47 $
+$Date: 2007/01/11 09:51:20 $
 $Author: billhorsman $
+
+- Changed the warning message when a statement is closed which isn't known to be 
+  open. This can happen if you close a statement twice and the message now suggests
+  that as a cause.
 
 0.9.0RC3
 
