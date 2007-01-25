@@ -14,7 +14,7 @@ import java.sql.Statement;
  * connection. The subclass of this defines how we delegate to the
  * real connection.
 
- * @version $Revision: 1.7 $, $Date: 2005/10/07 08:18:24 $
+ * @version $Revision: 1.8 $, $Date: 2007/01/25 23:38:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -131,12 +131,28 @@ public interface ProxyConnectionIF extends ConnectionInfoIF {
      */
     String getLastSqlCall();
 
+    /**
+     * Get the reason why this connection is {@link #getMark() marked}
+     * @return {@link org.logicalcobwebs.proxool.ConnectionListenerIF#MAXIMUM_ACTIVE_TIME_EXPIRED},
+     * {@link org.logicalcobwebs.proxool.ConnectionListenerIF#HOUSE_KEEPER_TEST_FAIL},
+     * {@link org.logicalcobwebs.proxool.ConnectionListenerIF#FATAL_SQL_EXCEPTION_DETECTED},
+     * {@link org.logicalcobwebs.proxool.ConnectionListenerIF#MANUAL_EXPIRY},
+     * {@link org.logicalcobwebs.proxool.ConnectionListenerIF#MAXIMUM_CONNECTION_LIFETIME_EXCEEDED},
+     * {@link org.logicalcobwebs.proxool.ConnectionListenerIF#RESET_FAIL},
+     * {@link org.logicalcobwebs.proxool.ConnectionListenerIF#SHUTDOWN}, or
+     * {@link org.logicalcobwebs.proxool.ConnectionListenerIF#VALIDATION_FAIL}
+     */
+    int getReasonCode();
+
 }
 
 
 /*
  Revision history:
  $Log: ProxyConnectionIF.java,v $
+ Revision 1.8  2007/01/25 23:38:24  billhorsman
+ Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
+
  Revision 1.7  2005/10/07 08:18:24  billhorsman
  New sqlCalls gives list of SQL calls rather than just he most recent (for when a connection makes more than one call before being returned to the pool)
 

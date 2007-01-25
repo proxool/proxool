@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
  * Contains most of the functionality that we require to manipilate the
  * statement. The subclass of this defines how we delegate to the
  * real statement.
- * @version $Revision: 1.22 $, $Date: 2006/03/03 09:58:26 $
+ * @version $Revision: 1.23 $, $Date: 2007/01/25 23:38:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -67,7 +67,7 @@ abstract class AbstractProxyStatement {
             // just junk it.
             try {
                 statement.close();
-                connectionPool.throwConnection(proxyConnection, "Fatal SQL Exception has been detected");
+                connectionPool.throwConnection(proxyConnection, ConnectionListenerIF.FATAL_SQL_EXCEPTION_DETECTED, "Fatal SQL Exception has been detected");
 
                 // We should check all the existing connections as soon as possible
                 HouseKeeperController.sweepNow(connectionPool.getDefinition().getAlias());
@@ -276,6 +276,9 @@ abstract class AbstractProxyStatement {
 /*
  Revision history:
  $Log: AbstractProxyStatement.java,v $
+ Revision 1.23  2007/01/25 23:38:24  billhorsman
+ Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
+
  Revision 1.22  2006/03/03 09:58:26  billhorsman
  Fix for statement.getConnection(). See bug 1149834.
 

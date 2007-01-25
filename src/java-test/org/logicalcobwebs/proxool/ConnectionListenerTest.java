@@ -15,7 +15,7 @@ import java.util.Properties;
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.16 $, $Date: 2007/01/25 00:10:24 $
+ * @version $Revision: 1.17 $, $Date: 2007/01/25 23:38:24 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -213,7 +213,7 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
             onBirthCalls++;
         }
 
-        public void onDeath(Connection connection) throws SQLException {
+        public void onDeath(Connection connection, int reasonCode) throws SQLException {
             onDeathCalls++;
         }
 
@@ -244,6 +244,9 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.17  2007/01/25 23:38:24  billhorsman
+ Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
+
  Revision 1.16  2007/01/25 00:10:24  billhorsman
  New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
 

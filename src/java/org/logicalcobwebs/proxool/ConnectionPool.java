@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.85 $, $Date: 2007/01/25 00:10:24 $
+ * @version $Revision: 1.86 $, $Date: 2007/01/25 23:38:24 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -285,7 +285,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         }
         else {
             proxyConnection.setStatus(ProxyConnectionIF.STATUS_NULL);
-            removeProxyConnection(proxyConnection, "it didn't pass the validation", ConnectionPool.REQUEST_EXPIRY, true);
+            removeProxyConnection(proxyConnection, ConnectionListenerIF.VALIDATION_FAIL, "it didn't pass the validation", ConnectionPool.REQUEST_EXPIRY, true);
         }
         
         // return 
@@ -342,7 +342,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         // It's possible that this connection is due for expiry
         if (proxyConnection.isMarkedForExpiry()) {
             if (proxyConnection.setStatus(ProxyConnectionIF.STATUS_ACTIVE, ProxyConnectionIF.STATUS_NULL)) {
-                expireProxyConnection(proxyConnection, proxyConnection.getReasonForMark(), REQUEST_EXPIRY);
+                expireProxyConnection(proxyConnection, proxyConnection.getReasonCode(), proxyConnection.getReasonForMark(), REQUEST_EXPIRY);
             }
         } else {
 
@@ -378,8 +378,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     /** This means that there's something wrong the connection and it's probably best if no one uses it again. */
-    protected void throwConnection(ProxyConnectionIF proxyConnection, String reason) {
-        expireConnectionAsSoonAsPossible(proxyConnection, reason, true);
+    protected void throwConnection(ProxyConnectionIF proxyConnection, int reasonCode, String reason) {
+        expireConnectionAsSoonAsPossible(proxyConnection, reasonCode, reason, true);
     }
 
     /** Get a ProxyConnection by index */
@@ -404,7 +404,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * merely mark it for expiry so that it is removed as soon as it finished being active
      * @param triggerSweep if true then this removal will trigger a prototype sweep
      */
-    protected void removeProxyConnection(ProxyConnectionIF proxyConnection, String reason, boolean forceExpiry, boolean triggerSweep) {
+    protected void removeProxyConnection(ProxyConnectionIF proxyConnection, int reasonCode, String reason, boolean forceExpiry, boolean triggerSweep) {
         // Just check that it is null
         if (forceExpiry || proxyConnection.isNull()) {
 
@@ -413,7 +413,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
             /* Run some code everytime we destroy a connection */
 
             try {
-                onDeath(proxyConnection.getConnection());
+                onDeath(proxyConnection.getConnection(), reasonCode);
             } catch (SQLException e) {
                 log.error("Problem during onDeath (ignored)", e);
             }
@@ -452,8 +452,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         }
     }
 
-    protected void expireProxyConnection(ProxyConnectionIF proxyConnection, String reason, boolean forceExpiry) {
-        removeProxyConnection(proxyConnection, reason, forceExpiry, true);
+    protected void expireProxyConnection(ProxyConnectionIF proxyConnection, int reasonCode, String reason, boolean forceExpiry) {
+        removeProxyConnection(proxyConnection, reasonCode, reason, forceExpiry, true);
     }
 
     /**
@@ -542,7 +542,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                         long id = getProxyConnection(i).getId();
                         try {
                             connectionClosedManually = true;
-                            removeProxyConnection(getProxyConnection(i), "of shutdown", true, false);
+                            removeProxyConnection(getProxyConnection(i), ConnectionListenerIF.SHUTDOWN, "of shutdown", true, false);
                             if (log.isDebugEnabled()) {
                                 log.debug("Connection #" + id + " closed");
                             }
@@ -647,7 +647,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         return statistics.toString();
     }
 
-    protected void expireAllConnections(String reason, boolean merciful) {
+    protected void expireAllConnections(int reasonCode, String reason, boolean merciful) {
 
         // Do this in two stages because expiring a connection will trigger
         // the prototyper to make more. And that might mean we end up
@@ -660,15 +660,15 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         Iterator i = pcs.iterator();
         while (i.hasNext()) {
             ProxyConnectionIF pc = (ProxyConnectionIF) i.next();
-            expireConnectionAsSoonAsPossible(pc, reason, merciful);
+            expireConnectionAsSoonAsPossible(pc, reasonCode, reason, merciful);
         }
     }
 
-    protected void expireConnectionAsSoonAsPossible(ProxyConnectionIF proxyConnection, String reason, boolean merciful) {
+    protected void expireConnectionAsSoonAsPossible(ProxyConnectionIF proxyConnection, int reasonCode, String reason, boolean merciful) {
         if (proxyConnection.setStatus(ProxyConnectionIF.STATUS_AVAILABLE, ProxyConnectionIF.STATUS_OFFLINE)) {
             if (proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_NULL)) {
                 // It is.  Expire it now .
-                expireProxyConnection(proxyConnection, reason, REQUEST_EXPIRY);
+                expireProxyConnection(proxyConnection, reasonCode, reason, REQUEST_EXPIRY);
             }
         } else {
             // Oh no, it's in use.
@@ -685,7 +685,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 // So? Kill, kill, kill
 
                 // We have to make sure it's null first.
-                expireProxyConnection(proxyConnection, reason, FORCE_EXPIRY);
+                expireProxyConnection(proxyConnection, reasonCode, reason, FORCE_EXPIRY);
             }
 
         } // END if (proxyConnection.setOffline())
@@ -784,13 +784,8 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     }
 
     /** Call the onDeath() method on each StateListenerIF . */
-    protected void onDeath(Connection connection) throws SQLException {
-        this.compositeConnectionListener.onDeath(connection);
-    }
-
-    /** Call the onAboutToDie() method on each StateListenerIF . */
-    protected void onAboutToDie(Connection connection, int reason) throws SQLException {
-        this.compositeConnectionListener.onAboutToDie(connection, reason);
+    protected void onDeath(Connection connection, int reasonCode) throws SQLException {
+        this.compositeConnectionListener.onDeath(connection, reasonCode);
     }
 
     /** Call the onExecute() method on each StateListenerIF . */
@@ -878,7 +873,7 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
                 // This is the one
                 proxyConnection.setStatus(ProxyConnectionIF.STATUS_AVAILABLE, ProxyConnectionIF.STATUS_OFFLINE);
                 proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_NULL);
-                removeProxyConnection(proxyConnection, "it was manually killed", forceExpiry, true);
+                removeProxyConnection(proxyConnection, ConnectionListenerIF.MANUAL_EXPIRY, "it was manually killed", forceExpiry, true);
                 success = true;
                 break;
             }
@@ -912,9 +907,16 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
      * {@link ConnectionResetter#reset Resets} a Connection to its
      * original state.
      * @param connection the one to reset
+     * @param id the id of the connection
+     * @throws SQLException  if the call to {@link java.sql.Connection#isClosed()} fails
+     * @return true if it was successfully reset, false if there was a problem (like the connection being already closed)
      */
-    protected boolean resetConnection(Connection connection, String id) {
-        return connectionResetter.reset(connection, id);
+    protected boolean resetConnection(Connection connection, String id) throws SQLException {
+        if (connection.isClosed()) {
+            return false;
+        } else {
+            return connectionResetter.reset(connection, id);
+        }
     }
 
     /**
@@ -1110,11 +1112,16 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
     public long getConnectionCount() {
         return getPrototyper().getConnectionCount();
     }
+
+    
 }
 
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.86  2007/01/25 23:38:24  billhorsman
+ Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
+
  Revision 1.85  2007/01/25 00:10:24  billhorsman
  New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
 

@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
 /**
  * Manages a connection. This is wrapped up inside a...
  *
- * @version $Revision: 1.38 $, $Date: 2007/01/10 23:47:39 $
+ * @version $Revision: 1.39 $, $Date: 2007/01/25 23:38:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.10
@@ -235,7 +235,7 @@ public class ProxyConnection implements ProxyConnectionIF {
                     // means keeping track when they change and that might be even
                     // slower
                     if (!connectionPool.resetConnection(connection, "#" + getId())) {
-                        connectionPool.removeProxyConnection(this, "it couldn't be reset", true, true);
+                        connectionPool.removeProxyConnection(this, ConnectionListenerIF.RESET_FAIL, "it couldn't be reset", true, true);
                         removed = true;
                     }
                     needToReset = false;
@@ -494,6 +494,10 @@ public class ProxyConnection implements ProxyConnectionIF {
         } else {
             return null;
         }
+    }
+
+    public int getReasonCode() {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void addSqlCall(String sqlCall) {

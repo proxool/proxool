@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.85 $, $Date: 2006/11/02 10:00:34 $
+ * @version $Revision: 1.86 $, $Date: 2007/01/25 23:38:24 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -350,7 +350,7 @@ public class ProxoolFacade {
      * @throws ProxoolException if we couldn't find the pool
      */
     public static void killAllConnections(String alias, String reason, boolean merciful) throws ProxoolException {
-        ConnectionPoolManager.getInstance().getConnectionPool(alias).expireAllConnections(reason, merciful);
+        ConnectionPoolManager.getInstance().getConnectionPool(alias).expireAllConnections(ConnectionListenerIF.MANUAL_EXPIRY, reason, merciful);
     }
 
     /**
@@ -854,6 +854,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.86  2007/01/25 23:38:24  billhorsman
+ Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
+
  Revision 1.85  2006/11/02 10:00:34  billhorsman
  Added ProxoolFacade.disableShutdownHook.
 

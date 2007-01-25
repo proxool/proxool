@@ -20,7 +20,7 @@ import java.sql.SQLException;
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
  * 
- * @version $Revision: 1.7 $, $Date: 2007/01/25 00:10:24 $
+ * @version $Revision: 1.8 $, $Date: 2007/01/25 23:38:24 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -51,44 +51,22 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
     }
 
     /**
-     * @see ConnectionListenerIF#onDeath(Connection)
+     * @see ConnectionListenerIF#onDeath(java.sql.Connection, int)
      */
-    public void onDeath(Connection connection) throws SQLException 
+    public void onDeath(Connection connection, int reasonCode) throws SQLException
     {
         Object[] listeners = getListeners();
         
         for(int i=0; i<listeners.length; i++) {
             try {
                 ConnectionListenerIF connectionListener = (ConnectionListenerIF) listeners[i];
-                connectionListener.onDeath(connection);
+                connectionListener.onDeath(connection, reasonCode);
             }
             catch (RuntimeException re) {
                 LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching onDeath event", re);
             }
             catch(SQLException se) {
                 LOG.warn("SQLException received from listener "+listeners[i]+" when dispatching onDeath event - event dispatching cancelled");
-                throw se;
-            }
-        }
-    }
-
-    /**
-     * @see ConnectionListenerIF#onAboutToDie(java.sql.Connection, int) 
-     */
-    public void onAboutToDie(Connection connection, int reason) throws SQLException
-    {
-        Object[] listeners = getListeners();
-
-        for(int i=0; i<listeners.length; i++) {
-            try {
-                ConnectionListenerIF connectionListener = (ConnectionListenerIF) listeners[i];
-                connectionListener.onAboutToDie(connection, reason);
-            }
-            catch (RuntimeException re) {
-                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching onAboutToDie event", re);
-            }
-            catch(SQLException se) {
-                LOG.warn("SQLException received from listener "+listeners[i]+" when dispatching onAboutToDie event - event dispatching cancelled");
                 throw se;
             }
         }
@@ -134,6 +112,9 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
 /*
  Revision history:
  $Log: CompositeConnectionListener.java,v $
+ Revision 1.8  2007/01/25 23:38:24  billhorsman
+ Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
+
  Revision 1.7  2007/01/25 00:10:24  billhorsman
  New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
 

@@ -20,7 +20,7 @@ import java.util.Properties;
  *
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.14 $, $Date: 2007/01/25 00:10:24 $
+ * @version $Revision: 1.15 $, $Date: 2007/01/25 23:38:24 $
  * @since Proxool 0.8
  */
 public class HouseKeeperTest extends AbstractProxoolTest {
@@ -329,31 +329,25 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 
         boolean called;
 
-        public void onBirth(Connection connection) throws SQLException {
-            //To change body of implemented methods use File | Settings | File Templates.
+        public void onBirth(Connection connection) throws SQLException {}
+
+        public void onDeath(Connection connection, int reasonCode) throws SQLException {
+            called = (reasonCode == ConnectionListenerIF.MAXIMUM_ACTIVE_TIME_EXPIRED);
         }
 
-        public void onDeath(Connection connection) throws SQLException {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
+        public void onExecute(String command, long elapsedTime) {}
 
-        public void onExecute(String command, long elapsedTime) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
+        public void onFail(String command, Exception exception) {}
 
-        public void onFail(String command, Exception exception) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public void onAboutToDie(Connection connection, int reason) throws SQLException {
-            called = true;
-        }
     }
 }
 
 /*
 Revision history:
 $Log: HouseKeeperTest.java,v $
+Revision 1.15  2007/01/25 23:38:24  billhorsman
+Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
+
 Revision 1.14  2007/01/25 00:10:24  billhorsman
 New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
 

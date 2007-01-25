@@ -10,12 +10,11 @@ import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.Statement;
-import java.sql.SQLException;
 
 /**
  * Responisble for house keeping one pool
  *
- * @version $Revision: 1.6 $, $Date: 2007/01/25 00:10:25 $
+ * @version $Revision: 1.7 $, $Date: 2007/01/25 23:38:24 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -68,7 +67,7 @@ class HouseKeeper {
                        // Some DBs return an object even if DB is shut down
                        if (proxyConnection.isReallyClosed()) {
                            proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_NULL);
-                           connectionPool.removeProxyConnection(proxyConnection, "it appears to be closed", ConnectionPool.FORCE_EXPIRY, true);
+                           connectionPool.removeProxyConnection(proxyConnection, ConnectionListenerIF.HOUSE_KEEPER_TEST_FAIL, "it appears to be closed", ConnectionPool.FORCE_EXPIRY, true);
                        }
 
                        String sql = definition.getHouseKeepingTestSql();
@@ -88,7 +87,7 @@ class HouseKeeper {
                    } catch (Throwable e) {
                        // There is a problem with this connection.  Let's remove it!
                        proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_NULL);
-                       connectionPool.removeProxyConnection(proxyConnection, "it has problems: " + e, ConnectionPool.REQUEST_EXPIRY, true);
+                       connectionPool.removeProxyConnection(proxyConnection, ConnectionListenerIF.HOUSE_KEEPER_TEST_FAIL, "it has problems: " + e, ConnectionPool.REQUEST_EXPIRY, true);
                    } finally {
                        try {
                            testStatement.close();
@@ -104,7 +103,7 @@ class HouseKeeper {
                    if (proxyConnection.setStatus(ProxyConnectionIF.STATUS_AVAILABLE, ProxyConnectionIF.STATUS_OFFLINE)) {
                        if (proxyConnection.setStatus(ProxyConnectionIF.STATUS_OFFLINE, ProxyConnectionIF.STATUS_NULL)) {
                            // It is.  Expire it now .
-                           connectionPool.expireProxyConnection(proxyConnection, reason, ConnectionPool.REQUEST_EXPIRY);
+                           connectionPool.expireProxyConnection(proxyConnection, ConnectionListenerIF.MAXIMUM_CONNECTION_LIFETIME_EXCEEDED, reason, ConnectionPool.REQUEST_EXPIRY);
                        }
                    } else {
                        // Oh no, it's in use.  Never mind, we'll mark it for expiry
@@ -137,12 +136,7 @@ class HouseKeeper {
 
                        // This connection has been active for way too long. We're
                        // going to kill it :)
-                       try {
-                           connectionPool.onAboutToDie(proxyConnection.getConnection(), ConnectionListenerIF.LIFETIME_EXPIRED);
-                       } catch (SQLException e) {
-                           log.error("Problem during onAboutToDie (ignored)", e);
-                       }
-                       connectionPool.removeProxyConnection(proxyConnection,
+                       connectionPool.removeProxyConnection(proxyConnection, ConnectionListenerIF.MAXIMUM_ACTIVE_TIME_EXPIRED, 
                                "it has been active for too long", ConnectionPool.FORCE_EXPIRY, true);
                        String lastSqlCallMsg;
                        if (proxyConnection.getLastSqlCall() != null) {
@@ -265,6 +259,9 @@ class HouseKeeper {
 /*
  Revision history:
  $Log: HouseKeeper.java,v $
+ Revision 1.7  2007/01/25 23:38:24  billhorsman
+ Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
+
  Revision 1.6  2007/01/25 00:10:25  billhorsman
  New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
 

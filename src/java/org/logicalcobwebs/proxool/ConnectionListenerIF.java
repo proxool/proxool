@@ -22,7 +22,7 @@ import java.sql.SQLException;
  * ProxoolFacade.{@link org.logicalcobwebs.proxool.ProxoolFacade#addConnectionListener addConnectionListener}(alias, myConnectionListener);
  * </pre>
  *
- * @version $Revision: 1.8 $, $Date: 2007/01/25 00:10:24 $
+ * @version $Revision: 1.9 $, $Date: 2007/01/25 23:38:24 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -30,11 +30,58 @@ public interface ConnectionListenerIF {
 
     /**
      * We are killing a connection because the
-     * {@link ConnectionPoolDefinitionIF#getMaximumActiveTime() maximum-active-time}
+     * {@link org.logicalcobwebs.proxool.ProxoolConstants#MAXIMUM_ACTIVE_TIME MAXIMUM_ACTIVE_TIME}
      * has been exceeded.
-     * @see #onAboutToDie(java.sql.Connection, int)
+     * @see #onDeath(java.sql.Connection, int)
      */
-    static final int LIFETIME_EXPIRED = 0;
+    static final int MAXIMUM_ACTIVE_TIME_EXPIRED = 1;
+
+    /**
+     * We are killing a connection because it's manually been expired (by something external to
+     * Proxool)
+     * @see #onDeath(java.sql.Connection, int)
+     */
+    static final int MANUAL_EXPIRY = 2;
+
+    /**
+     * We are killing a connection because it has not been
+     * {@link org.logicalcobwebs.proxool.ConnectionValidatorIF#validate(ConnectionPoolDefinitionIF, java.sql.Connection) validated}.
+     * @see #onDeath(java.sql.Connection, int)
+     */
+    static final int VALIDATION_FAIL = 3;
+
+    /**
+     * We are killing a connection because Proxool is shutting down
+     * @see #onDeath(java.sql.Connection, int)
+     */
+    static final int SHUTDOWN = 4;
+
+    /**
+     * We are killing a connection because it couldn't be {@link org.logicalcobwebs.proxool.ConnectionResetter#reset(java.sql.Connection, String) reset}
+     * after it was returned to the pool and we don't want to give it out again in an unknown state.
+     * @see #onDeath(java.sql.Connection, int)
+     */
+    static final int RESET_FAIL = 5;
+
+    /**
+     * We are killing a connection because the routine house keeper test failed
+     * @see #onDeath(java.sql.Connection, int)
+     */
+    static final int HOUSE_KEEPER_TEST_FAIL = 6;
+
+    /**
+     * We are killing a connection because it's {@link org.logicalcobwebs.proxool.ProxoolConstants#MAXIMUM_CONNECTION_LIFETIME MAXIMUM_CONNECTION_LIFETIME}
+     * has been exceeded.
+     * @see #onDeath(java.sql.Connection, int)
+     */
+    static final int MAXIMUM_CONNECTION_LIFETIME_EXCEEDED = 7;
+
+    /**
+     * We are killing a connection because a {@link org.logicalcobwebs.proxool.ProxoolConstants#FATAL_SQL_EXCEPTION FATAL_SQL_EXCEPTION}
+     * has been detected.
+     * @see #onDeath(java.sql.Connection, int)
+     */
+    static final int FATAL_SQL_EXCEPTION_DETECTED = 8;
 
     /**
      * Happens everytime we create a new connection. You can use this
@@ -51,9 +98,17 @@ public interface ConnectionListenerIF {
      * reclaim resources from a connection.
      *
      * @param connection the connection that is about to expire
+     * @param reasonCode {@link #MAXIMUM_ACTIVE_TIME_EXPIRED},
+     * {@link #HOUSE_KEEPER_TEST_FAIL},
+     * {@link #FATAL_SQL_EXCEPTION_DETECTED},
+     * {@link #MANUAL_EXPIRY},
+     * {@link #MAXIMUM_CONNECTION_LIFETIME_EXCEEDED},
+     * {@link #RESET_FAIL},
+     * {@link #SHUTDOWN}, or
+     * {@link #VALIDATION_FAIL}
      * @throws SQLException if anything goes wrong (which will then be logged but ignored)
      */
-    void onDeath(Connection connection) throws SQLException;
+    void onDeath(Connection connection, int reasonCode) throws SQLException;
 
     /**
      * Happens after every successful execute. Note that the command
@@ -76,19 +131,14 @@ public interface ConnectionListenerIF {
      */
     void onFail(String command, Exception exception);
 
-    /**
-     * Happens if we are deliberately killing a connection. It gets called
-     * just before the call to {@link #onDeath(java.sql.Connection)}
-     * @param connection the connection that is about to expire
-     * @param reason why it is being killed: {@link
-     * @throws SQLException if anything goes wrong (which will then be logged but ignored)
-     */
-    void onAboutToDie(Connection connection, int reason) throws SQLException;
 }
 
 /*
  Revision history:
  $Log: ConnectionListenerIF.java,v $
+ Revision 1.9  2007/01/25 23:38:24  billhorsman
+ Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
+
  Revision 1.8  2007/01/25 00:10:24  billhorsman
  New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
 
