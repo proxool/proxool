@@ -5,12 +5,12 @@
  */
 package org.logicalcobwebs.proxool;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * A {@link ConnectionListenerIF} that keeps a list of <code>ConnectionListenerIF</code>s
@@ -20,7 +20,7 @@ import org.logicalcobwebs.proxool.util.AbstractListenerContainer;
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#addListener(Object) adding} and
  * {@link org.logicalcobwebs.proxool.util.ListenerContainerIF#removeListener(Object) removing} listeners.
  * 
- * @version $Revision: 1.6 $, $Date: 2006/01/18 14:40:01 $
+ * @version $Revision: 1.7 $, $Date: 2007/01/25 00:10:24 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -73,6 +73,28 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
     }
 
     /**
+     * @see ConnectionListenerIF#onAboutToDie(java.sql.Connection, int) 
+     */
+    public void onAboutToDie(Connection connection, int reason) throws SQLException
+    {
+        Object[] listeners = getListeners();
+
+        for(int i=0; i<listeners.length; i++) {
+            try {
+                ConnectionListenerIF connectionListener = (ConnectionListenerIF) listeners[i];
+                connectionListener.onAboutToDie(connection, reason);
+            }
+            catch (RuntimeException re) {
+                LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching onAboutToDie event", re);
+            }
+            catch(SQLException se) {
+                LOG.warn("SQLException received from listener "+listeners[i]+" when dispatching onAboutToDie event - event dispatching cancelled");
+                throw se;
+            }
+        }
+    }
+
+    /**
      * @see ConnectionListenerIF#onExecute(String, long)
      */
     public void onExecute(String command, long elapsedTime) 
@@ -112,6 +134,9 @@ public class CompositeConnectionListener extends AbstractListenerContainer imple
 /*
  Revision history:
  $Log: CompositeConnectionListener.java,v $
+ Revision 1.7  2007/01/25 00:10:24  billhorsman
+ New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
+
  Revision 1.6  2006/01/18 14:40:01  billhorsman
  Unbundled Jakarta's Commons Logging.
 

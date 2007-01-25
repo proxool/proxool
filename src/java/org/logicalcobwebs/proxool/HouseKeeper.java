@@ -10,11 +10,12 @@ import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.sql.SQLException;
 
 /**
  * Responisble for house keeping one pool
  *
- * @version $Revision: 1.5 $, $Date: 2006/01/18 14:40:01 $
+ * @version $Revision: 1.6 $, $Date: 2007/01/25 00:10:25 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -136,6 +137,11 @@ class HouseKeeper {
 
                        // This connection has been active for way too long. We're
                        // going to kill it :)
+                       try {
+                           connectionPool.onAboutToDie(proxyConnection.getConnection(), ConnectionListenerIF.LIFETIME_EXPIRED);
+                       } catch (SQLException e) {
+                           log.error("Problem during onAboutToDie (ignored)", e);
+                       }
                        connectionPool.removeProxyConnection(proxyConnection,
                                "it has been active for too long", ConnectionPool.FORCE_EXPIRY, true);
                        String lastSqlCallMsg;
@@ -259,6 +265,9 @@ class HouseKeeper {
 /*
  Revision history:
  $Log: HouseKeeper.java,v $
+ Revision 1.6  2007/01/25 00:10:25  billhorsman
+ New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
+
  Revision 1.5  2006/01/18 14:40:01  billhorsman
  Unbundled Jakarta's Commons Logging.
 

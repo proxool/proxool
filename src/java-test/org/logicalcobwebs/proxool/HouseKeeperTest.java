@@ -20,7 +20,7 @@ import java.util.Properties;
  *
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.13 $, $Date: 2006/03/24 00:17:32 $
+ * @version $Revision: 1.14 $, $Date: 2007/01/25 00:10:24 $
  * @since Proxool 0.8
  */
 public class HouseKeeperTest extends AbstractProxoolTest {
@@ -53,6 +53,8 @@ public class HouseKeeperTest extends AbstractProxoolTest {
         info.setProperty(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY, "1000");
         ProxoolFacade.registerConnectionPool(url, info);
 
+        Listener listener = new Listener();
+        ProxoolFacade.addConnectionListener(alias, listener);
         assertEquals("Shouldn't be any active connections yet", 0, ProxoolFacade.getSnapshot(alias, false).getServedCount());
 
         final Connection connection = DriverManager.getConnection(url);
@@ -75,6 +77,7 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 
         long elapsed = System.currentTimeMillis() - start;
         assertTrue("Connection has not been closed after " + elapsed + " milliseconds as expected", connection.isClosed());
+        assertTrue("onAboutToDie not called as expected", listener.called);
         assertEquals("Expected the connection to be inactive", 0, ProxoolFacade.getSnapshot(alias, false).getActiveConnectionCount());
 
         try {
@@ -322,11 +325,38 @@ public class HouseKeeperTest extends AbstractProxoolTest {
 
     }
 
+    class Listener implements ConnectionListenerIF {
+
+        boolean called;
+
+        public void onBirth(Connection connection) throws SQLException {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public void onDeath(Connection connection) throws SQLException {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public void onExecute(String command, long elapsedTime) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public void onFail(String command, Exception exception) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public void onAboutToDie(Connection connection, int reason) throws SQLException {
+            called = true;
+        }
+    }
 }
 
 /*
 Revision history:
 $Log: HouseKeeperTest.java,v $
+Revision 1.14  2007/01/25 00:10:24  billhorsman
+New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
+
 Revision 1.13  2006/03/24 00:17:32  billhorsman
 Correct alias name
 

@@ -8,20 +8,14 @@ package org.logicalcobwebs.proxool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Calendar;
+import java.sql.*;
 import java.util.Properties;
 
 /**
  * Test that registering a {@link ConnectionListenerIF} with the {@link ProxoolFacade}
  * works.
  *
- * @version $Revision: 1.15 $, $Date: 2006/03/23 11:42:20 $
+ * @version $Revision: 1.16 $, $Date: 2007/01/25 00:10:24 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.7
@@ -240,12 +234,19 @@ public class ConnectionListenerTest extends AbstractProxoolTest {
         public void clear() {
             command = null;
         }
+
+        public void onAboutToDie(Connection connection, int reason) throws SQLException {
+            // Ignore
+        }
     }
 }
 
 /*
  Revision history:
  $Log: ConnectionListenerTest.java,v $
+ Revision 1.16  2007/01/25 00:10:24  billhorsman
+ New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
+
  Revision 1.15  2006/03/23 11:42:20  billhorsman
  Create dummy table so test statements work. With HSQL 1.8 it is the prepareStatement() that throws the exception, not the execute() which means the listeners never gets the event.
 

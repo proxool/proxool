@@ -22,11 +22,19 @@ import java.sql.SQLException;
  * ProxoolFacade.{@link org.logicalcobwebs.proxool.ProxoolFacade#addConnectionListener addConnectionListener}(alias, myConnectionListener);
  * </pre>
  *
- * @version $Revision: 1.7 $, $Date: 2003/03/03 11:11:57 $
+ * @version $Revision: 1.8 $, $Date: 2007/01/25 00:10:24 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
 public interface ConnectionListenerIF {
+
+    /**
+     * We are killing a connection because the
+     * {@link ConnectionPoolDefinitionIF#getMaximumActiveTime() maximum-active-time}
+     * has been exceeded.
+     * @see #onAboutToDie(java.sql.Connection, int)
+     */
+    static final int LIFETIME_EXPIRED = 0;
 
     /**
      * Happens everytime we create a new connection. You can use this
@@ -68,11 +76,22 @@ public interface ConnectionListenerIF {
      */
     void onFail(String command, Exception exception);
 
+    /**
+     * Happens if we are deliberately killing a connection. It gets called
+     * just before the call to {@link #onDeath(java.sql.Connection)}
+     * @param connection the connection that is about to expire
+     * @param reason why it is being killed: {@link
+     * @throws SQLException if anything goes wrong (which will then be logged but ignored)
+     */
+    void onAboutToDie(Connection connection, int reason) throws SQLException;
 }
 
 /*
  Revision history:
  $Log: ConnectionListenerIF.java,v $
+ Revision 1.8  2007/01/25 00:10:24  billhorsman
+ New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
+
  Revision 1.7  2003/03/03 11:11:57  billhorsman
  fixed licence
 

@@ -5,27 +5,21 @@
  */
 package org.logicalcobwebs.proxool;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.logicalcobwebs.concurrent.ReaderPreferenceReadWriteLock;
-import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicalcobwebs.concurrent.ReaderPreferenceReadWriteLock;
+import org.logicalcobwebs.concurrent.WriterPreferenceReadWriteLock;
 import org.logicalcobwebs.proxool.admin.Admin;
 import org.logicalcobwebs.proxool.util.FastArrayList;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * This is where most things happen. (In fact, probably too many things happen in this one
  * class).
- * @version $Revision: 1.84 $, $Date: 2006/03/23 11:44:57 $
+ * @version $Revision: 1.85 $, $Date: 2007/01/25 00:10:24 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -794,6 +788,11 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
         this.compositeConnectionListener.onDeath(connection);
     }
 
+    /** Call the onAboutToDie() method on each StateListenerIF . */
+    protected void onAboutToDie(Connection connection, int reason) throws SQLException {
+        this.compositeConnectionListener.onAboutToDie(connection, reason);
+    }
+
     /** Call the onExecute() method on each StateListenerIF . */
     protected void onExecute(String command, long elapsedTime, Exception exception) throws SQLException {
         if (exception == null) {
@@ -1116,6 +1115,9 @@ class ConnectionPool implements ConnectionPoolStatisticsIF {
 /*
  Revision history:
  $Log: ConnectionPool.java,v $
+ Revision 1.85  2007/01/25 00:10:24  billhorsman
+ New onAboutToDie event for ConnectionListenerIF that gets called if the maximum-active-time is exceeded.
+
  Revision 1.84  2006/03/23 11:44:57  billhorsman
  More information when quickly refusing
 
