@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * stop you switching to another driver. Consider isolating the code that calls this
  * class so that you can easily remove it if you have to.</p>
  *
- * @version $Revision: 1.86 $, $Date: 2007/01/25 23:38:24 $
+ * @version $Revision: 1.87 $, $Date: 2007/05/15 23:00:22 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -448,7 +448,7 @@ public class ProxoolFacade {
      * @throws ProxoolException if we couldn't find the pool
      * @return wether the listnener was found and removed or not.
      */
-    public boolean removeStateListener(String alias, StateListenerIF stateListener) throws ProxoolException {
+    public static boolean removeStateListener(String alias, StateListenerIF stateListener) throws ProxoolException {
         ConnectionPool cp = ConnectionPoolManager.getInstance().getConnectionPool(alias);
         return cp.removeStateListener(stateListener);
     }
@@ -854,6 +854,9 @@ public class ProxoolFacade {
 /*
  Revision history:
  $Log: ProxoolFacade.java,v $
+ Revision 1.87  2007/05/15 23:00:22  billhorsman
+ Made removeStateListener() static like the other removeFooListener() methods. Credit to gazzamop@hotmail.com (bug 1716868).
+
  Revision 1.86  2007/01/25 23:38:24  billhorsman
  Scrapped onAboutToDie and altered onDeath signature instead. Now includes reasonCode (see ConnectionListenerIF)
 
