@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    $Revision: 1.77 $
-    $Date: 2007/01/10 09:24:35 $
+    $Revision: 1.78 $
+    $Date: 2007/05/15 23:17:21 $
     $Author: billhorsman $
 
     http://proxool.sourceforge.net
@@ -300,9 +300,6 @@
         <jarjar verbose="false" jarfile="build/lib/proxool-cglib.jar">
             <zipfileset src="jarjar/cglib-nodep-2.1_3.jar"/>
             <rule pattern="net.sf.cglib.**" result="org.logicalcobwebs.cglib.@1"/>
-            <zap pattern="net.sf.cglib.transform.**"/>
-            <zap pattern="net.sf.cglib.beans.**"/>
-            <zap pattern="net.sf.cglib.util.**"/>
         </jarjar>
     </target>
 

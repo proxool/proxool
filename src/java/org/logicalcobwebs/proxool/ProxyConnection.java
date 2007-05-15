@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
 /**
  * Manages a connection. This is wrapped up inside a...
  *
- * @version $Revision: 1.39 $, $Date: 2007/01/25 23:38:24 $
+ * @version $Revision: 1.40 $, $Date: 2007/05/15 23:17:21 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.10
@@ -224,7 +224,7 @@ public class ProxyConnection implements ProxyConnectionIF {
                     Statement statement = statements[j];
                     statement.close();
                     if (connectionPool.getLog().isDebugEnabled()) {
-                        connectionPool.getLog().debug("Closing statement " + Integer.toHexString(statement.hashCode()) + " automatically");
+                        connectionPool.getLog().debug("Closing statement " + Integer.toHexString(statement.hashCode()) + " (belonging to connection " + getId() + ") automatically");
                     }
                 }
                 openStatements.clear();
