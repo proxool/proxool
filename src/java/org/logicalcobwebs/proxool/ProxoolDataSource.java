@@ -32,7 +32,7 @@ import java.io.PrintWriter;
  * </ul>
  *
  * TODO - expand
- * @version $Revision: 1.7 $, $Date: 2006/05/23 21:17:55 $
+ * @version $Revision: 1.8 $, $Date: 2007/05/15 23:10:15 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -120,7 +120,6 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
             cpd.setMaximumConnectionLifetime(getMaximumConnectionLifetime());
             cpd.setMinimumConnectionCount(getMinimumConnectionCount());
             cpd.setOverloadWithoutRefusalLifetime(getOverloadWithoutRefusalLifetime());
-            cpd.setPassword(getPassword());
             cpd.setPrototypeCount(getPrototypeCount());
             cpd.setRecentlyStartedThreshold(getRecentlyStartedThreshold());
             cpd.setSimultaneousBuildThrottle(getSimultaneousBuildThrottle());
@@ -128,13 +127,16 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
             cpd.setStatisticsLogLevel(getStatisticsLogLevel());
             cpd.setTrace(isTrace());
             cpd.setUrl(getDriverUrl());
-            cpd.setUser(getUser());
             cpd.setVerbose(isVerbose());
             cpd.setJmx(isJmx());
             cpd.setJmxAgentId(getJmxAgentId());
             cpd.setTestAfterUse(isTestAfterUse());
             cpd.setTestBeforeUse(isTestBeforeUse());
             cpd.setDelegateProperties(delegateProperties);
+            // We must setUser and setPassword *after* setDelegateProperties
+            // otherwise the values will be overwritten. Credit Bulent Erdemir.
+            cpd.setUser(getUser());
+            cpd.setPassword(getPassword());
             ProxoolFacade.registerConnectionPool(cpd);
         }
     }
@@ -683,6 +685,9 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.8  2007/05/15 23:10:15  billhorsman
+ We must setUser and setPassword *after* setDelegateProperties otherwise the values will be overwritten. Credit Bulent Erdemir (bug 1716955)
+
  Revision 1.7  2006/05/23 21:17:55  billhorsman
  Add in maximum-active-time. Credit to Paolo Di Tommaso.
 
