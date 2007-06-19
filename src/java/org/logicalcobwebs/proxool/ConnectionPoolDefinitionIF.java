@@ -22,7 +22,7 @@ import java.util.Set;
  * {@link java.sql.Driver#connect ask} for a connection or call
  * {@link ProxoolFacade#updateConnectionPool Proxool} directly.
  *
- * @version $Revision: 1.22 $, $Date: 2004/06/02 20:19:14 $
+ * @version $Revision: 1.23 $, $Date: 2007/06/19 11:33:35 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -74,13 +74,13 @@ public interface ConnectionPoolDefinitionIF {
     public static final String FATAL_SQL_EXCEPTIONS_DELIMITER = ",";
 
     /** This is the time the house keeping thread sleeps for between checks. (milliseconds) */
-    int getHouseKeepingSleepTime();
+    long getHouseKeepingSleepTime();
 
     /** The maximum number of connections to the database */
     int getMaximumConnectionCount();
 
     /** The maximum amount of time that a connection exists for before it is killed (recycled). (milliseconds) */
-    int getMaximumConnectionLifetime();
+    long getMaximumConnectionLifetime();
 
     /**
      * In order to prevent overloading, this is the maximum number of connections that you can have that are in the progress
@@ -139,7 +139,7 @@ public interface ConnectionPoolDefinitionIF {
      then we consider the pool to be up. (That is, not down). This allows us to
      differentiate between having all the connections frozen and just being really
      busy. */
-    int getRecentlyStartedThreshold();
+    long getRecentlyStartedThreshold();
 
     /** This is the time in milliseconds after the last time that we refused a
      connection that we still consider ourselves to be overloaded. We have to do this
@@ -147,12 +147,12 @@ public interface ConnectionPoolDefinitionIF {
      count to be high and it's possible to be serving a lot of connections.
      Recognising an overload is easy (we refuse a connection) - it's recognising
      when we stop being overloaded that is hard. Hence this fudge :) */
-    int getOverloadWithoutRefusalLifetime();
+    long getOverloadWithoutRefusalLifetime();
 
     /** If the housekeeper comes across a thread that has been active for longer
      than this then it will kill it. So make sure you set this to a number bigger
      than your slowest expected response! */
-    int getMaximumActiveTime();
+    long getMaximumActiveTime();
 
     /**
      * @deprecated use {@link #isVerbose} instead
@@ -348,6 +348,9 @@ public interface ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinitionIF.java,v $
+ Revision 1.23  2007/06/19 11:33:35  billhorsman
+ Changed time (millisecond) properties from int to long: maximumConnectionLifetime, houseKeepingSleepTime, recentlyStartedThreshold, overloadWithoutRefusalLifetime, maximumActiveTime
+
  Revision 1.22  2004/06/02 20:19:14  billhorsman
  Added injectable interface properties
 

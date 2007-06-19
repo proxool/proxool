@@ -21,7 +21,7 @@ import java.lang.reflect.Modifier;
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.34 $, $Date: 2006/01/18 14:40:01 $
+ * @version $Revision: 1.35 $, $Date: 2007/06/19 11:33:35 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -71,7 +71,7 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     private String driver;
 
-    private int maximumConnectionLifetime;;
+    private long maximumConnectionLifetime;;
 
     private int prototypeCount;
 
@@ -79,15 +79,15 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 
     private int maximumConnectionCount;
 
-    private int houseKeepingSleepTime;
+    private long houseKeepingSleepTime;
 
     private int simultaneousBuildThrottle;
 
-    private int recentlyStartedThreshold;
+    private long recentlyStartedThreshold;
 
-    private int overloadWithoutRefusalLifetime;
+    private long overloadWithoutRefusalLifetime;
 
-    private int maximumActiveTime;
+    private long maximumActiveTime;
 
     private boolean verbose;
 
@@ -311,10 +311,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                 }
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME_PROPERTY)) {
-            if (getMaximumConnectionLifetime() != getInt(key, value)) {
+            if (getMaximumConnectionLifetime() != getLong(key, value)) {
                 changed = true;
                 if (!pretend) {
-                    setMaximumConnectionLifetime(getInt(key, value));
+                    setMaximumConnectionLifetime(getLong(key, value));
                 }
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_NEW_CONNECTIONS_PROPERTY)) {
@@ -345,24 +345,24 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
                 }
             }
         } else if (key.equals(ProxoolConstants.RECENTLY_STARTED_THRESHOLD_PROPERTY)) {
-            if (getRecentlyStartedThreshold() != getInt(key, value)) {
+            if (getRecentlyStartedThreshold() != getLong(key, value)) {
                 changed = true;
                 if (!pretend) {
-                    setRecentlyStartedThreshold(getInt(key, value));
+                    setRecentlyStartedThreshold(getLong(key, value));
                 }
             }
         } else if (key.equals(ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME_PROPERTY)) {
-            if (getOverloadWithoutRefusalLifetime() != getInt(key, value)) {
+            if (getOverloadWithoutRefusalLifetime() != getLong(key, value)) {
                 changed = true;
                 if (!pretend) {
-                    setOverloadWithoutRefusalLifetime(getInt(key, value));
+                    setOverloadWithoutRefusalLifetime(getLong(key, value));
                 }
             }
         } else if (key.equals(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY)) {
-            if (getMaximumActiveTime() != getInt(key, value)) {
+            if (getMaximumActiveTime() != getLong(key, value)) {
                 changed = true;
                 if (!pretend) {
-                    setMaximumActiveTime(getInt(key, value));
+                    setMaximumActiveTime(getLong(key, value));
                 }
             }
         } else if (key.equals(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY)) {
@@ -501,10 +501,10 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     private boolean setHouseKeeperProperty(String key, String value, boolean pretend) throws ProxoolException {
         boolean changed = false;
         if (key.equals(ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME_PROPERTY)) {
-            if (getHouseKeepingSleepTime() != getInt(key, value)) {
+            if (getHouseKeepingSleepTime() != getLong(key, value)) {
                 changed = true;
                 if (!pretend) {
-                    setHouseKeepingSleepTime(getInt(key, value));
+                    setHouseKeepingSleepTime(getLong(key, value));
                 }
             }
         } else if (key.equals(ProxoolConstants.HOUSE_KEEPING_TEST_SQL_PROPERTY)) {
@@ -557,6 +557,14 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             throw new ProxoolException("'" + key + "' property must be an integer. Found '" + value + "' instead.");
+        }
+    }
+
+    private long getLong(String key, String value) throws ProxoolException {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            throw new ProxoolException("'" + key + "' property must be a long. Found '" + value + "' instead.");
         }
     }
 
@@ -743,14 +751,14 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumConnectionLifetime
      */
-    public int getMaximumConnectionLifetime() {
+    public long getMaximumConnectionLifetime() {
         return maximumConnectionLifetime;
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumConnectionLifetime
      */
-    public void setMaximumConnectionLifetime(int maximumConnectionLifetime) {
+    public void setMaximumConnectionLifetime(long maximumConnectionLifetime) {
         this.maximumConnectionLifetime = maximumConnectionLifetime;
     }
 
@@ -799,14 +807,14 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     /**
      * @see ConnectionPoolDefinitionIF#getHouseKeepingSleepTime
      */
-    public int getHouseKeepingSleepTime() {
+    public long getHouseKeepingSleepTime() {
         return houseKeepingSleepTime;
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getHouseKeepingSleepTime
      */
-    public void setHouseKeepingSleepTime(int houseKeepingSleepTime) {
+    public void setHouseKeepingSleepTime(long houseKeepingSleepTime) {
         this.houseKeepingSleepTime = houseKeepingSleepTime;
     }
 
@@ -917,42 +925,42 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
     /**
      * @see ConnectionPoolDefinitionIF#getRecentlyStartedThreshold
      */
-    public int getRecentlyStartedThreshold() {
+    public long getRecentlyStartedThreshold() {
         return recentlyStartedThreshold;
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getRecentlyStartedThreshold
      */
-    public void setRecentlyStartedThreshold(int recentlyStartedThreshold) {
+    public void setRecentlyStartedThreshold(long recentlyStartedThreshold) {
         this.recentlyStartedThreshold = recentlyStartedThreshold;
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getOverloadWithoutRefusalLifetime
      */
-    public int getOverloadWithoutRefusalLifetime() {
+    public long getOverloadWithoutRefusalLifetime() {
         return overloadWithoutRefusalLifetime;
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getOverloadWithoutRefusalLifetime
      */
-    public void setOverloadWithoutRefusalLifetime(int overloadWithoutRefusalLifetime) {
+    public void setOverloadWithoutRefusalLifetime(long overloadWithoutRefusalLifetime) {
         this.overloadWithoutRefusalLifetime = overloadWithoutRefusalLifetime;
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumActiveTime
      */
-    public int getMaximumActiveTime() {
+    public long getMaximumActiveTime() {
         return maximumActiveTime;
     }
 
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumActiveTime
      */
-    public void setMaximumActiveTime(int maximumActiveTime) {
+    public void setMaximumActiveTime(long maximumActiveTime) {
         this.maximumActiveTime = maximumActiveTime;
     }
 
@@ -1360,6 +1368,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.35  2007/06/19 11:33:35  billhorsman
+ Changed time (millisecond) properties from int to long: maximumConnectionLifetime, houseKeepingSleepTime, recentlyStartedThreshold, overloadWithoutRefusalLifetime, maximumActiveTime
+
  Revision 1.34  2006/01/18 14:40:01  billhorsman
  Unbundled Jakarta's Commons Logging.
 

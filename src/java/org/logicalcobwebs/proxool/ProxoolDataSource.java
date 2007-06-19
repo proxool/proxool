@@ -32,7 +32,7 @@ import java.io.PrintWriter;
  * </ul>
  *
  * TODO - expand
- * @version $Revision: 1.8 $, $Date: 2007/05/15 23:10:15 $
+ * @version $Revision: 1.9 $, $Date: 2007/06/19 11:33:35 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -46,16 +46,16 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     private String alias;
     private String driver;
     private String fatalSqlExceptionWrapperClass;
-    private int houseKeepingSleepTime;
+    private long houseKeepingSleepTime;
     private String houseKeepingTestSql;
-    private int maximumActiveTime;
+    private long maximumActiveTime;
     private int maximumConnectionCount;
-    private int maximumConnectionLifetime;;
+    private long maximumConnectionLifetime;;
     private int minimumConnectionCount;
-    private int overloadWithoutRefusalLifetime;
+    private long overloadWithoutRefusalLifetime;
     private String password;
     private int prototypeCount;
-    private int recentlyStartedThreshold;
+    private long recentlyStartedThreshold;
     private int simultaneousBuildThrottle;
     private String statistics;
     private String statisticsLogLevel;
@@ -206,7 +206,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumConnectionLifetime
      */
-    public int getMaximumConnectionLifetime() {
+    public long getMaximumConnectionLifetime() {
         return maximumConnectionLifetime;
     }
 
@@ -262,7 +262,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     /**
      * @see ConnectionPoolDefinitionIF#getHouseKeepingSleepTime
      */
-    public int getHouseKeepingSleepTime() {
+    public long getHouseKeepingSleepTime() {
         return houseKeepingSleepTime;
     }
 
@@ -290,7 +290,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     /**
      * @see ConnectionPoolDefinitionIF#getRecentlyStartedThreshold
      */
-    public int getRecentlyStartedThreshold() {
+    public long getRecentlyStartedThreshold() {
         return recentlyStartedThreshold;
     }
 
@@ -304,7 +304,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     /**
      * @see ConnectionPoolDefinitionIF#getOverloadWithoutRefusalLifetime
      */
-    public int getOverloadWithoutRefusalLifetime() {
+    public long getOverloadWithoutRefusalLifetime() {
         return overloadWithoutRefusalLifetime;
     }
 
@@ -318,7 +318,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumActiveTime
      */
-    public int getMaximumActiveTime() {
+    public long getMaximumActiveTime() {
         return maximumActiveTime;
     }
 
@@ -685,6 +685,9 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.9  2007/06/19 11:33:35  billhorsman
+ Changed time (millisecond) properties from int to long: maximumConnectionLifetime, houseKeepingSleepTime, recentlyStartedThreshold, overloadWithoutRefusalLifetime, maximumActiveTime
+
  Revision 1.8  2007/05/15 23:10:15  billhorsman
  We must setUser and setPassword *after* setDelegateProperties otherwise the values will be overwritten. Credit Bulent Erdemir (bug 1716955)
 

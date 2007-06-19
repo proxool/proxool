@@ -11,7 +11,7 @@ import java.util.Properties;
 /**
  * Helper for all tests
  *
- * @version $Revision: 1.22 $, $Date: 2006/01/18 14:40:06 $
+ * @version $Revision: 1.23 $, $Date: 2007/06/19 11:33:35 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -95,6 +95,10 @@ public class TestHelper {
         checkProperty(name, String.valueOf(correctValue), String.valueOf(candidateValue));
     }
 
+    private static void checkProperty(String name, long correctValue, long candidateValue) throws ProxoolException {
+        checkProperty(name, String.valueOf(correctValue), String.valueOf(candidateValue));
+    }
+
     /**
      * Build a valid Proxool URL
      * @param alias identifies the pool
@@ -140,6 +144,9 @@ public class TestHelper {
 /*
  Revision history:
  $Log: TestHelper.java,v $
+ Revision 1.23  2007/06/19 11:33:35  billhorsman
+ Changed time (millisecond) properties from int to long: maximumConnectionLifetime, houseKeepingSleepTime, recentlyStartedThreshold, overloadWithoutRefusalLifetime, maximumActiveTime
+
  Revision 1.22  2006/01/18 14:40:06  billhorsman
  Unbundled Jakarta's Commons Logging.
 

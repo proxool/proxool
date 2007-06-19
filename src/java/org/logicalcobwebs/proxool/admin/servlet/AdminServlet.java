@@ -63,7 +63,7 @@ import java.util.Properties;
  *
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.14 $, $Date: 2006/06/09 17:32:54 $
+ * @version $Revision: 1.15 $, $Date: 2007/06/19 11:33:35 $
  * @since Proxool 0.7
  */
 public class AdminServlet extends HttpServlet {
@@ -828,17 +828,24 @@ public class AdminServlet extends HttpServlet {
      * @return time (e.g. 180000 = 00:30:00)
      * @see #TIME_FORMAT
      */
-    private String formatMilliseconds(int time) {
-        Calendar c = Calendar.getInstance();
-        c.clear();
-        c.add(Calendar.MILLISECOND, time);
-        return TIME_FORMAT.format(c.getTime());
+    private String formatMilliseconds(long time) {
+        if (time > Integer.MAX_VALUE) {
+            return time + "ms";
+        } else {
+            Calendar c = Calendar.getInstance();
+            c.clear();
+            c.add(Calendar.MILLISECOND, (int) time);
+            return TIME_FORMAT.format(c.getTime());
+        }
     }
 }
 
 /*
 Revision history:
 $Log: AdminServlet.java,v $
+Revision 1.15  2007/06/19 11:33:35  billhorsman
+Changed time (millisecond) properties from int to long: maximumConnectionLifetime, houseKeepingSleepTime, recentlyStartedThreshold, overloadWithoutRefusalLifetime, maximumActiveTime
+
 Revision 1.14  2006/06/09 17:32:54  billhorsman
 Fix closing tag for select. Credit to Paolo Di Tommaso.
 

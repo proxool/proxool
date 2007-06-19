@@ -83,7 +83,7 @@ import java.text.MessageFormat;
  * <li>{@link #NOTIFICATION_TYPE_DEFINITION_UPDATED}</li>
  * </ul>
  * </p>
- * @version $Revision: 1.15 $, $Date: 2006/01/18 14:39:55 $
+ * @version $Revision: 1.16 $, $Date: 2007/06/19 11:33:36 $
  * @author Christian Nedregaard (christian_nedregaard@email.com)
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.8
@@ -196,7 +196,7 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                             getValueOrEmpty(this.poolProperties.getProperty(ProxoolConstants.FATAL_SQL_EXCEPTION_PROPERTY))));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.HOUSE_KEEPING_SLEEP_TIME)) {
                     resultList.add(new Attribute(attributeNames[i],
-                            new Integer(this.poolDefinition.getHouseKeepingSleepTime())));
+                            new Long(this.poolDefinition.getHouseKeepingSleepTime())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.HOUSE_KEEPING_TEST_SQL)) {
                     resultList.add(new Attribute(attributeNames[i],
                             getValueOrEmpty(poolDefinition.getHouseKeepingTestSql())));
@@ -208,13 +208,13 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                             new Boolean(this.poolDefinition.isTestAfterUse())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_ACTIVE_TIME)) {
                     resultList.add(new Attribute(attributeNames[i],
-                            new Integer(this.poolDefinition.getMaximumActiveTime())));
+                            new Long(this.poolDefinition.getMaximumActiveTime())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_CONNECTION_COUNT)) {
                     resultList.add(new Attribute(attributeNames[i],
                             new Integer(this.poolDefinition.getMaximumConnectionCount())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_CONNECTION_LIFETIME)) {
                     resultList.add(new Attribute(attributeNames[i],
-                            new Integer(this.poolDefinition.getMaximumConnectionLifetime())));
+                            new Long(this.poolDefinition.getMaximumConnectionLifetime())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.MAXIMUM_NEW_CONNECTIONS)) {
                     resultList.add(new Attribute(attributeNames[i],
                             new Integer(this.poolDefinition.getMaximumNewConnections())));
@@ -226,13 +226,13 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
                             new Integer(this.poolDefinition.getMinimumConnectionCount())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.OVERLOAD_WITHOUT_REFUSAL_LIFETIME)) {
                     resultList.add(new Attribute(attributeNames[i],
-                            new Integer(this.poolDefinition.getOverloadWithoutRefusalLifetime())));
+                            new Long(this.poolDefinition.getOverloadWithoutRefusalLifetime())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.PROTOTYPE_COUNT)) {
                     resultList.add(new Attribute(attributeNames[i],
                             new Integer(this.poolDefinition.getPrototypeCount())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.RECENTLY_STARTED_THRESHOLD)) {
                     resultList.add(new Attribute(attributeNames[i],
-                            new Integer(this.poolDefinition.getRecentlyStartedThreshold())));
+                            new Long(this.poolDefinition.getRecentlyStartedThreshold())));
                 } else if (equalsProperty(attributeNames[i], ProxoolConstants.STATISTICS)) {
                     resultList.add(new Attribute(attributeNames[i],
                             getValueOrEmpty(this.poolDefinition.getStatistics())));
@@ -721,6 +721,9 @@ public class ConnectionPoolMBean implements DynamicMBean, MBeanRegistration, Not
 /*
  Revision history:
  $Log: ConnectionPoolMBean.java,v $
+ Revision 1.16  2007/06/19 11:33:36  billhorsman
+ Changed time (millisecond) properties from int to long: maximumConnectionLifetime, houseKeepingSleepTime, recentlyStartedThreshold, overloadWithoutRefusalLifetime, maximumActiveTime
+
  Revision 1.15  2006/01/18 14:39:55  billhorsman
  Unbundled Jakarta's Commons Logging.
 
