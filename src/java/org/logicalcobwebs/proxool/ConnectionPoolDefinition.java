@@ -11,17 +11,13 @@ import org.apache.commons.logging.LogFactory;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.lang.reflect.Modifier;
 
 /**
  * This defines a connection pool: the URL to connect to the database, the
  * delegate driver to use, and how the pool behaves.
- * @version $Revision: 1.35 $, $Date: 2007/06/19 11:33:35 $
+ * @version $Revision: 1.36 $, $Date: 2007/07/28 10:39:12 $
  * @author billhorsman
  * @author $Author: billhorsman $ (current maintainer)
  */
@@ -231,9 +227,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
         }
 
         if (info != null) {
-            Iterator i = info.keySet().iterator();
-            while (i.hasNext()) {
-                String key = (String) i.next();
+            Enumeration e = info.propertyNames();
+            while (e.hasMoreElements()) {
+                String key = (String) e.nextElement();
                 String value = info.getProperty(key);
                 changed = changed | setAnyProperty(key, value, pretend);
                 if (!pretend) {
@@ -1368,6 +1364,9 @@ class ConnectionPoolDefinition implements ConnectionPoolDefinitionIF {
 /*
  Revision history:
  $Log: ConnectionPoolDefinition.java,v $
+ Revision 1.36  2007/07/28 10:39:12  billhorsman
+ Use enumeration of property names rather than iteration of keyset so that we make use of any default properties that might be set.
+
  Revision 1.35  2007/06/19 11:33:35  billhorsman
  Changed time (millisecond) properties from int to long: maximumConnectionLifetime, houseKeepingSleepTime, recentlyStartedThreshold, overloadWithoutRefusalLifetime, maximumActiveTime
 
