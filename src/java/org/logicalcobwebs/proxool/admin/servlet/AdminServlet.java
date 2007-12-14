@@ -63,7 +63,7 @@ import java.util.Properties;
  *
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
- * @version $Revision: 1.15 $, $Date: 2007/06/19 11:33:35 $
+ * @version $Revision: 1.16 $, $Date: 2007/12/14 23:20:41 $
  * @since Proxool 0.7
  */
 public class AdminServlet extends HttpServlet {
@@ -165,7 +165,7 @@ public class AdminServlet extends HttpServlet {
     /**
      * dd-MMM-yyyy HH:mm:ss
      */
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
 
@@ -843,6 +843,9 @@ public class AdminServlet extends HttpServlet {
 /*
 Revision history:
 $Log: AdminServlet.java,v $
+Revision 1.16  2007/12/14 23:20:41  billhorsman
+Change date format to yyyy-MM-dd to avoid CharConversionException in some locales.
+
 Revision 1.15  2007/06/19 11:33:35  billhorsman
 Changed time (millisecond) properties from int to long: maximumConnectionLifetime, houseKeepingSleepTime, recentlyStartedThreshold, overloadWithoutRefusalLifetime, maximumActiveTime
 
