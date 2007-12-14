@@ -32,7 +32,7 @@ import java.io.PrintWriter;
  * </ul>
  *
  * TODO - expand
- * @version $Revision: 1.9 $, $Date: 2007/06/19 11:33:35 $
+ * @version $Revision: 1.10 $, $Date: 2007/12/14 13:49:39 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -521,10 +521,14 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
         StringTokenizer stOuter = new StringTokenizer(properties, ",");
         while (stOuter.hasMoreTokens()) {
             StringTokenizer stInner = new StringTokenizer(stOuter.nextToken(), "=");
-            if (stInner.countTokens() != 2) {
+            if (stInner.countTokens() == 1) {
+                // Allow blank string to be a valid value
+                delegateProperties.put(stInner.nextToken().trim(), "");
+            } else if (stInner.countTokens() == 2) {
+                delegateProperties.put(stInner.nextToken().trim(), stInner.nextToken().trim());
+            } else {
                 throw new IllegalArgumentException("Unexpected delegateProperties value: '" + properties + "'. Expected 'name=value'");
             }
-            delegateProperties.put(stInner.nextToken().trim(), stInner.nextToken().trim());
         }
     }
 
@@ -685,6 +689,9 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.10  2007/12/14 13:49:39  billhorsman
+ Allow a blank string to be a valid value for a delegate property
+
  Revision 1.9  2007/06/19 11:33:35  billhorsman
  Changed time (millisecond) properties from int to long: maximumConnectionLifetime, houseKeepingSleepTime, recentlyStartedThreshold, overloadWithoutRefusalLifetime, maximumActiveTime
 
