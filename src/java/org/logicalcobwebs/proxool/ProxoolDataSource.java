@@ -32,7 +32,7 @@ import java.io.PrintWriter;
  * </ul>
  *
  * TODO - expand
- * @version $Revision: 1.10 $, $Date: 2007/12/14 13:49:39 $
+ * @version $Revision: 1.11 $, $Date: 2007/12/14 23:03:28 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.9
@@ -325,7 +325,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumActiveTime
      */
-    public void setMaximumActiveTime(int maximumActiveTime) {
+    public void setMaximumActiveTime(long maximumActiveTime) {
         this.maximumActiveTime = maximumActiveTime;
     }
 
@@ -563,7 +563,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
         }
         property = reference.get(ProxoolConstants.MAXIMUM_ACTIVE_TIME_PROPERTY);
         if (property != null) {
-            setMaximumActiveTime(Integer.valueOf(property.getContent().toString()).intValue());
+            setMaximumActiveTime(Long.valueOf(property.getContent().toString()).intValue());
         }
         property = reference.get(ProxoolConstants.MINIMUM_CONNECTION_COUNT_PROPERTY);
         if (property != null) {
@@ -689,6 +689,9 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
 /*
  Revision history:
  $Log: ProxoolDataSource.java,v $
+ Revision 1.11  2007/12/14 23:03:28  billhorsman
+ Use long consistently for maximum_active_time, not int.
+
  Revision 1.10  2007/12/14 13:49:39  billhorsman
  Allow a blank string to be a valid value for a delegate property
 
