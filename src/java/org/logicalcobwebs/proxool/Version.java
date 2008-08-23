@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  * 1.0.1 (2 January)
  *   A bug fix release built on January 2nd.
  *
- * @version $Revision: 1.22 $, $Date: 2008/08/19 19:17:11 $
+ * @version $Revision: 1.23 $, $Date: 2008/08/23 10:08:08 $
  * @author bill
  * @author $Author: billhorsman $ (current maintainer)
  * @since Proxool 0.6
@@ -39,7 +39,7 @@ public class Version {
 
     private static final String BUILD_DATE = null;
 
-    private static final String CVS = "0.9.0";
+    private static final String CVS = "0.9.1+";
 
     public static String getVersion() {
         StringBuffer version = new StringBuffer();
@@ -76,6 +76,9 @@ public class Version {
 /*
  Revision history:
  $Log: Version.java,v $
+ Revision 1.23  2008/08/23 10:08:08  billhorsman
+ Version 0.9.1 - packaging of Cglib
+
  Revision 1.22  2008/08/19 19:17:11  billhorsman
  Version 0.9.0
 

@@ -1,9 +1,13 @@
 Changes to Proxool
 ----------------
 
-$Revision: 1.49 $
-$Date: 2008/08/19 19:17:11 $
+$Revision: 1.50 $
+$Date: 2008/08/23 10:08:08 $
 $Author: billhorsman $
+
+0.9.1
+
+- Fixed bundling of Cglib in binary release. Cglib is "repackaged" using JarJar.
 
 0.9.0
 
