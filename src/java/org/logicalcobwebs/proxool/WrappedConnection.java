@@ -111,7 +111,7 @@ public class WrappedConnection implements MethodInterceptor {
             concreteMethod = InvokerFacade.getConcreteMethod(proxyConnection.getConnection().getClass(), method);
         }
         try {
-            if (proxyConnection != null && proxyConnection.isReallyClosed()) {
+            if (proxyConnection != null && !concreteMethod.getName().equals(FINALIZE_METHOD) && proxyConnection.isReallyClosed()) {
                 // The user is trying to do something to this connection and it's been closed.
                 if (concreteMethod.getName().equals(IS_CLOSED_METHOD)) {
                     // That's cool. No problem checking as many times as you like.
