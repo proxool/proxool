@@ -213,7 +213,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     /**
      * @see ConnectionPoolDefinitionIF#getMaximumConnectionLifetime
      */
-    public void setMaximumConnectionLifetime(int maximumConnectionLifetime) {
+    public void setMaximumConnectionLifetime(long maximumConnectionLifetime) {
         this.maximumConnectionLifetime = maximumConnectionLifetime;
     }
 
@@ -269,7 +269,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     /**
      * @see ConnectionPoolDefinitionIF#getHouseKeepingSleepTime
      */
-    public void setHouseKeepingSleepTime(int houseKeepingSleepTime) {
+    public void setHouseKeepingSleepTime(long houseKeepingSleepTime) {
         this.houseKeepingSleepTime = houseKeepingSleepTime;
     }
 
@@ -311,7 +311,7 @@ public class ProxoolDataSource implements DataSource, ObjectFactory {
     /**
      * @see ConnectionPoolDefinitionIF#getOverloadWithoutRefusalLifetime
      */
-    public void setOverloadWithoutRefusalLifetime(int overloadWithoutRefusalLifetime) {
+    public void setOverloadWithoutRefusalLifetime(long overloadWithoutRefusalLifetime) {
         this.overloadWithoutRefusalLifetime = overloadWithoutRefusalLifetime;
     }
 
