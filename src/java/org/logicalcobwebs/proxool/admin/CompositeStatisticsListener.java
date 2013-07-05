@@ -28,14 +28,14 @@ public class CompositeStatisticsListener extends AbstractListenerContainer imple
     /**
      * @see StatisticsListenerIF#statistics(String, StatisticsIF)
      */
-    public void statistics(String alias, StatisticsIF statistics) 
+    public void statistics(String alias, StatisticsIF statistics, String token) 
     {
         Object[] listeners = getListeners();
         
         for(int i=0; i<listeners.length; i++) {
             try {
                 StatisticsListenerIF statisticsListener = (StatisticsListenerIF) listeners[i];
-                statisticsListener.statistics(alias, statistics);
+                statisticsListener.statistics(alias, statistics, token);
             }
             catch (RuntimeException re) {
                 LOG.warn("RuntimeException received from listener "+listeners[i]+" when dispatching statistics event", re);
