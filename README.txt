@@ -1,3 +1,8 @@
+UNMAINTAINED
+------------
+
+This project is no longer actively maintained. I haven't used Proxool myself since 2006 and no longer even use Java. If the project has any chance of survival at all it would need to find a new maintainer. If anyone can recommend a good alternative I would be happy to mention it here. Alternatively, if anyone wants to contribute to this project then please create a pull request. 
+
 About Proxool
 ------------
 
