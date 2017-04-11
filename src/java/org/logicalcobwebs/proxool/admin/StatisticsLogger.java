@@ -34,11 +34,15 @@ public class StatisticsLogger implements StatisticsListenerIF {
         this.logLevel = logLevel;
     }
 
-    public void statistics(String alias, StatisticsIF statistics) {
+    public void statistics(String alias, StatisticsIF statistics, String token) {
 
         if (statistics != null && logLevel != null) {
 
                 StringBuffer out = new StringBuffer();
+
+                out.append("t:");
+                out.append(token);
+                out.append(" - ");
 
                 out.append(TIME_FORMAT.format(statistics.getStartDate()));
                 out.append(" - ");

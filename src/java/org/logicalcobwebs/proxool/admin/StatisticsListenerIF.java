@@ -27,8 +27,9 @@ public interface StatisticsListenerIF {
      * A new set of statistics have just been produced
      * @param alias identifies the pool
      * @param statistics new statistics
+     * @param token period of time for this statistics
      */
-    void statistics(String alias, StatisticsIF statistics);
+    void statistics(String alias, StatisticsIF statistics, String token);
 }
 
 

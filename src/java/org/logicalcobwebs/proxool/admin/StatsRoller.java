@@ -45,9 +45,12 @@ class StatsRoller {
 
     private String alias;
 
+    private String token;
+
     public StatsRoller(String alias, CompositeStatisticsListener compositeStatisticsListener, String token) throws ProxoolException {
         this.alias = alias;
         this.compositeStatisticsListener = compositeStatisticsListener;
+        this.token = token;
 
         nextRollDate = Calendar.getInstance();
         if (token.endsWith("s")) {
@@ -121,7 +124,7 @@ class StatsRoller {
                     completeStatistics = currentStatistics;
                     currentStatistics = new Statistics(nextRollDate.getTime());
                     nextRollDate.add(units, period);
-                    compositeStatisticsListener.statistics(alias, completeStatistics);
+                    compositeStatisticsListener.statistics(alias, completeStatistics, token);
                 }
             } catch (Throwable e) {
                 LOG.error("Unable to roll statistics log", e);
